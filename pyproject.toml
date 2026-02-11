@@ -40,18 +40,22 @@ dev = [
     "flake8>=6.0",
     "mypy>=1.0",
 ]
-torch-models = [
+torch = [
     "torch>=2.0.0",
     "einops>=0.7.0",
     "transformers>=4.31.0",
     "accelerate>=0.28.0",
     "sentencepiece>=0.2.0",
 ]
-torch-models-full = [
-    "liulian[torch-models]",
-    "mamba-ssm>=1.0.0",
+torch-full = [
+    "liulian[torch]",
+    # Use the latest mamba-ssm version (remove version pin)
+#    "mamba-ssm>=2.3.0",
     "reformer-pytorch>=1.4.0",
     "local-attention>=1.11.0",
+]
+all = [
+    "liulian[dev,logging,hpo,docs,torch-full]"
 ]
 
 [project.scripts]
@@ -96,3 +100,10 @@ markers = [
     "slow: marks tests as slow (may involve downloads or heavy computation)",
     "download: marks tests that require internet connection and download models/data",
 ]
+
+[tool.uv.extra-build-dependencies]
+mamba-ssm = ["torch"]
+
+[tool.yapf]
+based_on_style = "pep8"
+blank_lines_around_top_level_definition = 2
