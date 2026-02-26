@@ -19,6 +19,7 @@ from typing import Dict, Any
 
 from liulian.models.torch.layers.embed import DataEmbedding
 from liulian.models.torch.base_adapter import TorchModelAdapter
+from liulian.models.torch.entity_mixin import EntityAwareMixin
 
 
 class Model(nn.Module):
@@ -76,7 +77,7 @@ class Model(nn.Module):
         return None
 
 
-class MambaAdapter(TorchModelAdapter):
+class MambaAdapter(EntityAwareMixin, TorchModelAdapter):
     """Adapter for Mamba model to liulian ExecutableModel interface.
 
     Note: Requires mamba_ssm package (pip install mamba-ssm).
@@ -111,5 +112,7 @@ class MambaAdapter(TorchModelAdapter):
         }
         default_config.update(config)
 
-        model = Model(self._dict_to_namespace(default_config))
+        model_cfg = self._entity_model_config(default_config)
+        model = Model(self._dict_to_namespace(model_cfg))
         super().__init__(model, default_config)
+        self._init_entity_support(default_config)

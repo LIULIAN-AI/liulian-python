@@ -41,12 +41,12 @@ class TokenBudgeter:
         self.budget = budget
         self.used = 0
         self.usage_log: List[TokenUsage] = []
-        self.cache_dir = cache_dir or Path(".cache")
+        self.cache_dir = cache_dir or Path('.cache')
         self.cache: Dict[str, Any] = {}
         
         # Load cache if exists
         if self.cache_dir.exists():
-            cache_file = self.cache_dir / "prompt_cache.json"
+            cache_file = self.cache_dir / 'prompt_cache.json'
             if cache_file.exists():
                 try:
                     with open(cache_file, 'r') as f:
@@ -89,7 +89,7 @@ class TokenBudgeter:
         step_usage = next((u for u in self.usage_log if u.step_id == step_id), None)
         
         if not step_usage:
-            return ""
+            return ''
         
         _, percentage = self.check_budget()
         
@@ -139,13 +139,13 @@ Token Usage: {step_id}
                 key_imports = [i.split()[-1] for i in imports[:3]]
                 summary_parts.append(f"Imports: {', '.join(key_imports)}")
             
-            summary = f"File: {file_path.name} (~{total_lines} LOC)\n" + " | ".join(summary_parts)
-            summary += "\nFull content available on request."
+            summary = f'File: {file_path.name} (~{total_lines} LOC)\n' + ' | '.join(summary_parts)
+            summary += '\nFull content available on request.'
             
             return summary
             
         except Exception as e:
-            return f"File: {file_path.name} (could not generate summary: {e})"
+            return f'File: {file_path.name} (could not generate summary: {e})'
     
     def generate_diff_only(
         self,
@@ -208,7 +208,7 @@ Token Usage: {step_id}
         
         # Save cache to disk
         self.cache_dir.mkdir(parents=True, exist_ok=True)
-        cache_file = self.cache_dir / "prompt_cache.json"
+        cache_file = self.cache_dir / 'prompt_cache.json'
         with open(cache_file, 'w') as f:
             json.dump(self.cache, f, indent=2)
     
@@ -272,4 +272,4 @@ class CopilotRequestBudgeter:
     def format_usage_report(self) -> str:
         """Format request usage report."""
         _, percentage = self.check_budget()
-        return f"Copilot Requests: {self.used} / {self.budget} ({percentage:.1f}%)"
+        return f'Copilot Requests: {self.used} / {self.budget} ({percentage:.1f}%)'

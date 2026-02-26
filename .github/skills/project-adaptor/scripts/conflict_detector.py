@@ -21,10 +21,10 @@ from enum import Enum
 
 class ConflictSeverity(Enum):
     """Conflict severity levels."""
-    CRITICAL = "CRITICAL"
-    HIGH = "HIGH"
-    MEDIUM = "MEDIUM"
-    LOW = "LOW"
+    CRITICAL = 'CRITICAL'
+    HIGH = 'HIGH'
+    MEDIUM = 'MEDIUM'
+    LOW = 'LOW'
 
 
 @dataclass
@@ -43,8 +43,8 @@ class Conflict:
     severity: ConflictSeverity
     conflict_type: str
     description: str
-    affected_projects: List[str]  # e.g., ["C_r1", "C_r2", "P_t"]
-    affected_items: List[str]  # e.g., ["model", "dataset"]
+    affected_projects: List[str]  # e.g., ['C_r1', 'C_r2', 'P_t']
+    affected_items: List[str]  # e.g., ['model', 'dataset']
     locations: Dict[str, CodeLocation]  # project_id -> location
     resolution_options: List[str]
     impact_assessment: str
@@ -70,7 +70,7 @@ def extract_class_definitions(file_path: Path) -> Dict[str, Tuple[int, int]]:
         
         return classes
     except Exception as e:
-        print(f"⚠️  Could not parse {file_path}: {e}")
+        print(f'⚠️  Could not parse {file_path}: {e}')
         return {}
 
 
@@ -94,12 +94,12 @@ def extract_function_signatures(file_path: Path) -> Dict[str, str]:
                 for arg in node.args.args:
                     arg_str = arg.arg
                     if arg.annotation:
-                        arg_str += f": {ast.unparse(arg.annotation)}"
+                        arg_str += f': {ast.unparse(arg.annotation)}'
                     args.append(arg_str)
                 
                 signature = f"{node.name}({', '.join(args)})"
                 if node.returns:
-                    signature += f" -> {ast.unparse(node.returns)}"
+                    signature += f' -> {ast.unparse(node.returns)}'
                 
                 functions[node.name] = signature
         
@@ -183,9 +183,9 @@ def detect_naming_conflicts(
                             lines = f.readlines()
                             snippet = ''.join(lines[start-1:min(end, start+10)])
                     except Exception:
-                        snippet = f"class {class_name}(...)"
+                        snippet = f'class {class_name}(...)'
                     
-                    locations[f"{proj_id}_{file_path.name}"] = CodeLocation(
+                    locations[f'{proj_id}_{file_path.name}'] = CodeLocation(
                         file_path=file_path,
                         start_line=start,
                         end_line=end,
@@ -196,18 +196,18 @@ def detect_naming_conflicts(
                 conflict = Conflict(
                     conflict_id=conflict_id,
                     severity=ConflictSeverity.CRITICAL,
-                    conflict_type=f"Naming Conflict - Base {item_type.title()} Class",
+                    conflict_type=f'Naming Conflict - Base {item_type.title()} Class',
                     description=f"Multiple base class names found for {item_type}: {', '.join(found_classes.keys())}",
                     affected_projects=list(affected_projects),
                     affected_items=[item_type],
                     locations=locations,
                     resolution_options=[
-                        f"A. Standardize to {list(found_classes.keys())[0]}",
-                        f"B. Standardize to {list(found_classes.keys())[1]}" if len(found_classes) > 1 else "B. Create adapter pattern",
-                        "C. Maintain separate implementations",
-                        "D. Manual resolution"
+                        f'A. Standardize to {list(found_classes.keys())[0]}',
+                        f'B. Standardize to {list(found_classes.keys())[1]}' if len(found_classes) > 1 else 'B. Create adapter pattern',
+                        'C. Maintain separate implementations',
+                        'D. Manual resolution'
                     ],
-                    impact_assessment=f"Affects all {item_type} adaptation items"
+                    impact_assessment=f'Affects all {item_type} adaptation items'
                 )
                 conflicts.append(conflict)
                 conflict_id += 1
@@ -235,7 +235,7 @@ def detect_dependency_conflicts(projects: Dict[str, Path]) -> List[Conflict]:
         deps = {}
         
         # Check pyproject.toml
-        pyproject = proj_path / "pyproject.toml"
+        pyproject = proj_path / 'pyproject.toml'
         if pyproject.exists():
             try:
                 with open(pyproject, 'r') as f:
@@ -255,7 +255,7 @@ def detect_dependency_conflicts(projects: Dict[str, Path]) -> List[Conflict]:
                             
                             # Extract package and version
                             if '"' in line:
-                                match = re.search(r'"([^"]+)"', line)
+                                match = re.search(r'"([^']+)'', line)
                                 if match:
                                     dep_spec = match.group(1)
                                     # Parse package name and version constraint
@@ -268,7 +268,7 @@ def detect_dependency_conflicts(projects: Dict[str, Path]) -> List[Conflict]:
                                         # No version specified
                                         deps[dep_spec.strip()] = (None, None)
             except Exception as e:
-                print(f"⚠️  Could not parse {pyproject}: {e}")
+                print(f'⚠️  Could not parse {pyproject}: {e}')
         
         dependencies[proj_id] = deps
     
@@ -290,7 +290,7 @@ def detect_dependency_conflicts(projects: Dict[str, Path]) -> List[Conflict]:
             
             for proj_id, (op, ver) in versions.items():
                 if op and ver:
-                    version_strs.append(f"{proj_id}: {package}{op}{ver}")
+                    version_strs.append(f'{proj_id}: {package}{op}{ver}')
                     # Simple conflict detection (this would need more sophisticated logic)
                     if op == '==' and len(versions) > 1:
                         has_conflict = True
@@ -299,18 +299,18 @@ def detect_dependency_conflicts(projects: Dict[str, Path]) -> List[Conflict]:
                 conflict = Conflict(
                     conflict_id=conflict_id,
                     severity=ConflictSeverity.HIGH,
-                    conflict_type="Dependency Conflict",
-                    description=f"Incompatible version requirements for {package}",
+                    conflict_type='Dependency Conflict',
+                    description=f'Incompatible version requirements for {package}',
                     affected_projects=list(versions.keys()),
-                    affected_items=["dependencies"],
+                    affected_items=['dependencies'],
                     locations={},
                     resolution_options=[
-                        "A. Use version range that satisfies all constraints",
-                        "B. Upgrade to latest compatible version",
-                        "C. Make dependency optional with version guards",
-                        "D. Manual resolution"
+                        'A. Use version range that satisfies all constraints',
+                        'B. Upgrade to latest compatible version',
+                        'C. Make dependency optional with version guards',
+                        'D. Manual resolution'
                     ],
-                    impact_assessment=f"May affect components that use {package}"
+                    impact_assessment=f'May affect components that use {package}'
                 )
                 conflicts.append(conflict)
                 conflict_id += 1
@@ -329,47 +329,47 @@ def format_conflict_report(conflicts: List[Conflict]) -> str:
         Formatted report string
     """
     if not conflicts:
-        return "\n✅ No conflicts detected - ready to proceed with adaptation.\n"
+        return '\n✅ No conflicts detected - ready to proceed with adaptation.\n'
     
     lines = [
-        "",
-        "CONFLICT DETECTION REPORT",
-        "=" * 70,
-        f"\nFound {len(conflicts)} conflict(s) requiring resolution:\n"
+        '',
+        'CONFLICT DETECTION REPORT',
+        '=' * 70,
+        f'\nFound {len(conflicts)} conflict(s) requiring resolution:\n'
     ]
     
     for conflict in conflicts:
-        lines.append(f"\nCONFLICT {conflict.conflict_id}: [SEVERITY: {conflict.severity.value}]")
-        lines.append(f"Type: {conflict.conflict_type}")
+        lines.append(f'\nCONFLICT {conflict.conflict_id}: [SEVERITY: {conflict.severity.value}]')
+        lines.append(f'Type: {conflict.conflict_type}')
         lines.append(f"Affected Projects: {', '.join(conflict.affected_projects)}")
         if conflict.affected_items:
             lines.append(f"Affected Items: {', '.join(conflict.affected_items)}")
-        lines.append(f"\nDescription: {conflict.description}")
+        lines.append(f'\nDescription: {conflict.description}')
         
         if conflict.locations:
-            lines.append("\nDetails:")
+            lines.append('\nDetails:')
             for proj_file, location in conflict.locations.items():
-                lines.append(f"  {proj_file} ({location.file_path}:{location.start_line}-{location.end_line}):")
+                lines.append(f'  {proj_file} ({location.file_path}:{location.start_line}-{location.end_line}):')
                 # Show first few lines of snippet
                 snippet_lines = location.snippet.split('\n')[:5]
                 for sline in snippet_lines:
-                    lines.append(f"    {sline}")
+                    lines.append(f'    {sline}')
         
-        lines.append("\nResolution Options:")
+        lines.append('\nResolution Options:')
         for option in conflict.resolution_options:
-            lines.append(f"  {option}")
+            lines.append(f'  {option}')
         
-        lines.append(f"\nRequired Action: User must select resolution option.\n")
-        lines.append("-" * 70)
+        lines.append(f'\nRequired Action: User must select resolution option.\n')
+        lines.append('-' * 70)
     
     # Summary table
-    lines.append("\nCONFLICT SUMMARY TABLE:")
+    lines.append('\nCONFLICT SUMMARY TABLE:')
     lines.append(f"{'ID':<4} | {'Severity':<8} | {'Type':<25} | {'Projects':<15} | Resolution")
-    lines.append("-" * 70)
+    lines.append('-' * 70)
     
     for conflict in conflicts:
         projects_str = ','.join(conflict.affected_projects)[:15]
-        required = "REQUIRED" if conflict.severity in [ConflictSeverity.CRITICAL, ConflictSeverity.HIGH] else "RECOMMENDED"
-        lines.append(f"{conflict.conflict_id:<4} | {conflict.severity.value:<8} | {conflict.conflict_type[:25]:<25} | {projects_str:<15} | {required}")
+        required = 'REQUIRED' if conflict.severity in [ConflictSeverity.CRITICAL, ConflictSeverity.HIGH] else 'RECOMMENDED'
+        lines.append(f'{conflict.conflict_id:<4} | {conflict.severity.value:<8} | {conflict.conflict_type[:25]:<25} | {projects_str:<15} | {required}')
     
-    return "\n".join(lines)
+    return '\n'.join(lines)

@@ -33,8 +33,11 @@ nav:
       - Manifest Specification: manifest_spec.md
   - Models:
       - PyTorch Models: models/torch_models.md
+      - Entity Identifiers: entity_identifiers.md
+      - Search Spaces: search_spaces.md
   - Data:
       - Data Loaders: data_loaders.md
+      - Datasets: datasets.md
   - Contributing: contributing.md
 
 markdown_extensions:

@@ -2,4 +2,4 @@
 
 from plugins.hydrology.swissriver_adapter import SwissRiverDatasetAdapter
 
-__all__ = ["SwissRiverDatasetAdapter"]
+__all__ = ['SwissRiverDatasetAdapter']

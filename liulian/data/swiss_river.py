@@ -1,235 +1,632 @@
-"""Swiss River dataset adapter for the liulian framework.
+"""Swiss River dataset adapter built on TS/ST middle interfaces.
 
-Wraps the Time-LLM reference project's Dataset_Swiss_1990 (ConcatDataset of
-per-station SequenceWindowedDatasets) into liulian's BaseDataset / DataSplit
-interface. Data loading is delegated to the reference project's data_provider.
+Adapted from reference project:
+- refer_projects/swiss-river-network-benchmark/swissrivernetwork/benchmark/dataset.py
+- refer_projects/swiss-river-network-benchmark/swissrivernetwork/benchmark/train_single_model.py
+- refer_projects/swiss-river-network-benchmark/swissrivernetwork/benchmark/test_single_model.py
 
-Source data: refer_projects/Time-LLM_20260209_154911/dataset/swiss_river/
-Data loader: refer_projects/Time-LLM_20260209_154911/data_provider/
+Provides configurable handling for:
+- subsequence breaks (``short_subsequence_method``, ``gap_mode``)
+- optional noise injection
+- historical target integration (``include_historical_y``)
+- nowcasting (``task='nowcast'``)
+- LSTM-like full-history mode (``use_full_history=True``)
+- entity identifiers (embedding index, one-hot, numeric id, coordinates, sinusoidal)
+- graph integration (``graph_mode='edge_index'|'graphlet_features'``)
 """
 
 from __future__ import annotations
 
-import os
-import sys
-from typing import Any, Dict, Optional
+from pathlib import Path
+from typing import Any, Dict, Mapping, Optional, Union
 
 import numpy as np
-from torch.utils.data import DataLoader
+import pandas as pd
 
-from liulian.data.base import BaseDataset, DataSplit
-
-
-# ---------------------------------------------------------------------------
-# Locate and import reference project data_provider
-# ---------------------------------------------------------------------------
-_PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-_TIMELLM_ROOT = os.path.join(
-    _PROJECT_ROOT, 'refer_projects', 'Time-LLM_20260209_154911'
-)
+from liulian.data.backend import ArrayBackend
+from liulian.data.scalers import EntityScaler
+from liulian.data.spec import TopologySpec
+from liulian.data.st.spatialtempodataset import SpatialTempoDataset
+from liulian.data.ts.timeseriesdataset import TimeSeriesDataset, TimeSeriesSplit
 
 
-def _ensure_timellm_path() -> None:
-    """Add Time-LLM reference project to sys.path if needed."""
-    if _TIMELLM_ROOT not in sys.path:
-        sys.path.insert(0, _TIMELLM_ROOT)
+class SwissRiverDataset(SpatialTempoDataset):
+    """Swiss River dataset with configurable TS and ST adaptation modes.
 
-
-class SwissRiverDataset(BaseDataset):
-    """Swiss River Network dataset using liulian's BaseDataset interface.
-
-    Loads Swiss River station data via the Time-LLM reference project's
-    data_provider, then materialises the PyTorch DataLoader batches into
-    numpy arrays for the liulian DataSplit format.
-
-    Attributes:
-        domain: ``"hydrology"``
-        version: ``"1.0"``
-
-    Args:
-        data_name: Dataset variant (``"swiss-river-1990"`` / ``"swiss-river-2010"``
-            / ``"swiss-river-zurich"``).
-        root_path: Path to the swiss_river data directory. If None, auto-detected
-            from the reference project.
-        seq_len: Input sequence length (default: 90).
-        pred_len: Prediction horizon (default: 7).
-        max_samples: Maximum samples to materialise per split (for quick tests).
-            If None, all samples are loaded.
-
-    Example::
-
-        ds = SwissRiverDataset(data_name="swiss-river-1990", max_samples=1000)
-        train_split = ds.get_split("train")
-        X_batch, y_batch = train_split.get_batch(batch_size=32)
+    Parameters
+    ----------
+    data_name : str
+        Dataset variant: ``'swiss-river-1990'``, ``'swiss-river-2010'``,
+        or ``'swiss-river-zurich'``.
+    root_path : str or None
+        Path to the ``dataset/swiss_river`` directory.  Auto-detected when
+        ``None``.
+    split_mode : str
+        ``'ts'`` — per-station time-series (ConcatDataset-like).
+        ``'st'`` — multi-station spatial-temporal tensor.
+    seq_len : int
+        Look-back window size (0 for full-sequence mode).
+    pred_len : int
+        Forecast horizon.
+    task : str
+        ``'forecast'`` | ``'nowcast'``.
+    train_split : float
+        Fraction of *training* CSV to use for training (rest → validation).
+    use_current_x : bool
+        Whether to include the current time-step features as input.
+    use_full_history : bool
+        When ``True`` each contiguous segment becomes a single sample
+        (for LSTM-like models).
+    short_subsequence_method : str
+        ``'drop'`` | ``'pad'``.
+    gap_mode : str
+        ``'split'`` | ``'mask_pad'``.
+    max_mask_consecutive : int
+        Maximum gap to fill when ``gap_mode='mask_pad'``.
+    noise_type : str or None
+        Noise type (see :mod:`liulian.data.noise`).
+    noise_kwargs : dict or None
+        Extra noise parameters.
+    include_historical_y : str
+        ``'none'`` | ``'gt'`` | ``'predicted'``.
+    include_historical_predicted_y : bool
+        Append predicted y of neighbours as extra features.
+    identifier_mode : str
+        Entity identifier strategy.
+    id_integration : str
+        How entity feats are added (``'concat_to_x'`` | ``'add_to_x'``).
+    graph_mode : str
+        ``'none'`` | ``'edge_index'`` | ``'adj_matrix'`` |
+        ``'graphlet_features'``.
+    graphlet_num_hops : int
+        Neighbourhood radius for graphlet features.
+    max_samples : int or None
+        Cap the number of samples per split (for debugging / dev runs).
+    backend : str or ArrayBackend
+        ``'numpy'`` (default) or ``'torch'``.  Controls the format of
+        graph arrays (``edge_index``, ``adj_matrix``) and the output
+        ``DataSplit`` arrays.
     """
 
     domain = 'hydrology'
-    version = '1.0'
+    version = '2.0'
 
     def __init__(
         self,
         data_name: str = 'swiss-river-1990',
         root_path: Optional[str] = None,
+        *,
+        split_mode: str = 'ts',
         seq_len: int = 90,
-        pred_len: int = 7,
+        pred_len: int = 1,
+        task: str = 'forecast',
+        train_split: float = 0.8,
+        scaler_type: str = 'none',
+        use_current_x: bool = True,
+        use_full_history: bool = False,
+        short_subsequence_method: str = 'drop',
+        gap_mode: str = 'split',
+        max_mask_consecutive: int = 10,
+        noise_type: str | None = None,
+        noise_kwargs: Mapping[str, Any] | None = None,
+        include_historical_y: str = 'none',
+        include_historical_predicted_y: bool = False,
+        identifier_mode: str = 'none',
+        id_integration: str = 'concat_to_x',
+        graph_mode: str = 'none',
+        graphlet_num_hops: int = 1,
         max_samples: Optional[int] = None,
+        backend: str | ArrayBackend = 'numpy',
     ) -> None:
-        super().__init__()
-
         self.data_name = data_name
-        self.seq_len = seq_len
-        self.pred_len = pred_len
+        self.split_mode = split_mode
+        self.train_split = train_split
+        self.scaler_type = scaler_type.strip().lower()
+        self.graphlet_num_hops = graphlet_num_hops
         self.max_samples = max_samples
 
-        # Auto-detect root_path
-        if root_path is None:
-            root_path = os.path.join(_TIMELLM_ROOT, 'dataset', 'swiss_river')
-        self.root_path = root_path
+        project_root = Path(__file__).resolve().parents[2]
+        self.root_path = Path(root_path) if root_path else project_root / 'dataset' / 'swiss_river'
 
-        # Data path mapping
-        self._data_path_map = {
-            'swiss-river-1990': 'swiss-1990.csv',
-            'swiss-river-2010': 'swiss-2010.csv',
-            'swiss-river-zurich': 'zurich.csv',
+        self._file_map = {
+            'swiss-river-1990': {
+                'train': 'swiss-1990_train.csv',
+                'test': 'swiss-1990_test.csv',
+                'graph': 'graph_swiss-1990.pth',
+                'graph_name': 'swiss-1990',
+            },
+            'swiss-river-2010': {
+                'train': 'swiss-2010_train.csv',
+                'test': 'swiss-2010_test.csv',
+                'graph': 'graph_swiss-2010.pth',
+                'graph_name': 'swiss-2010',
+            },
+            'swiss-river-zurich': {
+                'train': 'zurich_train.csv',
+                'test': 'zurich_test.csv',
+                'graph': 'graph_zurich.pth',
+                'graph_name': 'zurich',
+            },
         }
 
-        # Cache loaded splits
-        self._splits: Dict[str, DataSplit] = {}
+        if data_name not in self._file_map:
+            raise ValueError(f'Unknown data_name: {data_name!r}')
 
-    def _build_args(self) -> Any:
-        """Build a simple namespace matching data_provider's expected args."""
-        from types import SimpleNamespace
-
-        return SimpleNamespace(
-            data=self.data_name,
-            root_path=self.root_path + '/',
-            data_path=self._data_path_map.get(self.data_name, 'swiss-1990.csv'),
-            features='M',
-            target='OT',
-            embed='timeF',
-            freq='d',
-            seq_len=self.seq_len,
-            label_len=0,
-            pred_len=self.pred_len,
-            percent=100,
-            batch_size=256,  # large batch for materialisation
-            num_workers=0,
-            seasonal_patterns='Monthly',
+        # --- Load raw DataFrames ----------------------------------------
+        train_df = self._read_csv(self._file_map[data_name]['train'])
+        test_df = self._read_csv(self._file_map[data_name]['test'])
+        train_df, val_df = TimeSeriesDataset.split_train_val(
+            train_df, train_ratio=train_split
         )
 
-    def _materialise_split(self, flag: str) -> DataSplit:
-        """Load data via data_provider and convert to numpy arrays.
+        self.graph_name = self._file_map[data_name]['graph_name']
+        # todo: check if we need to use the original read_graph() to get station ids instead:
+        self.station_ids = self._infer_station_ids(train_df)
 
-        Args:
-            flag: One of ``"train"``, ``"val"``, ``"test"``.
+        # --- Normalization -----------------------------------------------
+        # EntityScaler handles per-entity fit/transform/inverse,
+        # matching the reference project's normalize_isolated_station.
+        entity_scaler = EntityScaler(
+            entity_ids=self.station_ids,
+            scaler_type=self.scaler_type,
+            feature_suffixes=['_at'],
+            target_suffixes=['_wt'],
+        )
+        entity_scaler.fit(train_df)
+        for df in (train_df, val_df, test_df):
+            entity_scaler.transform(df)
 
-        Returns:
-            DataSplit with X and y numpy arrays.
+        # --- Topology is optional (only needed for graph-based modes) ----
+        if graph_mode != 'none':
+            topology = self._load_topology(self._file_map[data_name]['graph'])
+        else:
+            topology = None
+
+        self._split_frames = {
+            'train': train_df,
+            'val': val_df,
+            'test': test_df,
+        }
+        self._split_cache: dict[str, TimeSeriesSplit] = {}
+
+        # --- Initialize parent (SpatialTempoDataset → TimeSeriesDataset) -
+        super().__init__(
+            splits={'train': pd.DataFrame({'epoch_day': []})},
+            time_col='epoch_day',
+            feature_cols=['air_temperature'],
+            target_cols=['water_temperature'],
+            seq_len=seq_len,
+            pred_len=pred_len,
+            task=task,
+            use_current_x=use_current_x,
+            include_historical_y=include_historical_y,
+            include_historical_predicted_y=include_historical_predicted_y,
+            predicted_y_cols=['water_temperature_hat'],
+            use_full_history=use_full_history,
+            short_subsequence_method=short_subsequence_method,
+            gap_mode=gap_mode,
+            max_mask_consecutive=max_mask_consecutive,
+            noise_type=noise_type,
+            noise_kwargs=noise_kwargs,
+            station_ids=self.station_ids,
+            identifier_mode=identifier_mode,
+            id_integration=id_integration,
+            topology=topology,
+            graph_mode=graph_mode,
+            graph_metadata={'graph_name': self.graph_name},
+            backend=backend,
+        )
+
+        # Restore the entity scaler after super().__init__() which sets
+        # self._scaler = None for the generic TimeSeriesDataset path.  Do not move it before super().__init__().
+        self._scaler = entity_scaler
+
+    # ------------------------------------------------------------------
+    # Scaler delegation
+    # ------------------------------------------------------------------
+
+    @property
+    def station_scaler(self) -> EntityScaler:
+        """The fitted per-station scaler (read-only)."""
+        return self._scaler
+
+    @property
+    def target_scalers(self) -> Dict[str, Any]:
+        """Per-station target scalers: ``station_id → scaler``."""
+        return self._scaler.target_scalers
+
+    @property
+    def feature_scalers(self) -> Dict[str, Any]:
+        """Per-station feature scalers: ``station_id → scaler``."""
+        return self._scaler.feature_scalers
+
+    def inverse_transform(self, data, **kwargs):
+        """Inverse-transform normalized target values back to original scale.
+
+        Delegates to :class:`EntityScaler.inverse_transform`.
+        When ``scaler_type='none'`` this is an identity operation.
+
+        Parameters
+        ----------
+        data : numpy.ndarray or torch.Tensor
+            Shape ``(B, T, C)`` or ``(N, C)``.
+        **kwargs
+            Forwarded to :meth:`EntityScaler.inverse_transform`.
+            Typically ``entity_ids`` (list of station IDs) and/or
+            ``timestamps``.
+
+        Returns
+        -------
+        Same type and shape as *data*, in the original (un-normalized) scale.
         """
-        _ensure_timellm_path()
+        return self._scaler.inverse_transform(data, **kwargs)
 
-        # CWD must be Time-LLM root for relative paths in data_provider
-        original_cwd = os.getcwd()
-        os.chdir(_TIMELLM_ROOT)
+    def inverse_transform_station(
+        self,
+        data: np.ndarray,
+        station_id: str,
+        suffix: str = '_wt',
+    ) -> np.ndarray:
+        """Per-station inverse transform (delegates to EntityScaler)."""
+        return self._scaler.inverse_transform_entity(data, station_id, suffix)
+
+    # ------------------------------------------------------------------
+    # I/O helpers
+    # ------------------------------------------------------------------
+
+    def _read_csv(self, filename: str) -> pd.DataFrame:
+        path = self.root_path / filename
+        if not path.exists():
+            raise FileNotFoundError(f'Dataset CSV not found: {path}')
+        return pd.read_csv(path)
+
+    @staticmethod
+    def _infer_station_ids(df: pd.DataFrame) -> list[str]:
+        """Extract station identifiers from ``*_wt`` column names."""
+        station_cols = [col for col in df.columns if col.endswith('_wt')]
+        return [col[:-3] for col in station_cols]
+
+    def _load_topology(self, graph_filename: str) -> TopologySpec:
+        """Load graph topology from a ``.pth`` file.
+
+        The ``.pth`` file contains ``(x, edge_index)`` where ``x`` is a
+        node feature tensor with station-id in column 2 and optional
+        coordinates in columns 0–1, and ``edge_index`` is ``(2, E)``.
+        """
+        graph_path = self.root_path / graph_filename
+        if not graph_path.exists():
+            return TopologySpec(node_ids=self.station_ids, edges=[])
 
         try:
-            from data_provider.data_factory import data_provider
+            import torch
+        except ImportError:
+            return TopologySpec(node_ids=self.station_ids, edges=[])
 
-            args = self._build_args()
-            dataset, loader = data_provider(args, flag)
+        x, edge_index = torch.load(graph_path, weights_only=False)
 
-            all_x, all_y = [], []
-            count = 0
-            for batch_x, batch_y, _, _ in loader:
-                all_x.append(batch_x.numpy())
-                all_y.append(batch_y.numpy())
-                count += batch_x.shape[0]
-                if self.max_samples is not None and count >= self.max_samples:
-                    break
+        node_ids = [str(int(i)) for i in x[:, 2].tolist()]
+        edges: list[tuple[str, str]] = []
+        if hasattr(edge_index, 'shape') and edge_index.shape[0] == 2:
+            src = edge_index[0].tolist()
+            dst = edge_index[1].tolist()
+            for s, d in zip(src, dst):
+                if 0 <= s < len(node_ids) and 0 <= d < len(node_ids):
+                    edges.append((node_ids[s], node_ids[d]))
+                else:
+                    raise ValueError(
+                        f'Edge index out of bounds: {(s, d)} with {len(node_ids)} nodes.'
+                    )
 
-            X = np.concatenate(all_x, axis=0)
-            y = np.concatenate(all_y, axis=0)
+        coords: dict[str, tuple[float, float]] = {}
+        if hasattr(x, 'shape') and x.shape[1] >= 2:
+            for idx, station in enumerate(node_ids):
+                coords[station] = (float(x[idx, 0]), float(x[idx, 1]))
 
-            if self.max_samples is not None:
-                X = X[: self.max_samples]
-                y = y[: self.max_samples]
+        return TopologySpec(
+            node_ids=node_ids, edges=edges, coordinates=coords
+        )
 
-            return DataSplit(X=X, y=y, name=flag)
-        finally:
-            os.chdir(original_cwd)
+    # ------------------------------------------------------------------
+    # Per-station DataFrame construction
+    # ------------------------------------------------------------------
 
-    def get_split(self, split_name: str) -> DataSplit:
-        """Return the data split for the given partition.
+    def _make_station_frame(
+        self,
+        df: pd.DataFrame,
+        station: str,
+        graphlet_neighbors: list[str] | None = None,
+    ) -> pd.DataFrame:
+        """Build a single-station DataFrame with standard column names.
 
-        Args:
-            split_name: One of ``"train"``, ``"val"``, ``"test"``.
-
-        Returns:
-            A DataSplit with X [n, seq_len, features] and y [n, pred_len, features].
-
-        Raises:
-            KeyError: If split_name is not valid.
+        Parameters
+        ----------
+        df:
+            Raw multi-station DataFrame.
+        station:
+            Station identifier.
+        graphlet_neighbors:
+            Neighbour station ids whose predicted y should be included as
+            extra features (graphlet mode).
         """
+        out = pd.DataFrame(
+            {
+                'epoch_day': df['epoch_day'],
+                'air_temperature': df[f'{station}_at'],
+                'water_temperature': df[f'{station}_wt'],
+            }
+        )
+        if 'has_nan' in df.columns:
+            out['has_nan'] = df['has_nan']
+
+        # Graphlet: add neighbour predictions as extra input features
+        if graphlet_neighbors:
+            for neigh in graphlet_neighbors:
+                hat_col = f'{neigh}_wt_hat'
+                raw_col = f'{neigh}_wt'
+                if hat_col in df.columns:
+                    out[hat_col] = df[hat_col]
+                elif raw_col in df.columns:
+                    out[hat_col] = df[raw_col]
+
+        # Include predicted y for this station if available
+        if f'{station}_wt_hat' in df.columns:
+            out['water_temperature_hat'] = df[f'{station}_wt_hat']
+
+        return out
+
+    # ------------------------------------------------------------------
+    # Graphlet neighbour map
+    # ------------------------------------------------------------------
+
+    def _graphlet_neighbor_map(self) -> dict[str, list[str]]:
+        """Return mapping station → list of k-hop neighbour station ids."""
+        if self.topology is None or not self.topology.edges:
+            return {station: [] for station in self.station_ids}
+
+        adj: dict[str, list[str]] = {station: [] for station in self.station_ids}
+        for src, dst in self.topology.edges:
+            if src in adj:
+                adj[src].append(dst)
+            if dst in adj:
+                adj[dst].append(src)
+
+        if self.graphlet_num_hops <= 1:
+            return {k: sorted(set(v)) for k, v in adj.items()}
+
+        out: dict[str, list[str]] = {}
+        for station in self.station_ids:
+            visited = {station}
+            frontier = {station}
+            for _ in range(self.graphlet_num_hops):
+                nxt = set()
+                for node in frontier:
+                    nxt.update(adj.get(node, []))
+                nxt -= visited
+                visited |= nxt
+                frontier = nxt
+            visited.discard(station)
+            out[station] = sorted(visited)
+        return out
+
+    # ------------------------------------------------------------------
+    # Split builders
+    # ------------------------------------------------------------------
+
+    def _build_ts_split(self, split_name: str) -> TimeSeriesSplit:
+        """Build a per-station time-series split (TS mode).
+
+        Each station gets its own :class:`TimeSeriesDataset`, and the
+        resulting samples are concatenated (equivalent to
+        ``torch.utils.data.ConcatDataset`` in the reference project).
+        """
+        df = self._split_frames[split_name]
+        graphlet_map = (
+            self._graphlet_neighbor_map()
+            if self.graph_mode == 'graphlet_features'
+            else {}
+        )
+
+        parts: list[TimeSeriesSplit] = []
+        for station in self.station_ids:
+            station_df = self._make_station_frame(
+                df, station, graphlet_neighbors=graphlet_map.get(station)
+            )
+            predicted_cols = [
+                col for col in station_df.columns if col.endswith('_wt_hat')
+            ]
+            ds_station = TimeSeriesDataset(
+                splits={split_name: station_df},
+                time_col='epoch_day',
+                feature_cols=['air_temperature'] + predicted_cols,
+                target_cols=['water_temperature'],
+                seq_len=self.seq_len,
+                pred_len=self.pred_len,
+                task=self.task,
+                use_current_x=self.use_current_x,
+                include_historical_y=self.include_historical_y,
+                include_historical_predicted_y=self.include_historical_predicted_y,
+                predicted_y_cols=predicted_cols + ['water_temperature_hat'],
+                use_full_history=self.use_full_history,
+                short_subsequence_method=self.short_subsequence_method,
+                gap_mode=self.gap_mode,
+                max_mask_consecutive=self.max_mask_consecutive,
+                noise_type=self.noise_type,
+                noise_kwargs=self.noise_kwargs,
+                station_ids=self.station_ids,
+                identifier_mode=self.identifier_mode,
+                id_integration=self.id_integration,
+                coordinates=(
+                    self.topology.coordinates if self.topology else {}
+                ),
+                station_name=station,
+            )
+            parts.append(ds_station.get_split(split_name))
+
+        merged = TimeSeriesSplit.merge(parts, name=split_name)
+        return merged.with_max_samples(self.max_samples)
+
+    def _build_st_split(self, split_name: str) -> TimeSeriesSplit:
+        """Build a multi-station spatial-temporal split (ST mode).
+
+        All stations are treated as separate feature / target channels in
+        a single :class:`TimeSeriesDataset`, producing samples of shape
+        ``(seq_len, N_stations * n_features)`` — the pattern used by
+        ``STGNNSequence*Dataset`` in the reference project.
+        """
+        df = self._split_frames[split_name].copy().reset_index(drop=True)
+        feature_cols = [
+            f'{station}_at'
+            for station in self.station_ids
+            if f'{station}_at' in df.columns
+        ]
+        target_cols = [
+            f'{station}_wt'
+            for station in self.station_ids
+            if f'{station}_wt' in df.columns
+        ]
+
+        st_ds = TimeSeriesDataset(
+            splits={split_name: df[['epoch_day'] + feature_cols + target_cols]},
+            time_col='epoch_day',
+            feature_cols=feature_cols,
+            target_cols=target_cols,
+            seq_len=self.seq_len,
+            pred_len=self.pred_len,
+            task=self.task,
+            use_current_x=self.use_current_x,
+            include_historical_y='none',
+            include_historical_predicted_y=False,
+            use_full_history=self.use_full_history,
+            short_subsequence_method=self.short_subsequence_method,
+            gap_mode=self.gap_mode,
+            max_mask_consecutive=self.max_mask_consecutive,
+            noise_type=self.noise_type,
+            noise_kwargs=self.noise_kwargs,
+        )
+        split = st_ds.get_split(split_name)
+        return split.with_max_samples(self.max_samples)
+
+    def _build_ci_split(self, split_name: str) -> TimeSeriesSplit:
+        """Build a channel-independent split.
+
+        Uses the TS mode (per-station) base split, then wraps it with
+        :class:`~liulian.data.ts.channel_independent.ChannelIndependentDataset`
+        so each feature channel is treated as a separate univariate series.
+        """
+        from liulian.data.ts.channel_independent import ChannelIndependentDataset
+
+        base_split = self._build_ts_split(split_name)
+        ci_ds = ChannelIndependentDataset(base_split)
+        return ci_ds
+
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
+
+    def get_split(self, split_name: str) -> TimeSeriesSplit:
         if split_name not in ('train', 'val', 'test'):
             raise KeyError(
-                f"Unknown split: '{split_name}'. Use 'train', 'val', or 'test'."
+                f'Unknown split: {split_name!r}. Use train/val/test.'
             )
-
-        if split_name not in self._splits:
-            self._splits[split_name] = self._materialise_split(split_name)
-
-        return self._splits[split_name]
+        if split_name not in self._split_cache:
+            if self.split_mode == 'st':
+                self._split_cache[split_name] = self._build_st_split(split_name)
+            elif self.split_mode == 'channel_independent':
+                self._split_cache[split_name] = self._build_ci_split(split_name)
+            else:
+                self._split_cache[split_name] = self._build_ts_split(split_name)
+        return self._split_cache[split_name]
 
     def info(self) -> Dict[str, Any]:
-        """Return dataset metadata."""
-        return {
-            'domain': self.domain,
-            'version': self.version,
-            'data_name': self.data_name,
-            'seq_len': self.seq_len,
-            'pred_len': self.pred_len,
-            'root_path': self.root_path,
-        }
+        out = super().info()
+        out.update(
+            {
+                'domain': self.domain,
+                'version': self.version,
+                'data_name': self.data_name,
+                'root_path': str(self.root_path),
+                'split_mode': self.split_mode,
+                'graph_name': self.graph_name,
+                'num_stations': len(self.station_ids),
+            }
+        )
+        return out
 
     def get_data_loaders(
         self,
-        batch_size: int = 8,
+        batch_size: int = 32,
         num_workers: int = 0,
     ) -> Dict[str, Any]:
-        """Return PyTorch DataLoaders for train / val / test splits.
+        """Create train/val/test torch DataLoaders.
 
-        This uses the Time-LLM reference project's ``data_provider`` to
-        create proper ``DataLoader`` instances.  The result can be passed
-        directly to :class:`~liulian.runtime.experiment.Experiment` via
-        the ``data_loaders`` parameter.
+        Each batch yields
+        ``(batch_x, batch_y, batch_x_mark, batch_y_mark[, entity_ids])``
+        — the format expected by :mod:`liulian.runtime.trainer`.
+        When per-sample entity IDs are available (TS/CI mode with
+        ``seg_entity_ids``), the 5th element is a list of entity-ID
+        strings (length ``B``).
 
-        Args:
-            batch_size: Batch size for all loaders.
-            num_workers: Number of data-loading worker processes.
+        For **forecasting** (window = seq_len + pred_len):
 
-        Returns:
-            Dict with ``"train"``, ``"val"``, and ``"test"``
-            :class:`~torch.utils.data.DataLoader` instances.
+        * ``batch_x``  = features  ``[:, :seq_len, :]``   — encoder input
+        * ``batch_y``  = targets   ``[:, :, :]``           — full window
+          (the trainer slices ``[:, -pred_len:, :]`` for the loss)
+        * ``batch_x_mark`` = time values for encoder steps (reshaped to ``(B, seq_len, 1)``)
+        * ``batch_y_mark`` = time values for full window   (reshaped to ``(B, win, 1)``)
         """
-        _ensure_timellm_path()
-        original_cwd = os.getcwd()
-        os.chdir(_TIMELLM_ROOT)
+        import torch
+        from torch.utils.data import DataLoader
 
-        try:
-            from data_provider.data_factory import data_provider
+        seq_len = self.seq_len
 
-            args = self._build_args()
-            args.batch_size = batch_size
-            args.num_workers = num_workers
+        # Build station_id → integer index mapping for embedding mode
+        _station_to_idx = {sid: i for i, sid in enumerate(self.station_ids)}
 
-            _, train_loader = data_provider(args, 'train')
-            _, val_loader = data_provider(args, 'val')
-            _, test_loader = data_provider(args, 'test')
+        def _collate_with_marks(batch):
+            # Each item is a 4-tuple or 5-tuple (with entity_id string)
+            n_fields = len(batch[0])
+            fields = list(zip(*batch))
 
-            return {
-                'train': train_loader,
-                'val': val_loader,
-                'test': test_loader,
-            }
-        finally:
-            os.chdir(original_cwd)
+            xs, ys, x_mark, y_mark = fields[0], fields[1], fields[2], fields[3]
+            entity_id_strs = list(fields[4]) if n_fields > 4 else None
+
+            x = torch.stack(xs)       # (B, seq_len, D_x)
+            y = torch.stack(ys)       # (B, pred_len, D_y)
+            xt = torch.stack(x_mark)   # (B, seq_len, 1)
+            yt = torch.stack(y_mark)   # (B, pred_len, 1)
+
+            # batch_x: encoder features (first seq_len steps)
+            batch_x = x[:, :seq_len, :]
+            # batch_y: full target window — trainer will slice [-pred_len:]
+            batch_y = y
+
+            # Marks carry time information (expanded to 3-D)
+            batch_x_mark = xt[:, :seq_len]   # (B, seq_len, 1)
+            # (B, win, 1): full window of time marks for loss computation:
+            batch_y_mark = torch.cat([xt[:, :seq_len], yt], dim=1)
+
+            if entity_id_strs is not None:
+                # Convert string station IDs → integer index tensor (B,)
+                entity_idx = torch.tensor(
+                    [_station_to_idx.get(s, 0) for s in entity_id_strs],
+                    dtype=torch.long,
+                )
+                return batch_x, batch_y, batch_x_mark, batch_y_mark, entity_id_strs, entity_idx
+            return batch_x, batch_y, batch_x_mark, batch_y_mark
+
+        def _make(split_name: str) -> DataLoader:
+            split = self.get_split(split_name)
+            return DataLoader(
+                split,
+                batch_size=batch_size,
+                shuffle=(split_name == 'train'),
+                num_workers=num_workers,
+                drop_last=False,
+                collate_fn=_collate_with_marks,
+            )
+
+        return {
+            'train': _make('train'),
+            'val': _make('val'),
+            'test': _make('test'),
+        }

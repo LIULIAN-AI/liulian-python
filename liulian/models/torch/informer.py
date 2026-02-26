@@ -19,6 +19,7 @@ from liulian.models.torch.layers.transformer_blocks import (
 from liulian.models.torch.layers.attention import ProbAttention, AttentionLayer
 from liulian.models.torch.layers.embed import DataEmbedding
 from liulian.models.torch.base_adapter import TorchModelAdapter
+from liulian.models.torch.entity_mixin import EntityAwareMixin
 
 
 class Model(nn.Module):
@@ -167,7 +168,7 @@ class Model(nn.Module):
         return None
 
 
-class InformerAdapter(TorchModelAdapter):
+class InformerAdapter(EntityAwareMixin, TorchModelAdapter):
     """
     Adapter for Informer model to liulian ExecutableModel interface.
     
@@ -217,8 +218,10 @@ class InformerAdapter(TorchModelAdapter):
         if 'dec_in' not in default_config:
             default_config['dec_in'] = default_config['enc_in']
         
-        model = Model(self._dict_to_namespace(default_config))
+        model_cfg = self._entity_model_config(default_config)
+        model = Model(self._dict_to_namespace(model_cfg))
         super().__init__(model, default_config)
+        self._init_entity_support(default_config)
     
     def _prepare_model_inputs(self, inputs: Dict[str, torch.Tensor]) -> tuple:
         """Prepare inputs for Informer forward pass"""

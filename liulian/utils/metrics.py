@@ -132,6 +132,27 @@ def RMSE(pred: npt.NDArray[np.float64], true: npt.NDArray[np.float64]) -> float:
     return float(np.sqrt(MSE(pred, true)))
 
 
+def NSE(pred: npt.NDArray[np.float64], true: npt.NDArray[np.float64]) -> float:
+    """
+    Nash-Sutcliffe Efficiency (NSE).
+
+    Measures predictive skill relative to the mean of observations.
+    Higher is better, with 1.0 indicating perfect predictions.
+
+    Args:
+        pred: Predicted values, shape (n_samples, ...)
+        true: True values, shape (n_samples, ...)
+
+    Returns:
+        NSE value (float). Returns NaN when variance of ``true`` is ~0.
+    """
+    denominator = np.sum((true - np.mean(true)) ** 2)
+    if denominator <= 1e-12:
+        return float('nan')
+    numerator = np.sum((true - pred) ** 2)
+    return float(1.0 - (numerator / denominator))
+
+
 def MAPE(pred: npt.NDArray[np.float64], true: npt.NDArray[np.float64]) -> float:
     """
     Mean Absolute Percentage Error.

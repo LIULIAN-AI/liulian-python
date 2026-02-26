@@ -84,7 +84,7 @@ def rotation(x: torch.Tensor) -> torch.Tensor:
 def permutation(
     x: torch.Tensor, 
     max_segments: int = 5, 
-    seg_mode: Literal["equal", "random"] = "equal"
+    seg_mode: Literal['equal', 'random'] = 'equal'
 ) -> torch.Tensor:
     """
     Split time series into segments and randomly permute them.
@@ -107,7 +107,7 @@ def permutation(
     ret = torch.zeros_like(x)
     
     for i in range(batch_size):
-        if seg_mode == "equal":
+        if seg_mode == 'equal':
             # Equal-sized segments
             n_segments = torch.randint(1, max_segments + 1, (1,)).item()
             segment_size = seq_len // n_segments
@@ -166,7 +166,7 @@ def magnitude_warp(x: torch.Tensor, sigma: float = 0.2, knot: int = 4) -> torch.
         from scipy.interpolate import CubicSpline
     except ImportError:
         # Fallback to linear interpolation if scipy not available
-        print("Warning: scipy not available, using linear interpolation instead of cubic spline")
+        print('Warning: scipy not available, using linear interpolation instead of cubic spline')
         return _magnitude_warp_linear(x, sigma, knot)
     
     batch_size, seq_len, n_features = x.shape
@@ -245,7 +245,7 @@ def time_warp(x: torch.Tensor, sigma: float = 0.2, knot: int = 4) -> torch.Tenso
     try:
         from scipy.interpolate import CubicSpline
     except ImportError:
-        print("Warning: scipy not available, using linear interpolation instead of cubic spline")
+        print('Warning: scipy not available, using linear interpolation instead of cubic spline')
         return _time_warp_linear(x, sigma, knot)
     
     batch_size, seq_len, n_features = x.shape
@@ -277,30 +277,25 @@ def time_warp(x: torch.Tensor, sigma: float = 0.2, knot: int = 4) -> torch.Tenso
 
 
 def _time_warp_linear(x: torch.Tensor, sigma: float, knot: int) -> torch.Tensor:
-    """Linear interpolation fallback for time_warp."""
+    """Linear interpolation fallback for time_warp (no scipy)."""
     batch_size, seq_len, n_features = x.shape
     device = x.device
     ret = torch.zeros_like(x)
-    
+
     for i in range(batch_size):
-        # Random time warp factors
-        random_warps = torch.randn(knot + 2, device=device) * sigma + 1.0
-        warp_steps = torch.linspace(0, seq_len - 1, knot + 2, device=device)
-        
         # Simple linear time warp
         time_warp_map = torch.linspace(0, seq_len - 1, seq_len, device=device)
         time_warp_map = time_warp_map * (1.0 + torch.randn(1, device=device).item() * sigma * 0.1)
         time_warp_map = torch.clamp(time_warp_map, 0, seq_len - 1)
-        
+
         for dim in range(n_features):
-            # Use grid_sample for interpolation
-            grid = (time_warp_map / (seq_len - 1) * 2 - 1).view(1, 1, -1, 1)  # normalize to [-1, 1]
-            values = x[i, :, dim].view(1, 1, seq_len, 1)
-            warped = torch.nn.functional.grid_sample(
-                values, grid, mode='bilinear', align_corners=True, padding_mode='border'
-            )
-            ret[i, :, dim] = warped.squeeze()
-    
+            src = x[i, :, dim]
+            # Manual linear interpolation using floor/ceil indices
+            idx_floor = time_warp_map.long().clamp(0, seq_len - 2)
+            idx_ceil = (idx_floor + 1).clamp(max=seq_len - 1)
+            frac = time_warp_map - idx_floor.float()
+            ret[i, :, dim] = src[idx_floor] * (1.0 - frac) + src[idx_ceil] * frac
+
     return ret
 
 
@@ -455,39 +450,39 @@ def apply_augmentations(
     x_aug = x.clone()
     
     for aug_name in augmentation_list:
-        if aug_name == "jitter":
-            sigma = kwargs.get("jitter_sigma", 0.03)
+        if aug_name == 'jitter':
+            sigma = kwargs.get('jitter_sigma', 0.03)
             x_aug = jitter(x_aug, sigma=sigma)
             
-        elif aug_name == "scaling":
-            sigma = kwargs.get("scaling_sigma", 0.1)
+        elif aug_name == 'scaling':
+            sigma = kwargs.get('scaling_sigma', 0.1)
             x_aug = scaling(x_aug, sigma=sigma)
             
-        elif aug_name == "rotation":
+        elif aug_name == 'rotation':
             x_aug = rotation(x_aug)
             
-        elif aug_name == "permutation":
-            max_segments = kwargs.get("permutation_segments", 5)
-            seg_mode = kwargs.get("permutation_mode", "equal")
+        elif aug_name == 'permutation':
+            max_segments = kwargs.get('permutation_segments', 5)
+            seg_mode = kwargs.get('permutation_mode', 'equal')
             x_aug = permutation(x_aug, max_segments=max_segments, seg_mode=seg_mode)
             
-        elif aug_name == "magnitude_warp" or aug_name == "magwarp":
-            sigma = kwargs.get("mag_warp_sigma", 0.2)
-            knot = kwargs.get("mag_warp_knot", 4)
+        elif aug_name == 'magnitude_warp' or aug_name == 'magwarp':
+            sigma = kwargs.get('mag_warp_sigma', 0.2)
+            knot = kwargs.get('mag_warp_knot', 4)
             x_aug = magnitude_warp(x_aug, sigma=sigma, knot=knot)
             
-        elif aug_name == "time_warp" or aug_name == "timewarp":
-            sigma = kwargs.get("time_warp_sigma", 0.2)
-            knot = kwargs.get("time_warp_knot", 4)
+        elif aug_name == 'time_warp' or aug_name == 'timewarp':
+            sigma = kwargs.get('time_warp_sigma', 0.2)
+            knot = kwargs.get('time_warp_knot', 4)
             x_aug = time_warp(x_aug, sigma=sigma, knot=knot)
             
-        elif aug_name == "window_slice" or aug_name == "windowslice":
-            ratio = kwargs.get("window_slice_ratio", 0.9)
+        elif aug_name == 'window_slice' or aug_name == 'windowslice':
+            ratio = kwargs.get('window_slice_ratio', 0.9)
             x_aug = window_slice(x_aug, reduce_ratio=ratio)
             
-        elif aug_name == "window_warp" or aug_name == "windowwarp":
-            ratio = kwargs.get("window_warp_ratio", 0.1)
-            scales = kwargs.get("window_warp_scales", (0.5, 2.0))
+        elif aug_name == 'window_warp' or aug_name == 'windowwarp':
+            ratio = kwargs.get('window_warp_ratio', 0.1)
+            scales = kwargs.get('window_warp_scales', (0.5, 2.0))
             x_aug = window_warp(x_aug, window_ratio=ratio, scales=scales)
             
         else:
@@ -517,7 +512,7 @@ def random_augmentation(
         >>> x_aug = random_augmentation(x, num_augmentations=3)
     """
     if available_augs is None:
-        available_augs = ["jitter", "scaling", "rotation", "permutation", "window_slice"]
+        available_augs = ['jitter', 'scaling', 'rotation', 'permutation', 'window_slice']
     
     # Randomly select augmentations
     selected_augs = np.random.choice(available_augs, size=min(num_augmentations, len(available_augs)), replace=False).tolist()

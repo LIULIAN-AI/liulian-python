@@ -15,8 +15,9 @@ import numpy as np
 from typing import Dict, Any
 from liulian.models.torch.layers.transformer_blocks import Encoder, EncoderLayer
 from liulian.models.torch.layers.attention import FullAttention, AttentionLayer
-from liulian.models.torch.layers.embed import PatchEmbedding
+from liulian.models.torch.layers.embed import TimeLLMPatchEmbedding as PatchEmbedding
 from liulian.models.torch.base_adapter import TorchModelAdapter
+from liulian.models.torch.entity_mixin import EntityAwareMixin
 
 
 class Transpose(nn.Module):
@@ -242,7 +243,7 @@ class Model(nn.Module):
         return None
 
 
-class PatchTSTAdapter(TorchModelAdapter):
+class PatchTSTAdapter(EntityAwareMixin, TorchModelAdapter):
     """
     Adapter for PatchTST model to liulian ExecutableModel interface.
     
@@ -277,12 +278,14 @@ class PatchTSTAdapter(TorchModelAdapter):
         }
         default_config.update(config)
         
+        model_cfg = self._entity_model_config(default_config)
         model = Model(
-            self._dict_to_namespace(default_config),
-            patch_len=default_config['patch_len'],
-            stride=default_config['stride']
+            self._dict_to_namespace(model_cfg),
+            patch_len=model_cfg['patch_len'],
+            stride=model_cfg['stride']
         )
         super().__init__(model, default_config)
+        self._init_entity_support(default_config)
     
     def _prepare_model_inputs(self, inputs: Dict[str, torch.Tensor]) -> tuple:
         """Prepare inputs for PatchTST forward pass"""

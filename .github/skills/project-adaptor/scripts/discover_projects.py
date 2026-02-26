@@ -22,7 +22,7 @@ class ProjectInfo:
     """Information about a discovered project."""
     
     path: Path
-    source: str  # "git", "local", or "cwd"
+    source: str  # 'git', 'local', or 'cwd'
     original_location: Optional[str] = None
     timestamp: Optional[str] = None
     package_name: Optional[str] = None
@@ -47,8 +47,8 @@ def clone_git_repository(git_url: str, base_dir: Path) -> Optional[Path]:
         repo_name = repo_name[:-4]
     
     # Create timestamped directory name
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    clone_dir = base_dir / f"{repo_name}_{timestamp}"
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    clone_dir = base_dir / f'{repo_name}_{timestamp}'
     
     # Ensure base directory exists
     base_dir.mkdir(parents=True, exist_ok=True)
@@ -65,14 +65,14 @@ def clone_git_repository(git_url: str, base_dir: Path) -> Optional[Path]:
         if result.returncode == 0:
             return clone_dir
         else:
-            print(f"❌ Clone failed: {result.stderr}")
+            print(f'❌ Clone failed: {result.stderr}')
             return None
             
     except subprocess.TimeoutExpired:
-        print(f"❌ Clone timeout exceeded (5 minutes)")
+        print(f'❌ Clone timeout exceeded (5 minutes)')
         return None
     except Exception as e:
-        print(f"❌ Clone error: {e}")
+        print(f'❌ Clone error: {e}')
         return None
 
 
@@ -91,10 +91,10 @@ def validate_local_path(path: str) -> Optional[Path]:
         if p.exists() and p.is_dir():
             return p
         else:
-            print(f"❌ Path does not exist or is not a directory: {path}")
+            print(f'❌ Path does not exist or is not a directory: {path}')
             return None
     except Exception as e:
-        print(f"❌ Path validation error: {e}")
+        print(f'❌ Path validation error: {e}')
         return None
 
 
@@ -116,11 +116,11 @@ def analyze_project_structure(project_path: Path) -> ProjectInfo:
     """
     info = ProjectInfo(
         path=project_path,
-        source="unknown"
+        source='unknown'
     )
     
     # Check for pyproject.toml
-    pyproject = project_path / "pyproject.toml"
+    pyproject = project_path / 'pyproject.toml'
     if pyproject.exists():
         try:
             with open(pyproject, 'r') as f:
@@ -149,11 +149,11 @@ def analyze_project_structure(project_path: Path) -> ProjectInfo:
                         info.python_version = python_version_line[start_quote:end_quote]
                         
         except Exception as e:
-            print(f"⚠️  Could not parse pyproject.toml: {e}")
+            print(f'⚠️  Could not parse pyproject.toml: {e}')
     
     # Fallback: check for setup.py
     if not info.package_name:
-        setup_py = project_path / "setup.py"
+        setup_py = project_path / 'setup.py'
         if setup_py.exists():
             try:
                 with open(setup_py, 'r') as f:
@@ -164,7 +164,7 @@ def analyze_project_structure(project_path: Path) -> ProjectInfo:
                             if 'name' in line and '=' in line:
                                 parts = line.split('=')
                                 if len(parts) == 2:
-                                    name = parts[1].strip().strip(',').strip('"').strip("'")
+                                    name = parts[1].strip().strip(',').strip('"').strip("'')
                                     info.package_name = name
                                     break
             except Exception:
@@ -172,13 +172,13 @@ def analyze_project_structure(project_path: Path) -> ProjectInfo:
     
     # Check for test directories
     if not info.test_framework:
-        if (project_path / "tests").exists():
+        if (project_path / 'tests').exists():
             # Check if pytest.ini exists
-            if (project_path / "pytest.ini").exists():
-                info.test_framework = "pytest"
+            if (project_path / 'pytest.ini').exists():
+                info.test_framework = 'pytest'
             # Check test files for imports
             else:
-                test_files = list((project_path / "tests").glob("test_*.py"))
+                test_files = list((project_path / 'tests').glob('test_*.py"))
                 if test_files:
                     try:
                         with open(test_files[0], 'r') as f:
@@ -210,7 +210,7 @@ def scan_refer_projects_directory(base_dir: Path) -> List[ProjectInfo]:
     for item in base_dir.iterdir():
         if item.is_dir() and not item.name.startswith('.'):
             info = analyze_project_structure(item)
-            info.source = "refer_projects"
+            info.source = "refer_projects'
             projects.append(info)
     
     return projects
@@ -230,29 +230,29 @@ def format_project_config_summary(
     Returns:
         Formatted summary string
     """
-    lines = ["", "PROJECT CONFIGURATION SUMMARY", "=" * 50, ""]
+    lines = ['', 'PROJECT CONFIGURATION SUMMARY', '=' * 50, '']
     
-    lines.append("Reference Project(s):")
+    lines.append('Reference Project(s):')
     for i, proj in enumerate(reference_projects, 1):
-        lines.append(f"  C_r{i}: {proj.path}")
+        lines.append(f'  C_r{i}: {proj.path}')
         if proj.original_location:
-            lines.append(f"       Source: {proj.original_location}")
+            lines.append(f'       Source: {proj.original_location}')
         if proj.timestamp:
-            lines.append(f"       Timestamp: {proj.timestamp}")
+            lines.append(f'       Timestamp: {proj.timestamp}')
         if proj.package_name:
-            lines.append(f"       Package: {proj.package_name}")
-        lines.append("")
+            lines.append(f'       Package: {proj.package_name}')
+        lines.append('')
     
-    lines.append("Target Project:")
-    lines.append(f"  P_t: {target_project.path}")
+    lines.append('Target Project:')
+    lines.append(f'  P_t: {target_project.path}')
     if target_project.package_name:
-        lines.append(f"       Package: {target_project.package_name}")
+        lines.append(f'       Package: {target_project.package_name}')
     if target_project.python_version:
-        lines.append(f"       Python: {target_project.python_version}")
+        lines.append(f'       Python: {target_project.python_version}')
     if target_project.test_framework:
-        lines.append(f"       Tests: {target_project.test_framework}")
+        lines.append(f'       Tests: {target_project.test_framework}')
     
-    lines.append("")
-    lines.append("Confirm this configuration? (yes/edit)")
+    lines.append('')
+    lines.append('Confirm this configuration? (yes/edit)')
     
-    return "\n".join(lines)
+    return '\n".join(lines)

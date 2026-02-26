@@ -13,6 +13,8 @@ from torch.utils.data import Dataset
 from typing import Literal, Tuple
 from dataclasses import dataclass
 
+from liulian.data.backend import with_backend
+
 
 @dataclass
 class M4Meta:
@@ -103,6 +105,7 @@ class M4DatasetInfo:
         )
 
 
+@with_backend(default='torch')
 class M4Dataset(Dataset):
     """
     M4 dataset for time series forecasting (PyTorch version).
@@ -292,3 +295,16 @@ class M4Dataset(Dataset):
             insample_mask[i, -len(ts_last_window):] = 1.0
         
         return torch.from_numpy(insample), torch.from_numpy(insample_mask)
+
+    def inverse_transform(self, data):
+        """Identity inverse-transform — M4 uses no scaling.
+
+        Parameters
+        ----------
+        data : numpy.ndarray or torch.Tensor
+
+        Returns
+        -------
+        Same data, unchanged.
+        """
+        return data

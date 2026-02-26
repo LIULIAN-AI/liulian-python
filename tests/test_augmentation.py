@@ -93,7 +93,7 @@ def test_rotation_shape(sample_data):
 
 def test_permutation_shape(sample_data):
     """Test permutation preserves shape."""
-    x_aug = permutation(sample_data, max_segments=5, seg_mode="equal")
+    x_aug = permutation(sample_data, max_segments=5, seg_mode='equal')
     
     assert x_aug.shape == sample_data.shape
     assert x_aug.dtype == sample_data.dtype
@@ -102,7 +102,7 @@ def test_permutation_shape(sample_data):
 def test_permutation_equal_mode(sample_data):
     """Test equal-segment permutation."""
     torch.manual_seed(42)
-    x_aug = permutation(sample_data.clone(), max_segments=4, seg_mode="equal")
+    x_aug = permutation(sample_data.clone(), max_segments=4, seg_mode='equal')
     
     # Should be different order
     assert not torch.allclose(x_aug, sample_data)
@@ -111,7 +111,7 @@ def test_permutation_equal_mode(sample_data):
 def test_permutation_random_mode(sample_data):
     """Test random-segment permutation."""
     torch.manual_seed(42)
-    x_aug = permutation(sample_data.clone(), max_segments=5, seg_mode="random")
+    x_aug = permutation(sample_data.clone(), max_segments=5, seg_mode='random')
     
     assert x_aug.shape == sample_data.shape
 
@@ -167,7 +167,7 @@ def test_window_warp_shape(sample_data):
 def test_apply_augmentations_single(sample_data):
     """Test applying single augmentation."""
     torch.manual_seed(42)
-    x_aug = apply_augmentations(sample_data.clone(), ["jitter"], jitter_sigma=0.05)
+    x_aug = apply_augmentations(sample_data.clone(), ['jitter'], jitter_sigma=0.05)
     
     assert x_aug.shape == sample_data.shape
     assert not torch.allclose(x_aug, sample_data)
@@ -178,7 +178,7 @@ def test_apply_augmentations_multiple(sample_data):
     torch.manual_seed(42)
     x_aug = apply_augmentations(
         sample_data.clone(),
-        ["jitter", "scaling", "permutation"],
+        ['jitter', 'scaling', 'permutation'],
         jitter_sigma=0.05,
         scaling_sigma=0.1,
         permutation_segments=4
@@ -194,11 +194,11 @@ def test_apply_augmentations_all(sample_data):
     np.random.seed(42)
     
     aug_list = [
-        "jitter",
-        "scaling",
-        "rotation",
-        "permutation",
-        "window_slice"
+        'jitter',
+        'scaling',
+        'rotation',
+        'permutation',
+        'window_slice'
     ]
     
     x_aug = apply_augmentations(sample_data.clone(), aug_list)
@@ -223,7 +223,7 @@ def test_random_augmentation_custom_list(sample_data):
     torch.manual_seed(42)
     np.random.seed(42)
     
-    available_augs = ["jitter", "scaling"]
+    available_augs = ['jitter', 'scaling']
     x_aug = random_augmentation(
         sample_data.clone(),
         num_augmentations=2,
@@ -236,7 +236,7 @@ def test_random_augmentation_custom_list(sample_data):
 def test_augmentation_on_gpu():
     """Test augmentations work on GPU if available."""
     if not torch.cuda.is_available():
-        pytest.skip("CUDA not available")
+        pytest.skip('CUDA not available')
     
     x = torch.randn(4, 96, 7, device='cuda')
     
@@ -263,17 +263,17 @@ def test_augmentation_with_different_shapes():
     """Test augmentations work with different input shapes."""
     # Short sequence
     x_short = torch.randn(8, 24, 3)
-    x_aug = apply_augmentations(x_short, ["jitter", "scaling"])
+    x_aug = apply_augmentations(x_short, ['jitter', 'scaling'])
     assert x_aug.shape == x_short.shape
     
     # Long sequence
     x_long = torch.randn(8, 512, 10)
-    x_aug = apply_augmentations(x_long, ["jitter", "permutation"])
+    x_aug = apply_augmentations(x_long, ['jitter', 'permutation'])
     assert x_aug.shape == x_long.shape
     
     # Single feature
     x_univariate = torch.randn(8, 96, 1)
-    x_aug = apply_augmentations(x_univariate, ["jitter", "window_slice"])
+    x_aug = apply_augmentations(x_univariate, ['jitter', 'window_slice'])
     assert x_aug.shape == x_univariate.shape
 
 
@@ -297,12 +297,12 @@ def test_augmentation_reproducibility():
     # First run
     torch.manual_seed(123)
     np.random.seed(123)
-    x_aug1 = apply_augmentations(x.clone(), ["jitter", "scaling", "permutation"])
+    x_aug1 = apply_augmentations(x.clone(), ['jitter', 'scaling', 'permutation'])
     
     # Second run with same seed
     torch.manual_seed(123)
     np.random.seed(123)
-    x_aug2 = apply_augmentations(x.clone(), ["jitter", "scaling", "permutation"])
+    x_aug2 = apply_augmentations(x.clone(), ['jitter', 'scaling', 'permutation'])
     
     assert torch.allclose(x_aug1, x_aug2)
 
@@ -316,10 +316,10 @@ def test_augmentation_unknown_name(sample_data):
     captured_output = io.StringIO()
     sys.stdout = captured_output
     
-    x_aug = apply_augmentations(sample_data.clone(), ["unknown_aug", "jitter"])
+    x_aug = apply_augmentations(sample_data.clone(), ['unknown_aug', 'jitter'])
     
     sys.stdout = sys.__stdout__
     output = captured_output.getvalue()
     
-    assert "Warning: Unknown augmentation" in output
+    assert 'Warning: Unknown augmentation' in output
     assert x_aug.shape == sample_data.shape

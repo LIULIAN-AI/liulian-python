@@ -16,7 +16,7 @@ from .embed import (
     DataEmbedding,
     DataEmbedding_inverted,
     DataEmbedding_wo_pos,
-    PatchEmbedding,
+    TimeLLMPatchEmbedding,
 )
 
 from .decomposition import (

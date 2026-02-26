@@ -19,6 +19,7 @@ from liulian.models.torch.layers.autocorrelation import AutoCorrelation, AutoCor
 from liulian.models.torch.layers.autoformer_blocks import Encoder, Decoder, EncoderLayer, DecoderLayer, my_Layernorm
 from liulian.models.torch.layers.decomposition import series_decomp
 from liulian.models.torch.base_adapter import TorchModelAdapter
+from liulian.models.torch.entity_mixin import EntityAwareMixin
 
 
 class Model(nn.Module):
@@ -175,7 +176,7 @@ class Model(nn.Module):
         return None
 
 
-class AutoformerAdapter(TorchModelAdapter):
+class AutoformerAdapter(EntityAwareMixin, TorchModelAdapter):
     """
     Adapter for Autoformer model to liulian ExecutableModel interface.
     
@@ -225,8 +226,10 @@ class AutoformerAdapter(TorchModelAdapter):
         if 'dec_in' not in default_config:
             default_config['dec_in'] = default_config['enc_in']
         
-        model = Model(self._dict_to_namespace(default_config))
+        model_cfg = self._entity_model_config(default_config)
+        model = Model(self._dict_to_namespace(model_cfg))
         super().__init__(model, default_config)
+        self._init_entity_support(default_config)
     
     def _prepare_model_inputs(self, inputs: Dict[str, torch.Tensor]) -> tuple:
         """Prepare inputs for Autoformer forward pass"""

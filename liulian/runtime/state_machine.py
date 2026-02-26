@@ -14,12 +14,12 @@ from typing import Dict, List
 class LifecycleState(Enum):
     """Possible states of an experiment run."""
 
-    INIT = "init"
-    TRAIN = "train"
-    EVAL = "eval"
-    INFER = "infer"
-    PAUSED = "paused"
-    COMPLETED = "completed"
+    INIT = 'init'
+    TRAIN = 'train'
+    EVAL = 'eval'
+    INFER = 'infer'
+    PAUSED = 'paused'
+    COMPLETED = 'completed'
 
 
 class ExecutionMode(Enum):
@@ -29,10 +29,10 @@ class ExecutionMode(Enum):
     compatibility (v1+).
     """
 
-    OFFLINE = "offline"
-    ONLINE = "online"  # streaming / real-time (v1+)
-    HITL = "hitl"  # human-in-the-loop (v1+)
-    AGENT_ASSIST = "agent_assist"  # LLM-assisted (v1+)
+    OFFLINE = 'offline'
+    ONLINE = 'online'  # streaming / real-time (v1+)
+    HITL = 'hitl'  # human-in-the-loop (v1+)
+    AGENT_ASSIST = 'agent_assist'  # LLM-assisted (v1+)
 
 
 # Allowed transitions encoded as adjacency list
@@ -93,7 +93,7 @@ class StateMachine:
         """
         if not self.can_transition(target):
             raise ValueError(
-                f"Invalid transition: {self._state.value} -> {target.value}"
+                f'Invalid transition: {self._state.value} -> {target.value}'
             )
         self._state = target
 

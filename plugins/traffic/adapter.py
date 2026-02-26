@@ -22,11 +22,11 @@ class TrafficDatasetAdapter(BaseDataset):
         version: ``"0.0.1"``.
     """
 
-    domain: str = "traffic"
-    version: str = "0.0.1"
+    domain: str = 'traffic'
+    version: str = '0.0.1'
 
     def __init__(self) -> None:
-        super().__init__(manifest={"name": "traffic-synthetic", "version": "0.0.1"})
+        super().__init__(manifest={'name': 'traffic-synthetic', 'version': '0.0.1'})
 
     def get_split(self, split_name: str) -> DataSplit:
         """Return a synthetic traffic data split.
@@ -38,14 +38,14 @@ class TrafficDatasetAdapter(BaseDataset):
             :class:`DataSplit` with random traffic-like data.
 
         Raises:
-            KeyError: If *split_name* is not recognised.
+            KeyError: If *split_name* is not recognized.
         """
-        valid = {"train", "val", "test"}
+        valid = {'train', 'val', 'test'}
         if split_name not in valid:
             raise KeyError(f"Unknown split '{split_name}'. Choose from {valid}.")
 
         rng = np.random.default_rng(seed=hash(split_name) % 2**32)
-        n_samples = {"train": 64, "val": 16, "test": 16}[split_name]
+        n_samples = {'train': 64, 'val': 16, 'test': 16}[split_name]
         n_timesteps = 48
         n_sensors = 4
 

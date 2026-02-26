@@ -1,7 +1,7 @@
 """ExperimentSpec — full experiment specification for reproducibility.
 
 An :class:`ExperimentSpec` is a serialisable snapshot of every parameter
-that defines an experiment: task, dataset, model, optimiser, and logger
+that defines an experiment: task, dataset, model, optimizer, and logger
 configuration.  It is persisted as YAML alongside experiment artifacts.
 """
 
@@ -49,11 +49,11 @@ class ExperimentSpec:
         Args:
             path: Target file path.
         """
-        with open(path, "w", encoding="utf-8") as fh:
+        with open(path, 'w', encoding='utf-8') as fh:
             yaml.dump(self.to_dict(), fh, default_flow_style=False, sort_keys=False)
 
     @classmethod
-    def from_yaml(cls, path: str) -> "ExperimentSpec":
+    def from_yaml(cls, path: str) -> 'ExperimentSpec':
         """Load an :class:`ExperimentSpec` from a YAML file.
 
         Args:
@@ -62,6 +62,6 @@ class ExperimentSpec:
         Returns:
             Reconstructed :class:`ExperimentSpec`.
         """
-        with open(path, "r", encoding="utf-8") as fh:
+        with open(path, 'r', encoding='utf-8') as fh:
             data = yaml.safe_load(fh) or {}
         return cls(**data)

@@ -2,4 +2,4 @@
 
 from liulian.models.base import ExecutableModel
 
-__all__ = ["ExecutableModel"]
+__all__ = ['ExecutableModel']

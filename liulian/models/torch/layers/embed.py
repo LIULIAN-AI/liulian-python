@@ -14,8 +14,6 @@ import math
 
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
-from torch.nn.utils import weight_norm
 
 
 class PositionalEmbedding(nn.Module):
@@ -23,7 +21,7 @@ class PositionalEmbedding(nn.Module):
     
     Uses sine and cosine functions of different frequencies to encode positions.
     """
-    
+
     def __init__(self, d_model: int, max_len: int = 5000):
         """Initialize positional embedding
         
@@ -63,7 +61,7 @@ class TokenEmbedding(nn.Module):
     
     Uses 1D convolution to project input features to model dimension.
     """
-    
+
     def __init__(self, c_in: int, d_model: int):
         """Initialize token embedding
         
@@ -74,11 +72,11 @@ class TokenEmbedding(nn.Module):
         super(TokenEmbedding, self).__init__()
         padding = 1 if torch.__version__ >= '1.5.0' else 2
         self.tokenConv = nn.Conv1d(
-            in_channels=c_in, 
+            in_channels=c_in,
             out_channels=d_model,
-            kernel_size=3, 
-            padding=padding, 
-            padding_mode='circular', 
+            kernel_size=3,
+            padding=padding,
+            padding_mode='circular',
             bias=False
         )
         for m in self.modules():
@@ -97,7 +95,7 @@ class TokenEmbedding(nn.Module):
             Embedded tensor [batch_size, seq_len, d_model]
         """
         x = self.tokenConv(x.permute(0, 2, 1)).transpose(1, 2)
-        return x
+        return x  # x: [B*N_f, num_patches, d_model]
 
 
 class FixedEmbedding(nn.Module):
@@ -105,7 +103,7 @@ class FixedEmbedding(nn.Module):
     
     Similar to positional embedding but used for feature encoding.
     """
-    
+
     def __init__(self, c_in: int, d_model: int):
         """Initialize fixed embedding
         
@@ -145,7 +143,7 @@ class TemporalEmbedding(nn.Module):
     
     Encodes minute, hour, weekday, day, and month information.
     """
-    
+
     def __init__(self, d_model: int, embed_type: str = 'fixed', freq: str = 'h'):
         """Initialize temporal embedding
         
@@ -196,7 +194,7 @@ class TimeFeatureEmbedding(nn.Module):
     
     Alternative to TemporalEmbedding using continuous features.
     """
-    
+
     def __init__(self, d_model: int, embed_type: str = 'timeF', freq: str = 'h'):
         """Initialize time feature embedding
         
@@ -228,14 +226,14 @@ class DataEmbedding(nn.Module):
     
     Combines token embedding, positional embedding, and temporal embedding.
     """
-    
+
     def __init__(
-        self, 
-        c_in: int, 
-        d_model: int, 
-        embed_type: str = 'fixed', 
-        freq: str = 'h', 
-        dropout: float = 0.1
+            self,
+            c_in: int,
+            d_model: int,
+            embed_type: str = 'fixed',
+            freq: str = 'h',
+            dropout: float = 0.1
     ):
         """Initialize data embedding
         
@@ -251,8 +249,8 @@ class DataEmbedding(nn.Module):
         self.value_embedding = TokenEmbedding(c_in=c_in, d_model=d_model)
         self.position_embedding = PositionalEmbedding(d_model=d_model)
         self.temporal_embedding = (
-            TemporalEmbedding(d_model=d_model, embed_type=embed_type, freq=freq) 
-            if embed_type != 'timeF' 
+            TemporalEmbedding(d_model=d_model, embed_type=embed_type, freq=freq)
+            if embed_type != 'timeF'
             else TimeFeatureEmbedding(d_model=d_model, embed_type=embed_type, freq=freq)
         )
         self.dropout = nn.Dropout(p=dropout)
@@ -270,8 +268,8 @@ class DataEmbedding(nn.Module):
         if x_mark is None:
             x = self.value_embedding(x) + self.position_embedding(x)
         else:
-            x = (self.value_embedding(x) + 
-                 self.temporal_embedding(x_mark) + 
+            x = (self.value_embedding(x) +
+                 self.temporal_embedding(x_mark) +
                  self.position_embedding(x))
         return self.dropout(x)
 
@@ -281,14 +279,14 @@ class DataEmbedding_inverted(nn.Module):
     
     Used by iTransformer and similar models.
     """
-    
+
     def __init__(
-        self, 
-        c_in: int, 
-        d_model: int, 
-        embed_type: str = 'fixed', 
-        freq: str = 'h', 
-        dropout: float = 0.1
+            self,
+            c_in: int,
+            d_model: int,
+            embed_type: str = 'fixed',
+            freq: str = 'h',
+            dropout: float = 0.1
     ):
         """Initialize inverted data embedding
         
@@ -326,14 +324,14 @@ class DataEmbedding_wo_pos(nn.Module):
     
     Used by models that don't require explicit position information.
     """
-    
+
     def __init__(
-        self, 
-        c_in: int, 
-        d_model: int, 
-        embed_type: str = 'fixed', 
-        freq: str = 'h', 
-        dropout: float = 0.1
+            self,
+            c_in: int,
+            d_model: int,
+            embed_type: str = 'fixed',
+            freq: str = 'h',
+            dropout: float = 0.1
     ):
         """Initialize data embedding without position
         
@@ -349,8 +347,8 @@ class DataEmbedding_wo_pos(nn.Module):
         self.value_embedding = TokenEmbedding(c_in=c_in, d_model=d_model)
         self.position_embedding = PositionalEmbedding(d_model=d_model)
         self.temporal_embedding = (
-            TemporalEmbedding(d_model=d_model, embed_type=embed_type, freq=freq) 
-            if embed_type != 'timeF' 
+            TemporalEmbedding(d_model=d_model, embed_type=embed_type, freq=freq)
+            if embed_type != 'timeF'
             else TimeFeatureEmbedding(d_model=d_model, embed_type=embed_type, freq=freq)
         )
         self.dropout = nn.Dropout(p=dropout)
@@ -372,22 +370,82 @@ class DataEmbedding_wo_pos(nn.Module):
         return self.dropout(x)
 
 
-class PatchEmbedding(nn.Module):
-    """Patch-based embedding for PatchTST and similar models
-    
+# class PatchEmbedding(nn.Module):
+#     """Patch-based embedding for PatchTST and similar models
+#
+#     Divides the time series into patches and embeds each patch.
+#     """
+#
+#     def __init__(
+#         self,
+#         d_model: int,
+#         patch_len: int,
+#         stride: int,
+#         padding: int,
+#         dropout: float
+#     ):
+#         """Initialize patch embedding
+#
+#         Args:
+#             d_model: Dimension of the model
+#             patch_len: Length of each patch
+#             stride: Stride for patching
+#             padding: Padding to add
+#             dropout: Dropout rate
+#         """
+#         super(PatchEmbedding, self).__init__()
+#         # Patching parameters
+#         self.patch_len = patch_len
+#         self.stride = stride
+#         self.padding_patch_layer = nn.ReplicationPad1d((0, padding))
+#
+#         # Input encoding: projection of patches onto d-dim vector space
+#         self.value_embedding = nn.Linear(patch_len, d_model, bias=False)
+#
+#         # Positional embedding
+#         self.position_embedding = PositionalEmbedding(d_model)
+#
+#         # Residual dropout
+#         self.dropout = nn.Dropout(dropout)
+#
+#     def forward(self, x):
+#         """Forward pass with patching
+#
+#         Args:
+#             x: Input data [batch_size, n_vars, seq_len]
+#
+#         Returns:
+#             Tuple of:
+#                 - Embedded patches [batch_size*n_vars, n_patches, d_model]
+#                 - Number of variables
+#         """
+#         # Do patching
+#         n_vars = x.shape[1]
+#         x = self.padding_patch_layer(x)
+#         x = x.unfold(dimension=-1, size=self.patch_len, step=self.stride)
+#         x = torch.reshape(x, (x.shape[0] * x.shape[1], x.shape[2], x.shape[3]))
+#
+#         # Input encoding
+#         x = self.value_embedding(x) + self.position_embedding(x)
+#         return self.dropout(x), n_vars
+
+
+class TimeLLMPatchEmbedding(nn.Module):
+    """Patch-based embedding for TimeLLM.
+
     Divides the time series into patches and embeds each patch.
     """
-    
+
     def __init__(
-        self, 
-        d_model: int, 
-        patch_len: int, 
-        stride: int, 
-        padding: int, 
-        dropout: float
+            self,
+            d_model: int,
+            patch_len: int,
+            stride: int,
+            padding: int,
+            dropout: float
     ):
         """Initialize patch embedding
-        
+
         Args:
             d_model: Dimension of the model
             patch_len: Length of each patch
@@ -395,38 +453,37 @@ class PatchEmbedding(nn.Module):
             padding: Padding to add
             dropout: Dropout rate
         """
-        super(PatchEmbedding, self).__init__()
+        super(TimeLLMPatchEmbedding, self).__init__()
         # Patching parameters
         self.patch_len = patch_len
         self.stride = stride
         self.padding_patch_layer = nn.ReplicationPad1d((0, padding))
 
-        # Input encoding: projection of patches onto d-dim vector space
-        self.value_embedding = nn.Linear(patch_len, d_model, bias=False)
+        # Backbone, Input encoding: projection of feature vectors onto a d-dim vector space
+        self.value_embedding = TokenEmbedding(patch_len, d_model)
 
         # Positional embedding
-        self.position_embedding = PositionalEmbedding(d_model)
+        # self.position_embedding = PositionalEmbedding(d_model)
 
         # Residual dropout
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, x):
         """Forward pass with patching
-        
+
         Args:
             x: Input data [batch_size, n_vars, seq_len]
-            
+
         Returns:
             Tuple of:
                 - Embedded patches [batch_size*n_vars, n_patches, d_model]
                 - Number of variables
         """
         # Do patching
-        n_vars = x.shape[1]
-        x = self.padding_patch_layer(x)
-        x = x.unfold(dimension=-1, size=self.patch_len, step=self.stride)
-        x = torch.reshape(x, (x.shape[0] * x.shape[1], x.shape[2], x.shape[3]))
-        
+        n_vars = x.shape[1]  # x: [B, N_f, T]
+        x = self.padding_patch_layer(x)  # [B, N_f, T + pad_len (T')]
+        x = x.unfold(dimension=-1, size=self.patch_len, step=self.stride)  # [B, N_f, num_patches, patch_len]
+        x = torch.reshape(x, (x.shape[0] * x.shape[1], x.shape[2], x.shape[3]))  # [B * N_f, num_patches, patch_len]
         # Input encoding
-        x = self.value_embedding(x) + self.position_embedding(x)
+        x = self.value_embedding(x)  # x: [B*N_f, num_patches, d_model]
         return self.dropout(x), n_vars

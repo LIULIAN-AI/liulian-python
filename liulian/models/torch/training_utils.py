@@ -9,12 +9,15 @@ Fixed:  np.Inf → np.inf (NumPy 2.0 compatibility)
 
 from __future__ import annotations
 
+import logging
 import os
 from typing import Optional
 
 import numpy as np
 import torch
 import torch.nn as nn
+
+logger = logging.getLogger(__name__)
 
 
 class EarlyStopping:
@@ -48,7 +51,7 @@ class EarlyStopping:
         verbose: bool = False,
         delta: float = 0.0,
         save_mode: bool = True,
-        checkpoint_name: str = "checkpoint",
+        checkpoint_name: str = 'checkpoint',
     ) -> None:
         """Initialize early stopping.
 
@@ -103,10 +106,9 @@ class EarlyStopping:
     ) -> None:
         """Save model checkpoint."""
         if self.verbose:
-            print(
-                f"Validation loss decreased "
-                f"({self.val_loss_min:.6f} -> {val_loss:.6f}). "
-                f"Saving model ..."
+            logger.ok(
+                'Validation loss decreased (%.6f -> %.6f). Saving model ...',
+                self.val_loss_min, val_loss,
             )
         os.makedirs(path, exist_ok=True)
         torch.save(model.state_dict(), os.path.join(path, self.checkpoint_name))

@@ -1,6 +1,6 @@
-"""Base optimiser interface and result container.
+"""Base optimizer interface and result container.
 
-All hyperparameter optimisers (Ray Tune, Optuna, grid search, etc.) must
+All hyperparameter optimizers (Ray Tune, Optuna, grid search, etc.) must
 implement :class:`BaseOptimizer` so the runner can invoke HPO uniformly.
 """
 
@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 @dataclass
@@ -20,16 +20,21 @@ class OptimizationResult:
         best_value: Metric value achieved by the best trial.
         n_trials: Total number of evaluated configurations.
         trials_summary: Per-trial records with config and metrics.
+        best_checkpoint_path: Filesystem path to the best checkpoint
+            (model state dict), if checkpoint saving was enabled.
+        storage_path: Root directory where Ray Tune stored trial results.
     """
 
     best_config: Dict[str, Any]
     best_value: float
     n_trials: int
     trials_summary: List[Dict[str, Any]] = field(default_factory=list)
+    best_checkpoint_path: Optional[str] = None
+    storage_path: Optional[str] = None
 
 
 class BaseOptimizer(ABC):
-    """Abstract base class for hyperparameter optimisers.
+    """Abstract base class for hyperparameter optimizers.
 
     Subclasses must implement :meth:`run`.
     """

@@ -46,3 +46,18 @@ uv.lock
 # Logs
 *.log
 refer_projects/
+
+# Local data / caches / checkpoints
+cache/
+dataset/
+checkpoints/
+experiments/configs/
+experiments/*/checkpoints/
+.debug/
+history/
+
+# W&B run logs
+wandb/
+
+# Scratch files
+_test_batch.py

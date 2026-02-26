@@ -7,6 +7,7 @@ forecasting, imputation, anomaly detection, and classification tasks.
 
 import pytest
 import numpy as np
+import torch
 from tests.models.torch.conftest import (
     check_torch_available,
     sample_forecast_inputs,
@@ -20,7 +21,7 @@ from tests.models.torch.conftest import (
 )
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope='module', autouse=True)
 def check_dependencies():
     """Check required dependencies are installed."""
     check_torch_available()
@@ -33,14 +34,14 @@ class TestDLinearForecast:
     def forecast_config(self):
         """Configuration for forecasting."""
         return {
-            "task_name": "long_term_forecast",
-            "seq_len": 96,
-            "pred_len": 24,
-            "label_len": 48,
-            "enc_in": 7,
-            "dec_in": 7,
-            "c_out": 7,
-            "individual": False,
+            'task_name': 'long_term_forecast',
+            'seq_len': 96,
+            'pred_len': 24,
+            'label_len': 48,
+            'enc_in': 7,
+            'dec_in': 7,
+            'c_out': 7,
+            'individual': False,
         }
     
     def test_adapter_instantiation(self, forecast_config):
@@ -63,8 +64,8 @@ class TestDLinearForecast:
         validate_forecast_output(
             outputs,
             batch_size=4,
-            pred_len=forecast_config["pred_len"],
-            features=forecast_config["c_out"]
+            pred_len=forecast_config['pred_len'],
+            features=forecast_config['c_out']
         )
     
     def test_individual_vs_shared(self, forecast_config, sample_forecast_inputs):
@@ -73,13 +74,13 @@ class TestDLinearForecast:
         
         # Shared layers
         config_shared = forecast_config.copy()
-        config_shared["individual"] = False
+        config_shared['individual'] = False
         model_shared = DLinearAdapter(config_shared)
         outputs_shared = model_shared.run(sample_forecast_inputs)
         
         # Individual layers
         config_individual = forecast_config.copy()
-        config_individual["individual"] = True
+        config_individual['individual'] = True
         model_individual = DLinearAdapter(config_individual)
         outputs_individual = model_individual.run(sample_forecast_inputs)
         
@@ -88,10 +89,10 @@ class TestDLinearForecast:
         validate_forecast_output(outputs_individual, 4, 24, 7)
         
         # Outputs should be different (different parameterization)
-        assert not np.allclose(
-            outputs_shared["predictions"],
-            outputs_individual["predictions"]
-        ), "Individual and shared modes should produce different outputs"
+        preds_s = outputs_shared['predictions'].detach().cpu()
+        preds_i = outputs_individual['predictions'].detach().cpu()
+        assert not torch.allclose(preds_s, preds_i), \
+            'Individual and shared modes should produce different outputs'
 
 
 class TestDLinearImputation:
@@ -101,11 +102,11 @@ class TestDLinearImputation:
     def imputation_config(self):
         """Configuration for imputation."""
         return {
-            "task_name": "imputation",
-            "seq_len": 96,
-            "enc_in": 7,
-            "c_out": 7,
-            "individual": False,
+            'task_name': 'imputation',
+            'seq_len': 96,
+            'enc_in': 7,
+            'c_out': 7,
+            'individual': False,
         }
     
     def test_imputation_run(self, imputation_config, sample_imputation_inputs):
@@ -118,8 +119,8 @@ class TestDLinearImputation:
         validate_imputation_output(
             outputs,
             batch_size=4,
-            seq_len=imputation_config["seq_len"],
-            features=imputation_config["c_out"]
+            seq_len=imputation_config['seq_len'],
+            features=imputation_config['c_out']
         )
 
 
@@ -130,11 +131,11 @@ class TestDLinearAnomalyDetection:
     def anomaly_config(self):
         """Configuration for anomaly detection."""
         return {
-            "task_name": "anomaly_detection",
-            "seq_len": 96,
-            "enc_in": 7,
-            "c_out": 7,
-            "individual": False,
+            'task_name': 'anomaly_detection',
+            'seq_len': 96,
+            'enc_in': 7,
+            'c_out': 7,
+            'individual': False,
         }
     
     def test_anomaly_run(self, anomaly_config, sample_anomaly_inputs):
@@ -147,8 +148,8 @@ class TestDLinearAnomalyDetection:
         validate_anomaly_output(
             outputs,
             batch_size=4,
-            seq_len=anomaly_config["seq_len"],
-            features=anomaly_config["c_out"]
+            seq_len=anomaly_config['seq_len'],
+            features=anomaly_config['c_out']
         )
 
 
@@ -159,11 +160,11 @@ class TestDLinearClassification:
     def classification_config(self):
         """Configuration for classification."""
         return {
-            "task_name": "classification",
-            "seq_len": 96,
-            "enc_in": 7,
-            "num_class": 10,
-            "individual": False,
+            'task_name': 'classification',
+            'seq_len': 96,
+            'enc_in': 7,
+            'num_class': 10,
+            'individual': False,
         }
     
     def test_classification_run(self, classification_config, sample_classification_inputs):
@@ -176,7 +177,7 @@ class TestDLinearClassification:
         validate_classification_output(
             outputs,
             batch_size=4,
-            num_classes=classification_config["num_class"]
+            num_classes=classification_config['num_class']
         )
 
 
@@ -189,27 +190,27 @@ class TestDLinearEdgeCases:
         from liulian.models.torch.dlinear import DLinearAdapter
         
         config = {
-            "task_name": "long_term_forecast",
-            "seq_len": 96,
-            "pred_len": 24,
-            "label_len": 48,
-            "enc_in": 7,
-            "dec_in": 7,
-            "c_out": 7,
-            "individual": False,
+            'task_name': 'long_term_forecast',
+            'seq_len': 96,
+            'pred_len': 24,
+            'label_len': 48,
+            'enc_in': 7,
+            'dec_in': 7,
+            'c_out': 7,
+            'individual': False,
         }
         
         model = DLinearAdapter(config)
         
         # Only x_enc provided - optional keys missing but handled gracefully
         incomplete_inputs = {
-            "x_enc": torch.randn(4, 96, 7),
+            'x_enc': torch.randn(4, 96, 7),
             # Missing x_mark_enc, x_dec, x_mark_dec (passed as None)
         }
         
         # Should work - model handles None for optional parameters
         outputs = model.run(incomplete_inputs)
-        assert "predictions" in outputs
+        assert 'predictions' in outputs
     
     def test_wrong_input_shapes(self, sample_forecast_inputs):
         """Test model behavior with mismatched input shapes.
@@ -221,23 +222,23 @@ class TestDLinearEdgeCases:
         from liulian.models.torch.dlinear import DLinearAdapter
         
         config = {
-            "task_name": "long_term_forecast",
-            "seq_len": 96,
-            "pred_len": 24,
-            "label_len": 48,
-            "enc_in": 7,
-            "dec_in": 7,
-            "c_out": 7,
-            "individual": False,
+            'task_name': 'long_term_forecast',
+            'seq_len': 96,
+            'pred_len': 24,
+            'label_len': 48,
+            'enc_in': 7,
+            'dec_in': 7,
+            'c_out': 7,
+            'individual': False,
         }
         
         model = DLinearAdapter(config)
         
         # Wrong shape for x_enc (expecting features=7, providing 5)
         wrong_inputs = sample_forecast_inputs.copy()
-        wrong_inputs["x_enc"] = torch.randn(4, 96, 5)
+        wrong_inputs['x_enc'] = torch.randn(4, 96, 5)
         
         # Model will process it but output shape may be wrong
         outputs = model.run(wrong_inputs)
         # Just verify it runs and returns something
-        assert "predictions" in outputs
+        assert 'predictions' in outputs

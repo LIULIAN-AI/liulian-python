@@ -16,7 +16,7 @@ from einops import rearrange, repeat
 
 class TriangularCausalMask:
     """Triangular causal mask for autoregressive models"""
-    def __init__(self, B, L, device="cpu"):
+    def __init__(self, B, L, device='cpu'):
         mask_shape = [B, 1, L, L]
         with torch.no_grad():
             self._mask = torch.triu(torch.ones(mask_shape, dtype=torch.bool), diagonal=1).to(device)
@@ -28,7 +28,7 @@ class TriangularCausalMask:
 
 class ProbMask:
     """Probabilistic mask for ProbSparse attention"""
-    def __init__(self, B, H, L, index, scores, device="cpu"):
+    def __init__(self, B, H, L, index, scores, device='cpu'):
         _mask = torch.ones(L, scores.shape[-1], dtype=torch.bool).to(device).triu(1)
         _mask_ex = _mask[None, None, :].expand(B, H, L, scores.shape[-1])
         indicator = _mask_ex[torch.arange(B)[:, None, None],
@@ -62,7 +62,7 @@ class DSAttention(nn.Module):
             1).unsqueeze(1)  # B x 1 x 1 x S
 
         # De-stationary Attention, rescaling pre-softmax score with learned de-stationary factors
-        scores = torch.einsum("blhe,bshe->bhls", queries, keys) * tau + delta
+        scores = torch.einsum('blhe,bshe->bhls', queries, keys) * tau + delta
 
         if self.mask_flag:
             if attn_mask is None:
@@ -71,7 +71,7 @@ class DSAttention(nn.Module):
             scores.masked_fill_(attn_mask.mask, -np.inf)
 
         A = self.dropout(torch.softmax(scale * scores, dim=-1))
-        V = torch.einsum("bhls,bshd->blhd", A, values)
+        V = torch.einsum('bhls,bshd->blhd', A, values)
 
         if self.output_attention:
             return V.contiguous(), A
@@ -94,7 +94,7 @@ class FullAttention(nn.Module):
         _, S, _, D = values.shape
         scale = self.scale or 1. / sqrt(E)
 
-        scores = torch.einsum("blhe,bshe->bhls", queries, keys)
+        scores = torch.einsum('blhe,bshe->bhls', queries, keys)
 
         if self.mask_flag:
             if attn_mask is None:
@@ -103,7 +103,7 @@ class FullAttention(nn.Module):
             scores.masked_fill_(attn_mask.mask, -np.inf)
 
         A = self.dropout(torch.softmax(scale * scores, dim=-1))
-        V = torch.einsum("bhls,bshd->blhd", A, values)
+        V = torch.einsum('bhls,bshd->blhd', A, values)
 
         if self.output_attention:
             return V.contiguous(), A

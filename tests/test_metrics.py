@@ -4,7 +4,7 @@ Tests for time series metrics module.
 
 import pytest
 import numpy as np
-from liulian.utils.metrics import RSE, CORR, MAE, MSE, RMSE, MAPE, MSPE, metric
+from liulian.utils.metrics import RSE, CORR, MAE, MSE, RMSE, NSE, MAPE, MSPE, metric
 
 
 class TestBasicMetrics:
@@ -127,6 +127,19 @@ class TestRelativeMetrics:
         pred = np.random.randn(100)
         corr = CORR(pred, true)
         assert abs(corr) < 0.5  # Should be close to 0
+
+    def test_nse_perfect_prediction(self):
+        """NSE should be 1.0 for perfect predictions."""
+        true = np.array([1.0, 2.0, 3.0, 4.0])
+        pred = true.copy()
+        assert NSE(pred, true) == pytest.approx(1.0)
+
+    def test_nse_degrades_for_bad_predictions(self):
+        """NSE should get lower as predictions worsen."""
+        true = np.array([1.0, 2.0, 3.0, 4.0])
+        pred_good = true + 0.1
+        pred_bad = true + 2.0
+        assert NSE(pred_good, true) > NSE(pred_bad, true)
 
 
 class TestMetricFunction:

@@ -39,15 +39,15 @@ class Model(nn.Module):
     """
 
     def __init__(self, configs):
-        super(Model, self).__init__()
+        super(Model, self).__init__()  # todo: nowcasting? extrapo_mode: limo, future_embedding, recursive
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
         self.enc_in = configs.enc_in
         self.c_out = configs.c_out
 
-        d_model = getattr(configs, "d_model", 64)
-        n_layers = getattr(configs, "e_layers", 2)
-        dropout = getattr(configs, "dropout", 0.1)
+        d_model = getattr(configs, 'd_model', 64)
+        n_layers = getattr(configs, 'e_layers', 2)
+        dropout = getattr(configs, 'dropout', 0.0)
 
         self.lstm = nn.LSTM(
             input_size=self.enc_in,
@@ -106,14 +106,14 @@ class LSTMAdapter(TorchModelAdapter):
 
     def __init__(self, config: Dict[str, Any]):
         default_config = {
-            "d_model": 64,
-            "e_layers": 2,
-            "dropout": 0.1,
-            "task_name": "long_term_forecast",
+            'd_model': 64,
+            'e_layers': 2,
+            'dropout': 0.1,
+            'task_name': 'long_term_forecast',
         }
         default_config.update(config)
-        if "c_out" not in default_config:
-            default_config["c_out"] = default_config["enc_in"]
+        if 'c_out' not in default_config:
+            default_config['c_out'] = default_config['enc_in']
 
         model = Model(self._dict_to_namespace(default_config))
         super().__init__(model, default_config)

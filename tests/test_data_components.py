@@ -17,12 +17,21 @@ def _torch_available():
         return False
 
 
+def _sklearn_available():
+    try:
+        import sklearn  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
 # -----------------------------------------------------------------------
 # DatasetCustom  (requires torch)
 # -----------------------------------------------------------------------
 
 
 @pytest.mark.skipif(not _torch_available(), reason='torch not installed')
+@pytest.mark.skipif(not _sklearn_available(), reason='scikit-learn not installed')
 class TestDatasetCustom:
     """Tests for DatasetCustom CSV loader."""
 
@@ -46,23 +55,23 @@ class TestDatasetCustom:
     def test_instantiation(self, sample_csv):
         from liulian.data.dataset_custom import DatasetCustom
 
-        ds = DatasetCustom(
+        container = DatasetCustom(
             root_path=os.path.dirname(sample_csv),
             data_path=os.path.basename(sample_csv),
-            flag='train',
             size=(48, 24, 12),
         )
+        ds = container.get_split('train')
         assert len(ds) > 0
 
     def test_getitem(self, sample_csv):
         from liulian.data.dataset_custom import DatasetCustom
 
-        ds = DatasetCustom(
+        container = DatasetCustom(
             root_path=os.path.dirname(sample_csv),
             data_path=os.path.basename(sample_csv),
-            flag='train',
             size=(48, 24, 12),
         )
+        ds = container.get_split('train')
         seq_x, seq_y, seq_x_mark, seq_y_mark = ds[0]
         assert seq_x.shape[0] == 48  # seq_len
         assert seq_y.shape[0] == 24 + 12  # label_len + pred_len
@@ -73,30 +82,28 @@ class TestDatasetCustom:
         dirname = os.path.dirname(sample_csv)
         basename = os.path.basename(sample_csv)
 
-        train = DatasetCustom(
-            root_path=dirname, data_path=basename, flag='train', size=(24, 12, 6)
+        container = DatasetCustom(
+            root_path=dirname, data_path=basename, size=(24, 12, 6)
         )
-        val = DatasetCustom(
-            root_path=dirname, data_path=basename, flag='val', size=(24, 12, 6)
-        )
-        test = DatasetCustom(
-            root_path=dirname, data_path=basename, flag='test', size=(24, 12, 6)
-        )
+        train = container.get_split('train')
+        val = container.get_split('val')
+        test = container.get_split('test')
 
         assert len(train) > 0
         assert len(val) >= 0
         assert len(test) > 0
 
     def test_get_data_loaders(self, sample_csv):
-        from liulian.data.dataset_custom import DatasetCustom
+        """Test creating dataloaders via data_factory."""
+        from liulian.data.data_factory import create_dataloaders
 
-        ds = DatasetCustom(
+        loaders = create_dataloaders(
+            data_name='custom',
             root_path=os.path.dirname(sample_csv),
             data_path=os.path.basename(sample_csv),
-            flag='train',
             size=(24, 12, 6),
+            batch_size=4,
         )
-        loaders = ds.get_data_loaders(batch_size=4)
         assert 'train' in loaders
         assert 'val' in loaders
         assert 'test' in loaders

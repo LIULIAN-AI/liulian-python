@@ -28,6 +28,7 @@ Usage:
 """
 
 import argparse
+import logging
 import os
 import sys
 import time
@@ -87,7 +88,8 @@ class EarlyStopping:
                 self.save_checkpoint(val_loss, model, path)
         elif score < self.best_score + self.delta:
             self.counter += 1
-            print(f'EarlyStopping counter: {self.counter} out of {self.patience}')
+            logging.getLogger(__name__).info(
+                'EarlyStopping counter: %d out of %d', self.counter, self.patience)
             if self.counter >= self.patience:
                 self.early_stop = True
         else:
@@ -98,8 +100,9 @@ class EarlyStopping:
 
     def save_checkpoint(self, val_loss, model, path):
         if self.verbose:
-            print(f'Validation loss decreased ({self.val_loss_min:.6f} → '
-                  f'{val_loss:.6f}). Saving model ...')
+            logging.getLogger(__name__).ok(
+                'Validation loss decreased (%.6f → %.6f). Saving model ...',
+                self.val_loss_min, val_loss)
         torch.save(model.state_dict(), os.path.join(path, 'checkpoint'))
         self.val_loss_min = val_loss
 
@@ -383,7 +386,7 @@ def build_parser():
     parser.add_argument('--model_id', type=str, default='swiss_river_timellm')
     parser.add_argument('--model_comment', type=str, default='swiss_river_timellm')
     parser.add_argument('--model', type=str, default='TimeLLM')
-    parser.add_argument('--seed', type=int, default=2021)
+    parser.add_argument('--seed', type=int, default=2026)
 
     # Data loader
     parser.add_argument('--data', type=str, default='swiss-river-1990')

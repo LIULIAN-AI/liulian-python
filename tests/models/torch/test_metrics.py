@@ -9,7 +9,7 @@ try:
         RSE, CORR, MAE, MSE, RMSE, MAPE, MSPE, metric
     )
 except ImportError:
-    pytest.skip("torch not installed", allow_module_level=True)
+    pytest.skip('torch not installed', allow_module_level=True)
 
 
 class TestBasicMetrics:
@@ -232,7 +232,7 @@ class TestDeviceCompatibility:
         assert isinstance(mae, float)
         assert mae > 0
     
-    @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
+    @pytest.mark.skipif(not torch.cuda.is_available(), reason='CUDA not available')
     def test_gpu_tensors(self):
         """Test with GPU tensors."""
         pred = torch.tensor([1.0, 2.0, 3.0]).cuda()

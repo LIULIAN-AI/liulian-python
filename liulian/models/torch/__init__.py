@@ -39,6 +39,7 @@ except ImportError as e:
 
 # Export base class
 from .base_adapter import TorchModelAdapter
+from .entity_mixin import EntityAwareMixin, EntityWrapper
 
 # Model adapters
 from .dlinear import DLinearAdapter
@@ -53,12 +54,40 @@ from .timemixer import TimeMixerAdapter
 from .timexer import TimeXerAdapter
 from .mamba_model import MambaAdapter
 
+# Optional-dependency models (lazy-imported, require `transformers`)
+try:
+    from .timellm import TimeLLMAdapter
+except ImportError:
+    TimeLLMAdapter = None  # type: ignore[assignment,misc]
+
+try:
+    from .timemoe import TimeMoEAdapter
+except ImportError:
+    TimeMoEAdapter = None  # type: ignore[assignment,misc]
+
+from .swiss_lstm import (
+    LSTMAdapter,
+    ExtrapoLSTMAdapter,
+    LstmEntityFeatureModel,
+    SwissLSTMAdapter,
+    SwissExtrapoLSTMAdapter,
+    SwissLSTMEmbeddingAdapter,
+)
+from .swiss_transformer import (
+    TransformerEncoderAdapter,
+    TransformerEntityFeatureModel,
+    SwissTransformerAdapter,
+    SwissTransformerEmbeddingAdapter,
+)
+
 # Version info
 __version__ = '0.0.1'
 
 # Export list
 __all__ = [
     'TorchModelAdapter',
+    'EntityAwareMixin',
+    'EntityWrapper',
     'DLinearAdapter',
     'PatchTSTAdapter',
     'iTransformerAdapter',
@@ -70,4 +99,17 @@ __all__ = [
     'TimeMixerAdapter',
     'TimeXerAdapter',
     'MambaAdapter',
+    'TimeLLMAdapter',
+    'TimeMoEAdapter',
+    'LSTMAdapter',
+    'ExtrapoLSTMAdapter',
+    'LstmEntityFeatureModel',
+    'TransformerEncoderAdapter',
+    'TransformerEntityFeatureModel',
+    # Backward-compatible aliases
+    'SwissLSTMAdapter',
+    'SwissExtrapoLSTMAdapter',
+    'SwissLSTMEmbeddingAdapter',
+    'SwissTransformerAdapter',
+    'SwissTransformerEmbeddingAdapter',
 ]

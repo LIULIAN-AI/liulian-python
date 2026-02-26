@@ -99,7 +99,11 @@ addopts = "-v"
 markers = [
     "slow: marks tests as slow (may involve downloads or heavy computation)",
     "download: marks tests that require internet connection and download models/data",
+    "main_branch: marks tests that should only run on the main branch (e.g. Swiss River e2e)",
 ]
+
+[tool.uv]
+preview = true
 
 [tool.uv.extra-build-dependencies]
 mamba-ssm = ["torch"]

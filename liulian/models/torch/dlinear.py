@@ -15,6 +15,7 @@ import numpy as np
 from typing import Dict, Any, Optional
 from liulian.models.torch.layers.decomposition import series_decomp
 from liulian.models.torch.base_adapter import TorchModelAdapter
+from liulian.models.torch.entity_mixin import EntityAwareMixin
 
 
 class Model(nn.Module):
@@ -123,7 +124,7 @@ class Model(nn.Module):
         return None
 
 
-class DLinearAdapter(TorchModelAdapter):
+class DLinearAdapter(EntityAwareMixin, TorchModelAdapter):
     """
     Adapter for DLinear model to liulian ExecutableModel interface.
     
@@ -145,11 +146,14 @@ class DLinearAdapter(TorchModelAdapter):
         }
         default_config.update(config)
         
+        # Adjust enc_in for entity embedding if needed
+        model_cfg = self._entity_model_config(default_config)
         # Create model instance
-        model = Model(self._dict_to_namespace(default_config), 
-                     individual=default_config.get('individual', False))
+        model = Model(self._dict_to_namespace(model_cfg), 
+                     individual=model_cfg.get('individual', False))
         
         super().__init__(model, default_config)
+        self._init_entity_support(default_config)
     
     def _prepare_model_inputs(self, inputs: Dict[str, torch.Tensor]) -> tuple:
         """

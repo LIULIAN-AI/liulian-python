@@ -31,6 +31,7 @@ from liulian.runtime.state_machine import LifecycleState, StateMachine
 from liulian.tasks.base import BaseTask
 from liulian.utils.helpers import ensure_dir, timestamp_id
 
+
 logger = logging.getLogger(__name__)
 
 
@@ -130,6 +131,44 @@ class Experiment:
             fn(**kwargs)
 
     # ------------------------------------------------------------------
+    # Inverse-transform resolution (for denormalized eval metrics)
+    # ------------------------------------------------------------------
+
+    def _resolve_inverse_transform_fn(
+        self,
+        loaders: Dict[str, Any],
+    ) -> Optional[Callable[[Any], Any]]:
+        """Resolve a callable inverse-transform function for eval denorm.
+
+        Resolution order:
+
+        1. ``config['inverse_transform']`` when callable
+        2. ``dataset.inverse_transform`` when available
+        3. Any loader dataset's ``inverse_transform`` (train/val/test)
+
+        Returns:
+            Callable inverse transform or ``None`` if unavailable.
+        """
+        configured = self.config.get('inverse_transform')
+        if callable(configured):
+            return configured
+
+        dataset_inv = getattr(self.dataset, 'inverse_transform', None)
+        if callable(dataset_inv):
+            return dataset_inv
+
+        for split_name in ('train', 'val', 'test'):
+            loader = loaders.get(split_name)
+            if loader is None:
+                continue
+            ds = getattr(loader, 'dataset', None)
+            split_inv = getattr(ds, 'inverse_transform', None)
+            if callable(split_inv):
+                return split_inv
+
+        return None
+
+    # ------------------------------------------------------------------
     # Lifecycle
     # ------------------------------------------------------------------
 
@@ -164,11 +203,9 @@ class Experiment:
         self.spec.to_yaml(spec_path)
         logger.info('Experiment spec saved to %s', spec_path)
 
-        # Auto-create a local logger if none provided
+        # Auto-create a logger from config if none provided
         if self.exp_logger is None:
-            from liulian.loggers.local_logger import LocalFileLogger
-
-            self.exp_logger = LocalFileLogger(run_dir=self._artifacts_dir)
+            self.exp_logger = self._maybe_create_logger()
 
         summary: Dict[str, Any] = {
             'status': 'ok',
@@ -192,7 +229,15 @@ class Experiment:
         if self.exp_logger:
             self.exp_logger.log_artifact(spec_path)
 
-        logger.info("Experiment '%s' completed.", self.spec.name)
+        # ---- Auto-viz ----
+        if self.config.get('auto_viz', False) and 'predictions' in summary:
+            try:
+                viz_paths = self.visualize(summary)
+                summary['viz_paths'] = viz_paths
+            except Exception as exc:
+                logger.warning('Auto-viz failed: %s', exc)
+
+        logger.ok("Experiment '%s' completed.", self.spec.name)
         return summary
 
     # ------------------------------------------------------------------
@@ -217,6 +262,71 @@ class Experiment:
         """Alias for :meth:`val`."""
         return self.val(**kwargs)
 
+    def visualize(
+        self,
+        summary: Optional[Dict[str, Any]] = None,
+        *,
+        output_dir: str | None = None,
+        method: str = 'mean',
+    ) -> Dict[str, str]:
+        """Generate prediction visualisations from experiment results.
+
+        Can be called after :meth:`run` with the returned summary, or
+        standalone with pre-loaded predictions.
+
+        Args:
+            summary: Experiment summary dict containing ``'predictions'``
+                with ``preds``, ``trues``, ``times`` tensors.
+            output_dir: Output directory for plots.  Defaults to
+                ``{artifacts_dir}/figures``.
+            method: Aggregation method for overlapping predictions.
+
+        Returns:
+            Mapping of plot name → file path.
+        """
+        from liulian.viz.plots import save_prediction_plots
+
+        if summary is None:
+            raise ValueError('No summary provided — call run() first.')
+
+        predictions = summary.get('predictions', {})
+        preds = predictions.get('preds')
+        trues = predictions.get('trues')
+        times = predictions.get('times')
+
+        if preds is None or trues is None or times is None:
+            logger.warning('No predictions in summary — skipping viz.')
+            return {}
+
+        # Convert to numpy if tensors
+        import torch as _torch
+
+        if isinstance(preds, _torch.Tensor):
+            preds = preds.detach().cpu().numpy()
+        if isinstance(trues, _torch.Tensor):
+            trues = trues.detach().cpu().numpy()
+        if isinstance(times, _torch.Tensor):
+            times = times.detach().cpu().numpy()
+
+        if output_dir is None:
+            output_dir = os.path.join(
+                self._artifacts_dir or 'artifacts', 'figures'
+            )
+
+        viz_method = self.config.get('viz_method', method)
+        pred_len = self.config.get('pred_len')
+
+        paths = save_prediction_plots(
+            preds, trues, times,
+            method=viz_method,
+            pred_len=pred_len,
+            output_dir=output_dir,
+            title_prefix=f'{self.spec.name} — ',
+        )
+
+        logger.ok('Saved %d plots to %s', len(paths), output_dir)
+        return paths
+
     # ------------------------------------------------------------------
     # PyTorch path (ForecastTrainer)
     # ------------------------------------------------------------------
@@ -229,7 +339,13 @@ class Experiment:
         eval: bool,
         infer: bool,
     ) -> None:
-        """Drive the lifecycle using :class:`ForecastTrainer`."""
+        """Drive the lifecycle using :class:`ForecastTrainer`.
+
+        When ``self.optimizer`` is set and a ``search_space`` is present
+        in ``self.config``, the method branches to an HPO flow that
+        delegates to :meth:`RayOptimizer.run`.  Otherwise it runs a
+        single-trial training loop as before.
+        """
         from liulian.runtime.trainer import ForecastTrainer
 
         loaders = self.data_loaders or {}
@@ -250,10 +366,178 @@ class Experiment:
 
         ckpt_dir = os.path.join(self._artifacts_dir, 'checkpoints')
 
+        # ----- HPO branch -----
+        search_space = self.config.get('search_space')
+        if (
+            train
+            and self.optimizer is not None
+            and search_space
+            and train_loader is not None
+        ):
+            self._sm.transition(LifecycleState.TRAIN)
+            logger.info('Starting HPO via %s', type(self.optimizer).__name__)
+
+            # Detect EntityWrapper and extract the inner model class so that
+            # make_trainable can build fresh models per trial.
+            from liulian.models.torch.entity_mixin import EntityWrapper
+
+            is_entity_wrapped = isinstance(torch_model, EntityWrapper)
+            if is_entity_wrapped:
+                inner_model_cls = type(torch_model.inner)
+                model_args = getattr(torch_model.inner, '_args', None)
+                # Capture EntityWrapper parameters so we can re-wrap per trial todo: these arg names may change.
+                _ew_enc_in = self.config.get('enc_in', torch_model.enc_proj.in_features - torch_model.embedding.embedding_dim)
+                _ew_num_embeddings = torch_model.embedding.num_embeddings
+                _ew_entity_id_col = torch_model.entity_id_col
+            else:
+                inner_model_cls = type(torch_model)
+                model_args = getattr(torch_model, '_args', None)
+
+            if model_args is None:
+                from types import SimpleNamespace
+                model_args = SimpleNamespace(**self.config)
+
+            # Build a model factory that rebuilds the full model (including
+            # EntityWrapper wrapping) from a namespace of args.
+            if is_entity_wrapped:
+                def _model_factory(args):
+                    inner = inner_model_cls(args).float()
+                    emb_size = getattr(args, 'embedding_size', 10)
+                    return EntityWrapper(
+                        inner_model=inner,
+                        enc_in=_ew_enc_in,
+                        num_embeddings=_ew_num_embeddings,
+                        embedding_size=emb_size,
+                        entity_id_col=_ew_entity_id_col,
+                    )
+            else:
+                _model_factory = None
+
+            trainable = None
+            try:
+                from liulian.optim.ray_optimizer import make_trainable
+
+                # Determine if checkpoint saving is enabled
+                _save_ckpts = True
+                if self.optimizer is not None and hasattr(self.optimizer, 'config'):
+                    _save_ckpts = self.optimizer.config.get('save_checkpoints', True)
+
+                trainable = make_trainable(
+                    model_cls=inner_model_cls,
+                    model_args=model_args,
+                    loaders=loaders,
+                    base_config=self.config,
+                    model_factory=_model_factory,
+                    save_checkpoints=_save_ckpts,
+                )
+            except Exception as exc:
+                logger.warning('Could not build HPO trainable: %s', exc)
+
+            hpo_result = self.optimizer.run(
+                self.spec, search_space, trainable,
+            )
+            summary['metrics']['hpo'] = {
+                'best_config': hpo_result.best_config,
+                'best_value': hpo_result.best_value,
+                'n_trials': hpo_result.n_trials,
+                'best_checkpoint_path': hpo_result.best_checkpoint_path,
+                'storage_path': hpo_result.storage_path,
+            }
+            logger.ok(
+                'HPO complete — best value: %.6f, config: %s',
+                hpo_result.best_value,
+                hpo_result.best_config,
+            )
+
+            # Retrain with best config
+            best_cfg = {**self.config, **hpo_result.best_config}
+            best_cfg.pop('search_space', None)
+            trainer = ForecastTrainer(
+                config=best_cfg,
+                checkpoint_dir=ckpt_dir,
+                exp_logger=self.exp_logger,
+                inverse_transform=self._resolve_inverse_transform_fn(loaders),
+            )
+
+            # Rebuild model with best hypers
+            try:
+                from types import SimpleNamespace as _NS
+                best_args = _NS(**{**vars(model_args), **hpo_result.best_config})
+                if _model_factory is not None:
+                    torch_model = _model_factory(best_args)
+                else:
+                    torch_model = inner_model_cls(best_args).float()
+            except Exception:
+                pass  # fallback: retrain existing model
+
+            # Load the best checkpoint from Ray Tune results
+            _loaded_checkpoint = False
+            if hpo_result.best_checkpoint_path is not None:
+                try:
+                    ckpt_dir_path = hpo_result.best_checkpoint_path
+                    # Find .pth file in the checkpoint directory
+                    pth_files = [
+                        f for f in os.listdir(ckpt_dir_path)
+                        if f.endswith('.pth')
+                    ]  #  todo: maybe this is incorrect if multiple checkpoints are saved?
+                    if pth_files:
+                        import torch as _torch
+                        state_path = os.path.join(ckpt_dir_path, sorted(pth_files)[0])
+                        torch_model.load_state_dict(_torch.load(state_path, weights_only=True))
+                        torch_model.eval()
+                        logger.ok('Loaded best checkpoint from %s', state_path)
+                        _loaded_checkpoint = True
+                except Exception as exc:
+                    logger.warning('Could not load best checkpoint: %s', exc)
+
+            if _loaded_checkpoint:
+                # Evaluate the loaded model to populate train_result
+                train_result = {
+                    'best_val_mse': hpo_result.best_value,
+                    'epochs_run': 0,
+                    'history': [],
+                    'final_test': {},
+                }
+                if test_loader is not None:
+                    test_metrics = trainer.evaluate(torch_model, test_loader)
+                    train_result['final_test'] = test_metrics
+            else:
+                # No checkpoint available — retrain with best config
+                raise RuntimeError(
+                    'Best checkpoint not found after HPO.  Checkpoint saving may have been disabled. Please retrain with best config.'
+                )
+                logger.warning(
+                    'No checkpoint available from HPO (checkpoint saving '
+                    'may have been disabled). Retraining with best config.'
+                )
+                train_result = trainer.fit(
+                    torch_model, train_loader, val_loader, test_loader,
+                )
+            summary['metrics']['training'] = {
+                'best_val_mse': train_result['best_val_mse'],
+                'epochs_run': train_result['epochs_run'],
+            }
+            summary['metrics']['history'] = train_result['history']
+
+            self._sm.transition(LifecycleState.EVAL)
+            if train_result.get('final_test'):
+                summary['metrics']['final_test'] = train_result['final_test']
+            self._fire('on_eval_end', metrics=train_result.get('final_test', {}))
+
+            # Compute task metrics + predictions on the retrained model
+            self._compute_task_metrics(summary, torch_model, trainer)  # todo: is this necessary if trainer.evaluate is already done?
+            if test_loader is not None:
+                pred_result = trainer.predict(torch_model, test_loader)
+                summary['predictions'] = pred_result
+            return
+
+        # ----- Standard single-trial path -----
+
         trainer = ForecastTrainer(
             config=self.config,
             checkpoint_dir=ckpt_dir,
             exp_logger=self.exp_logger,
+            inverse_transform=self._resolve_inverse_transform_fn(loaders),
         )
 
         if train and train_loader is not None and val_loader is not None:
@@ -293,7 +577,7 @@ class Experiment:
                         ckpt_path, map_location=trainer.device, weights_only=True
                     )
                 )
-                logger.info('Loaded checkpoint: %s', ckpt_path)
+                logger.ok('Loaded checkpoint: %s', ckpt_path)
 
             if test_loader is not None:
                 test_metrics = trainer.evaluate(torch_model, test_loader)
@@ -303,6 +587,17 @@ class Experiment:
 
         # Compute liulian task-level metrics on a sample
         self._compute_task_metrics(summary, torch_model, trainer)
+
+        # Collect raw predictions for downstream visualization
+        if test_loader is not None:
+            pred_result = trainer.predict(torch_model, test_loader)
+            summary['predictions'] = pred_result
+            logger.info(
+                'Predictions collected: preds=%s, trues=%s, times=%s',
+                list(pred_result['preds'].shape),
+                list(pred_result['trues'].shape),
+                list(pred_result['times'].shape),
+            )
 
         if infer:
             if self._sm.can_transition(LifecycleState.INFER):
@@ -321,16 +616,26 @@ class Experiment:
 
             test_split = self.dataset.get_split('test')
             X_sample, y_sample = test_split.get_batch(batch_size=32)
-            batch = self.task.prepare_batch({'X': X_sample, 'y': y_sample})
+
+            cfg = self.config
+            pred_len = cfg.get('pred_len', 1)
+            seq_len = cfg.get('seq_len', X_sample.shape[1])
+
+            # For forecast windows: X_sample and y_sample span seq_len+pred_len.
+            # Slice to match model expectations.
+            x_enc = X_sample[:, :seq_len, :]   # encoder input
+            y_true = y_sample[:, -pred_len:, :] # ground truth for loss
+
+            batch = self.task.prepare_batch({
+                'X': x_enc, 'y': y_true,
+            })  # these are numpy arrays.
 
             x_tensor = _torch.tensor(batch['X'], dtype=_torch.float32).to(
                 trainer.device
-            )
+            )  # todo: can this just use x_enc?
 
             torch_model.eval()
-            cfg = self.config
             with _torch.no_grad():
-                pred_len = cfg.get('pred_len', batch['y'].shape[1])
                 dec = _torch.zeros(
                     x_tensor.size(0),
                     pred_len,
@@ -342,7 +647,7 @@ class Experiment:
                     x_tensor.size(1),
                     1,
                     device=trainer.device,
-                )
+                )  # todo: maybe this is known or useful for some tasks?
                 mark_dec = _torch.zeros(
                     x_tensor.size(0),
                     pred_len,
@@ -410,7 +715,7 @@ class Experiment:
                 self._sm.transition(LifecycleState.EVAL)
                 self._sm.transition(LifecycleState.INFER)
             self._fire('on_infer_complete')
-            logger.info('Inference phase completed')
+            logger.ok('Inference phase completed')
 
     # ------------------------------------------------------------------
     # Pause / Resume
@@ -443,3 +748,42 @@ class Experiment:
     def artifacts_dir(self) -> Optional[str]:
         """Path to the artifacts directory (set after :meth:`run`)."""
         return self._artifacts_dir
+
+    # ------------------------------------------------------------------
+    # Logger auto-creation
+    # ------------------------------------------------------------------
+
+    def _maybe_create_logger(self) -> LoggerInterface:
+        """Create a logger from config keys or fall back to local.
+
+        Recognised config keys:
+
+        * ``wandb_project`` — enables WandB logging.
+        * ``wandb_entity``  — optional WandB team/user.
+        * ``dev_run``       — when *True*, disables wandb even if project
+          is set (matches swiss-river reference convention).
+
+        Returns:
+            A :class:`LoggerInterface` instance.
+        """
+        wandb_project = self.config.get('wandb_project')
+        dev_run = self.config.get('dev_run', False)
+
+        if wandb_project and not dev_run:
+            try:
+                from liulian.loggers.wandb_logger import WandbLogger
+
+                return WandbLogger(
+                    project=wandb_project,
+                    entity=self.config.get('wandb_entity'),
+                    config=self.config,
+                    run_dir=self._artifacts_dir or 'artifacts/logs',
+                )
+            except Exception as exc:
+                logger.warning(
+                    'Could not create WandbLogger (%s); falling back to local.', exc,
+                )
+
+        from liulian.loggers.local_logger import LocalFileLogger
+
+        return LocalFileLogger(run_dir=self._artifacts_dir or 'artifacts/logs')

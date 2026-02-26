@@ -39,5 +39,5 @@ class TestExecutableModel:
                 return {}
 
         stub = _Stub()
-        stub.save("/tmp/test_checkpoint")  # no-op
-        stub.load("/tmp/test_checkpoint")  # no-op
+        stub.save('/tmp/test_checkpoint')  # no-op
+        stub.load('/tmp/test_checkpoint')  # no-op

@@ -16,8 +16,8 @@ try:
     import torch
 except ImportError:
     raise ImportError(
-        "PyTorch metrics require torch to be installed. "
-        "Install with: pip install liulian[torch-models]"
+        'PyTorch metrics require torch to be installed. '
+        'Install with: pip install liulian[torch-models]'
     )
 
 
@@ -144,6 +144,27 @@ def RMSE(pred: torch.Tensor, true: torch.Tensor) -> float:
         >>> rmse = RMSE(pred, true)  # ~0.1
     """
     return torch.sqrt(torch.tensor(MSE(pred, true))).item()
+
+
+def NSE(pred: torch.Tensor, true: torch.Tensor) -> float:
+    """
+    Nash-Sutcliffe Efficiency (NSE).
+
+    Measures predictive skill relative to the mean of observations.
+    Higher is better, with 1.0 indicating perfect predictions.
+
+    Args:
+        pred: Predicted values, shape (n_samples, ...)
+        true: True values, shape (n_samples, ...)
+
+    Returns:
+        NSE value (float). Returns NaN when variance of ``true`` is ~0.
+    """
+    denominator = torch.sum((true - torch.mean(true)) ** 2)
+    if torch.abs(denominator) <= 1e-12:
+        return float('nan')
+    numerator = torch.sum((true - pred) ** 2)
+    return (1.0 - (numerator / denominator)).item()
 
 
 def MAPE(pred: torch.Tensor, true: torch.Tensor) -> float:

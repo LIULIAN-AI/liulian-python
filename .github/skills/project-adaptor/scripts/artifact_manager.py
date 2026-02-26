@@ -29,7 +29,7 @@ class ChangeRecord:
     step_id: str
     timestamp: str
     file_path: str
-    change_type: str  # "create", "modify", "delete"
+    change_type: str  # 'create', 'modify', 'delete'
     lines_added: int
     lines_removed: int
     patch_file: str
@@ -48,7 +48,7 @@ class AdaptationRun:
     config: Dict[str, Any]
     changes: List[ChangeRecord]
     conflicts_resolved: List[Dict[str, Any]]
-    status: str  # "in_progress", "completed", "aborted"
+    status: str  # 'in_progress', 'completed', 'aborted'
     token_usage: int = 0
     copilot_requests: int = 0
 
@@ -69,27 +69,27 @@ def initialize_artifact_directory(workspace_path: Path, run_id: str) -> Path:
     Returns:
         Path to the run's artifact directory
     """
-    artifact_dir = workspace_path / "artifacts" / "adaptations" / run_id
+    artifact_dir = workspace_path / 'artifacts' / 'adaptations' / run_id
     
     # Create directory structure
     artifact_dir.mkdir(parents=True, exist_ok=True)
-    (artifact_dir / "changes").mkdir(exist_ok=True)
-    (artifact_dir / "tests").mkdir(exist_ok=True)
-    (artifact_dir / "commits").mkdir(exist_ok=True)
+    (artifact_dir / 'changes').mkdir(exist_ok=True)
+    (artifact_dir / 'tests').mkdir(exist_ok=True)
+    (artifact_dir / 'commits').mkdir(exist_ok=True)
     
     return artifact_dir
 
 
 def save_config(artifact_dir: Path, config: Dict[str, Any]) -> None:
     """Save run configuration to config.json."""
-    config_file = artifact_dir / "config.json"
+    config_file = artifact_dir / 'config.json'
     with open(config_file, 'w') as f:
         json.dump(config, f, indent=2)
 
 
 def save_plan(artifact_dir: Path, plan: Dict[str, Any]) -> None:
     """Save adaptation plan to plan.yaml."""
-    plan_file = artifact_dir / "plan.yaml"
+    plan_file = artifact_dir / 'plan.yaml'
     with open(plan_file, 'w') as f:
         yaml.dump(plan, f, default_flow_style=False, sort_keys=False)
 
@@ -99,7 +99,7 @@ def save_conflict_resolutions(
     resolutions: List[Dict[str, Any]]
 ) -> None:
     """Save conflict resolutions to conflict_resolutions.yaml."""
-    resolution_file = artifact_dir / "conflict_resolutions.yaml"
+    resolution_file = artifact_dir / 'conflict_resolutions.yaml'
     with open(resolution_file, 'w') as f:
         yaml.dump(resolutions, f, default_flow_style=False, sort_keys=False)
 
@@ -113,7 +113,7 @@ def record_change(
     
     Creates a change record JSON file in changes/ directory.
     """
-    change_file = artifact_dir / "changes" / f"{change.step_id}.json"
+    change_file = artifact_dir / 'changes' / f'{change.step_id}.json'
     with open(change_file, 'w') as f:
         json.dump(asdict(change), f, indent=2)
 
@@ -124,7 +124,7 @@ def record_test_results(
     test_output: str
 ) -> None:
     """Record test execution results."""
-    test_file = artifact_dir / "tests" / f"{step_id}_results.txt"
+    test_file = artifact_dir / 'tests' / f'{step_id}_results.txt'
     with open(test_file, 'w') as f:
         f.write(test_output)
 
@@ -135,7 +135,7 @@ def record_commit(
     commit_info: Dict[str, Any]
 ) -> None:
     """Record Git commit information."""
-    commit_file = artifact_dir / "commits" / f"{step_id}.json"
+    commit_file = artifact_dir / 'commits' / f'{step_id}.json'
     with open(commit_file, 'w') as f:
         json.dump(commit_info, f, indent=2)
 
@@ -155,17 +155,17 @@ def generate_final_report(
     
     # Generate Markdown report
     md_lines = [
-        "# Adaptation Report",
-        "",
-        f"**Run ID:** {run.run_id}",
-        f"**Timestamp:** {run.timestamp}",
-        f"**Status:** {run.status}",
-        "",
-        "## Configuration",
-        "",
-        f"**Target Project:** {run.target_project}",
-        "",
-        "**Reference Projects:**",
+        '# Adaptation Report',
+        '',
+        f'**Run ID:** {run.run_id}',
+        f'**Timestamp:** {run.timestamp}',
+        f'**Status:** {run.status}',
+        '',
+        '## Configuration',
+        '',
+        f'**Target Project:** {run.target_project}',
+        '',
+        '**Reference Projects:**',
     ]
     
     for i, ref in enumerate(run.reference_projects, 1):
@@ -174,71 +174,71 @@ def generate_final_report(
             md_lines.append(f"  - Source: {ref['source']}")
     
     md_lines.extend([
-        "",
-        "**Items Adapted:**",
+        '',
+        '**Items Adapted:**',
     ])
     for item in run.items:
-        md_lines.append(f"- {item}")
+        md_lines.append(f'- {item}')
     
     # Changes summary
     md_lines.extend([
-        "",
-        f"## Changes Summary",
-        "",
-        f"**Total Changes:** {len(run.changes)}",
-        ""
+        '',
+        f'## Changes Summary',
+        '',
+        f'**Total Changes:** {len(run.changes)}',
+        ''
     ])
     
-    files_created = sum(1 for c in run.changes if c.change_type == "create")
-    files_modified = sum(1 for c in run.changes if c.change_type == "modify")
+    files_created = sum(1 for c in run.changes if c.change_type == 'create')
+    files_modified = sum(1 for c in run.changes if c.change_type == 'modify')
     total_lines_added = sum(c.lines_added for c in run.changes)
     total_lines_removed = sum(c.lines_removed for c in run.changes)
     
     md_lines.extend([
-        f"- Files created: {files_created}",
-        f"- Files modified: {files_modified}",
-        f"- Total lines added: {total_lines_added}",
-        f"- Total lines removed: {total_lines_removed}",
-        ""
+        f'- Files created: {files_created}',
+        f'- Files modified: {files_modified}',
+        f'- Total lines added: {total_lines_added}',
+        f'- Total lines removed: {total_lines_removed}',
+        ''
     ])
     
     # Conflicts resolved
     if run.conflicts_resolved:
         md_lines.extend([
-            "## Conflicts Resolved",
-            ""
+            '## Conflicts Resolved',
+            ''
         ])
         for conflict in run.conflicts_resolved:
             md_lines.append(f"- {conflict.get('description', 'Unknown conflict')}")
             md_lines.append(f"  - Resolution: {conflict.get('resolution', 'N/A')}")
-        md_lines.append("")
+        md_lines.append('')
     
     # Resource usage
     md_lines.extend([
-        "## Resource Usage",
-        "",
-        f"- Token usage: {run.token_usage:,}",
-        f"- Copilot requests: {run.copilot_requests}",
-        ""
+        '## Resource Usage',
+        '',
+        f'- Token usage: {run.token_usage:,}',
+        f'- Copilot requests: {run.copilot_requests}',
+        ''
     ])
     
     # Suggested next steps
     md_lines.extend([
-        "## Suggested Next Steps",
-        "",
-        "1. Review all changes in feature branch",
-        "2. Run full test suite: `pytest`",
-        "3. Update documentation to reflect new components",
-        "4. Consider merging feature branch to main",
-        ""
+        '## Suggested Next Steps',
+        '',
+        '1. Review all changes in feature branch',
+        '2. Run full test suite: `pytest`',
+        '3. Update documentation to reflect new components',
+        '4. Consider merging feature branch to main',
+        ''
     ])
     
-    md_content = "\n".join(md_lines)
+    md_content = '\n'.join(md_lines)
     json_content = json.dumps(json_report, indent=2)
     
     # Save reports
-    (artifact_dir / "report.md").write_text(md_content)
-    (artifact_dir / "report.json").write_text(json_content)
+    (artifact_dir / 'report.md').write_text(md_content)
+    (artifact_dir / 'report.json').write_text(json_content)
     
     return md_content, json_content
 
@@ -252,7 +252,7 @@ def generate_adaptation_summary(run: AdaptationRun) -> str:
     """
     completed_items = len([c for c in run.changes if c.user_confirmed])
     total_items = len(run.items)
-    total_commits = len([c for c in run.changes if c.change_type in ["create", "modify"]])
+    total_commits = len([c for c in run.changes if c.change_type in ['create', 'modify']])
     
     # Count test results
     passed_tests = 0
@@ -266,12 +266,12 @@ def generate_adaptation_summary(run: AdaptationRun) -> str:
     
     items_str = ','.join(run.items[:3])
     if len(run.items) > 3:
-        items_str += f",+{len(run.items)-3}"
+        items_str += f',+{len(run.items)-3}'
     
     summary = (
-        f"ADAPT[{run.run_id}]: {completed_items}/{total_items} items OK | "
-        f"{total_commits} commits | {passed_tests}/{total_tests} tests | "
-        f"{items_str} | {conflicts_remaining} conflicts remaining"
+        f'ADAPT[{run.run_id}]: {completed_items}/{total_items} items OK | '
+        f'{total_commits} commits | {passed_tests}/{total_tests} tests | '
+        f'{items_str} | {conflicts_remaining} conflicts remaining'
     )
     
     return summary

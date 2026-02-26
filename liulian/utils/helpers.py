@@ -14,7 +14,7 @@ def timestamp_id() -> str:
     Returns:
         A string like ``20260206_143021``.
     """
-    return datetime.now().strftime("%Y%m%d_%H%M%S")
+    return datetime.now().strftime('%Y%m%d_%H%M%S')
 
 
 def ensure_dir(path: str) -> str:
@@ -43,8 +43,8 @@ def file_sha256(path: str) -> str:
         FileNotFoundError: If *path* does not exist.
     """
     h = hashlib.sha256()
-    with open(path, "rb") as f:
-        for chunk in iter(lambda: f.read(8192), b""):
+    with open(path, 'rb') as f:
+        for chunk in iter(lambda: f.read(8192), b''):
             h.update(chunk)
     return h.hexdigest()
 

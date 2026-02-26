@@ -20,7 +20,7 @@ class AdaptationConfig:
     target_project: Optional[str] = None
     items: List[str] = field(default_factory=list)
     dry_run: bool = False
-    mode: str = "minimal"  # or "comprehensive"
+    mode: str = 'minimal'  # or 'comprehensive'
     batch_size: int = 3
     auto_test: bool = True
     create_branch: bool = True
@@ -41,7 +41,7 @@ def parse_slash_command(command: str) -> Optional[AdaptationConfig]:
     Returns:
         AdaptationConfig if parsing succeeds, None otherwise
     """
-    if not command.strip().startswith("/adapt"):
+    if not command.strip().startswith('/adapt'):
         return None
     
     config = AdaptationConfig()
@@ -127,7 +127,7 @@ def parse_natural_language(request: str) -> Optional[AdaptationConfig]:
         match = re.search(pattern, request, re.IGNORECASE)
         if match:
             if match.groups():
-                config.items.append(f"{comp_type}:{match.group(1)}")
+                config.items.append(f'{comp_type}:{match.group(1)}')
             else:
                 config.items.append(comp_type)
     

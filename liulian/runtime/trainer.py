@@ -22,18 +22,28 @@ from __future__ import annotations
 
 import logging
 import os
+import sys
 import time
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
 import torch.nn as nn
+
+
 from torch import optim
-from torch.optim import lr_scheduler
 from torch.utils.data import DataLoader
+
+try:
+    from tqdm.auto import tqdm
+except Exception:  # pragma: no cover
+    tqdm = None
 
 from liulian.loggers.interface import LoggerInterface
 from liulian.models.torch.training_utils import EarlyStopping
+from liulian.optim.lr_schedulers import adjust_learning_rate, build_scheduler
+from liulian.runtime.accelerator import build_accelerator
+from liulian.utils.augmentation import apply_augmentations
 
 logger = logging.getLogger(__name__)
 
@@ -51,19 +61,22 @@ class ForecastTrainer:
     All behaviour is controlled through a single *config* dict.  Recognised
     keys (with defaults):
 
-    ====================  ========  ==========================================
-    Key                   Default   Description
-    ====================  ========  ==========================================
-    train_epochs          30        Maximum number of training epochs
-    learning_rate         0.001     Peak / initial learning rate
-    patience              10        Early-stopping patience (epochs)
-    label_len             0         Length of label segment for decoder input
-    lradj                 "type1"   LR schedule type ("COS" / "type1")
-    pct_start             0.2       OneCycleLR warm-up fraction
-    features              "M"       "M" (multivariate) or "MS" (multi→single)
-    max_train_iters       None      Cap on training iterations per epoch
-    max_eval_iters        None      Cap on eval iterations per call
-    ====================  ========  ==========================================
+    ========================  ========  ==========================================
+    Key                       Default   Description
+    ========================  ========  ==========================================
+    train_epochs              30        Maximum number of training epochs
+    learning_rate             0.001     Peak / initial learning rate
+    patience                  10        Early-stopping patience (epochs)
+    disable_early_stopping    False     Skip early stopping (e.g. under ASHA)
+    label_len                 0         Length of label segment for decoder input
+    lradj                     "type1"   LR schedule type ("COS" / "type1")
+    pct_start                 0.2       OneCycleLR warm-up fraction
+    features                  "M"       "M" (multivariate) or "MS" (multi→single)
+    nan_mask_loss             False     Mask NaN targets in loss computation
+    teacher_forcing           "label"   Decoder input: "label" / "zeros" / "none"
+    max_train_iters           None      Cap on training iterations per epoch
+    max_eval_iters            None      Cap on eval iterations per call
+    ========================  ========  ==========================================
 
     Args:
         config: Experiment configuration dictionary.
@@ -78,6 +91,7 @@ class ForecastTrainer:
         device: Optional[torch.device] = None,
         checkpoint_dir: Optional[str] = None,
         exp_logger: Optional[LoggerInterface] = None,
+        inverse_transform: Optional[Callable[..., torch.Tensor]] = None,
     ) -> None:
         self.config = config
         self.device = device or torch.device(
@@ -85,6 +99,36 @@ class ForecastTrainer:
         )
         self.checkpoint_dir = checkpoint_dir or 'checkpoints'
         self.exp_logger = exp_logger
+        self.inverse_transform_fn = inverse_transform
+        self.loss_name = str(self.config.get('loss', 'mse')).strip().lower()
+        self.metric_names = self._parse_metric_names(
+            self.config.get('metrics', ['rmse', 'mae', 'nse'])
+        )
+        self.show_progress = bool(self.config.get('show_progress', True))
+        self.nan_mask_loss = bool(self.config.get('nan_mask_loss', False))
+        self.teacher_forcing = str(
+            self.config.get('teacher_forcing', 'label')
+        ).strip().lower()
+        self.eval_denorm = bool(self.config.get('eval_denorm', False))
+        self.use_entity_embedding = (
+            str(self.config.get('identifier_mode', 'none')).strip().lower()
+            == 'embedding'
+        )
+
+        # Data augmentation during training
+        aug_cfg = self.config.get('augmentation', None)
+        if isinstance(aug_cfg, str):
+            self.augmentation_list = [s.strip() for s in aug_cfg.split(',') if s.strip()]
+        elif isinstance(aug_cfg, (list, tuple)):
+            self.augmentation_list = list(aug_cfg)
+        else:
+            self.augmentation_list = []
+        self.augmentation_kwargs = dict(self.config.get('augmentation_kwargs', {}))
+
+        # HF Accelerate / DeepSpeed integration (optional)
+        self.accelerator = build_accelerator(self.config)
+        if self.accelerator is not None:
+            self.device = self.accelerator.device
 
         # Public state populated after fit()
         self.history: List[Dict[str, float]] = []
@@ -99,6 +143,7 @@ class ForecastTrainer:
         train_loader: DataLoader,
         val_loader: DataLoader,
         test_loader: Optional[DataLoader] = None,
+        epoch_callback: Optional[Callable[..., None]] = None,
     ) -> Dict[str, Any]:
         """Run the full training loop.
 
@@ -108,6 +153,10 @@ class ForecastTrainer:
             val_loader: Validation data loader.
             test_loader: Optional test data loader (evaluated each epoch for
                 monitoring; final metrics reported at the end).
+            epoch_callback: Optional callback invoked at the end of every
+                epoch with signature ``(epoch_record, model, checkpoint_dir)``.
+                Used by the Ray Tune trainable to report per-epoch metrics
+                and save checkpoints, keeping the training loop shared.
 
         Returns:
             Summary dict with ``"best_val_mse"``, ``"final_test"``, and
@@ -124,69 +173,161 @@ class ForecastTrainer:
         trained_params = [p for p in model.parameters() if p.requires_grad]
         model_optim = optim.Adam(trained_params, lr=learning_rate)
 
-        # LR scheduler
-        if cfg.get('lradj') == 'COS':
-            sched = lr_scheduler.CosineAnnealingLR(model_optim, T_max=20, eta_min=1e-8)
-        else:
-            sched = lr_scheduler.OneCycleLR(
-                optimizer=model_optim,
-                steps_per_epoch=max(len(train_loader), 1),
-                pct_start=cfg.get('pct_start', 0.2),
-                epochs=train_epochs,
-                max_lr=learning_rate,
-            )
+        # LR scheduler — built via the centralised registry
+        lradj = str(cfg.get('lradj', 'onecycle')).strip()
+        sched, sched_step_mode = build_scheduler(
+            optimizer=model_optim,
+            lradj=lradj,
+            config=cfg,
+            steps_per_epoch=max(len(train_loader), 1),
+        )
+        # Store for use in _train_epoch and epoch-end stepping
+        self._sched_step_mode = sched_step_mode
 
-        criterion = nn.MSELoss()
-        mae_metric = nn.L1Loss()
+        criterion = self._build_loss(self.loss_name)
+        disable_es = bool(cfg.get('disable_early_stopping', False))
         early_stopping = EarlyStopping(patience=patience, verbose=True)
+
+        # Accelerator wrapping
+        if self.accelerator is not None:
+            model, model_optim, train_loader, sched = self.accelerator.prepare(
+                model, model_optim, train_loader, sched,
+            )
+            if val_loader is not None:
+                val_loader = self.accelerator.prepare(val_loader)
+            if test_loader is not None:
+                test_loader = self.accelerator.prepare(test_loader)
 
         os.makedirs(self.checkpoint_dir, exist_ok=True)
 
         self.history = []
 
+        eval_metric_names = self._dedupe_metric_names(
+            [self.loss_name] + list(self.metric_names)
+        )
+        monitor_key = str(
+            cfg.get('monitor_metric', f'val_{self.loss_name}')
+        ).strip().lower()
+
         for epoch in range(train_epochs):
             # --- train one epoch ---
             t0 = time.time()
             train_loss = self._train_epoch(
-                model, train_loader, model_optim, criterion, sched, cfg
+                model,
+                train_loader,
+                model_optim,
+                criterion,
+                sched,
+                cfg,
+                epoch=epoch + 1,
+                total_epochs=train_epochs,
             )
             epoch_time = time.time() - t0
 
             # --- validate / test ---
-            val_metrics = self.evaluate(model, val_loader)
-            test_metrics = self.evaluate(model, test_loader) if test_loader else {}
+            val_metrics = self.evaluate(
+                model,
+                val_loader,
+                metric_names=eval_metric_names,
+                stage='Validation',
+                epoch=epoch + 1,
+                total_epochs=train_epochs,
+            )
+            test_metrics = (
+                self.evaluate(
+                    model,
+                    test_loader,
+                    metric_names=eval_metric_names,
+                    stage='Test',
+                    epoch=epoch + 1,
+                    total_epochs=train_epochs,
+                )
+                if test_loader
+                else {}
+            )
 
             epoch_record = {
                 'epoch': epoch + 1,
                 'train_loss': train_loss,
-                'val_mse': val_metrics['mse'],
-                'val_mae': val_metrics['mae'],
                 'time': epoch_time,
             }
-            if test_metrics:
-                epoch_record['test_mse'] = test_metrics['mse']
-                epoch_record['test_mae'] = test_metrics['mae']
+            for metric_name, metric_value in val_metrics.items():
+                epoch_record[f'val_{metric_name}'] = metric_value
+            for metric_name, metric_value in test_metrics.items():
+                epoch_record[f'test_{metric_name}'] = metric_value
             self.history.append(epoch_record)
 
             if self.exp_logger:
                 self.exp_logger.log_metrics(step=epoch + 1, metrics=epoch_record)
 
+            monitor_value = epoch_record.get(monitor_key)
+            if monitor_value is None:
+                fallback_key = f'val_{self.loss_name}'
+                monitor_key = fallback_key
+                monitor_value = epoch_record.get(fallback_key)
+            if monitor_value is None and val_metrics:
+                first_key = next(iter(val_metrics))
+                monitor_key = f'val_{first_key}'
+                monitor_value = val_metrics[first_key]
+            if monitor_value is None:
+                monitor_value = float('inf')
+
+            # Collect denorm metric strings for val and test
+            val_denorm_str = ', '.join(
+                f'val_{k}={v:.6f}'
+                for k, v in val_metrics.items()
+                if k.startswith('denorm_')
+            )
+            test_denorm_str = ', '.join(
+                f'test_{k}={v:.6f}'
+                for k, v in test_metrics.items()
+                if k.startswith('denorm_')
+            )
+            extra_parts = []
+            if val_denorm_str:
+                extra_parts.append(val_denorm_str)
+            norm_test = ', '.join(
+                f'test_{k}={v:.6f}'
+                for k, v in test_metrics.items()
+                if not k.startswith('denorm_')
+            )
+            if norm_test:
+                extra_parts.append(norm_test)
+            if test_denorm_str:
+                extra_parts.append(test_denorm_str)
+
             logger.info(
-                'Epoch %d (%.1fs) | Train: %.6f | Val MSE: %.6f | %s',
+                'Epoch %d (%.1fs) | Train %s: %.6f | %s: %.6f | %s',
                 epoch + 1,
                 epoch_time,
+                self.loss_name.upper(),
                 train_loss,
-                val_metrics['mse'],
-                (f'Test MSE: {test_metrics["mse"]:.6f}' if test_metrics else ''),
+                monitor_key,
+                monitor_value,
+                ' | '.join(extra_parts) if extra_parts else '',
             )
 
-            early_stopping(val_metrics['mse'], model, self.checkpoint_dir)
-            if early_stopping.early_stop:
+            early_stopping(monitor_value, model, self.checkpoint_dir)
+
+            # Per-epoch callback (used by Ray Tune trainable for reporting)
+            if epoch_callback is not None:
+                try:
+                    epoch_callback(epoch_record, model, self.checkpoint_dir)
+                except Exception as e:
+                    raise RuntimeError(f'Epoch callback failed at epoch {epoch + 1}') from e
+                    pass  # callback failure should not abort training
+
+            if early_stopping.early_stop and not disable_es:
                 logger.info('Early stopping at epoch %d', epoch + 1)
                 break
 
-            if cfg.get('lradj') == 'COS':
+            # End-of-epoch LR scheduling
+            if sched is not None and sched_step_mode == 'epoch':
                 sched.step()
+            elif sched is not None and sched_step_mode == 'plateau':
+                sched.step(monitor_value)
+            elif sched_step_mode == 'manual':
+                adjust_learning_rate(model_optim, epoch + 1, cfg)
 
         # --- Load best & final test ---
         best_ckpt = os.path.join(self.checkpoint_dir, 'checkpoint')
@@ -197,15 +338,21 @@ class ForecastTrainer:
 
         final_test = {}
         if test_loader is not None:
-            final_test = self.evaluate(model, test_loader)
-            logger.info(
-                'Final Test: MSE=%.6f  MAE=%.6f',
-                final_test['mse'],
-                final_test['mae'],
+            final_test = self.evaluate(
+                model,
+                test_loader,
+                metric_names=eval_metric_names,
+                stage='Test',
+            )
+            logger.ok(
+                'Final Test: %s',
+                ', '.join(f'{k.upper()}={v:.6f}' for k, v in final_test.items()),
             )
 
         return {
             'best_val_mse': float(early_stopping.val_loss_min),
+            'best_val_score': float(early_stopping.val_loss_min),
+            'monitored_metric': monitor_key,
             'final_test': final_test,
             'history': self.history,
             'epochs_run': len(self.history),
@@ -215,6 +362,10 @@ class ForecastTrainer:
         self,
         model: nn.Module,
         loader: DataLoader,
+        metric_names: Optional[List[str]] = None,
+        stage: str = 'Evaluation',
+        epoch: Optional[int] = None,
+        total_epochs: Optional[int] = None,
     ) -> Dict[str, float]:
         """Evaluate model on a data loader.
 
@@ -223,38 +374,63 @@ class ForecastTrainer:
             loader: Data loader to evaluate on.
 
         Returns:
-            Dict with ``"mse"`` and ``"mae"`` keys.
+            Dict with configured metric keys.
         """
         cfg = self.config
+        model = model.to(self.device)
         model.eval()
-        mse_list: List[float] = []
-        mae_list: List[float] = []
-        criterion = nn.MSELoss()
-        mae_metric = nn.L1Loss()
+        resolved_metric_names = self._dedupe_metric_names(
+            [self.loss_name] + list(metric_names or self.metric_names)
+        )
+        collected: Dict[str, List[float]] = {name: [] for name in resolved_metric_names}
+        denorm_collected: Dict[str, List[float]] = (
+            {name: [] for name in resolved_metric_names}
+            if self.eval_denorm and self.inverse_transform_fn is not None
+            else {}
+        )
         max_iters = cfg.get('max_eval_iters')
 
+        iterator = self._with_progress(
+            loader=loader,
+            stage=stage,
+            color='blue' if stage.lower().startswith('validation') else 'yellow',
+            epoch=epoch,
+            total_epochs=total_epochs,
+            max_iters=max_iters,
+        )
+
         with torch.no_grad():
-            for idx, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(
-                loader
-            ):
+            for idx, batch in enumerate(iterator):
                 if max_iters is not None and idx >= max_iters:
                     break
 
-                batch_x = batch_x.float().to(self.device)
+                # Unpack: 4-tuple (standard), or 6-tuple
+                # (batch_x, batch_y, batch_x_mark, batch_y_mark,
+                #  entity_id_strs, entity_idx)
+                batch_x = batch[0]
+                batch_y = batch[1]
+                batch_x_mark = batch[2]
+                batch_y_mark = batch[3]
+                batch_entity_ids = batch[4] if len(batch) > 4 else None
+                batch_entity_idx = batch[5] if len(batch) > 5 else None
+
+                batch_x = batch_x.float().to(self.device)  # todo: always to float as timellm?
                 batch_y = batch_y.float()
                 batch_x_mark = batch_x_mark.float().to(self.device)
                 batch_y_mark = batch_y_mark.float().to(self.device)
+                if batch_entity_idx is not None:
+                    batch_entity_idx = batch_entity_idx.to(self.device)
 
                 label_len = cfg.get('label_len', 0)
                 pred_len = cfg['pred_len']
-                dec_inp = torch.zeros_like(batch_y[:, -pred_len:, :]).float()
-                dec_inp = (
-                    torch.cat([batch_y[:, :label_len, :], dec_inp], dim=1)
-                    .float()
-                    .to(self.device)
-                )
 
-                outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+                dec_inp = self._build_decoder_input(batch_y, label_len, pred_len)
+
+                # Pass entity_ids to model if in embedding mode
+                fwd_kwargs: Dict[str, Any] = {}
+                if self.use_entity_embedding and batch_entity_idx is not None:
+                    fwd_kwargs['entity_ids'] = batch_entity_idx
+                outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs)
                 if isinstance(outputs, tuple):
                     outputs = outputs[0]
 
@@ -262,11 +438,132 @@ class ForecastTrainer:
                 outputs = outputs[:, -pred_len:, f_dim:]
                 batch_y = batch_y[:, -pred_len:, f_dim:].to(self.device)
 
-                mse_list.append(criterion(outputs, batch_y).item())
-                mae_list.append(mae_metric(outputs, batch_y).item())
+                metrics = self._compute_metrics(outputs, batch_y, resolved_metric_names)
+                for name, value in metrics.items():
+                    collected[name].append(value)
+
+                # De-normalized metrics
+                if denorm_collected:
+                    try:
+                        inv_kwargs: Dict[str, Any] = {}
+                        if batch_entity_ids is not None:
+                            inv_kwargs['entity_ids'] = batch_entity_ids
+                        inv_kwargs['timestamps'] = batch_y_mark.detach()  # todo: is this useful or correct?
+                        out_dn = self.inverse_transform_fn(outputs.detach(), **inv_kwargs)
+                        tgt_dn = self.inverse_transform_fn(batch_y.detach(), **inv_kwargs)
+                        if out_dn is None:
+                            out_dn = outputs.detach()
+                        if tgt_dn is None:
+                            tgt_dn = batch_y.detach()
+                        dn_metrics = self._compute_metrics(out_dn, tgt_dn, resolved_metric_names)
+                        for name, value in dn_metrics.items():
+                            denorm_collected[name].append(value)
+                    except Exception as exc:
+                        logger.debug('inverse_transform failed (batch %d): %s', idx, exc)
+
+                if tqdm is not None and hasattr(iterator, 'set_postfix'):
+                    iterator.set_postfix(
+                        {
+                            resolved_metric_names[0]: (
+                                collected[resolved_metric_names[0]][-1]
+                            )
+                        }
+                    )
 
         model.train()
-        return {'mse': float(np.mean(mse_list)), 'mae': float(np.mean(mae_list))}
+        result = {
+            name: float(np.nanmean(values)) if values else float('nan')
+            for name, values in collected.items()
+        }
+        if denorm_collected:
+            for name, values in denorm_collected.items():
+                result[f'denorm_{name}'] = (
+                    float(np.nanmean(values)) if values else float('nan')
+                )
+        return result
+
+    # ------------------------------------------------------------------
+    # Prediction (collect all outputs for downstream viz)
+    # ------------------------------------------------------------------
+
+    def predict(
+        self,
+        model: nn.Module,
+        loader: DataLoader,
+        max_iters: int | None = None,
+    ) -> Dict[str, torch.Tensor]:
+        """Run inference and collect per-window predictions & ground truth.
+
+        Unlike :meth:`evaluate` which only returns aggregate metrics, this
+        method returns the raw tensors needed by the visualization pipeline.
+
+        Args:
+            model: Trained model.
+            loader: Data loader to run predictions on.
+            max_iters: Maximum number of batches to process.  Falls back
+                to ``config['max_eval_iters']`` when ``None``.
+
+        Returns:
+            Dict with:
+            - ``"preds"``  : ``(N, pred_len, c_out)`` — model predictions
+            - ``"trues"``  : ``(N, pred_len, c_out)`` — ground truth targets
+            - ``"times"``  : ``(N, win_len)``          — time marks (epoch day)
+              where *win_len* is the full window length of the target.
+        """
+        cfg = self.config  # todo: maybe also allow predicting on train / val sets with different configs?
+        model = model.to(self.device)
+        model.eval()
+        pred_len = cfg['pred_len']
+        f_dim = -1 if cfg.get('features') == 'MS' else 0
+        if max_iters is None:
+            max_iters = cfg.get('max_eval_iters')
+
+        all_preds: List[torch.Tensor] = []
+        all_trues: List[torch.Tensor] = []
+        all_times: List[torch.Tensor] = []
+
+        with torch.no_grad():
+            for idx, batch in enumerate(loader):
+                if max_iters is not None and idx >= max_iters:
+                    break
+
+                batch_x, batch_y, batch_x_mark, batch_y_mark = batch[0], batch[1], batch[2], batch[3]
+                batch_entity_idx = batch[5] if len(batch) > 5 else None
+                batch_x = batch_x.float().to(self.device)
+                batch_y = batch_y.float()
+                batch_x_mark = batch_x_mark.float().to(self.device)
+                batch_y_mark = batch_y_mark.float().to(self.device)
+                if batch_entity_idx is not None:
+                    batch_entity_idx = batch_entity_idx.to(self.device)
+
+                label_len = cfg.get('label_len', 0)
+                dec_inp = self._build_decoder_input(batch_y, label_len, pred_len)
+
+                fwd_kwargs: Dict[str, Any] = {}
+                if self.use_entity_embedding and batch_entity_idx is not None:
+                    fwd_kwargs['entity_ids'] = batch_entity_idx
+                outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs)
+                if isinstance(outputs, tuple):
+                    outputs = outputs[0]
+
+                outputs = outputs[:, -pred_len:, f_dim:].cpu()
+                targets = batch_y[:, -pred_len:, f_dim:]
+
+                all_preds.append(outputs)
+                all_trues.append(targets)
+
+                # Time marks: squeeze trailing dim  (B, win, 1) → (B, win)
+                t = batch_y_mark.cpu()
+                if t.ndim == 3 and t.shape[-1] == 1:
+                    t = t.squeeze(-1)
+                all_times.append(t)  # todo: should this use only y_mark?
+
+        model.train()
+        return {
+            'preds': torch.cat(all_preds, dim=0),
+            'trues': torch.cat(all_trues, dim=0),
+            'times': torch.cat(all_times, dim=0),
+        }
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -277,38 +574,57 @@ class ForecastTrainer:
         model: nn.Module,
         loader: DataLoader,
         optimizer: optim.Optimizer,
-        criterion: nn.Module,
+        criterion: Callable[[torch.Tensor, torch.Tensor], torch.Tensor],
         scheduler: Any,
         cfg: Dict[str, Any],
+        epoch: int,
+        total_epochs: int,
     ) -> float:
         """Train for a single epoch, returning mean loss."""
         model.train()
         losses: List[float] = []
         max_iters = cfg.get('max_train_iters')
 
-        for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(loader):
+        iterator = self._with_progress(
+            loader=loader,
+            stage='Train',
+            color='green',
+            epoch=epoch,
+            total_epochs=total_epochs,
+            max_iters=max_iters,
+        )
+
+        for i, batch in enumerate(iterator):
             if max_iters is not None and i >= max_iters:
                 break
 
             optimizer.zero_grad()
 
+            batch_x, batch_y, batch_x_mark, batch_y_mark = batch[0], batch[1], batch[2], batch[3]
+            batch_entity_idx = batch[5] if len(batch) > 5 else None
             batch_x = batch_x.float().to(self.device)
             batch_y = batch_y.float().to(self.device)
             batch_x_mark = batch_x_mark.float().to(self.device)
             batch_y_mark = batch_y_mark.float().to(self.device)
+            if batch_entity_idx is not None:
+                batch_entity_idx = batch_entity_idx.to(self.device)
+
+            # --- Data augmentation (training only) ---
+            if self.augmentation_list:
+                batch_x = apply_augmentations(
+                    batch_x, self.augmentation_list, **self.augmentation_kwargs
+                )
 
             label_len = cfg.get('label_len', 0)
             pred_len = cfg['pred_len']
-            dec_inp = (
-                torch.zeros_like(batch_y[:, -pred_len:, :]).float().to(self.device)
-            )
-            dec_inp = (
-                torch.cat([batch_y[:, :label_len, :], dec_inp], dim=1)
-                .float()
-                .to(self.device)
-            )
 
-            outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+            # --- Decoder input (teacher forcing strategy) ---
+            dec_inp = self._build_decoder_input(batch_y, label_len, pred_len)
+
+            fwd_kwargs: Dict[str, Any] = {}
+            if self.use_entity_embedding and batch_entity_idx is not None:
+                fwd_kwargs['entity_ids'] = batch_entity_idx
+            outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs)
             if isinstance(outputs, tuple):
                 outputs = outputs[0]
 
@@ -316,13 +632,160 @@ class ForecastTrainer:
             outputs = outputs[:, -pred_len:, f_dim:]
             targets = batch_y[:, -pred_len:, f_dim:]
 
-            loss = criterion(outputs, targets)
+            # --- NaN-masked loss ---
+            loss = self._masked_loss(criterion, outputs, targets)
             losses.append(loss.item())
 
-            loss.backward()
+            if self.accelerator is not None:
+                self.accelerator.backward(loss)
+            else:
+                loss.backward()
             optimizer.step()
 
-            if cfg.get('lradj') not in ('COS', 'TST'):
+            if scheduler is not None and getattr(self, '_sched_step_mode', 'batch') == 'batch':
                 scheduler.step()
 
+            if tqdm is not None and hasattr(iterator, 'set_postfix'):
+                iterator.set_postfix({self.loss_name: loss.item()})
+
         return float(np.mean(losses))
+
+    # ------------------------------------------------------------------
+    # Decoder input / NaN masking helpers
+    # ------------------------------------------------------------------
+
+    def _build_decoder_input(
+        self,
+        batch_y: torch.Tensor,
+        label_len: int,
+        pred_len: int,
+    ) -> torch.Tensor:
+        """Construct decoder input according to ``self.teacher_forcing``.
+
+        Modes:
+
+        * ``"label"`` — first ``label_len`` steps are ground-truth, rest zeros.
+          (TimeLLM / Time-Series-Library convention)
+        * ``"zeros"`` / ``"none"`` — all-zeros decoder input (swiss-river
+          convention, avoids GT leakage during evaluation).
+        """
+        zeros = torch.zeros_like(batch_y[:, -pred_len:, :]).float().to(self.device)
+        if self.teacher_forcing == 'label' and label_len > 0:
+            prefix = batch_y[:, :label_len, :].float().to(self.device)
+            return torch.cat([prefix, zeros], dim=1)
+        # "zeros", "none", or label_len == 0
+        return zeros
+
+    def _masked_loss(
+        self,
+        criterion: Any,
+        outputs: torch.Tensor,
+        targets: torch.Tensor,
+    ) -> torch.Tensor:
+        """Compute loss with optional NaN masking.
+
+        When ``self.nan_mask_loss`` is *True*, NaN entries in *targets*
+        are excluded from the loss computation (swiss-river convention).
+        """
+        if self.nan_mask_loss:
+            mask = ~torch.isnan(targets)
+            if mask.any():
+                return criterion(outputs[mask], targets[mask])
+            return torch.tensor(0.0, device=outputs.device, requires_grad=True)
+        return criterion(outputs, targets)
+
+    # ------------------------------------------------------------------
+    # Metric/loss/progress helpers
+    # ------------------------------------------------------------------
+
+    def _parse_metric_names(self, value: Any) -> List[str]:
+        if isinstance(value, str):
+            names = [p.strip().lower() for p in value.split(',') if p.strip()]
+        elif isinstance(value, (list, tuple)):
+            names = [str(p).strip().lower() for p in value if str(p).strip()]
+        else:
+            names = []
+        if not names:
+            names = ['rmse', 'mae', 'nse']
+        return self._dedupe_metric_names(names)
+
+    @staticmethod
+    def _dedupe_metric_names(names: List[str]) -> List[str]:
+        seen = set()
+        ordered: List[str] = []
+        for name in names:
+            if name not in seen:
+                seen.add(name)
+                ordered.append(name)
+        return ordered
+
+    def _build_loss(
+        self,
+        loss_name: str,
+    ) -> Callable[[torch.Tensor, torch.Tensor], torch.Tensor]:
+        if loss_name == 'mse':
+            return nn.MSELoss()
+        if loss_name == 'mae':
+            return nn.L1Loss()
+        if loss_name == 'rmse':
+            return lambda pred, true: torch.sqrt(
+                torch.mean((pred - true) ** 2) + 1e-12
+            )
+        raise ValueError(
+            f'Unsupported loss={loss_name!r}. Supported: mse, mae, rmse'
+        )
+
+    def _compute_metrics(
+        self,
+        pred: torch.Tensor,
+        true: torch.Tensor,
+        metric_names: List[str],
+    ) -> Dict[str, float]:
+        mse = torch.mean((pred - true) ** 2)
+        mae = torch.mean(torch.abs(pred - true))
+        rmse = torch.sqrt(mse + 1e-12)
+        denom = torch.sum((true - torch.mean(true)) ** 2)
+        if torch.abs(denom) <= 1e-12:
+            nse = torch.tensor(float('nan'), device=true.device)
+        else:
+            nse = 1.0 - (torch.sum((true - pred) ** 2) / denom)
+
+        values = {
+            'mse': float(mse.item()),
+            'mae': float(mae.item()),
+            'rmse': float(rmse.item()),
+            'nse': float(nse.item()),
+        }
+        unknown = sorted(set(metric_names) - set(values))
+        if unknown:
+            raise ValueError(
+                f'Unsupported metrics={unknown}. Supported: {sorted(values)}'
+            )
+        return {name: values[name] for name in metric_names}
+
+    def _with_progress(
+        self,
+        loader: DataLoader,
+        stage: str,
+        color: str,
+        epoch: Optional[int],
+        total_epochs: Optional[int],
+        max_iters: Optional[int],
+    ) -> Any:
+        if not self.show_progress or tqdm is None:
+            return loader
+        total = len(loader)
+        if max_iters is not None:
+            total = min(total, max_iters)
+        prefix = stage
+        if epoch is not None and total_epochs is not None:
+            prefix = f'Epoch {epoch}/{total_epochs} [{stage}]'
+        return tqdm(
+            loader,
+            total=total,
+            desc=prefix,
+            leave=True,
+            dynamic_ncols=True,
+            colour=color,
+            file=sys.stdout,
+        )

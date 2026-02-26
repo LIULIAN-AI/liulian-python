@@ -23,7 +23,7 @@ class LocalFileLogger(LoggerInterface):
     """
 
     def __init__(self, run_dir: str = 'artifacts/logs') -> None:
-        """Initialise the logger, creating *run_dir* if needed.
+        """Initialize the logger, creating *run_dir* if needed.
 
         Args:
             run_dir: Target directory for metrics and artifact files.

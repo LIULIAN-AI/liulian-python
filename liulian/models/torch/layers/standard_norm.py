@@ -15,12 +15,22 @@ class Normalize(nn.Module):
     """
     Normalization layer with affine transformation option
     """
-    def __init__(self, num_features, eps=1e-5, affine=False, subtract_last=False):
+
+    def __init__(self, num_features, eps=1e-5, affine=False, subtract_last=False, non_norm=False):
+        """
+        Args:
+            num_features: the number of features or channels
+            eps: a value added for numerical stability
+            affine: if True, RevIN has learnable affine parameters
+            subtract_last: if True, subtract the last time step instead of the mean
+            non_norm: if True, skip normalization (useful for ablation studies)
+        """
         super(Normalize, self).__init__()
         self.num_features = num_features
         self.eps = eps
         self.affine = affine
         self.subtract_last = subtract_last
+        self.non_norm = non_norm  # todo: check if this is needed
         if self.affine:
             self._init_params()
 
@@ -48,6 +58,8 @@ class Normalize(nn.Module):
         self.stdev = torch.sqrt(torch.var(x, dim=dim2reduce, keepdim=True, unbiased=False) + self.eps).detach()
 
     def _normalize(self, x):
+        if self.non_norm:  # todo: check if this is needed
+            return x
         if self.subtract_last:
             x = x - self.last
         else:
@@ -59,6 +71,8 @@ class Normalize(nn.Module):
         return x
 
     def _denormalize(self, x):
+        if self.non_norm:  # todo: check if this is needed
+            return x
         if self.affine:
             x = x - self.affine_bias
             x = x / (self.affine_weight + self.eps * self.eps)

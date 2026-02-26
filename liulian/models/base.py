@@ -23,7 +23,7 @@ class ExecutableModel(ABC):
 
     @abstractmethod
     def configure(self, task: Any, config: Dict[str, Any]) -> None:
-        """Initialise the model with a task and hyperparameter config.
+        """Initialize the model with a task and hyperparameter config.
 
         This is called once before any forward pass.  Adapters should use
         this to build their internal model graph / load weights.

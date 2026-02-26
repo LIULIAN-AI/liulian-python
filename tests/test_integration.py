@@ -114,6 +114,9 @@ def cfg():
         'batch_size': 4,
         'learning_rate': 0.01,
         'patience': 5,
+        'loss': 'mse',
+        'metrics': ['rmse', 'mae', 'nse'],
+        'show_progress': False,
         'lradj': 'type1',
         'pct_start': 0.2,
         'max_train_iters': 5,
@@ -164,6 +167,8 @@ class TestForecastTrainer:
         assert result['epochs_run'] == 2
         assert result['final_test']['mse'] >= 0
         assert result['final_test']['mae'] >= 0
+        assert result['final_test']['rmse'] >= 0
+        assert 'nse' in result['final_test']
         assert len(result['history']) == 2
 
     def test_fit_itransformer(self, cfg, loaders):
@@ -187,6 +192,8 @@ class TestForecastTrainer:
 
         assert 'mse' in metrics
         assert 'mae' in metrics
+        assert 'rmse' in metrics
+        assert 'nse' in metrics
         assert metrics['mse'] >= 0
 
 

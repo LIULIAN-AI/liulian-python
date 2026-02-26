@@ -67,7 +67,8 @@ from liulian.runtime.experiment import Experiment
 from liulian.loggers.local_logger import LocalFileLogger
 from liulian.models.torch.training_utils import EarlyStopping
 
-logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+from liulian.utils.log_tags import setup_logging as _setup_logging
+_setup_logging(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -87,11 +88,11 @@ def build_model(model_name: str, config: Dict[str, Any]) -> nn.Module:
     from types import SimpleNamespace
     cfg = SimpleNamespace(**config)
 
-    if model_name == "lstm":
+    if model_name == 'lstm':
         from liulian.models.torch.lstm import Model as LSTMModel
         return LSTMModel(cfg).float()
 
-    elif model_name == "timellm":
+    elif model_name == 'timellm':
         from liulian.models.torch.timellm import Model as TimeLLMModel
         # Load prompt content
         prompt_map = {
@@ -99,7 +100,7 @@ def build_model(model_name: str, config: Dict[str, Any]) -> nn.Module:
             'swiss-river-2010': 'wt-swiss-2010',
             'swiss-river-zurich': 'wt-zurich',
         }
-        fname = prompt_map.get(config.get("data", ""), config.get("data", ""))
+        fname = prompt_map.get(config.get('data', ''), config.get('data', ''))
         prompt_path = os.path.join(
             TIMELLM_ROOT, 'dataset', 'prompt_bank', f'{fname}.txt'
         )
@@ -108,8 +109,8 @@ def build_model(model_name: str, config: Dict[str, Any]) -> nn.Module:
                 cfg.content = f.read()
         else:
             cfg.content = (
-                "Swiss River Network water temperature dataset. "
-                "Daily water and air temperature from monitoring stations."
+                'Swiss River Network water temperature dataset. '
+                'Daily water and air temperature from monitoring stations.'
             )
         return TimeLLMModel(cfg).float()
 
@@ -135,7 +136,7 @@ class SwissRiverTrainer:
         self.model_name = model_name
         self.config = config
         self.device = torch.device(
-            "cuda" if torch.cuda.is_available() else "cpu"
+            'cuda' if torch.cuda.is_available() else 'cpu'
         )
 
     def run(self, train: bool = True, eval_only: bool = False) -> Dict[str, Any]:
@@ -152,38 +153,38 @@ class SwissRiverTrainer:
 
         # --- liulian components ---
         dataset = SwissRiverDataset(
-            data_name=cfg.get("data", "swiss-river-1990"),
-            seq_len=cfg["seq_len"],
-            pred_len=cfg["pred_len"],
-            max_samples=cfg.get("max_samples"),
+            data_name=cfg.get('data', 'swiss-river-1990'),
+            seq_len=cfg['seq_len'],
+            pred_len=cfg['pred_len'],
+            max_samples=cfg.get('max_samples'),
         )
 
         task = PredictionTask(
             regime=PredictionRegime(
-                horizon=cfg["pred_len"],
-                context_length=cfg["seq_len"],
+                horizon=cfg['pred_len'],
+                context_length=cfg['seq_len'],
                 stride=1,
-                multivariate=cfg.get("features", "M") == "M",
+                multivariate=cfg.get('features', 'M') == 'M',
             )
         )
 
         spec = ExperimentSpec(
-            name=f"swiss_river_{self.model_name}",
-            task={"type": "PredictionTask", "pred_len": cfg["pred_len"],
-                  "seq_len": cfg["seq_len"]},
-            dataset={"type": "SwissRiverDataset", "data": cfg.get("data")},
-            model={"type": self.model_name, **{k: v for k, v in cfg.items()
-                    if k in ("d_model", "e_layers", "d_ff", "n_heads",
-                             "llm_model", "llm_dim")}},
-            metadata={"seed": cfg.get("seed", 2021), "device": str(self.device)},
+            name=f'swiss_river_{self.model_name}',
+            task={'type': 'PredictionTask', 'pred_len': cfg['pred_len'],
+                  'seq_len': cfg['seq_len']},
+            dataset={'type': 'SwissRiverDataset', 'data': cfg.get('data')},
+            model={'type': self.model_name, **{k: v for k, v in cfg.items()
+                    if k in ('d_model', 'e_layers', 'd_ff', 'n_heads',
+                             'llm_model', 'llm_dim')}},
+            metadata={'seed': cfg.get('seed', 2026), 'device': str(self.device)},
         )
 
         artifacts_dir = os.path.join(
-            PROJECT_ROOT, "artifacts", "experiments",
+            PROJECT_ROOT, 'artifacts', 'experiments',
             f"{spec.name}_{time.strftime('%Y%m%d_%H%M%S')}"
         )
         os.makedirs(artifacts_dir, exist_ok=True)
-        spec.to_yaml(os.path.join(artifacts_dir, "spec.yaml"))
+        spec.to_yaml(os.path.join(artifacts_dir, 'spec.yaml'))
 
         exp_logger = LocalFileLogger(run_dir=artifacts_dir)
 
@@ -193,8 +194,8 @@ class SwissRiverTrainer:
         from data_provider.data_factory import data_provider
         args = dataset._build_args()
         # Override batch_size from config
-        args.batch_size = cfg.get("batch_size", 8)
-        args.num_workers = cfg.get("num_workers", 0)
+        args.batch_size = cfg.get('batch_size', 8)
+        args.num_workers = cfg.get('num_workers', 0)
 
         train_data, train_loader = data_provider(args, 'train')
         val_data, val_loader = data_provider(args, 'val')
@@ -203,7 +204,7 @@ class SwissRiverTrainer:
         os.chdir(PROJECT_ROOT)
 
         logger.info(
-            "Data loaded: train=%d, val=%d, test=%d",
+            'Data loaded: train=%d, val=%d, test=%d',
             len(train_data), len(val_data), len(test_data),
         )
 
@@ -216,49 +217,49 @@ class SwissRiverTrainer:
             p.numel() for p in model.parameters() if p.requires_grad
         )
         logger.info(
-            "Model: %s | Params: %s total, %s trainable (%.1f%%)",
-            self.model_name, f"{total_params:,}", f"{trainable_params:,}",
+            'Model: %s | Params: %s total, %s trainable (%.1f%%)',
+            self.model_name, f'{total_params:,}', f'{trainable_params:,}',
             100 * trainable_params / max(total_params, 1),
         )
 
         # --- Checkpoint ---
-        ckpt_dir = os.path.join(artifacts_dir, "checkpoints")
+        ckpt_dir = os.path.join(artifacts_dir, 'checkpoints')
         os.makedirs(ckpt_dir, exist_ok=True)
 
         summary: Dict[str, Any] = {
-            "model": self.model_name,
-            "artifacts_dir": artifacts_dir,
-            "metrics": {},
+            'model': self.model_name,
+            'artifacts_dir': artifacts_dir,
+            'metrics': {},
         }
 
         # --- Eval only ---
         if eval_only:
-            ckpt_path = os.path.join(ckpt_dir, "checkpoint")
+            ckpt_path = os.path.join(ckpt_dir, 'checkpoint')
             if os.path.exists(ckpt_path):
                 model.load_state_dict(
                     torch.load(ckpt_path, map_location=self.device)
                 )
-                logger.info("Loaded checkpoint: %s", ckpt_path)
+                logger.ok('Loaded checkpoint: %s', ckpt_path)
             else:
-                logger.warning("No checkpoint found, using random init.")
+                logger.warning('No checkpoint found, using random init.')
 
             test_metrics = self._evaluate(model, test_loader, cfg)
-            summary["metrics"]["test"] = test_metrics
+            summary['metrics']['test'] = test_metrics
             exp_logger.log_metrics(step=0, metrics=test_metrics)
 
-            logger.info("Test metrics: %s", test_metrics)
+            logger.info('Test metrics: %s', test_metrics)
             return summary
 
         # --- Training ---
         trained_params = [p for p in model.parameters() if p.requires_grad]
         model_optim = optim.Adam(
-            trained_params, lr=cfg.get("learning_rate", 0.001)
+            trained_params, lr=cfg.get('learning_rate', 0.001)
         )
 
-        train_epochs = cfg.get("train_epochs", 30)
+        train_epochs = cfg.get('train_epochs', 30)
         train_steps = len(train_loader)
 
-        if cfg.get("lradj") == "COS":
+        if cfg.get('lradj') == 'COS':
             scheduler = lr_scheduler.CosineAnnealingLR(
                 model_optim, T_max=20, eta_min=1e-8
             )
@@ -266,15 +267,15 @@ class SwissRiverTrainer:
             scheduler = lr_scheduler.OneCycleLR(
                 optimizer=model_optim,
                 steps_per_epoch=max(train_steps, 1),
-                pct_start=cfg.get("pct_start", 0.2),
+                pct_start=cfg.get('pct_start', 0.2),
                 epochs=train_epochs,
-                max_lr=cfg.get("learning_rate", 0.001),
+                max_lr=cfg.get('learning_rate', 0.001),
             )
 
         criterion = nn.MSELoss()
         mae_metric = nn.L1Loss()
         early_stopping = EarlyStopping(
-            patience=cfg.get("patience", 10), verbose=True
+            patience=cfg.get('patience', 10), verbose=True
         )
 
         # Training loop
@@ -283,12 +284,12 @@ class SwissRiverTrainer:
             model.train()
             epoch_start = time.time()
 
-            max_iters = cfg.get("max_train_iters")  # None = unlimited
+            max_iters = cfg.get('max_train_iters')  # None = unlimited
 
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in tqdm(
                 enumerate(train_loader),
                 total=max_iters or len(train_loader),
-                desc=f"Epoch {epoch + 1}/{train_epochs}",
+                desc=f'Epoch {epoch + 1}/{train_epochs}',
                 leave=False,
             ):
                 if max_iters is not None and i >= max_iters:
@@ -301,8 +302,8 @@ class SwissRiverTrainer:
                 batch_y_mark = batch_y_mark.float().to(self.device)
 
                 # Decoder input
-                label_len = cfg.get("label_len", 0)
-                pred_len = cfg["pred_len"]
+                label_len = cfg.get('label_len', 0)
+                pred_len = cfg['pred_len']
                 dec_inp = torch.zeros_like(
                     batch_y[:, -pred_len:, :]
                 ).float().to(self.device)
@@ -315,7 +316,7 @@ class SwissRiverTrainer:
                 if isinstance(outputs, tuple):
                     outputs = outputs[0]
 
-                f_dim = -1 if cfg.get("features") == "MS" else 0
+                f_dim = -1 if cfg.get('features') == 'MS' else 0
                 outputs = outputs[:, -pred_len:, f_dim:]
                 targets = batch_y[:, -pred_len:, f_dim:]
 
@@ -325,7 +326,7 @@ class SwissRiverTrainer:
                 loss.backward()
                 model_optim.step()
 
-                if cfg.get("lradj") not in ("COS", "TST"):
+                if cfg.get('lradj') not in ('COS', 'TST'):
                     scheduler.step()
 
             epoch_cost = time.time() - epoch_start
@@ -339,76 +340,76 @@ class SwissRiverTrainer:
             exp_logger.log_metrics(
                 step=epoch + 1,
                 metrics={
-                    "train_loss": train_loss,
-                    "val_mse": val_metrics["mse"],
-                    "val_mae": val_metrics["mae"],
-                    "test_mse": test_metrics["mse"],
-                    "test_mae": test_metrics["mae"],
+                    'train_loss': train_loss,
+                    'val_mse': val_metrics['mse'],
+                    'val_mae': val_metrics['mae'],
+                    'test_mse': test_metrics['mse'],
+                    'test_mae': test_metrics['mae'],
                 },
             )
 
             # Also compute task-level metrics using liulian PredictionTask
             # (demonstrates framework integration)
             logger.info(
-                "Epoch %d (%.1fs) | Train: %.6f | Val MSE: %.6f | "
-                "Test MSE: %.6f MAE: %.6f",
+                'Epoch %d (%.1fs) | Train: %.6f | Val MSE: %.6f | '
+                'Test MSE: %.6f MAE: %.6f',
                 epoch + 1, epoch_cost, train_loss,
-                val_metrics["mse"], test_metrics["mse"], test_metrics["mae"],
+                val_metrics['mse'], test_metrics['mse'], test_metrics['mae'],
             )
 
-            early_stopping(val_metrics["mse"], model, ckpt_dir)
+            early_stopping(val_metrics['mse'], model, ckpt_dir)
             if early_stopping.early_stop:
-                logger.info("Early stopping at epoch %d", epoch + 1)
+                logger.info('Early stopping at epoch %d', epoch + 1)
                 break
 
-            if cfg.get("lradj") == "COS":
+            if cfg.get('lradj') == 'COS':
                 scheduler.step()
 
         # Load best and final eval
-        best_ckpt = os.path.join(ckpt_dir, "checkpoint")
+        best_ckpt = os.path.join(ckpt_dir, 'checkpoint')
         if os.path.exists(best_ckpt):
             model.load_state_dict(
                 torch.load(best_ckpt, map_location=self.device)
             )
 
         final_test = self._evaluate(model, test_loader, cfg)
-        summary["metrics"]["final_test"] = final_test
+        summary['metrics']['final_test'] = final_test
         exp_logger.log_metrics(step=train_epochs + 1, metrics=final_test)
 
-        logger.info("=== Final Test: MSE=%.6f  MAE=%.6f ===",
-                     final_test["mse"], final_test["mae"])
+        logger.ok('=== Final Test: MSE=%.6f  MAE=%.6f ===',
+                  final_test['mse'], final_test['mae'])
 
         # Use liulian task to compute metrics on a sample
         try:
-            test_split = dataset.get_split("test")
+            test_split = dataset.get_split('test')
             X_sample, y_sample = test_split.get_batch(batch_size=32)
-            batch = task.prepare_batch({"X": X_sample, "y": y_sample})
+            batch = task.prepare_batch({'X': X_sample, 'y': y_sample})
 
             # Forward through model for task-level metrics
-            x_tensor = torch.tensor(batch["X"], dtype=torch.float32).to(self.device)
+            x_tensor = torch.tensor(batch['X'], dtype=torch.float32).to(self.device)
             model.eval()
             with torch.no_grad():
                 dec = torch.zeros(
-                    x_tensor.size(0), cfg["pred_len"],
+                    x_tensor.size(0), cfg['pred_len'],
                     x_tensor.size(2), device=self.device
                 )
                 mark = torch.zeros(
-                    x_tensor.size(0), cfg["seq_len"], 1, device=self.device
+                    x_tensor.size(0), cfg['seq_len'], 1, device=self.device
                 )
                 mark_dec = torch.zeros(
-                    x_tensor.size(0), cfg["pred_len"], 1, device=self.device
+                    x_tensor.size(0), cfg['pred_len'], 1, device=self.device
                 )
                 pred = model(x_tensor, mark, dec, mark_dec)
                 if isinstance(pred, tuple):
                     pred = pred[0]
-                pred = pred[:, -cfg["pred_len"]:, :]
+                pred = pred[:, -cfg['pred_len']:, :]
 
-            model_output = {"predictions": pred.cpu().numpy()}
+            model_output = {'predictions': pred.cpu().numpy()}
             task_metrics = task.compute_metrics(model_output, batch)
-            summary["metrics"]["liulian_task_metrics"] = task_metrics
-            logger.info("liulian PredictionTask metrics: %s", task_metrics)
+            summary['metrics']['liulian_task_metrics'] = task_metrics
+            logger.info('liulian PredictionTask metrics: %s', task_metrics)
         except Exception as e:
-            logger.warning("Could not compute liulian task metrics: %s", e)
+            logger.warning('Could not compute liulian task metrics: %s', e)
 
         return summary
 
@@ -427,7 +428,7 @@ class SwissRiverTrainer:
         total_mse, total_mae = [], []
         criterion = nn.MSELoss()
         mae_metric = nn.L1Loss()
-        max_iters = cfg.get("max_eval_iters")
+        max_iters = cfg.get('max_eval_iters')
 
         with torch.no_grad():
             for idx, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(loader):
@@ -438,8 +439,8 @@ class SwissRiverTrainer:
                 batch_x_mark = batch_x_mark.float().to(self.device)
                 batch_y_mark = batch_y_mark.float().to(self.device)
 
-                label_len = cfg.get("label_len", 0)
-                pred_len = cfg["pred_len"]
+                label_len = cfg.get('label_len', 0)
+                pred_len = cfg['pred_len']
                 dec_inp = torch.zeros_like(
                     batch_y[:, -pred_len:, :]
                 ).float()
@@ -451,7 +452,7 @@ class SwissRiverTrainer:
                 if isinstance(outputs, tuple):
                     outputs = outputs[0]
 
-                f_dim = -1 if cfg.get("features") == "MS" else 0
+                f_dim = -1 if cfg.get('features') == 'MS' else 0
                 outputs = outputs[:, -pred_len:, f_dim:]
                 batch_y = batch_y[:, -pred_len:, f_dim:].to(self.device)
 
@@ -460,8 +461,8 @@ class SwissRiverTrainer:
 
         model.train()
         return {
-            "mse": float(np.mean(total_mse)),
-            "mae": float(np.mean(total_mae)),
+            'mse': float(np.mean(total_mse)),
+            'mae': float(np.mean(total_mae)),
         }
 
 
@@ -470,59 +471,59 @@ class SwissRiverTrainer:
 # ---------------------------------------------------------------------------
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
-        description="Swiss River experiment (liulian framework)"
+        description='Swiss River experiment (liulian framework)'
     )
-    p.add_argument("--model", type=str, default="lstm",
-                    choices=["lstm", "timellm"],
-                    help="Model to use (default: lstm)")
-    p.add_argument("--quick_test", action="store_true",
-                    help="Quick test: 2 epochs, max_samples=500")
-    p.add_argument("--eval_only", action="store_true",
-                    help="Evaluate from checkpoint only")
-    p.add_argument("--seed", type=int, default=2021)
+    p.add_argument('--model', type=str, default='lstm',
+                    choices=['lstm', 'timellm'],
+                    help='Model to use (default: lstm)')
+    p.add_argument('--quick_test', action='store_true',
+                    help='Quick test: 2 epochs, max_samples=500')
+    p.add_argument('--eval_only', action='store_true',
+                    help='Evaluate from checkpoint only')
+    p.add_argument('--seed', type=int, default=2026)
 
     # Data
-    p.add_argument("--data", type=str, default="swiss-river-1990")
-    p.add_argument("--seq_len", type=int, default=90)
-    p.add_argument("--pred_len", type=int, default=7)
-    p.add_argument("--features", type=str, default="M")
-    p.add_argument("--label_len", type=int, default=0)
+    p.add_argument('--data', type=str, default='swiss-river-1990')
+    p.add_argument('--seq_len', type=int, default=90)
+    p.add_argument('--pred_len', type=int, default=7)
+    p.add_argument('--features', type=str, default='M')
+    p.add_argument('--label_len', type=int, default=0)
 
     # Model
-    p.add_argument("--enc_in", type=int, default=1)
-    p.add_argument("--dec_in", type=int, default=1)
-    p.add_argument("--c_out", type=int, default=1)
-    p.add_argument("--d_model", type=int, default=64)
-    p.add_argument("--d_ff", type=int, default=32)
-    p.add_argument("--n_heads", type=int, default=8)
-    p.add_argument("--e_layers", type=int, default=2)
-    p.add_argument("--d_layers", type=int, default=1)
-    p.add_argument("--dropout", type=float, default=0.1)
-    p.add_argument("--patch_len", type=int, default=16)
-    p.add_argument("--stride", type=int, default=8)
+    p.add_argument('--enc_in', type=int, default=1)
+    p.add_argument('--dec_in', type=int, default=1)
+    p.add_argument('--c_out', type=int, default=1)
+    p.add_argument('--d_model', type=int, default=64)
+    p.add_argument('--d_ff', type=int, default=32)
+    p.add_argument('--n_heads', type=int, default=8)
+    p.add_argument('--e_layers', type=int, default=2)
+    p.add_argument('--d_layers', type=int, default=1)
+    p.add_argument('--dropout', type=float, default=0.1)
+    p.add_argument('--patch_len', type=int, default=16)
+    p.add_argument('--stride', type=int, default=8)
 
     # LLM (TimeLLM only)
-    p.add_argument("--llm_model", type=str, default="GPT2")
-    p.add_argument("--llm_dim", type=int, default=768)
-    p.add_argument("--llm_layers", type=int, default=6)
-    p.add_argument("--prompt_domain", type=int, default=0)
+    p.add_argument('--llm_model', type=str, default='GPT2')
+    p.add_argument('--llm_dim', type=int, default=768)
+    p.add_argument('--llm_layers', type=int, default=6)
+    p.add_argument('--prompt_domain', type=int, default=0)
 
     # Training
-    p.add_argument("--train_epochs", type=int, default=30)
-    p.add_argument("--batch_size", type=int, default=8)
-    p.add_argument("--learning_rate", type=float, default=0.001)
-    p.add_argument("--patience", type=int, default=10)
-    p.add_argument("--lradj", type=str, default="type1")
-    p.add_argument("--pct_start", type=float, default=0.2)
-    p.add_argument("--num_workers", type=int, default=0)
+    p.add_argument('--train_epochs', type=int, default=30)
+    p.add_argument('--batch_size', type=int, default=8)
+    p.add_argument('--learning_rate', type=float, default=0.001)
+    p.add_argument('--patience', type=int, default=10)
+    p.add_argument('--lradj', type=str, default='type1')
+    p.add_argument('--pct_start', type=float, default=0.2)
+    p.add_argument('--num_workers', type=int, default=0)
 
     # Misc
-    p.add_argument("--embed", type=str, default="timeF")
-    p.add_argument("--activation", type=str, default="gelu")
-    p.add_argument("--output_attention", action="store_true")
-    p.add_argument("--moving_avg", type=int, default=25)
-    p.add_argument("--factor", type=int, default=1)
-    p.add_argument("--task_name", type=str, default="long_term_forecast")
+    p.add_argument('--embed', type=str, default='timeF')
+    p.add_argument('--activation', type=str, default='gelu')
+    p.add_argument('--output_attention', action='store_true')
+    p.add_argument('--moving_avg', type=int, default=25)
+    p.add_argument('--factor', type=int, default=1)
+    p.add_argument('--task_name', type=str, default='long_term_forecast')
 
     return p
 
@@ -539,28 +540,28 @@ def main():
     config = vars(args).copy()
 
     if args.quick_test:
-        config["train_epochs"] = 2
-        config["batch_size"] = 4
-        config["patience"] = 2
-        config["max_samples"] = 500
-        config["max_train_iters"] = 100
-        config["max_eval_iters"] = 50
-        config["num_workers"] = 0
-        logger.info("Quick test mode: 2 epochs, batch_size=4, 100 iters/epoch")
+        config['train_epochs'] = 2
+        config['batch_size'] = 4
+        config['patience'] = 2
+        config['max_samples'] = 500
+        config['max_train_iters'] = 100
+        config['max_eval_iters'] = 50
+        config['num_workers'] = 0
+        logger.info('Quick test mode: 2 epochs, batch_size=4, 100 iters/epoch')
 
     trainer = SwissRiverTrainer(model_name=args.model, config=config)
     summary = trainer.run(train=not args.eval_only, eval_only=args.eval_only)
 
     print(f"\n{'='*60}")
-    print(f"Experiment complete: {args.model}")
+    print(f'Experiment complete: {args.model}')
     print(f"Artifacts: {summary.get('artifacts_dir', 'N/A')}")
-    for metric_group, metrics in summary.get("metrics", {}).items():
+    for metric_group, metrics in summary.get('metrics', {}).items():
         if isinstance(metrics, dict):
-            print(f"  {metric_group}: {metrics}")
+            print(f'  {metric_group}: {metrics}')
         else:
-            print(f"  {metric_group}: {metrics}")
+            print(f'  {metric_group}: {metrics}')
     print(f"{'='*60}")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

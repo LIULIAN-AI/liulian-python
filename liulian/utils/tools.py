@@ -11,6 +11,7 @@ Includes:
 
 MIT License
 """
+import logging
 import os
 import math
 from typing import Optional, Dict, Any
@@ -19,6 +20,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 import matplotlib.pyplot as plt
+
+logger = logging.getLogger(__name__)
 
 plt.switch_backend('agg')
 
@@ -70,7 +73,7 @@ class EarlyStopping:
             # No improvement
             self.counter += 1
             if self.verbose:
-                print(f'EarlyStopping counter: {self.counter} out of {self.patience}')
+                logger.info('EarlyStopping counter: %d out of %d', self.counter, self.patience)
             if self.counter >= self.patience:
                 self.early_stop = True
         else:
@@ -82,7 +85,7 @@ class EarlyStopping:
     def save_checkpoint(self, val_loss: float, model: nn.Module, path: str):
         """Save model checkpoint when validation loss improves."""
         if self.verbose:
-            print(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}). Saving model...')
+            logger.ok('Validation loss decreased (%.6f --> %.6f). Saving model...', self.val_loss_min, val_loss)
         
         # Ensure directory exists
         os.makedirs(path, exist_ok=True)
@@ -158,7 +161,7 @@ def adjust_learning_rate(
         }
     
     else:
-        raise ValueError(f"Unknown learning rate adjustment type: {lradj}")
+        raise ValueError(f'Unknown learning rate adjustment type: {lradj}')
     
     # Apply adjustment if current epoch is in schedule
     if epoch in lr_adjust.keys():

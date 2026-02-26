@@ -1,6 +1,10 @@
 # PyTorch Time Series Models
 
-This guide documents the 14 time series forecasting models adapted from [Time-Series-Library](https://github.com/thuml/Time-Series-Library) and [Time-LLM](https://github.com/KimMeen/Time-LLM) into the liulian framework.
+This guide documents the 16 time series forecasting models adapted from [Time-Series-Library](https://github.com/thuml/Time-Series-Library) and [Time-LLM](https://github.com/KimMeen/Time-LLM) into the liulian framework.
+
+### Entity Identifier Support
+
+All 11 TSL model adapters (DLinear through Mamba) support entity identifiers through `EntityAwareMixin`. Custom models (LSTM, ExtrapoLSTM, TransformerEncoder) have built-in entity support with all 7 modes. See [Entity Identifiers](../entity_identifiers.md) for details.
 
 ---
 

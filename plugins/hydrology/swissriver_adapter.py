@@ -30,7 +30,7 @@ class SwissRiverDatasetAdapter(BaseDataset):
         version: Dataset version from the manifest.
     """
 
-    domain: str = "hydrology"
+    domain: str = 'hydrology'
 
     def __init__(
         self,
@@ -50,55 +50,55 @@ class SwissRiverDatasetAdapter(BaseDataset):
         else:
             # Provide a minimal default manifest for synthetic demos
             parsed = {
-                "name": "swissriver-synthetic",
-                "version": "0.0.1",
-                "fields": [
+                'name': 'swissriver-synthetic',
+                'version': '0.0.1',
+                'fields': [
                     {
-                        "name": "discharge",
-                        "dtype": "float32",
-                        "unit": "m3/s",
-                        "semantic_tags": ["target"],
+                        'name': 'discharge',
+                        'dtype': 'float32',
+                        'unit': 'm3/s',
+                        'semantic_tags': ['target'],
                     },
                 ],
-                "splits": {
-                    "train": {"start": "2010-01-01", "end": "2018-12-31"},
-                    "val": {"start": "2019-01-01", "end": "2019-12-31"},
-                    "test": {"start": "2020-01-01", "end": "2020-12-31"},
+                'splits': {
+                    'train': {'start': '2010-01-01', 'end': '2018-12-31'},
+                    'val': {'start': '2019-01-01', 'end': '2019-12-31'},
+                    'test': {'start': '2020-01-01', 'end': '2020-12-31'},
                 },
             }
 
-        self.version = str(parsed.get("version", "0.0.1"))
+        self.version = str(parsed.get('version', '0.0.1'))
 
         # Build topology from manifest if available
-        topo_section = parsed.get("topology", {})
+        topo_section = parsed.get('topology', {})
         if topo_section:
             topology = TopologySpec(
-                node_ids=topo_section.get("node_ids", []),
-                edges=[tuple(e) for e in topo_section.get("edges", [])],
-                coordinates=topo_section.get("coordinates", {}),
+                node_ids=topo_section.get('node_ids', []),
+                edges=[tuple(e) for e in topo_section.get('edges', [])],
+                coordinates=topo_section.get('coordinates', {}),
             )
         else:
             # Default synthetic topology — 5 stations in a chain
             topology = TopologySpec(
-                node_ids=["S1", "S2", "S3", "S4", "S5"],
-                edges=[("S1", "S2"), ("S2", "S3"), ("S3", "S4"), ("S4", "S5")],
+                node_ids=['S1', 'S2', 'S3', 'S4', 'S5'],
+                edges=[('S1', 'S2'), ('S2', 'S3'), ('S3', 'S4'), ('S4', 'S5')],
                 coordinates={
-                    "S1": (46.95, 7.45),
-                    "S2": (46.80, 7.50),
-                    "S3": (46.65, 7.55),
-                    "S4": (46.50, 7.60),
-                    "S5": (46.35, 7.65),
+                    'S1': (46.95, 7.45),
+                    'S2': (46.80, 7.50),
+                    'S3': (46.65, 7.55),
+                    'S4': (46.50, 7.60),
+                    'S5': (46.35, 7.65),
                 },
             )
 
         # Build field specs
-        raw_fields = parsed.get("fields", [])
+        raw_fields = parsed.get('fields', [])
         fields = [
             FieldSpec(
-                name=f["name"],
-                dtype=f.get("dtype", "float32"),
-                unit=f.get("unit"),
-                semantic_tags=f.get("semantic_tags", []),
+                name=f['name'],
+                dtype=f.get('dtype', 'float32'),
+                unit=f.get('unit'),
+                semantic_tags=f.get('semantic_tags', []),
             )
             for f in raw_fields
         ]
@@ -121,9 +121,9 @@ class SwissRiverDatasetAdapter(BaseDataset):
             A :class:`DataSplit` instance.
 
         Raises:
-            KeyError: If *split_name* is not a recognised partition.
+            KeyError: If *split_name* is not a recognized partition.
         """
-        valid = {"train", "val", "test"}
+        valid = {'train', 'val', 'test'}
         if split_name not in valid:
             raise KeyError(f"Unknown split '{split_name}'. Choose from {valid}.")
 
@@ -139,7 +139,7 @@ class SwissRiverDatasetAdapter(BaseDataset):
         modelling.
         """
         rng = np.random.default_rng(seed=hash(split_name) % 2**32)
-        n_samples = {"train": 64, "val": 16, "test": 16}[split_name]
+        n_samples = {'train': 64, 'val': 16, 'test': 16}[split_name]
         n_timesteps = 48  # context_length + horizon
         n_nodes = self.topology.num_nodes if self.topology else 1
 

@@ -19,6 +19,11 @@ try:
 except ImportError:
     pytest.skip('torch not installed', allow_module_level=True)
 
+try:
+    import sklearn  # noqa: F401
+except ImportError:
+    pytest.skip('scikit-learn not installed', allow_module_level=True)
+
 import pandas as pd
 import numpy as np
 
@@ -116,13 +121,13 @@ class TestETTHourDataset:
         """Test basic dataset loading."""
         root_path, data_path = ett_hour_data
         
-        dataset = ETTHourDataset(
+        container = ETTHourDataset(
             root_path=root_path,
             data_path=data_path,
-            flag='train',
             size=(96, 48, 96),
             features='M',
         )
+        dataset = container.get_split('train')
         
         # Check dataset length
         assert len(dataset) > 0
@@ -131,13 +136,13 @@ class TestETTHourDataset:
         """Test that dataset returns torch tensors."""
         root_path, data_path = ett_hour_data
         
-        dataset = ETTHourDataset(
+        container = ETTHourDataset(
             root_path=root_path,
             data_path=data_path,
-            flag='train',
             size=(96, 48, 96),
             features='M',
         )
+        dataset = container.get_split('train')
         
         # Get a sample
         seq_x, seq_y, seq_x_mark, seq_y_mark = dataset[0]
@@ -153,13 +158,13 @@ class TestETTHourDataset:
         root_path, data_path = ett_hour_data
         
         seq_len, label_len, pred_len = 96, 48, 96
-        dataset = ETTHourDataset(
+        container = ETTHourDataset(
             root_path=root_path,
             data_path=data_path,
-            flag='train',
             size=(seq_len, label_len, pred_len),
             features='M',
         )
+        dataset = container.get_split('train')
         
         seq_x, seq_y, seq_x_mark, seq_y_mark = dataset[0]
         
@@ -177,14 +182,14 @@ class TestETTHourDataset:
         """Test univariate (S) mode."""
         root_path, data_path = ett_hour_data
         
-        dataset = ETTHourDataset(
+        container = ETTHourDataset(
             root_path=root_path,
             data_path=data_path,
-            flag='train',
             size=(96, 48, 96),
             features='S',
             target='OT',
         )
+        dataset = container.get_split('train')
         
         seq_x, seq_y, seq_x_mark, seq_y_mark = dataset[0]
         
@@ -196,18 +201,18 @@ class TestETTHourDataset:
         """Test inverse transformation."""
         root_path, data_path = ett_hour_data
         
-        dataset = ETTHourDataset(
+        container = ETTHourDataset(
             root_path=root_path,
             data_path=data_path,
-            flag='train',
             size=(96, 48, 96),
             scale=True,
         )
+        dataset = container.get_split('train')
         
         seq_x, _, _, _ = dataset[0]
         
         # Inverse transform should work
-        original = dataset.inverse_transform(seq_x)
+        original = container.inverse_transform(seq_x)
         assert isinstance(original, torch.Tensor)
         assert original.shape == seq_x.shape
     
@@ -215,26 +220,15 @@ class TestETTHourDataset:
         """Test that train/val/test splits are different."""
         root_path, data_path = ett_hour_data
         
-        train_dataset = ETTHourDataset(
+        container = ETTHourDataset(
             root_path=root_path,
             data_path=data_path,
-            flag='train',
             size=(96, 48, 96),
         )
         
-        val_dataset = ETTHourDataset(
-            root_path=root_path,
-            data_path=data_path,
-            flag='val',
-            size=(96, 48, 96),
-        )
-        
-        test_dataset = ETTHourDataset(
-            root_path=root_path,
-            data_path=data_path,
-            flag='test',
-            size=(96, 48, 96),
-        )
+        train_dataset = container.get_split('train')
+        val_dataset = container.get_split('val')
+        test_dataset = container.get_split('test')
         
         # All should have data
         assert len(train_dataset) > 0
@@ -249,13 +243,13 @@ class TestETTMinuteDataset:
         """Test basic dataset loading."""
         root_path, data_path = ett_minute_data
         
-        dataset = ETTMinuteDataset(
+        container = ETTMinuteDataset(
             root_path=root_path,
             data_path=data_path,
-            flag='train',
             size=(96, 48, 96),
             features='M',
         )
+        dataset = container.get_split('train')
         
         assert len(dataset) > 0
     
@@ -263,12 +257,12 @@ class TestETTMinuteDataset:
         """Test that dataset returns torch tensors."""
         root_path, data_path = ett_minute_data
         
-        dataset = ETTMinuteDataset(
+        container = ETTMinuteDataset(
             root_path=root_path,
             data_path=data_path,
-            flag='train',
             size=(96, 48, 96),
         )
+        dataset = container.get_split('train')
         
         seq_x, seq_y, seq_x_mark, seq_y_mark = dataset[0]
         
@@ -282,12 +276,12 @@ class TestETTMinuteDataset:
         """Test categorical time encoding (includes minute)."""
         root_path, data_path = ett_minute_data
         
-        dataset = ETTMinuteDataset(
+        container = ETTMinuteDataset(
             root_path=root_path,
             data_path=data_path,
-            flag='train',
             timeenc=0,  # Categorical
         )
+        dataset = container.get_split('train')
         
         _, _, seq_x_mark, _ = dataset[0]
         
@@ -302,13 +296,13 @@ class TestCustomCSVDataset:
         """Test basic dataset loading."""
         root_path, data_path = custom_csv_data
         
-        dataset = CustomCSVDataset(
+        container = CustomCSVDataset(
             root_path=root_path,
             data_path=data_path,
-            flag='train',
             size=(96, 48, 96),
             target='target_value',
         )
+        dataset = container.get_split('train')
         
         assert len(dataset) > 0
     
@@ -316,12 +310,12 @@ class TestCustomCSVDataset:
         """Test that dataset returns torch tensors."""
         root_path, data_path = custom_csv_data
         
-        dataset = CustomCSVDataset(
+        container = CustomCSVDataset(
             root_path=root_path,
             data_path=data_path,
-            flag='train',
             target='target_value',
         )
+        dataset = container.get_split('train')
         
         seq_x, seq_y, seq_x_mark, seq_y_mark = dataset[0]
         
@@ -335,32 +329,17 @@ class TestCustomCSVDataset:
         root_path, data_path = custom_csv_data
         
         # 80/10/10 split
-        train_dataset = CustomCSVDataset(
+        container = CustomCSVDataset(
             root_path=root_path,
             data_path=data_path,
-            flag='train',
             target='target_value',
             train_ratio=0.8,
             test_ratio=0.1,
         )
         
-        val_dataset = CustomCSVDataset(
-            root_path=root_path,
-            data_path=data_path,
-            flag='val',
-            target='target_value',
-            train_ratio=0.8,
-            test_ratio=0.1,
-        )
-        
-        test_dataset = CustomCSVDataset(
-            root_path=root_path,
-            data_path=data_path,
-            flag='test',
-            target='target_value',
-            train_ratio=0.8,
-            test_ratio=0.1,
-        )
+        train_dataset = container.get_split('train')
+        val_dataset = container.get_split('val')
+        test_dataset = container.get_split('test')
         
         # All should have data
         assert len(train_dataset) > 0
@@ -437,7 +416,7 @@ class TestDataFactory:
     
     def test_unknown_dataset_error(self):
         """Test error on unknown dataset name."""
-        with pytest.raises(ValueError, match="Unknown dataset"):
+        with pytest.raises(ValueError, match='Unknown dataset'):
             create_dataloader(
                 data_name='nonexistent_dataset',
                 root_path='/tmp',

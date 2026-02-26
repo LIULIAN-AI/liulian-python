@@ -34,22 +34,22 @@ class TaskSuggester:
             Dict with ``"task"`` (class name) and ``"reason"`` (human
             readable justification).
         """
-        n_timesteps = dataset_info.get("n_timesteps", 0)
-        has_graph = dataset_info.get("has_graph", False)
+        n_timesteps = dataset_info.get('n_timesteps', 0)
+        has_graph = dataset_info.get('has_graph', False)
 
         # For MVP1 we only have PredictionTask; the heuristic is trivially
         # deterministic but structured so that new branches can be added
         # when more task types are introduced (e.g., ClassificationTask).
         if n_timesteps > 1:
-            reason = "Dataset has temporal dimension " f"(n_timesteps={n_timesteps})"
+            reason = 'Dataset has temporal dimension ' f'(n_timesteps={n_timesteps})'
             if has_graph:
-                reason += " with graph topology — spatiotemporal prediction recommended"
+                reason += ' with graph topology — spatiotemporal prediction recommended'
             else:
-                reason += " — time-series prediction recommended"
-            return {"task": "PredictionTask", "reason": reason}
+                reason += ' — time-series prediction recommended'
+            return {'task': 'PredictionTask', 'reason': reason}
 
         # Fallback
         return {
-            "task": "PredictionTask",
-            "reason": "Default fallback; extend TaskSuggester for new task types.",
+            'task': 'PredictionTask',
+            'reason': 'Default fallback; extend TaskSuggester for new task types.',
         }

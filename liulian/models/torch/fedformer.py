@@ -31,6 +31,7 @@ from liulian.models.torch.layers.decomposition import (
     series_decomp,
 )
 from liulian.models.torch.base_adapter import TorchModelAdapter
+from liulian.models.torch.entity_mixin import EntityAwareMixin
 
 
 class Model(nn.Module):
@@ -215,7 +216,7 @@ class Model(nn.Module):
         return None
 
 
-class FEDformerAdapter(TorchModelAdapter):
+class FEDformerAdapter(EntityAwareMixin, TorchModelAdapter):
     """Adapter for FEDformer model to liulian ExecutableModel interface.
 
     Expected config parameters:
@@ -259,5 +260,7 @@ class FEDformerAdapter(TorchModelAdapter):
         }
         default_config.update(config)
 
-        model = Model(self._dict_to_namespace(default_config))
+        model_cfg = self._entity_model_config(default_config)
+        model = Model(self._dict_to_namespace(model_cfg))
         super().__init__(model, default_config)
+        self._init_entity_support(default_config)

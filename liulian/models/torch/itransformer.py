@@ -18,6 +18,7 @@ from liulian.models.torch.layers.transformer_blocks import Encoder, EncoderLayer
 from liulian.models.torch.layers.attention import FullAttention, AttentionLayer
 from liulian.models.torch.layers.embed import DataEmbedding_inverted
 from liulian.models.torch.base_adapter import TorchModelAdapter
+from liulian.models.torch.entity_mixin import EntityAwareMixin
 
 
 class Model(nn.Module):
@@ -145,7 +146,7 @@ class Model(nn.Module):
         return None
 
 
-class iTransformerAdapter(TorchModelAdapter):
+class iTransformerAdapter(EntityAwareMixin, TorchModelAdapter):
     """
     Adapter for iTransformer model to liulian ExecutableModel interface.
     
@@ -180,8 +181,10 @@ class iTransformerAdapter(TorchModelAdapter):
         }
         default_config.update(config)
         
-        model = Model(self._dict_to_namespace(default_config))
+        model_cfg = self._entity_model_config(default_config)
+        model = Model(self._dict_to_namespace(model_cfg))
         super().__init__(model, default_config)
+        self._init_entity_support(default_config)
     
     def _prepare_model_inputs(self, inputs: Dict[str, torch.Tensor]) -> tuple:
         """Prepare inputs for iTransformer forward pass"""

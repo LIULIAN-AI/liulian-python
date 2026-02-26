@@ -69,11 +69,11 @@ class TopologySpec:
             Dictionary suitable for YAML / JSON serialisation.
         """
         return {
-            "node_ids": self.node_ids,
-            "edges": [list(e) for e in self.edges],
-            "coordinates": self.coordinates,
-            "metadata": self.metadata,
+            'node_ids': self.node_ids,
+            'edges': [list(e) for e in self.edges],
+            'coordinates': self.coordinates,
+            'metadata': self.metadata,
         }
 
     def __repr__(self) -> str:
-        return f"TopologySpec(nodes={self.num_nodes}, edges={self.num_edges})"
+        return f'TopologySpec(nodes={self.num_nodes}, edges={self.num_edges})'

@@ -194,6 +194,72 @@ def cmd_eval(args: argparse.Namespace) -> None:
     _print_summary(summary)
 
 
+def cmd_train(args: argparse.Namespace) -> None:
+    """Run training only (no eval)."""
+    cfg = _load_yaml(args.config)
+    # Apply CLI overrides
+    if hasattr(args, 'epochs') and args.epochs is not None:
+        cfg['train_epochs'] = args.epochs
+    if hasattr(args, 'lr') and args.lr is not None:
+        cfg['learning_rate'] = args.lr
+    if hasattr(args, 'wandb_project') and args.wandb_project is not None:
+        cfg['wandb_project'] = args.wandb_project
+    exp = _build_experiment(cfg)
+    summary = exp.run(train=True, eval=False)
+    _print_summary(summary)
+
+
+def cmd_predict(args: argparse.Namespace) -> None:
+    """Run prediction / inference from a trained checkpoint."""
+    cfg = _load_yaml(args.config)
+    exp = _build_experiment(cfg)
+    summary = exp.run(train=False, eval=True, infer=True)
+    _print_summary(summary)
+    if 'predictions' in summary:
+        preds = summary['predictions']
+        print(f'  Predictions shape: {list(preds["preds"].shape)}')
+        print(f'  Ground truth shape: {list(preds["trues"].shape)}')
+
+
+def cmd_viz(args: argparse.Namespace) -> None:
+    """Generate visualizations from experiment results."""
+    cfg = _load_yaml(args.config)
+    cfg['auto_viz'] = True
+    if hasattr(args, 'method') and args.method:
+        cfg['viz_method'] = args.method
+    exp = _build_experiment(cfg)
+    # Run with viz enabled
+    summary = exp.run(train=False, eval=True)
+    if 'predictions' in summary:
+        paths = exp.visualize(summary, method=args.method or 'mean')
+        print(f'\n  Saved {len(paths)} plots:')
+        for name, path in paths.items():
+            print(f'    {name}: {path}')
+    else:
+        print('  No predictions available for visualization.')
+
+
+def cmd_hparam(args: argparse.Namespace) -> None:
+    """Run hyperparameter search."""
+    cfg = _load_yaml(args.config)
+    # Ensure HPO is configured
+    if 'search_space' not in cfg:
+        print(
+            'Error: config must contain a "search_space" key for HPO.',
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    exp = _build_experiment(cfg)
+    summary = exp.run(train=True, eval=True)
+    _print_summary(summary)
+    if 'hpo' in summary.get('metrics', {}):
+        hpo = summary['metrics']['hpo']
+        print(f'\n  HPO Results:')
+        print(f'    Best value: {hpo["best_value"]:.6f}')
+        print(f'    Trials: {hpo["n_trials"]}')
+        print(f'    Best config: {hpo["best_config"]}')
+
+
 def _print_summary(summary: Dict[str, Any]) -> None:
     """Pretty-print experiment summary."""
     print(f'\n{"=" * 50}')
@@ -248,10 +314,38 @@ def main(argv: list[str] | None = None) -> None:
     sp_eval.add_argument('config', help='Path to experiment YAML config')
     sp_eval.set_defaults(func=cmd_eval)
 
+    # train
+    sp_train = subparsers.add_parser('train', help='Train a model')
+    sp_train.add_argument('config', help='Path to experiment YAML config')
+    sp_train.add_argument('--epochs', type=int, default=None, help='Override train_epochs')
+    sp_train.add_argument('--lr', type=float, default=None, help='Override learning_rate')
+    sp_train.add_argument('--wandb-project', default=None, help='Enable wandb logging')
+    sp_train.set_defaults(func=cmd_train)
+
+    # predict
+    sp_predict = subparsers.add_parser('predict', help='Run prediction / inference')
+    sp_predict.add_argument('config', help='Path to experiment YAML config')
+    sp_predict.set_defaults(func=cmd_predict)
+
+    # viz
+    sp_viz = subparsers.add_parser('viz', help='Generate visualizations')
+    sp_viz.add_argument('config', help='Path to experiment YAML config')
+    sp_viz.add_argument('--method', default='mean',
+                        choices=['mean', 'median', 'last', 'longest_history',
+                                 'best', 'worst', 'single'],
+                        help='Aggregation method for overlapping predictions')
+    sp_viz.set_defaults(func=cmd_viz)
+
+    # hparam
+    sp_hparam = subparsers.add_parser('hparam', help='Run hyperparameter search')
+    sp_hparam.add_argument('config', help='Path to experiment YAML config')
+    sp_hparam.set_defaults(func=cmd_hparam)
+
     args = parser.parse_args(argv)
 
     if args.verbose:
-        logging.basicConfig(level=logging.DEBUG, format='%(name)s %(message)s')
+        from liulian.utils.log_tags import setup_logging as _setup_logging
+        _setup_logging(level=logging.DEBUG, fmt='%(name)s %(message)s')
 
     if hasattr(args, 'func'):
         args.func(args)

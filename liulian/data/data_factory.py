@@ -1,6 +1,14 @@
 """
 Data factory for creating PyTorch DataLoaders with proper dataset selection.
 
+Supports two dataset styles:
+
+1. **TimeSeriesDataset subclasses** (ETTHour, ETTMinute, CustomCSV, PEMS):
+   multi-split containers where ``get_split(flag)`` returns a torch Dataset.
+2. **Standalone torch Datasets** (M4Dataset): single-flag per instance.
+
+The factory transparently handles both styles.
+
 Adapted from Time-Series-Library:
 https://github.com/thuml/Time-Series-Library/blob/main/data_provider/data_factory.py
 
@@ -9,23 +17,43 @@ MIT License
 from typing import Dict, Any, Optional
 from torch.utils.data import DataLoader
 
-from liulian.data.torch_datasets import (
+from liulian.data.csv_dataset import (
     ETTHourDataset,
     ETTMinuteDataset,
     CustomCSVDataset,
 )
 from liulian.data.m4_dataset import M4Dataset
+from liulian.data.pems_dataset import PEMSDataset
+from liulian.data.base import BaseDataset
 
 
 # Dataset registry mapping names to classes
 DATASET_REGISTRY: Dict[str, type] = {
+    # ETT family
     'ETTh1': ETTHourDataset,
     'ETTh2': ETTHourDataset,
     'ETTm1': ETTMinuteDataset,
     'ETTm2': ETTMinuteDataset,
+    # Generic CSV
     'custom': CustomCSVDataset,
+    # M4 competition
     'm4': M4Dataset,
+    # Standard benchmarks (all loaded via CustomCSVDataset)
+    'weather': CustomCSVDataset,
+    'electricity': CustomCSVDataset,
+    'traffic': CustomCSVDataset,
+    'exchange_rate': CustomCSVDataset,
+    'illness': CustomCSVDataset,
+    'solar': CustomCSVDataset,
+    # PEMS traffic sensors
+    'PEMS03': PEMSDataset,
+    'PEMS04': PEMSDataset,
+    'PEMS07': PEMSDataset,
+    'PEMS08': PEMSDataset,
 }
+
+# Cache for multi-split datasets to avoid re-loading per flag
+_DATASET_CACHE: Dict[str, BaseDataset] = {}
 
 
 def create_dataloader(
@@ -47,29 +75,33 @@ def create_dataloader(
 ) -> DataLoader:
     """
     Create a PyTorch DataLoader for time series forecasting.
-    
+
     Args:
-        data_name: Dataset name (e.g., 'ETTh1', 'ETTm1', 'custom')
-        root_path: Root directory containing the data file
-        data_path: CSV filename
-        flag: Split type - 'train', 'val', or 'test'
-        size: Tuple of (seq_len, label_len, pred_len)
-        features: Feature mode - 'M', 'S', or 'MS'
-        target: Target column name
-        scale: Whether to apply StandardScaler normalization
-        timeenc: Time encoding mode (0 or 1)
-        freq: Frequency string for time features
-        batch_size: Batch size for DataLoader
-        num_workers: Number of worker processes for data loading
-        shuffle: Whether to shuffle data (typically True for train, False for val/test)
-        drop_last: Whether to drop the last incomplete batch
-        **kwargs: Additional dataset-specific arguments
-        
+        data_name (str): Dataset name (e.g., `ETTh1`, `ETTm1`, `custom`).
+        root_path (str): Root directory containing the data file.
+        data_path (str): CSV filename or dataset identifier.
+        flag (str): Split type - one of `train`, `val`, or `test`.
+        size (tuple or None): Tuple `(seq_len, label_len, pred_len)` defining
+            input and prediction window sizes. `None` to use dataset defaults.
+        features (str): Feature mode. One of:  todo: make sure of the explanation.
+            - `M`: multivariate input and multivariate output (use all variables).
+            - `S`: univariate input and output (single series / target only).
+            - `MS`: multivariate input with a single target for prediction.
+        target (str): Name of the target column to predict.
+        scale (bool): If True, apply StandardScaler normalization to inputs.
+        timeenc (int): Time encoding mode (commonly `0` or `1`).
+        freq (str): Frequency string used to build time features (e.g., `h`, `t`).
+        batch_size (int): Batch size for the DataLoader.
+        num_workers (int): Number of worker processes for data loading.
+        shuffle (bool): Whether to shuffle the dataset (typically True for `train`).
+        drop_last (bool): Whether to drop the last incomplete batch.
+        **kwargs: Additional dataset-specific arguments passed to the dataset ctor.
+
     Returns:
-        DataLoader configured for the specified dataset
-        
+        torch.utils.data.DataLoader: Configured DataLoader for the requested split.
+
     Raises:
-        ValueError: If data_name is not recognized
+        ValueError: If `data_name` is not registered in the dataset registry.
         
     Examples:
         >>> train_loader = create_dataloader(
@@ -96,25 +128,44 @@ def create_dataloader(
     # Get dataset class from registry
     if data_name not in DATASET_REGISTRY:
         raise ValueError(
-            f"Unknown dataset: {data_name}. "
-            f"Available datasets: {list(DATASET_REGISTRY.keys())}"
+            f'Unknown dataset: {data_name}. '
+            f'Available datasets: {list(DATASET_REGISTRY.keys())}'
         )
     
     dataset_class = DATASET_REGISTRY[data_name]
-    
-    # Create dataset instance
-    dataset = dataset_class(
+
+    # Build kwargs for constructor
+    ctor_kwargs = dict(
         root_path=root_path,
         data_path=data_path,
-        flag=flag,
         size=size,
         features=features,
         target=target,
         scale=scale,
-        timeenc=timeenc,
-        freq=freq,
-        **kwargs
+        **kwargs,
     )
+
+    # Multi-split datasets (TimeSeriesDataset subclasses)
+    if isinstance(dataset_class, type) and issubclass(dataset_class, BaseDataset):
+        # Cache key to avoid re-loading per flag
+        cache_key = f'{data_name}:{root_path}:{data_path}:{size}:{features}:{target}:{scale}'
+        if cache_key not in _DATASET_CACHE:
+            # Filter out flag — these datasets create all splits at once
+            ctor_kwargs.pop('flag', None)
+            # Add timeenc/freq only for CSV datasets
+            if hasattr(dataset_class, 'timeenc'):
+                ctor_kwargs['timeenc'] = timeenc
+                ctor_kwargs['freq'] = freq
+            _DATASET_CACHE[cache_key] = dataset_class(**ctor_kwargs)
+
+        container = _DATASET_CACHE[cache_key]
+        dataset = container.get_split(flag)
+    else:
+        # Standalone datasets (M4Dataset etc.)
+        ctor_kwargs['flag'] = flag
+        ctor_kwargs['timeenc'] = timeenc
+        ctor_kwargs['freq'] = freq
+        dataset = dataset_class(**ctor_kwargs)
     
     # Determine shuffle based on flag if not explicitly set
     if flag == 'train' and shuffle is None:

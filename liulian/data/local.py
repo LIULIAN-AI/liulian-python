@@ -26,15 +26,15 @@ def load_numpy(path: str) -> np.ndarray:
         FileNotFoundError: If *path* does not exist.
     """
     if not os.path.isfile(path):
-        raise FileNotFoundError(f"Numpy file not found: {path}")
+        raise FileNotFoundError(f'Numpy file not found: {path}')
     return np.load(path)
 
 
 def load_csv_as_array(
     path: str,
-    delimiter: str = ",",
+    delimiter: str = ',',
     skip_header: bool = True,
-    dtype: str = "float32",
+    dtype: str = 'float32',
 ) -> np.ndarray:
     """Read a CSV file into a 2-D numpy array.
 
@@ -51,10 +51,10 @@ def load_csv_as_array(
         FileNotFoundError: If *path* does not exist.
     """
     if not os.path.isfile(path):
-        raise FileNotFoundError(f"CSV file not found: {path}")
+        raise FileNotFoundError(f'CSV file not found: {path}')
 
     rows: List[List[str]] = []
-    with open(path, "r", encoding="utf-8") as fh:
+    with open(path, 'r', encoding='utf-8') as fh:
         reader = csv.reader(fh, delimiter=delimiter)
         if skip_header:
             next(reader, None)
@@ -65,7 +65,7 @@ def load_csv_as_array(
 
 
 def list_data_files(
-    directory: str, extensions: Tuple[str, ...] = (".npy", ".csv")
+    directory: str, extensions: Tuple[str, ...] = ('.npy', '.csv')
 ) -> List[str]:
     """List data files in *directory* filtered by extension.
 
@@ -80,7 +80,7 @@ def list_data_files(
         FileNotFoundError: If *directory* does not exist.
     """
     if not os.path.isdir(directory):
-        raise FileNotFoundError(f"Directory not found: {directory}")
+        raise FileNotFoundError(f'Directory not found: {directory}')
 
     files = [
         os.path.join(directory, f)

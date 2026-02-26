@@ -22,29 +22,29 @@ class TestDummyModel:
 
     def test_forward_shape(self, model: DummyModel) -> None:
         """Forward output shape must be (batch, horizon, features)."""
-        batch = {"X": np.random.randn(4, 18, 3).astype(np.float32)}
+        batch = {'X': np.random.randn(4, 18, 3).astype(np.float32)}
         out = model.forward(batch)
-        assert "predictions" in out
-        assert out["predictions"].shape == (4, 6, 3)
+        assert 'predictions' in out
+        assert out['predictions'].shape == (4, 6, 3)
 
     def test_forward_last_value_repeat(self, model: DummyModel) -> None:
         """Predictions should be the last observed value repeated."""
         X = np.zeros((2, 18, 1), dtype=np.float32)
         X[:, -1, :] = 42.0
-        out = model.forward({"X": X})
-        np.testing.assert_allclose(out["predictions"], 42.0)
+        out = model.forward({'X': X})
+        np.testing.assert_allclose(out['predictions'], 42.0)
 
     def test_diagnostics(self, model: DummyModel) -> None:
-        out = model.forward({"X": np.zeros((1, 18, 1))})
-        assert out["diagnostics"]["model"] == "dummy"
+        out = model.forward({'X': np.zeros((1, 18, 1))})
+        assert out['diagnostics']['model'] == 'dummy'
 
     def test_capabilities(self, model: DummyModel) -> None:
         caps = model.capabilities()
-        assert caps["deterministic"] is True
-        assert caps["probabilistic"] is False
+        assert caps['deterministic'] is True
+        assert caps['probabilistic'] is False
 
     def test_save_load(self, model: DummyModel) -> None:
-        with tempfile.NamedTemporaryFile(suffix=".json", delete=False, mode="w") as tmp:
+        with tempfile.NamedTemporaryFile(suffix='.json', delete=False, mode='w') as tmp:
             tmp_path = tmp.name
 
         try:
@@ -61,6 +61,6 @@ class TestDummyModel:
 
         start = time.monotonic()
         for _ in range(100):
-            model.forward({"X": np.random.randn(8, 18, 5).astype(np.float32)})
+            model.forward({'X': np.random.randn(8, 18, 5).astype(np.float32)})
         elapsed = time.monotonic() - start
         assert elapsed < 1.0

@@ -50,7 +50,7 @@ class BaseTask(ABC):
         default_metrics: Metric names computed by default.
     """
 
-    name: str = "base"
+    name: str = 'base'
     supports_online: bool = False
     default_metrics: List[str] = []
 
@@ -99,7 +99,7 @@ class BaseTask(ABC):
 
 
 class PredictionTask(BaseTask):
-    """Deterministic forecasting task (MSE loss, MSE/MAE/RMSE metrics).
+    """Deterministic forecasting task with configurable loss and metrics.
 
     Attributes:
         regime: A :class:`PredictionRegime` describing window parameters.
@@ -107,30 +107,56 @@ class PredictionTask(BaseTask):
             (raises :class:`NotImplementedError`).
     """
 
-    name: str = "prediction"
-    default_metrics: List[str] = ["mse", "mae", "rmse"]
+    name: str = 'prediction'
+    default_metrics: List[str] = ['rmse', 'mae', 'nse']
 
     def __init__(
         self,
         regime: PredictionRegime | None = None,
-        output_type: str = "deterministic",
+        output_type: str = 'deterministic',
+        loss_name: str = 'mse',
+        metrics: List[str] | None = None,
     ) -> None:
-        """Initialise the prediction task.
+        """Initialize the prediction task.
 
         Args:
             regime: Forecasting regime params; defaults are used if *None*.
             output_type: ``"deterministic"`` or ``"probabilistic"``.
+            loss_name: Training/evaluation loss name. Supported:
+                ``"mse"``, ``"mae"``, ``"rmse"``.
+            metrics: Metric names to compute in :meth:`compute_metrics`.
+                Defaults to ``["rmse", "mae", "nse"]``.
 
         Raises:
             NotImplementedError: If *output_type* is ``"probabilistic"``.
         """
-        if output_type == "probabilistic":
+        if output_type == 'probabilistic':
             raise NotImplementedError(
-                "Probabilistic prediction is planned for v1+. "
+                'Probabilistic prediction is planned for v1+. '
                 "Use output_type='deterministic' for MVP1."
             )
         self.regime = regime or PredictionRegime()
         self.output_type = output_type
+        self.loss_name = loss_name.lower().strip()
+        self.metric_names = [
+            m.lower().strip() for m in (metrics or list(self.default_metrics))
+        ]
+
+        supported_losses = {'mse', 'mae', 'rmse'}
+        supported_metrics = {'mse', 'mae', 'rmse', 'nse'}
+
+        if self.loss_name not in supported_losses:
+            raise ValueError(
+                f'Unknown loss_name={loss_name!r}. '
+                f'Supported: {sorted(supported_losses)}'
+            )
+
+        unknown_metrics = sorted(set(self.metric_names) - supported_metrics)
+        if unknown_metrics:
+            raise ValueError(
+                f'Unknown metrics={unknown_metrics}. '
+                f'Supported: {sorted(supported_metrics)}'
+            )
 
     def prepare_batch(self, raw_batch: Dict[str, Any]) -> Dict[str, Any]:
         """Slice raw arrays into context (X) and target (y) windows.
@@ -144,44 +170,63 @@ class PredictionTask(BaseTask):
         Returns:
             Dictionary with ``"X"`` (context window) and ``"y"`` (target).
         """
-        x = np.asarray(raw_batch["X"])
-        if "y" in raw_batch:
-            y = np.asarray(raw_batch["y"])
+        x = np.asarray(raw_batch['X'])
+        if 'y' in raw_batch:
+            y = np.asarray(raw_batch['y'])
         else:
             # Auto-derive target from the end of the time axis
             y = x[:, -self.regime.horizon :, :]
             x = x[:, : -self.regime.horizon, :]
-        return {"X": x, "y": y}
+        return {'X': x, 'y': y}
 
     def build_loss(self, model_output: Dict[str, Any], batch: Dict[str, Any]) -> float:
-        """Mean squared error between predictions and targets.
+        """Compute configured loss between predictions and targets.
 
         Args:
             model_output: Must contain ``"predictions"`` array.
             batch: Must contain ``"y"`` array.
 
         Returns:
-            Scalar MSE value.
+            Scalar loss value.
         """
-        preds = np.asarray(model_output["predictions"])
-        targets = np.asarray(batch["y"])
-        return float(np.mean((preds - targets) ** 2))
+        preds = np.asarray(model_output['predictions'])
+        targets = np.asarray(batch['y'])
+        if self.loss_name == 'mse':
+            return float(np.mean((preds - targets) ** 2))
+        if self.loss_name == 'mae':
+            return float(np.mean(np.abs(preds - targets)))
+        if self.loss_name == 'rmse':
+            return float(np.sqrt(np.mean((preds - targets) ** 2)))
+        raise ValueError(f'Unsupported loss_name={self.loss_name!r}')
 
     def compute_metrics(
         self, model_output: Dict[str, Any], batch: Dict[str, Any]
     ) -> Dict[str, float]:
-        """Compute MSE, MAE, and RMSE.
+        """Compute configured metrics.
 
         Args:
             model_output: Must contain ``"predictions"`` array.
             batch: Must contain ``"y"`` array.
 
         Returns:
-            Dict with keys ``"mse"``, ``"mae"``, ``"rmse"``.
+            Dict with configured metric keys.
         """
-        preds = np.asarray(model_output["predictions"])
-        targets = np.asarray(batch["y"])
+        preds = np.asarray(model_output['predictions'])
+        targets = np.asarray(batch['y'])
         mse = float(np.mean((preds - targets) ** 2))
         mae = float(np.mean(np.abs(preds - targets)))
         rmse = float(np.sqrt(mse))
-        return {"mse": mse, "mae": mae, "rmse": rmse}
+
+        denom = float(np.sum((targets - targets.mean()) ** 2))
+        if denom <= 1e-12:
+            nse = float('nan')
+        else:
+            nse = float(1.0 - np.sum((targets - preds) ** 2) / denom)
+
+        values = {
+            'mse': mse,
+            'mae': mae,
+            'rmse': rmse,
+            'nse': nse,
+        }
+        return {name: values[name] for name in self.metric_names}

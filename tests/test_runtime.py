@@ -27,7 +27,7 @@ class TestStateMachine:
 
     def test_invalid_transition_raises(self) -> None:
         sm = StateMachine()
-        with pytest.raises(ValueError, match="Invalid transition"):
+        with pytest.raises(ValueError, match='Invalid transition'):
             sm.transition(LifecycleState.EVAL)  # INIT -> EVAL not allowed
 
     def test_full_lifecycle(self) -> None:
@@ -73,8 +73,8 @@ class TestStateMachine:
 
 class TestExecutionMode:
     def test_values(self) -> None:
-        assert ExecutionMode.OFFLINE.value == "offline"
-        assert ExecutionMode.ONLINE.value == "online"
+        assert ExecutionMode.OFFLINE.value == 'offline'
+        assert ExecutionMode.ONLINE.value == 'online'
 
 
 # ---------------------------------------------------------------------------
@@ -86,19 +86,19 @@ class TestExperimentSpec:
     @pytest.fixture
     def spec(self) -> ExperimentSpec:
         return ExperimentSpec(
-            name="test-exp",
-            task={"class": "PredictionTask", "horizon": 12},
-            dataset={"name": "fake"},
-            model={"class": "DummyModel"},
+            name='test-exp',
+            task={'class': 'PredictionTask', 'horizon': 12},
+            dataset={'name': 'fake'},
+            model={'class': 'DummyModel'},
         )
 
     def test_to_dict(self, spec: ExperimentSpec) -> None:
         d = spec.to_dict()
-        assert d["name"] == "test-exp"
-        assert d["task"]["class"] == "PredictionTask"
+        assert d['name'] == 'test-exp'
+        assert d['task']['class'] == 'PredictionTask'
 
     def test_yaml_roundtrip(self, spec: ExperimentSpec) -> None:
-        with tempfile.NamedTemporaryFile(suffix=".yaml", delete=False, mode="w") as tmp:
+        with tempfile.NamedTemporaryFile(suffix='.yaml', delete=False, mode='w') as tmp:
             tmp_path = tmp.name
 
         try:

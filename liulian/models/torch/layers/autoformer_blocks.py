@@ -18,7 +18,7 @@ class EncoderLayer(nn.Module):
     Autoformer encoder layer with the progressive decomposition architecture
     """
 
-    def __init__(self, attention, d_model, d_ff=None, moving_avg=25, dropout=0.1, activation="relu"):
+    def __init__(self, attention, d_model, d_ff=None, moving_avg=25, dropout=0.1, activation='relu'):
         super(EncoderLayer, self).__init__()
         d_ff = d_ff or 4 * d_model
         self.attention = attention
@@ -27,7 +27,7 @@ class EncoderLayer(nn.Module):
         self.decomp1 = series_decomp(moving_avg)
         self.decomp2 = series_decomp(moving_avg)
         self.dropout = nn.Dropout(dropout)
-        self.activation = F.relu if activation == "relu" else F.gelu
+        self.activation = F.relu if activation == 'relu' else F.gelu
 
     def forward(self, x, attn_mask=None):
         new_x, attn = self.attention(
@@ -80,7 +80,7 @@ class DecoderLayer(nn.Module):
     """
 
     def __init__(self, self_attention, cross_attention, d_model, c_out, d_ff=None,
-                 moving_avg=25, dropout=0.1, activation="relu"):
+                 moving_avg=25, dropout=0.1, activation='relu'):
         super(DecoderLayer, self).__init__()
         d_ff = d_ff or 4 * d_model
         self.self_attention = self_attention
@@ -93,7 +93,7 @@ class DecoderLayer(nn.Module):
         self.dropout = nn.Dropout(dropout)
         self.projection = nn.Conv1d(in_channels=d_model, out_channels=c_out, kernel_size=3, stride=1, padding=1,
                                     padding_mode='circular', bias=False)
-        self.activation = F.relu if activation == "relu" else F.gelu
+        self.activation = F.relu if activation == 'relu' else F.gelu
 
     def forward(self, x, cross, x_mask=None, cross_mask=None):
         x = x + self.dropout(self.self_attention(

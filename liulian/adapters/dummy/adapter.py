@@ -50,7 +50,7 @@ class DummyModel(ExecutableModel):
         self.config = config or {}
         # PredictionTask exposes regime.horizon; fallback to config
         self.horizon = getattr(
-            getattr(task, "regime", None), "horizon", config.get("horizon", 1)
+            getattr(task, 'regime', None), 'horizon', config.get('horizon', 1)
         )
 
     def forward(self, batch: Dict[str, np.ndarray]) -> Dict[str, Any]:
@@ -64,12 +64,12 @@ class DummyModel(ExecutableModel):
             Dict with ``"predictions"`` shaped
             ``(batch_size, horizon, n_features)`` and ``"diagnostics"``.
         """
-        x = batch["X"]
+        x = batch['X']
         last_val = x[:, -1:, :]  # (batch, 1, features)
         predictions = np.repeat(last_val, self.horizon, axis=1)
         return {
-            "predictions": predictions,
-            "diagnostics": {"model": "dummy", "horizon": self.horizon},
+            'predictions': predictions,
+            'diagnostics': {'model': 'dummy', 'horizon': self.horizon},
         }
 
     def save(self, path: str) -> None:
@@ -78,8 +78,8 @@ class DummyModel(ExecutableModel):
         Args:
             path: File path for the checkpoint.
         """
-        with open(path, "w", encoding="utf-8") as f:
-            json.dump({"horizon": self.horizon, "config": self.config}, f)
+        with open(path, 'w', encoding='utf-8') as f:
+            json.dump({'horizon': self.horizon, 'config': self.config}, f)
 
     def load(self, path: str) -> None:
         """Restore config from a JSON checkpoint.
@@ -87,10 +87,10 @@ class DummyModel(ExecutableModel):
         Args:
             path: Path to a previously saved checkpoint file.
         """
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        self.horizon = data.get("horizon", 1)
-        self.config = data.get("config", {})
+        self.horizon = data.get('horizon', 1)
+        self.config = data.get('config', {})
 
     def capabilities(self) -> Dict[str, bool]:
         """DummyModel supports deterministic predictions only.
@@ -98,4 +98,4 @@ class DummyModel(ExecutableModel):
         Returns:
             Capability flags.
         """
-        return {"deterministic": True, "probabilistic": False, "uncertainty": False}
+        return {'deterministic': True, 'probabilistic': False, 'uncertainty': False}

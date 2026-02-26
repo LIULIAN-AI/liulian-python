@@ -20,6 +20,7 @@ from liulian.models.torch.layers.embed import (
 )
 from liulian.models.torch.layers.attention import FullAttention, AttentionLayer
 from liulian.models.torch.base_adapter import TorchModelAdapter
+from liulian.models.torch.entity_mixin import EntityAwareMixin
 
 
 class FlattenHead(nn.Module):
@@ -303,7 +304,7 @@ class Model(nn.Module):
             return None
 
 
-class TimeXerAdapter(TorchModelAdapter):
+class TimeXerAdapter(EntityAwareMixin, TorchModelAdapter):
     """Adapter for TimeXer model to liulian ExecutableModel interface.
 
     TimeXer is a forecasting-only model that handles exogenous variables.
@@ -353,5 +354,7 @@ class TimeXerAdapter(TorchModelAdapter):
                 patch_len -= 1
             default_config['patch_len'] = patch_len
 
-        model = Model(self._dict_to_namespace(default_config))
+        model_cfg = self._entity_model_config(default_config)
+        model = Model(self._dict_to_namespace(model_cfg))
         super().__init__(model, default_config)
+        self._init_entity_support(default_config)

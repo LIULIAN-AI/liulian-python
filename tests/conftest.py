@@ -21,8 +21,8 @@ class FakeDataset(BaseDataset):
     without any external files.
     """
 
-    domain = "test"
-    version = "0.0.1"
+    domain = 'test'
+    version = '0.0.1'
 
     def __init__(
         self, n_samples: int = 16, n_timesteps: int = 48, n_features: int = 3

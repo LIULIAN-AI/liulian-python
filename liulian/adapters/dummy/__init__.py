@@ -2,4 +2,4 @@
 
 from liulian.adapters.dummy.adapter import DummyModel
 
-__all__ = ["DummyModel"]
+__all__ = ['DummyModel']

@@ -18,6 +18,7 @@ from liulian.models.torch.layers.decomposition import series_decomp
 from liulian.models.torch.layers.embed import DataEmbedding_wo_pos
 from liulian.models.torch.layers.standard_norm import Normalize
 from liulian.models.torch.base_adapter import TorchModelAdapter
+from liulian.models.torch.entity_mixin import EntityAwareMixin
 
 
 class DFT_series_decomp(nn.Module):
@@ -555,7 +556,7 @@ class Model(nn.Module):
             raise ValueError('Task not implemented yet')
 
 
-class TimeMixerAdapter(TorchModelAdapter):
+class TimeMixerAdapter(EntityAwareMixin, TorchModelAdapter):
     """Adapter for TimeMixer model to liulian ExecutableModel interface.
 
     Expected config parameters:
@@ -599,5 +600,7 @@ class TimeMixerAdapter(TorchModelAdapter):
         }
         default_config.update(config)
 
-        model = Model(self._dict_to_namespace(default_config))
+        model_cfg = self._entity_model_config(default_config)
+        model = Model(self._dict_to_namespace(model_cfg))
         super().__init__(model, default_config)
+        self._init_entity_support(default_config)

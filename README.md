@@ -50,10 +50,17 @@ LIULIAN is a **task-driven experiment framework** designed for researchers worki
 uv pip install -e .
 
 # With optional extras
-uv pip install -e ".[dev]"         # development tools
-uv pip install -e ".[logging]"     # WandB integration
-uv pip install -e ".[hpo]"         # Ray Tune hyperparameter optimization
-uv pip install -e ".[docs]"        # MkDocs documentation
+uv pip install -e "[dev]"         # development tools
+uv pip install -e "[logging]"     # WandB integration
+uv pip install -e "[hpo]"         # Ray Tune hyperparameter optimization
+uv pip install -e "[docs]"        # MkDocs documentation
+uv pip install -e "[torch]"       # PyTorch and related ML tools
+uv pip install -e "[torch-full]"  # PyTorch + advanced sequence models (mamba-ssm <2.0.0 for compatibility)
+
+# Install everything (full development, docs, logging, hpo, torch, etc.)
+uv pip install -e "[all]"
+
+# Note: [torch-full] now pins mamba-ssm to <2.0.0 to avoid build errors and CUDA/nvcc issues. If you need GPU support, ensure CUDA and nvcc are available, or use [torch] for CPU-only workflows.
 ```
 
 ### Minimal Example

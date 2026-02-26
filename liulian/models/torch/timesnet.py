@@ -19,6 +19,7 @@ from typing import Dict, Any
 from liulian.models.torch.layers.embed import DataEmbedding
 from liulian.models.torch.layers.conv_blocks import Inception_Block_V1
 from liulian.models.torch.base_adapter import TorchModelAdapter
+from liulian.models.torch.entity_mixin import EntityAwareMixin
 
 
 def FFT_for_Period(x, k=2):
@@ -244,7 +245,7 @@ class Model(nn.Module):
         return None
 
 
-class TimesNetAdapter(TorchModelAdapter):
+class TimesNetAdapter(EntityAwareMixin, TorchModelAdapter):
     """Adapter for TimesNet model to liulian ExecutableModel interface.
 
     Expected config parameters:
@@ -287,5 +288,7 @@ class TimesNetAdapter(TorchModelAdapter):
         if task not in ('long_term_forecast', 'short_term_forecast'):
             default_config['pred_len'] = 0
 
-        model = Model(self._dict_to_namespace(default_config))
+        model_cfg = self._entity_model_config(default_config)
+        model = Model(self._dict_to_namespace(model_cfg))
         super().__init__(model, default_config)
+        self._init_entity_support(default_config)

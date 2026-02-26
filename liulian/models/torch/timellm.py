@@ -10,13 +10,16 @@ using patch-based embeddings and cross-attention reprogramming.
 """
 
 from math import sqrt
+from os import PathLike
+from typing import Dict, Any, Union
+
 import torch
 import torch.nn as nn
-import numpy as np
-from typing import Dict, Any
-from liulian.models.torch.layers.embed import PatchEmbedding
-from liulian.models.torch.layers.standard_norm import Normalize
+
 from liulian.models.torch.base_adapter import TorchModelAdapter
+from liulian.models.torch.entity_mixin import EntityAwareMixin
+from liulian.models.torch.layers.embed import TimeLLMPatchEmbedding
+from liulian.models.torch.layers.standard_norm import Normalize
 
 
 class FlattenHead(nn.Module):
@@ -35,6 +38,7 @@ class FlattenHead(nn.Module):
 
 
 class ReprogrammingLayer(nn.Module):
+
     def __init__(self, d_model, n_heads, d_keys=None, d_llm=None, attention_dropout=0.1):
         super(ReprogrammingLayer, self).__init__()
 
@@ -48,8 +52,10 @@ class ReprogrammingLayer(nn.Module):
         self.dropout = nn.Dropout(attention_dropout)
 
     def forward(self, target_embedding, source_embedding, value_embedding):
+        # target_embedding is the time series patch embeddings,
+        # source_embedding and value_embedding are the LLM vocabulary embeddings.
         B, L, _ = target_embedding.shape
-        S, _ = source_embedding.shape
+        S, _ = source_embedding.shape  # S: num_tokens for text protypes embeddings (from LLM vocabulary)
         H = self.n_heads
 
         target_embedding = self.query_projection(target_embedding).view(B, L, H, -1)
@@ -58,19 +64,19 @@ class ReprogrammingLayer(nn.Module):
 
         out = self.reprogramming(target_embedding, source_embedding, value_embedding)
 
-        out = out.reshape(B, L, -1)
+        out = out.reshape(B, L, -1)  # [B, L, H * D_v]
 
-        return self.out_projection(out)
+        return self.out_projection(out)  # [B, L, D_llm]
 
     def reprogramming(self, target_embedding, source_embedding, value_embedding):
         B, L, H, E = target_embedding.shape
 
         scale = 1. / sqrt(E)
 
-        scores = torch.einsum("blhe,she->bhls", target_embedding, source_embedding)
+        scores = torch.einsum('blhe,she->bhls', target_embedding, source_embedding)
 
         A = self.dropout(torch.softmax(scale * scores, dim=-1))
-        reprogramming_embedding = torch.einsum("bhls,she->blhe", A, value_embedding)
+        reprogramming_embedding = torch.einsum('bhls,she->blhe', A, value_embedding)
 
         return reprogramming_embedding
 
@@ -88,29 +94,36 @@ class Model(nn.Module):
         self.patch_len = configs.patch_len
         self.stride = configs.stride
 
+        self.cache_dir: Union[str, PathLike, None] = getattr(configs, 'cache_dir', None)
+
         # Import transformers here to make it optional
         from transformers import (
             LlamaConfig, LlamaModel, LlamaTokenizer,
             GPT2Config, GPT2Model, GPT2Tokenizer,
-            BertConfig, BertModel, BertTokenizer
+            BertConfig, BertModel, BertTokenizer,
+            AutoConfig, AutoModel, AutoTokenizer, AutoModelForCausalLM
         )
 
         if configs.llm_model == 'LLAMA':
             self.llama_config = LlamaConfig.from_pretrained('huggyllama/llama-7b')
+            # # todo: use this?
+            # self.llama_config = LlamaConfig.from_pretrained('meta-llama/Llama-2-7b-hf')
             self.llama_config.num_hidden_layers = configs.llm_layers
             self.llama_config.output_attentions = True
             self.llama_config.output_hidden_states = True
             try:
                 self.llm_model = LlamaModel.from_pretrained(
                     'huggyllama/llama-7b',
+                    cache_dir=self.cache_dir,
                     trust_remote_code=True,
                     local_files_only=True,
                     config=self.llama_config,
                 )
             except EnvironmentError:  # downloads model from HF is not already done
-                print("Local model files not found. Attempting to download...")
+                print('Local model files not found. Attempting to download...')
                 self.llm_model = LlamaModel.from_pretrained(
                     'huggyllama/llama-7b',
+                    cache_dir=self.cache_dir,
                     trust_remote_code=True,
                     local_files_only=False,
                     config=self.llama_config,
@@ -118,11 +131,12 @@ class Model(nn.Module):
             try:
                 self.tokenizer = LlamaTokenizer.from_pretrained(
                     'huggyllama/llama-7b',
+                    cache_dir=self.cache_dir,
                     trust_remote_code=True,
                     local_files_only=True
                 )
             except EnvironmentError:  # downloads the tokenizer from HF if not already done
-                print("Local tokenizer files not found. Attempting to download them..")
+                print('Local tokenizer files not found. Attempting to download them..')
                 self.tokenizer = LlamaTokenizer.from_pretrained(
                     'huggyllama/llama-7b',
                     trust_remote_code=True,
@@ -136,14 +150,16 @@ class Model(nn.Module):
             try:
                 self.llm_model = GPT2Model.from_pretrained(
                     'openai-community/gpt2',
+                    cache_dir=self.cache_dir,
                     trust_remote_code=True,
                     local_files_only=True,
                     config=self.gpt2_config,
                 )
             except EnvironmentError:  # downloads model from HF is not already done
-                print("Local model files not found. Attempting to download...")
+                print('Local model files not found. Attempting to download...')
                 self.llm_model = GPT2Model.from_pretrained(
                     'openai-community/gpt2',
+                    cache_dir=self.cache_dir,
                     trust_remote_code=True,
                     local_files_only=False,
                     config=self.gpt2_config,
@@ -155,7 +171,7 @@ class Model(nn.Module):
                     local_files_only=True
                 )
             except EnvironmentError:  # downloads the tokenizer from HF if not already done
-                print("Local tokenizer files not found. Attempting to download them..")
+                print('Local tokenizer files not found. Attempting to download them..')
                 self.tokenizer = GPT2Tokenizer.from_pretrained(
                     'openai-community/gpt2',
                     trust_remote_code=True,
@@ -169,14 +185,16 @@ class Model(nn.Module):
             try:
                 self.llm_model = BertModel.from_pretrained(
                     'google-bert/bert-base-uncased',
+                    cache_dir=self.cache_dir,
                     trust_remote_code=True,
                     local_files_only=True,
                     config=self.bert_config,
                 )
             except EnvironmentError:  # downloads model from HF is not already done
-                print("Local model files not found. Attempting to download...")
+                print('Local model files not found. Attempting to download...')
                 self.llm_model = BertModel.from_pretrained(
                     'google-bert/bert-base-uncased',
+                    cache_dir=self.cache_dir,
                     trust_remote_code=True,
                     local_files_only=False,
                     config=self.bert_config,
@@ -188,9 +206,80 @@ class Model(nn.Module):
                     local_files_only=True
                 )
             except EnvironmentError:  # downloads the tokenizer from HF if not already done
-                print("Local tokenizer files not found. Attempting to download them..")
+                print('Local tokenizer files not found. Attempting to download them..')
                 self.tokenizer = BertTokenizer.from_pretrained(
                     'google-bert/bert-base-uncased',
+                    trust_remote_code=True,
+                    local_files_only=False
+                )
+
+        elif configs.llm_model == 'TINYLLAMA':
+            self.llm_config = AutoConfig.from_pretrained('TinyLlama/TinyLlama-1.1B-Chat-v1.0')
+            self.llm_config.num_hidden_layers = configs.llm_layers
+            self.llm_config.attn_implementation = 'eager'
+            self.llm_config.output_attentions = True
+            self.llm_config.output_hidden_states = True
+            try:
+                self.llm_model = AutoModel.from_pretrained(
+                    'TinyLlama/TinyLlama-1.1B-Chat-v1.0',
+                    cache_dir=self.cache_dir, trust_remote_code=True,
+                    local_files_only=True,
+                    config=self.llm_config,
+                )
+            except Exception as e:
+                print(f'Failed to load local TinyLLaMA: {e}')
+                print('Attempting to download...')
+                self.llm_model = AutoModel.from_pretrained(
+                    'TinyLlama/TinyLlama-1.1B-Chat-v1.0',
+                    cache_dir=self.cache_dir, trust_remote_code=True,
+                    local_files_only=False,
+                    config=self.llm_config,
+                )
+            try:
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    'TinyLlama/TinyLlama-1.1B-Chat-v1.0',
+                    trust_remote_code=True,
+                    local_files_only=True
+                )
+            except Exception as e:
+                print(f'Local TinyLLaMA tokenizer not found: {e}')
+                print('Attempting to download...')
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    'TinyLlama/TinyLlama-1.1B-Chat-v1.0',
+                    trust_remote_code=True,
+                    local_files_only=False
+                )
+
+        elif configs.llm_model == 'QWEN':
+            self.llm_config = AutoModelForCausalLM.from_pretrained('Qwen/Qwen-7B-Chat').config
+            self.llm_config.num_hidden_layers = configs.llm_layers
+            self.llm_config.output_attentions = True
+            self.llm_config.output_hidden_states = True
+            try:
+                self.llm_model = AutoModelForCausalLM.from_pretrained(
+                    'Qwen/Qwen-7B-Chat',
+                    cache_dir=self.cache_dir, trust_remote_code=True,
+                    local_files_only=True
+                )
+            except Exception as e:
+                print(f'Failed to load local Qwen: {e}')
+                print('Attempting to download...')
+                self.llm_model = AutoModelForCausalLM.from_pretrained(
+                    'Qwen/Qwen-7B-Chat',
+                    cache_dir=self.cache_dir, trust_remote_code=True,
+                    local_files_only=False
+                )
+            try:
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    'Qwen/Qwen-7B-Chat',
+                    trust_remote_code=True,
+                    local_files_only=True
+                )
+            except Exception as e:
+                print(f'Local Qwen tokenizer not found: {e}')
+                print('Attempting to download...')
+                self.tokenizer = AutoTokenizer.from_pretrained(
+                    'Qwen/Qwen-7B-Chat',
                     trust_remote_code=True,
                     local_files_only=False
                 )
@@ -207,15 +296,15 @@ class Model(nn.Module):
         for param in self.llm_model.parameters():
             param.requires_grad = False
 
-        if configs.prompt_domain:
+        if configs.prompt_domain:  # todo: what is this?
             self.description = configs.content
         else:
             self.description = 'The Electricity Transformer Temperature (ETT) is a crucial indicator in the electric power long-term deployment.'
 
         self.dropout = nn.Dropout(configs.dropout)
 
-        self.patch_embedding = PatchEmbedding(
-            configs.d_model, self.patch_len, self.stride, self.stride, configs.dropout)
+        self.patch_embedding = TimeLLMPatchEmbedding(
+            int(configs.d_model), int(self.patch_len), int(self.stride), int(self.stride), float(configs.dropout))
 
         self.word_embeddings = self.llm_model.get_input_embeddings().weight
         self.vocab_size = self.word_embeddings.shape[0]
@@ -237,13 +326,13 @@ class Model(nn.Module):
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
         if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
-            dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
+            dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)  # [B, pred_len, N_f]
             return dec_out[:, -self.pred_len:, :]
         return None
 
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
 
-        x_enc = self.normalize_layers(x_enc, 'norm')
+        x_enc = self.normalize_layers(x_enc, 'norm')  # x_enc: [B, T, N_f]
 
         B, T, N = x_enc.size()
         x_enc = x_enc.permute(0, 2, 1).contiguous().reshape(B * N, T, 1)
@@ -261,40 +350,50 @@ class Model(nn.Module):
             median_values_str = str(medians[b].tolist()[0])
             lags_values_str = str(lags[b].tolist())
             prompt_ = (
-                f"<|start_prompt|>Dataset description: {self.description}"
-                f"Task description: forecast the next {str(self.pred_len)} steps given the previous {str(self.seq_len)} steps information; "
-                "Input statistics: "
-                f"min value {min_values_str}, "
-                f"max value {max_values_str}, "
-                f"median value {median_values_str}, "
+                f'<|start_prompt|>Dataset description: {self.description}'
+                f'Task description: forecast the next {str(self.pred_len)} steps given the previous {str(self.seq_len)} steps information; '
+                'Input statistics: '
+                f'min value {min_values_str}, '
+                f'max value {max_values_str}, '
+                f'median value {median_values_str}, '
                 f"the trend of input is {'upward' if trends[b] > 0 else 'downward'}, "
-                f"top 5 lags are : {lags_values_str}<|<end_prompt>|>"
+                f'top 5 lags are : {lags_values_str}<|<end_prompt>|>'
             )
 
             prompt.append(prompt_)
 
         x_enc = x_enc.reshape(B, N, T).permute(0, 2, 1).contiguous()
 
-        prompt = self.tokenizer(prompt, return_tensors="pt", padding=True, truncation=True, max_length=2048).input_ids
+        if self.tokenizer is None or not callable(self.tokenizer):
+            raise RuntimeError('Tokenizer is not properly initialized or not callable. Please check LLM model and tokenizer setup.')
+        prompt_output = self.tokenizer(prompt, return_tensors='pt', padding=True, truncation=True, max_length=2048)
+        if not hasattr(prompt_output, 'input_ids'):
+            raise RuntimeError(f"Tokenizer output does not have 'input_ids'. Type: {type(prompt_output)}. Please check tokenizer type and initialization.")
+        prompt = prompt_output.input_ids
         prompt_embeddings = self.llm_model.get_input_embeddings()(prompt.to(x_enc.device))  # (batch, prompt_token, dim)
 
+        # [num_tokens, d_vocab]:
         source_embeddings = self.mapping_layer(self.word_embeddings.permute(1, 0)).permute(1, 0)
 
         x_enc = x_enc.permute(0, 2, 1).contiguous()
-        enc_out, n_vars = self.patch_embedding(x_enc.float())
-        enc_out = self.reprogramming_layer(enc_out, source_embeddings, source_embeddings)
+        # x_enc: [B, N_f, T]， enc_out: [B*N_f, num_patches, d_model]:
+        # enc_out, n_vars = self.patch_embedding(x_enc.to(torch.bfloat16))  # todo: maybe needed autocast as in timellm?
+        enc_out, n_vars = self.patch_embedding(x_enc)  # keep as float32, do not cast to bfloat16
+        enc_out = self.reprogramming_layer(enc_out, source_embeddings,
+                                           source_embeddings)  # enc_out: [B*N_f, num_patches, d_llm]
         llama_enc_out = torch.cat([prompt_embeddings, enc_out], dim=1)
-        dec_out = self.llm_model(inputs_embeds=llama_enc_out.to(
-            self.llm_model.dtype if hasattr(self.llm_model, 'dtype') else llama_enc_out.dtype
-        )).last_hidden_state
-        dec_out = dec_out.float()
-        dec_out = dec_out[:, :, :self.d_ff]
+        # dec_out = self.llm_model(inputs_embeds=llama_enc_out.to(
+        #     self.llm_model.dtype if hasattr(self.llm_model, 'dtype') else llama_enc_out.dtype
+        # )).last_hidden_state  # [B*N_f, prompt_len + num_patches, d_llm]
+        dec_out = self.llm_model(inputs_embeds=llama_enc_out).last_hidden_state
+        # dec_out = dec_out.float()
+        dec_out = dec_out[:, :, :self.d_ff]  # [B*N_f, prompt_len + num_patches, d_ff]
 
         dec_out = torch.reshape(
             dec_out, (-1, n_vars, dec_out.shape[-2], dec_out.shape[-1]))
-        dec_out = dec_out.permute(0, 1, 3, 2).contiguous()
+        dec_out = dec_out.permute(0, 1, 3, 2).contiguous()  # [B, N_f, d_ff, prompt_len + num_patches]
 
-        dec_out = self.output_projection(dec_out[:, :, :, -self.patch_nums:])
+        dec_out = self.output_projection(dec_out[:, :, :, -self.patch_nums:])  # [B, N_f, pred_len]
         dec_out = dec_out.permute(0, 2, 1).contiguous()
 
         dec_out = self.normalize_layers(dec_out, 'denorm')
@@ -311,10 +410,10 @@ class Model(nn.Module):
         return lags
 
 
-class TimeLLMAdapter(TorchModelAdapter):
+class TimeLLMAdapter(EntityAwareMixin, TorchModelAdapter):
     """
     Adapter for Time-LLM model to liulian ExecutableModel interface.
-    
+
     Expected config parameters:
         - seq_len: Input sequence length
         - pred_len: Prediction sequence length
@@ -331,10 +430,10 @@ class TimeLLMAdapter(TorchModelAdapter):
         - prompt_domain: Use domain-specific prompt (default: False)
         - content: Custom dataset description (default: ETT description)
         - task_name: Task type (default: 'long_term_forecast')
-        
+
     Note: Requires transformers package. Downloads pretrained LLM on first use.
     """
-    
+
     def __init__(self, config: Dict[str, Any]):
         default_config = {
             'd_model': 32,
@@ -351,21 +450,22 @@ class TimeLLMAdapter(TorchModelAdapter):
             'task_name': 'long_term_forecast',
         }
         default_config.update(config)
-        
+
         model = Model(
             self._dict_to_namespace(default_config),
             patch_len=default_config['patch_len'],
             stride=default_config['stride']
         )
         super().__init__(model, default_config)
-    
+        self._init_entity_support(default_config)
+
     def _prepare_model_inputs(self, inputs: Dict[str, torch.Tensor]) -> tuple:
         """Prepare inputs for Time-LLM forward pass"""
         x_enc = inputs['x_enc']
         batch_size, seq_len, n_features = x_enc.shape
-        
+
         x_mark_enc = inputs.get('x_mark_enc', torch.zeros(batch_size, seq_len, 1, device=x_enc.device))
-        x_dec = inputs.get('x_dec', torch.zeros(batch_size, self.config['pred_len'], n_features, device=x_enc.device))
-        x_mark_dec = inputs.get('x_mark_dec', torch.zeros(batch_size, self.config['pred_len'], 1, device=x_enc.device))
-        
+        x_dec = inputs.get('x_dec', torch.zeros(batch_size, self._config['pred_len'], n_features, device=x_enc.device))
+        x_mark_dec = inputs.get('x_mark_dec', torch.zeros(batch_size, self._config['pred_len'], 1, device=x_enc.device))
+
         return (x_enc, x_mark_enc, x_dec, x_mark_dec)
