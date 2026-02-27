@@ -7,7 +7,6 @@ return values, and basic content—not pixel-level rendering.
 from __future__ import annotations
 
 import os
-import tempfile
 
 import numpy as np
 import pytest
@@ -113,8 +112,10 @@ class TestPlotPredictionSummary:
         assert os.path.isfile(save_path)
 
     def test_empty_results(self):
-        """No crash on empty input."""
-        plot_prediction_summary([])
+        """Empty input should return without error and not create files."""
+        result = plot_prediction_summary([])
+        # plot_prediction_summary returns None on empty input
+        assert result is None
 
 
 # ---------------------------------------------------------------------------

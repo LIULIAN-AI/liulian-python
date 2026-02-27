@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import json
 import sys
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -154,23 +153,6 @@ class TestConfigGeneration:
         """All 15 models should appear in long_term configs."""
         names = {
             yf.stem.split('_')[0] for yf in (config_dir / 'long_term').glob('*.yaml')
-        }
-        expected_prefixes = {
-            'dlinear',
-            'transformer',
-            'informer',
-            'autoformer',
-            'fedformer',
-            'itransformer',
-            'patchtst',
-            'timesnet',
-            'timemixer',
-            'timexer',
-            'mamba',
-            'timellm',
-            'lstmadapter',
-            'extrapolstmadapter',
-            'transformerencoaderadapter',
         }
         # Some names may be lowered differently
         found = {n.lower() for n in names}
@@ -450,9 +432,6 @@ class TestEntityMixinUnit:
     def test_entity_wrapper_forward(self):
         import torch
         from liulian.models.torch.entity_mixin import EntityWrapper
-
-        # Minimal inner model
-        inner = torch.nn.Linear(7, 96 * 7)  # Simple model
 
         class SimpleModel(torch.nn.Module):
             def __init__(self):

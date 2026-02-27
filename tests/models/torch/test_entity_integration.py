@@ -44,7 +44,7 @@ try:
 
     _mamba_mod = importlib.import_module('mamba_ssm')
     _HAS_MAMBA = True
-except Exception:
+except ImportError:
     pass
 
 if _HAS_MAMBA:
@@ -203,6 +203,7 @@ class TestEntityWrapper:
 
         out = wrapper(x_enc, x_mark)
         assert out.shape == (B, T, 3)
+        assert torch.isfinite(out).all(), 'EntityWrapper embedding produced non-finite'
 
     def test_no_mark_passthrough(self):
         """Without x_mark_enc, wrapper should pass x_enc unchanged."""
@@ -230,6 +231,7 @@ class TestTSLAdaptersModeNone:
         adapter = cls(cfg)
         pred = _forward_adapter(adapter)
         assert pred.ndim == 3
+        assert torch.isfinite(pred).all(), 'None-mode forward produced non-finite'
 
     def test_inherits_mixin(self, adapter_spec):
         cls, extra = adapter_spec
@@ -277,6 +279,9 @@ class TestTSLAdaptersEmbeddingMode:
         out = adapter.forward(batch)
         assert 'predictions' in out
         assert out['predictions'].ndim == 3
+        assert torch.isfinite(out['predictions']).all(), (
+            'Embedding adapter forward produced non-finite'
+        )
 
     def test_model_direct_embedding(self, adapter_spec):
         """Test trainer path: model(x_enc, x_mark, dec_inp, dec_mark)."""
@@ -294,6 +299,7 @@ class TestTSLAdaptersEmbeddingMode:
         # Use the original cfg (not adjusted) — EntityWrapper augments
         pred = _forward_model_direct(adapter._model, cfg)
         assert pred.ndim == 3
+        assert torch.isfinite(pred).all(), 'Direct embedding model produced non-finite'
 
 
 class TestTSLAdaptersTransparentMode:
@@ -317,3 +323,4 @@ class TestTSLAdaptersTransparentMode:
 
         pred = _forward_adapter(adapter)
         assert pred.ndim == 3
+        assert torch.isfinite(pred).all(), 'Onehot-mode forward produced non-finite'

@@ -4,14 +4,11 @@ Tests for data augmentation module.
 
 import pytest
 
-try:
-    import torch
-except ImportError:
-    pytest.skip('torch not installed', allow_module_level=True)
+torch = pytest.importorskip('torch')
 
-import numpy as np
+import numpy as np  # noqa: E402
 
-from liulian.utils.augmentation import (
+from liulian.utils.augmentation import (  # noqa: E402
     jitter,
     scaling,
     rotation,
@@ -84,19 +81,28 @@ def test_scaling_changes_magnitude(sample_data):
 
 
 def test_rotation_shape(sample_data):
-    """Test rotation preserves shape."""
+    """Test rotation preserves shape and modifies values."""
     x_aug = rotation(sample_data)
 
     assert x_aug.shape == sample_data.shape
     assert x_aug.dtype == sample_data.dtype
+    # Rotation should produce different values
+    assert not torch.allclose(x_aug, sample_data)
 
 
 def test_permutation_shape(sample_data):
-    """Test permutation preserves shape."""
-    x_aug = permutation(sample_data, max_segments=5, seg_mode='equal')
+    """Test permutation preserves shape and contains same values."""
+    torch.manual_seed(42)
+    x_aug = permutation(sample_data.clone(), max_segments=5, seg_mode='equal')
 
     assert x_aug.shape == sample_data.shape
     assert x_aug.dtype == sample_data.dtype
+    # Permutation rearranges time steps — sorted values should match
+    for b in range(sample_data.shape[0]):
+        for c in range(sample_data.shape[2]):
+            orig_sorted = sample_data[b, :, c].sort().values
+            aug_sorted = x_aug[b, :, c].sort().values
+            assert torch.allclose(orig_sorted, aug_sorted)
 
 
 def test_permutation_equal_mode(sample_data):
@@ -109,18 +115,24 @@ def test_permutation_equal_mode(sample_data):
 
 
 def test_permutation_random_mode(sample_data):
-    """Test random-segment permutation."""
+    """Test random-segment permutation changes order."""
     torch.manual_seed(42)
     x_aug = permutation(sample_data.clone(), max_segments=5, seg_mode='random')
 
     assert x_aug.shape == sample_data.shape
+    # Should be different from original
+    assert not torch.allclose(x_aug, sample_data)
 
 
 def test_magnitude_warp_shape(sample_data):
-    """Test magnitude_warp preserves shape."""
-    x_aug = magnitude_warp(sample_data, sigma=0.2, knot=4)
+    """Test magnitude_warp preserves shape and modifies values."""
+    torch.manual_seed(42)
+    np.random.seed(42)
+    x_aug = magnitude_warp(sample_data.clone(), sigma=0.2, knot=4)
 
     assert x_aug.shape == sample_data.shape
+    # Should produce different values (not identity)
+    assert not torch.allclose(x_aug, sample_data)
 
 
 def test_magnitude_warp_changes_amplitude(sample_data):
@@ -134,10 +146,14 @@ def test_magnitude_warp_changes_amplitude(sample_data):
 
 
 def test_time_warp_shape(sample_data):
-    """Test time_warp preserves shape."""
-    x_aug = time_warp(sample_data, sigma=0.2, knot=4)
+    """Test time_warp preserves shape and modifies values."""
+    torch.manual_seed(42)
+    np.random.seed(42)
+    x_aug = time_warp(sample_data.clone(), sigma=0.2, knot=4)
 
     assert x_aug.shape == sample_data.shape
+    # Time warping should produce different values
+    assert not torch.allclose(x_aug, sample_data)
 
 
 def test_window_slice_shape(sample_data):
@@ -158,10 +174,13 @@ def test_window_slice_zooms_in(sample_data):
 
 
 def test_window_warp_shape(sample_data):
-    """Test window_warp preserves shape."""
-    x_aug = window_warp(sample_data, window_ratio=0.1, scales=(0.5, 2.0))
+    """Test window_warp preserves shape and modifies values."""
+    torch.manual_seed(42)
+    x_aug = window_warp(sample_data.clone(), window_ratio=0.1, scales=(0.5, 2.0))
 
     assert x_aug.shape == sample_data.shape
+    # Window warping should produce different values
+    assert not torch.allclose(x_aug, sample_data)
 
 
 def test_apply_augmentations_single(sample_data):
@@ -223,6 +242,7 @@ def test_random_augmentation_custom_list(sample_data):
     )
 
     assert x_aug.shape == sample_data.shape
+    assert not torch.allclose(x_aug, sample_data)
 
 
 def test_augmentation_on_gpu():

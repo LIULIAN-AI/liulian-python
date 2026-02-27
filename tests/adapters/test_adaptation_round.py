@@ -16,7 +16,7 @@ from __future__ import annotations
 import os
 import sys
 from types import SimpleNamespace
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -91,7 +91,6 @@ class _TinyModel(nn.Module):
         self.proj = nn.Linear(enc_in, c_out)
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
-        B = x_enc.size(0)
         out = self.proj(x_enc[:, : self.pred_len, :])
         return out
 
@@ -324,6 +323,8 @@ class TestWandbLogging:
         summary = exp.run(train=True)
         assert isinstance(exp.exp_logger, LocalFileLogger)
         assert summary['status'] == 'ok'
+        assert 'metrics' in summary
+        assert 'training' in summary['metrics']
 
     def test_dev_run_disables_wandb(self, dummy_config):
         """dev_run=True should use LocalFileLogger even with wandb_project."""
@@ -368,10 +369,10 @@ class TestWandbLogging:
         )
         summary = exp.run(train=True)
         assert isinstance(exp.exp_logger, LocalFileLogger)
+        assert summary['status'] == 'ok'
+        assert 'metrics' in summary
 
 
-# ===========================================================================
-# 5. Aggregator enhancements
 # ===========================================================================
 
 
@@ -606,9 +607,13 @@ class TestExperimentAutoViz:
             config=cfg,
         )
         summary = exp.run(train=True)
-        # If predictions are present, viz_paths should be set
-        if 'predictions' in summary:
-            assert 'viz_paths' in summary
+        assert summary['status'] == 'ok'
+        assert 'metrics' in summary
+        # Predictions must be present for auto_viz to produce plots
+        assert 'predictions' in summary, (
+            'Expected predictions in summary for auto_viz test'
+        )
+        assert 'viz_paths' in summary
 
 
 # ===========================================================================
@@ -670,6 +675,8 @@ class TestE2EDummy:
 
         assert summary['status'] == 'ok'
         assert 'training' in summary['metrics']
+        assert summary['metrics']['training']['epochs_run'] == 2
+        assert 'final_test' in summary['metrics']
         assert summary['metrics']['training']['epochs_run'] == 2
         assert 'predictions' in summary
         assert summary['predictions']['preds'].shape[1] == pred_len

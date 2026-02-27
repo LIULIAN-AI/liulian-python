@@ -205,6 +205,7 @@ class TestSwissModels:
         x = torch.randn(2, 10, 3)
         out = m(x)
         assert out.shape == (2, 10, 1)
+        assert torch.isfinite(out).all(), 'SwissLstm produced non-finite values'
 
     def test_extrapo_limo(self):
         from liulian.models.torch.swiss_lstm import ExtrapoLstmModelLIMO
@@ -215,6 +216,7 @@ class TestSwissModels:
         x = torch.randn(2, 13, 2)  # 10 + 3 future
         out = m(x)
         assert out.shape == (2, 3, 1)
+        assert torch.isfinite(out).all(), 'ExtrapoLIMO produced non-finite values'
 
     def test_extrapo_fembed(self):
         from liulian.models.torch.swiss_lstm import ExtrapoLstmModelFEmbed
@@ -229,6 +231,7 @@ class TestSwissModels:
         x = torch.randn(2, 13, 2)
         out = m(x)
         assert out.shape == (2, 3, 1)
+        assert torch.isfinite(out).all(), 'ExtrapoFEmbed produced non-finite values'
 
     def test_lstm_embedding(self):
         from liulian.models.torch.swiss_lstm import LstmEmbeddingModel
@@ -244,6 +247,7 @@ class TestSwissModels:
         x = torch.randn(2, 10, 2)
         out = m(e, x)
         assert out.shape == (2, 10, 1)
+        assert torch.isfinite(out).all(), 'LstmEmbedding produced non-finite values'
 
     def test_swiss_transformer_sinusoidal(self):
         from liulian.models.torch.swiss_transformer import SwissTransformerModel
@@ -259,6 +263,7 @@ class TestSwissModels:
         x = torch.randn(2, 10, 3)
         out = m(x)
         assert out.shape == (2, 10, 1)
+        assert torch.isfinite(out).all(), 'Transformer sinusoidal non-finite'
 
     def test_swiss_transformer_embedding(self):
         from liulian.models.torch.swiss_transformer import (
@@ -279,6 +284,7 @@ class TestSwissModels:
         x = torch.randn(2, 10, 3)
         out = m(e, x)
         assert out.shape == (2, 10, 1)
+        assert torch.isfinite(out).all(), 'Transformer embedding non-finite'
 
     def test_swiss_lstm_adapter(self):
         from liulian.models.torch.swiss_lstm import SwissLSTMAdapter
@@ -288,6 +294,7 @@ class TestSwissModels:
         out = adapter.forward(batch)
         assert 'predictions' in out
         assert out['predictions'].shape == (2, 10, 1)
+        assert torch.isfinite(out['predictions']).all()
 
     def test_swiss_transformer_adapter(self):
         from liulian.models.torch.swiss_transformer import SwissTransformerAdapter
@@ -306,6 +313,7 @@ class TestSwissModels:
         out = adapter.forward(batch)
         assert 'predictions' in out
         assert out['predictions'].shape == (2, 10, 1)
+        assert torch.isfinite(out['predictions']).all()
 
 
 # =====================================================================
@@ -326,6 +334,9 @@ class TestGeneralizedModels:
         x = torch.randn(2, 96, 7)
         out = m(x)
         assert out.shape == (2, 96, 7)
+        assert torch.isfinite(out).all(), (
+            'lstm_multi_channel produced non-finite values'
+        )
 
     def test_extrapo_limo_multi_channel(self):
         from liulian.models.torch.swiss_lstm import ExtrapoLstmModelLIMO
@@ -340,6 +351,9 @@ class TestGeneralizedModels:
         x = torch.randn(2, 96 + 24, 7)
         out = m(x)
         assert out.shape == (2, 24, 7)
+        assert torch.isfinite(out).all(), (
+            'extrapo_limo_multi produced non-finite values'
+        )
 
     def test_extrapo_fembed_multi_channel(self):
         from liulian.models.torch.swiss_lstm import ExtrapoLstmModelFEmbed
@@ -355,6 +369,9 @@ class TestGeneralizedModels:
         x = torch.randn(2, 96 + 24, 7)
         out = m(x)
         assert out.shape == (2, 24, 7)
+        assert torch.isfinite(out).all(), (
+            'extrapo_fembed_multi produced non-finite values'
+        )
 
     def test_lstm_embedding_multi_channel(self):
         from liulian.models.torch.swiss_lstm import LstmEmbeddingModel
@@ -371,6 +388,9 @@ class TestGeneralizedModels:
         x = torch.randn(2, 96, 7)
         out = m(e, x)
         assert out.shape == (2, 96, 7)
+        assert torch.isfinite(out).all(), (
+            'lstm_embedding_multi produced non-finite values'
+        )
 
     def test_transformer_multi_channel(self):
         from liulian.models.torch.swiss_transformer import SwissTransformerModel
@@ -387,6 +407,7 @@ class TestGeneralizedModels:
         x = torch.randn(2, 96, 7)
         out = m(x)
         assert out.shape == (2, 96, 7)
+        assert torch.isfinite(out).all(), 'transformer_multi produced non-finite values'
 
     def test_transformer_embedding_multi_channel(self):
         from liulian.models.torch.swiss_transformer import (
@@ -408,6 +429,9 @@ class TestGeneralizedModels:
         x = torch.randn(2, 96, 7)
         out = m(e, x)
         assert out.shape == (2, 96, 7)
+        assert torch.isfinite(out).all(), (
+            'transformer_embedding_multi produced non-finite values'
+        )
 
     # — LSTMAdapter with different entity modes ——————————————————————
 
@@ -425,6 +449,9 @@ class TestGeneralizedModels:
         )
         out = adapter.forward({'x_enc': torch.randn(2, 96, 10)})
         assert out['predictions'].shape == (2, 96, 10)
+        assert torch.isfinite(out['predictions']).all(), (
+            'lstm_adapter_no_entity produced non-finite'
+        )
 
     def test_lstm_adapter_embedding_mode(self):
         """Entity embedding mode — IDs from x_mark_enc."""
@@ -450,6 +477,9 @@ class TestGeneralizedModels:
             }
         )
         assert out['predictions'].shape == (2, 10, 1)
+        assert torch.isfinite(out['predictions']).all(), (
+            'lstm_adapter_embedding produced non-finite'
+        )
 
     def test_lstm_adapter_feature_concat_mode(self):
         """feature_concat mode — separate entity_features tensor."""
@@ -472,6 +502,9 @@ class TestGeneralizedModels:
             }
         )
         assert out['predictions'].shape == (2, 10, 1)
+        assert torch.isfinite(out['predictions']).all(), (
+            'lstm_adapter_feature_concat produced non-finite'
+        )
 
     def test_lstm_adapter_onehot_transparent(self):
         """One-hot entity features already in x_enc — transparent."""
@@ -489,6 +522,9 @@ class TestGeneralizedModels:
         )
         out = adapter.forward({'x_enc': torch.randn(2, 10, 8)})
         assert out['predictions'].shape == (2, 10, 1)
+        assert torch.isfinite(out['predictions']).all(), (
+            'lstm_adapter_onehot produced non-finite'
+        )
 
     # — TransformerEncoderAdapter with different entity modes ————————
 
@@ -509,6 +545,9 @@ class TestGeneralizedModels:
         )
         out = adapter.forward({'x_enc': torch.randn(2, 96, 7)})
         assert out['predictions'].shape == (2, 96, 7)
+        assert torch.isfinite(out['predictions']).all(), (
+            'transformer_adapter_multi produced non-finite'
+        )
 
     def test_transformer_adapter_embedding_mode(self):
         from liulian.models.torch.swiss_transformer import TransformerEncoderAdapter
@@ -535,6 +574,9 @@ class TestGeneralizedModels:
             }
         )
         assert out['predictions'].shape == (2, 10, 1)
+        assert torch.isfinite(out['predictions']).all(), (
+            'transformer_adapter_embedding produced non-finite'
+        )
 
     def test_transformer_adapter_feature_concat(self):
         from liulian.models.torch.swiss_transformer import TransformerEncoderAdapter
@@ -558,6 +600,9 @@ class TestGeneralizedModels:
             }
         )
         assert out['predictions'].shape == (2, 10, 1)
+        assert torch.isfinite(out['predictions']).all(), (
+            'transformer_adapter_feature_concat produced non-finite'
+        )
 
     # — Entity feature model (standalone) ———————————————————————————
 
@@ -575,6 +620,9 @@ class TestGeneralizedModels:
         ef = torch.randn(2, 10, 5)
         out = m(x, ef)
         assert out.shape == (2, 10, 1)
+        assert torch.isfinite(out).all(), (
+            'lstm_entity_feature produced non-finite values'
+        )
 
     def test_transformer_entity_feature_model(self):
         from liulian.models.torch.swiss_transformer import TransformerEntityFeatureModel
@@ -592,6 +640,9 @@ class TestGeneralizedModels:
         ef = torch.randn(2, 10, 5)
         out = m(x, ef)
         assert out.shape == (2, 10, 3)
+        assert torch.isfinite(out).all(), (
+            'transformer_entity_feature produced non-finite values'
+        )
 
     # — ExtrapoLSTMAdapter ——————————————————————————————————————————
 
@@ -609,6 +660,9 @@ class TestGeneralizedModels:
         )
         out = adapter.forward({'x_enc': torch.randn(2, 96, 7)})
         assert out['predictions'].shape == (2, 24, 7)
+        assert torch.isfinite(out['predictions']).all(), (
+            'extrapo_adapter_multi produced non-finite'
+        )
 
     # — Backward compatibility ——————————————————————————————————————
 
@@ -668,6 +722,7 @@ class TestGeneralizedModels:
         x = torch.randn(2, 10, 3)
         out = m(x)
         assert out.shape == (2, 10, 1)
+        assert torch.isfinite(out).all(), 'lstm_dropout produced non-finite values'
 
 
 # =====================================================================

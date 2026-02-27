@@ -36,7 +36,6 @@ class TestCliParsing:
 
     def test_train_parser_accepts_config(self):
         """``liulian train`` parser should accept config + optional overrides."""
-        from liulian.cli import main as _m
 
         # Build the parser manually to inspect
         parser = argparse.ArgumentParser()

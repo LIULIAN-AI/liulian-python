@@ -7,17 +7,14 @@ Real M4 dataset tests should be run with actual downloaded M4 data.
 
 import pytest
 
-try:
-    import torch
-except ImportError:
-    pytest.skip('torch not installed', allow_module_level=True)
+torch = pytest.importorskip('torch')
 
-import numpy as np
-import os
-import tempfile
-import pandas as pd
+import numpy as np  # noqa: E402
+import os  # noqa: E402
+import tempfile  # noqa: E402
+import pandas as pd  # noqa: E402
 
-from liulian.data.m4_dataset import M4Dataset, M4Meta, M4DatasetInfo
+from liulian.data.m4_dataset import M4Dataset, M4Meta, M4DatasetInfo  # noqa: E402
 
 
 @pytest.fixture

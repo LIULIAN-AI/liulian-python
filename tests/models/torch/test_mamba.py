@@ -8,7 +8,6 @@ package which is typically CUDA-only, so tests are skipped when unavailable.
 import pytest
 from tests.models.torch.conftest import (
     check_torch_available,
-    sample_forecast_inputs,
     validate_forecast_output,
 )
 

@@ -73,7 +73,7 @@ def sample_classification_inputs():
 def check_torch_available():
     """Check if torch is available, skip if not."""
     try:
-        import torch
+        import torch  # noqa: F401
 
         return True
     except ImportError:
@@ -83,7 +83,7 @@ def check_torch_available():
 def check_transformers_available():
     """Check if transformers is available, skip if not."""
     try:
-        import transformers
+        import transformers  # noqa: F401
 
         return True
     except ImportError:
@@ -125,6 +125,7 @@ def validate_imputation_output(
         f'Expected float dtype, got {predictions.dtype}'
     )
     assert not torch.isnan(predictions).any(), 'Predictions contain NaN values'
+    assert not torch.isinf(predictions).any(), 'Predictions contain Inf values'
 
 
 def validate_anomaly_output(
@@ -141,6 +142,8 @@ def validate_anomaly_output(
     assert predictions.dtype in [torch.float32, torch.float64], (
         f'Expected float dtype, got {predictions.dtype}'
     )
+    assert not torch.isnan(predictions).any(), 'Predictions contain NaN values'
+    assert not torch.isinf(predictions).any(), 'Predictions contain Inf values'
 
 
 def validate_classification_output(outputs: Dict, batch_size: int, num_classes: int):
@@ -155,3 +158,5 @@ def validate_classification_output(outputs: Dict, batch_size: int, num_classes: 
     assert predictions.dtype in [torch.float32, torch.float64], (
         f'Expected float dtype, got {predictions.dtype}'
     )
+    assert not torch.isnan(predictions).any(), 'Predictions contain NaN values'
+    assert not torch.isinf(predictions).any(), 'Predictions contain Inf values'

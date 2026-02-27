@@ -8,17 +8,14 @@ import pytest
 pandas = pytest.importorskip('pandas')
 pd = pandas  # alias used throughout tests
 
-import numpy as np
-from liulian.utils.timefeatures import (
-    TimeFeature,
+import numpy as np  # noqa: E402
+
+from liulian.utils.timefeatures import (  # noqa: E402
     SecondOfMinute,
     MinuteOfHour,
     HourOfDay,
     DayOfWeek,
-    DayOfMonth,
-    DayOfYear,
     MonthOfYear,
-    WeekOfYear,
     time_features_from_frequency_str,
     time_features,
 )

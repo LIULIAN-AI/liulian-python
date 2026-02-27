@@ -53,9 +53,15 @@ class TestLocalFileLogger:
             os.unlink(src_path)
 
     def test_log_artifact_missing_file(self, log_dir: str) -> None:
-        """Logging a non-existent artifact should be a silent no-op."""
+        """Logging a non-existent artifact should not raise and not create files."""
         logger = LocalFileLogger(run_dir=log_dir)
+        files_before = set(os.listdir(log_dir))
         logger.log_artifact('/nonexistent/file.json')  # should not raise
+        files_after = set(os.listdir(log_dir))
+        assert files_after == files_before, (
+            f'Non-existent artifact created unexpected files: '
+            f'{files_after - files_before}'
+        )
 
     def test_read_metrics_empty(self, log_dir: str) -> None:
         logger = LocalFileLogger(run_dir=log_dir)
@@ -70,20 +76,28 @@ class TestWandbLogger:
             # WandbLogger should not crash even if wandb is missing
             logger = WandbLogger(project='test', run_dir=log_dir)
 
+            # Regardless of wandb availability, log_metrics must work
+            logger.log_metrics(step=1, metrics={'loss': 0.5})
+
             if not logger._wandb_available:
-                # In fallback mode, log_metrics should work via LocalFileLogger
-                logger.log_metrics(step=1, metrics={'loss': 0.5})
+                # In fallback mode, verify LocalFileLogger was used
                 assert logger._fallback is not None
                 records = logger._fallback.read_metrics()
                 assert len(records) == 1
+                assert records[0]['loss'] == pytest.approx(0.5)
             else:
-                # wandb is actually installed — just verify the interface works
-                logger.finish()
+                # wandb is available — verify it was initialized
+                assert logger._wandb_available is True
+                assert logger._run is not None
+
+            logger.finish()
         finally:
             shutil.rmtree(log_dir, ignore_errors=True)
 
     def test_finish_safe(self) -> None:
         """finish() should not raise regardless of wandb availability."""
         logger = WandbLogger(project='test')
-        if not logger._wandb_available:
-            logger.finish()  # no-op in fallback mode
+        logger.finish()  # must not raise
+        # Verify the logger is still usable after finish (idempotent)
+        logger.finish()  # second call must also not raise
+        assert True  # explicit: we reached here without exception

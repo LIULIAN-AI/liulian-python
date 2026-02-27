@@ -702,7 +702,6 @@ class RayOptimizer(BaseOptimizer):
         best_trial = analysis.get_best_trial(metric, mode, scope='all')
         if best_trial is None:
             raise ValueError('No trials found in Ray Tune analysis.')
-            best_trial = analysis.best_trial
 
         best_config = best_trial.config
 
@@ -713,8 +712,9 @@ class RayOptimizer(BaseOptimizer):
             best_value = best_trial.metric_analysis[metric][mode]
         except (KeyError, TypeError, AttributeError):
             # Fallback to last_result if metric_analysis is unavailable
-            raise ValueError(
-                f'Metric analysis for "{metric}" not found — best_value may be inaccurate!'
+            logger.warning(
+                'Metric analysis for "%s" not found — falling back to last_result.',
+                metric,
             )
             best_value = best_trial.last_result.get(metric, float('inf'))
 
@@ -728,10 +728,9 @@ class RayOptimizer(BaseOptimizer):
                 best_checkpoint_path = best_ck.path
                 logger.ok('Best checkpoint (best epoch): %s', best_checkpoint_path)
             else:
-                raise ValueError('get_best_checkpoint returned None.')
+                logger.warning('No checkpoint found for best trial — skipping.')
         except Exception as e:
-            raise ValueError(f'Could not retrieve best checkpoint: {e}')
-            pass  # checkpoints not saved or unavailable
+            logger.warning('Could not retrieve best checkpoint: %s', e)
 
         trials_summary: List[Dict[str, Any]] = []
         for i, t in enumerate(analysis.trials):

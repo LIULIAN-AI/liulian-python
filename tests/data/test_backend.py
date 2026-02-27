@@ -13,7 +13,7 @@ from liulian.data.backend import (
     register_backend,
     with_backend,
 )
-from liulian.data.base import BaseDataset, DataSplit
+from liulian.data.base import DataSplit
 from liulian.data.spec import TopologySpec
 
 
@@ -521,7 +521,7 @@ class TestStandaloneTorchDatasets:
 
     def test_sequence_full_inherits_backend(self):
         """SequenceFullDataset inherits backend from SequenceDataset."""
-        torch = pytest.importorskip('torch')
+        pytest.importorskip('torch')
         import pandas as pd
         from liulian.data.seq_dataset import SequenceFullDataset
 
@@ -536,7 +536,7 @@ class TestStandaloneTorchDatasets:
         assert ds.backend_name == 'torch'
 
     def test_sequence_windowed_inherits_backend(self):
-        torch = pytest.importorskip('torch')
+        pytest.importorskip('torch')
         import pandas as pd
         from liulian.data.seq_dataset import SequenceWindowedDataset
 

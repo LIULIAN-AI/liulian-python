@@ -9,7 +9,6 @@ Requires the Swiss River CSV data under ``dataset/swiss_river/``.
 from __future__ import annotations
 
 import os
-from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -17,7 +16,9 @@ import pytest
 # Mark the entire module so it's easy to skip in CI feature branches
 pytestmark = pytest.mark.main_branch
 
-DATASET_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'dataset', 'swiss_river')
+DATASET_ROOT = os.path.join(
+    os.path.dirname(__file__), '..', '..', 'dataset', 'swiss_river'
+)
 SKIP_REASON = 'Swiss River CSV data not found under dataset/swiss_river'
 
 
@@ -89,7 +90,7 @@ class TestSwissRiverDatasetLoading:
 class TestSwissRiverE2ETraining:
     @pytest.mark.skipif(not _data_available(), reason=SKIP_REASON)
     def test_one_epoch_train(self, swiss_dataset, tmp_path):
-        torch = pytest.importorskip('torch')
+        pytest.importorskip('torch')
         import torch.nn as nn
         from torch.utils.data import DataLoader
 
@@ -102,7 +103,7 @@ class TestSwissRiverE2ETraining:
         val_loader = DataLoader(val_split, batch_size=8, shuffle=False)
 
         # Determine input features from a sample
-        x0, y0 = train_split[0][0], train_split[0][1]
+        x0, _ = train_split[0][0], train_split[0][1]
         c_in = x0.shape[-1]
 
         # Simple linear model
@@ -145,7 +146,7 @@ class TestSwissRiverE2ETraining:
 
     @pytest.mark.skipif(not _data_available(), reason=SKIP_REASON)
     def test_predict_and_aggregate(self, swiss_dataset, tmp_path):
-        torch = pytest.importorskip('torch')
+        pytest.importorskip('torch')
         import torch.nn as nn
         from torch.utils.data import DataLoader
 
@@ -155,7 +156,7 @@ class TestSwissRiverE2ETraining:
         test_split = swiss_dataset.get_split('test')
         test_loader = DataLoader(test_split, batch_size=8, shuffle=False)
 
-        x0, y0 = test_split[0][0], test_split[0][1]
+        x0, _ = test_split[0][0], test_split[0][1]
         c_in = x0.shape[-1]
 
         class _LinModel(nn.Module):

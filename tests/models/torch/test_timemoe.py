@@ -10,7 +10,6 @@ import numpy as np
 from tests.models.torch.conftest import (
     check_torch_available,
     check_transformers_available,
-    sample_forecast_inputs,
     validate_forecast_output,
 )
 

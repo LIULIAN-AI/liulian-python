@@ -8,10 +8,6 @@ for long-term time series forecasting (ICML 2022, Fourier mode).
 import pytest
 from tests.models.torch.conftest import (
     check_torch_available,
-    sample_forecast_inputs,
-    sample_imputation_inputs,
-    sample_anomaly_inputs,
-    sample_classification_inputs,
     validate_forecast_output,
     validate_imputation_output,
     validate_anomaly_output,

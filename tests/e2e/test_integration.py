@@ -32,9 +32,9 @@ if _torch_available():
     from torch.utils.data import DataLoader, TensorDataset
     from liulian.runtime.trainer import ForecastTrainer
 
-from liulian.data.base import BaseDataset, DataSplit
-from liulian.runtime import Experiment, ExperimentSpec
-from liulian.tasks.base import PredictionRegime, PredictionTask
+from liulian.data.base import BaseDataset, DataSplit  # noqa: E402
+from liulian.runtime import Experiment, ExperimentSpec  # noqa: E402
+from liulian.tasks.base import PredictionRegime, PredictionTask  # noqa: E402
 
 
 # ── Synthetic data helpers ──────────────────────────────────────────────
@@ -241,14 +241,23 @@ class TestExperimentTorchPath:
     def test_patchtst_e2e(self, cfg, loaders, dataset, task):
         summary = self._run_experiment('patchtst', cfg, loaders, dataset, task)
         assert summary['status'] == 'ok'
+        assert 'training' in summary['metrics']
+        assert summary['metrics']['training']['epochs_run'] == 2
+        assert 'final_test' in summary['metrics']
 
     def test_itransformer_e2e(self, cfg, loaders, dataset, task):
         summary = self._run_experiment('itransformer', cfg, loaders, dataset, task)
         assert summary['status'] == 'ok'
+        assert 'training' in summary['metrics']
+        assert summary['metrics']['training']['epochs_run'] == 2
+        assert 'final_test' in summary['metrics']
 
     def test_transformer_e2e(self, cfg, loaders, dataset, task):
         summary = self._run_experiment('transformer', cfg, loaders, dataset, task)
         assert summary['status'] == 'ok'
+        assert 'training' in summary['metrics']
+        assert summary['metrics']['training']['epochs_run'] == 2
+        assert 'final_test' in summary['metrics']
 
     def test_eval_only(self, cfg, loaders, dataset, task):
         """Test eval-only mode (no training)."""
@@ -275,6 +284,9 @@ class TestExperimentTorchPath:
 
         summary = exp.run(train=False)
         assert summary['status'] == 'ok'
+        # Eval-only should still produce test metrics
+        assert 'metrics' in summary
+        assert 'test' in summary['metrics']
 
     def test_artifacts_created(self, cfg, loaders, dataset, task):
         """Test that experiment creates artifacts directory."""

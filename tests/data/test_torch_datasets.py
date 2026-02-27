@@ -9,31 +9,20 @@ Tests verify:
 - Tensor shapes match expectations
 """
 
-import os
-import tempfile
-from pathlib import Path
-
 import pytest
 
-try:
-    import torch
-except ImportError:
-    pytest.skip('torch not installed', allow_module_level=True)
+torch = pytest.importorskip('torch')
+pytest.importorskip('sklearn')
 
-try:
-    import sklearn  # noqa: F401
-except ImportError:
-    pytest.skip('scikit-learn not installed', allow_module_level=True)
+import pandas as pd  # noqa: E402
+import numpy as np  # noqa: E402
 
-import pandas as pd
-import numpy as np
-
-from liulian.data.torch_datasets import (
+from liulian.data.torch_datasets import (  # noqa: E402
     ETTHourDataset,
     ETTMinuteDataset,
     CustomCSVDataset,
 )
-from liulian.data.data_factory import (
+from liulian.data.data_factory import (  # noqa: E402
     create_dataloader,
     create_dataloaders,
     register_dataset,

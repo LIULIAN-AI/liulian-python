@@ -6,14 +6,9 @@ forecasting, imputation, anomaly detection, and classification tasks.
 """
 
 import pytest
-import numpy as np
 import torch
 from tests.models.torch.conftest import (
     check_torch_available,
-    sample_forecast_inputs,
-    sample_imputation_inputs,
-    sample_anomaly_inputs,
-    sample_classification_inputs,
     validate_forecast_output,
     validate_imputation_output,
     validate_anomaly_output,
@@ -212,6 +207,10 @@ class TestDLinearEdgeCases:
         # Should work - model handles None for optional parameters
         outputs = model.run(incomplete_inputs)
         assert 'predictions' in outputs
+        assert outputs['predictions'].ndim == 3
+        assert torch.isfinite(outputs['predictions']).all(), (
+            'Missing-input predictions contain non-finite values'
+        )
 
     def test_wrong_input_shapes(self, sample_forecast_inputs):
         """Test model behavior with mismatched input shapes.
@@ -243,3 +242,7 @@ class TestDLinearEdgeCases:
         outputs = model.run(wrong_inputs)
         # Just verify it runs and returns something
         assert 'predictions' in outputs
+        assert outputs['predictions'].ndim == 3
+        assert torch.isfinite(outputs['predictions']).all(), (
+            'Wrong-input predictions contain non-finite values'
+        )

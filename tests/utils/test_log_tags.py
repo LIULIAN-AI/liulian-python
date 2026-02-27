@@ -15,7 +15,7 @@ import pytest
 
 def _force_mode(mode):
     """Context-manager-like helper: set mode, rebuild, yield, restore."""
-    from liulian.utils.log_tags import set_output_mode, get_output_mode, _rebuild_tags
+    from liulian.utils.log_tags import set_output_mode, get_output_mode
 
     original = get_output_mode()
     set_output_mode(mode)

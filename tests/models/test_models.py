@@ -39,5 +39,12 @@ class TestExecutableModel:
                 return {}
 
         stub = _Stub()
-        stub.save('/tmp/test_checkpoint')  # no-op
-        stub.load('/tmp/test_checkpoint')  # no-op
+        result_save = stub.save('/tmp/test_checkpoint_no_op')  # no-op
+        result_load = stub.load('/tmp/test_checkpoint_no_op')  # no-op
+        # Default implementations return None (no-ops)
+        assert result_save is None
+        assert result_load is None
+        # The no-op should NOT create any files
+        import os
+
+        assert not os.path.exists('/tmp/test_checkpoint_no_op')
