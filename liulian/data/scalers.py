@@ -21,9 +21,9 @@ All scalers follow the sklearn interface (``fit``, ``transform``,
 The factory :func:`get_scaler` creates the right scaler from a name string,
 making it easy to configure via YAML / CLI::
 
-    scaler = get_scaler("standard")    # StandardScaler
-    scaler = get_scaler("minmax")      # MinMaxScaler
-    scaler = get_scaler("none")        # NoScaler
+    scaler = get_scaler('standard')  # StandardScaler
+    scaler = get_scaler('minmax')  # MinMaxScaler
+    scaler = get_scaler('none')  # NoScaler
 """
 
 from __future__ import annotations
@@ -40,6 +40,7 @@ try:
     from sklearn.base import BaseEstimator, TransformerMixin
     from sklearn.preprocessing import MinMaxScaler, StandardScaler
     from sklearn.utils.validation import check_is_fitted
+
     _SKLEARN_AVAILABLE = True
 except ImportError:
     _SKLEARN_AVAILABLE = False
@@ -48,6 +49,7 @@ except ImportError:
 # -----------------------------------------------------------------------
 # NoScaler
 # -----------------------------------------------------------------------
+
 
 class NoScaler:
     """Identity scaler — does nothing, for API compatibility."""
@@ -68,6 +70,7 @@ class NoScaler:
 # -----------------------------------------------------------------------
 # DimSplitScaler
 # -----------------------------------------------------------------------
+
 
 class DimSplitScaler:
     """Per-dimension sub-scaler extracted from a fitted global scaler.
@@ -92,9 +95,7 @@ class DimSplitScaler:
             dims_kept = np.arange(global_scaler.n_features_in_)
         self.dims_kept = dims_kept
         self.n_dim = len(dims_kept)
-        self.scalers = [
-            self._single(global_scaler, d) for d in dims_kept
-        ]
+        self.scalers = [self._single(global_scaler, d) for d in dims_kept]
         self._cur: Optional[int] = None
 
     # -- indexing ---------------------------------------------------------
@@ -130,8 +131,13 @@ class DimSplitScaler:
             raise TypeError(f'Unsupported scaler type: {type(global_scaler)}')
 
         for attr in (
-            'min_', 'scale_', 'data_min_', 'data_max_', 'data_range_',
-            'mean_', 'var_',
+            'min_',
+            'scale_',
+            'data_min_',
+            'data_max_',
+            'data_range_',
+            'mean_',
+            'var_',
         ):
             if hasattr(global_scaler, attr):
                 val = getattr(global_scaler, attr)
@@ -147,6 +153,7 @@ class DimSplitScaler:
 # -----------------------------------------------------------------------
 # StationSplitScaler
 # -----------------------------------------------------------------------
+
 
 class StationSplitScaler:
     """Per-station sub-scaler identified by column-name suffix.
@@ -170,7 +177,9 @@ class StationSplitScaler:
         names = np.asarray(global_scaler.feature_names_in_, dtype=str)
         mask = np.char.endswith(names, feat_suffix)
         feat_idx = np.nonzero(mask)[0]
-        feat_keys = [n.rstrip(feat_suffix) if feat_suffix else n for n in names[feat_idx]]
+        feat_keys = [
+            n.rstrip(feat_suffix) if feat_suffix else n for n in names[feat_idx]
+        ]
 
         self.feat_keys = feat_keys
         self._scalers: Dict[str, Any] = {}
@@ -198,6 +207,7 @@ class StationSplitScaler:
 # -----------------------------------------------------------------------
 # EntityScaler  (was PerStationScaler)
 # -----------------------------------------------------------------------
+
 
 class EntityScaler:
     """Per-entity normalisation for multi-entity DataFrames.
@@ -277,7 +287,7 @@ class EntityScaler:
 
         NaN values are excluded when fitting (matching reference project
         behaviour of ``dropna`` before scaler fit).
-        """ # todo: is it better to use a single scaler with multiple features for all entities?
+        """  # todo: is it better to use a single scaler with multiple features for all entities?
         if self.scaler_type == 'none':
             self._fitted = True
             return self
@@ -300,7 +310,11 @@ class EntityScaler:
                 self._scalers[(entity, suffix)] = scaler
 
                 # Collect target values for optional global scaler
-                if self.create_global_scaler and suffix in self.target_suffixes and mask.any():
+                if (
+                    self.create_global_scaler
+                    and suffix in self.target_suffixes
+                    and mask.any()
+                ):
                     all_target_vals.append(vals[mask])
 
         # Optional global target scaler (pooled over all entities)
@@ -335,9 +349,7 @@ class EntityScaler:
                     df[col] = self._scalers[key].transform(vals).ravel()
         return df
 
-    def fit_transform(
-        self, train_df: pd.DataFrame
-    ) -> pd.DataFrame:
+    def fit_transform(self, train_df: pd.DataFrame) -> pd.DataFrame:
         """Fit on *train_df* and transform it in-place."""
         return self.fit(train_df).transform(train_df)
 
@@ -378,6 +390,7 @@ class EntityScaler:
 
         try:
             import torch as _torch
+
             is_tensor = isinstance(data, _torch.Tensor)
         except ImportError:
             is_tensor = False
@@ -395,8 +408,7 @@ class EntityScaler:
             n_samples = arr.shape[0]
             if len(entity_ids) != n_samples:
                 raise ValueError(
-                    f'entity_ids length ({len(entity_ids)}) != '
-                    f'batch size ({n_samples})'
+                    f'entity_ids length ({len(entity_ids)}) != batch size ({n_samples})'
                 )
             result = np.empty_like(arr)
             for i, eid in enumerate(entity_ids):
@@ -404,11 +416,19 @@ class EntityScaler:
                 was_2d = sample.ndim == 2
                 n_cols = sample.shape[-1]
                 for c in range(n_cols):
-                    suffix = self.target_suffixes[c] if c < len(self.target_suffixes) else self.target_suffixes[0]  # todo: Is this correct? Should have a kwarg input for this
+                    suffix = (
+                        self.target_suffixes[c]
+                        if c < len(self.target_suffixes)
+                        else self.target_suffixes[0]
+                    )  # todo: Is this correct? Should have a kwarg input for this
                     col_data = sample[:, c : c + 1] if was_2d else sample[c : c + 1]
                     result_col = self.inverse_transform_entity(col_data, eid, suffix)
                     if was_2d:
-                        result[i, :, c : c + 1] = result_col if result_col.ndim == 2 else result_col.reshape(-1, 1)
+                        result[i, :, c : c + 1] = (
+                            result_col
+                            if result_col.ndim == 2
+                            else result_col.reshape(-1, 1)
+                        )
                     else:
                         result[i, c : c + 1] = result_col.ravel()[:1]
             if is_tensor:
@@ -441,7 +461,8 @@ class EntityScaler:
             logger.warning(
                 'inverse_transform called without entity_ids in TS mode '
                 '(C=%d != n_entity_scalers=%d). Results may be inaccurate.',
-                n_cols, len(entity_target_scalers),
+                n_cols,
+                len(entity_target_scalers),
             )
             # Fallback: average across all entity scalers
             accum = np.zeros_like(arr_2d)
@@ -546,7 +567,5 @@ def get_scaler(name: str = 'standard', **kwargs: Any) -> Any:
     key = name.strip().lower()
     cls = _REGISTRY.get(key)
     if cls is None:
-        raise ValueError(
-            f"Unknown scaler '{name}'. Available: {sorted(_REGISTRY)}"
-        )
+        raise ValueError(f"Unknown scaler '{name}'. Available: {sorted(_REGISTRY)}")
     return cls(**kwargs)

@@ -32,25 +32,41 @@ class Model(nn.Module):
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
         # Embedding
-        self.enc_embedding = DataEmbedding_inverted(configs.seq_len, configs.d_model, configs.embed, configs.freq,
-                                                    configs.dropout)
+        self.enc_embedding = DataEmbedding_inverted(
+            configs.seq_len,
+            configs.d_model,
+            configs.embed,
+            configs.freq,
+            configs.dropout,
+        )
         # Encoder
         self.encoder = Encoder(
             [
                 EncoderLayer(
                     AttentionLayer(
-                        FullAttention(False, configs.factor, attention_dropout=configs.dropout,
-                                      output_attention=False), configs.d_model, configs.n_heads),
+                        FullAttention(
+                            False,
+                            configs.factor,
+                            attention_dropout=configs.dropout,
+                            output_attention=False,
+                        ),
+                        configs.d_model,
+                        configs.n_heads,
+                    ),
                     configs.d_model,
                     configs.d_ff,
                     dropout=configs.dropout,
-                    activation=configs.activation
-                ) for l in range(configs.e_layers)
+                    activation=configs.activation,
+                )
+                for l in range(configs.e_layers)
             ],
-            norm_layer=torch.nn.LayerNorm(configs.d_model)
+            norm_layer=torch.nn.LayerNorm(configs.d_model),
         )
         # Decoder
-        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
+        if (
+            self.task_name == 'long_term_forecast'
+            or self.task_name == 'short_term_forecast'
+        ):
             self.projection = nn.Linear(configs.d_model, configs.pred_len, bias=True)
         if self.task_name == 'imputation':
             self.projection = nn.Linear(configs.d_model, configs.seq_len, bias=True)
@@ -59,7 +75,9 @@ class Model(nn.Module):
         if self.task_name == 'classification':
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
-            self.projection = nn.Linear(configs.d_model * configs.enc_in, configs.num_class)
+            self.projection = nn.Linear(
+                configs.d_model * configs.enc_in, configs.num_class
+            )
 
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         # Normalization from Non-stationary Transformer
@@ -124,16 +142,21 @@ class Model(nn.Module):
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
 
         # Output
-        output = self.act(enc_out)  # the output transformer encoder/decoder embeddings don't include non-linearity
+        output = self.act(
+            enc_out
+        )  # the output transformer encoder/decoder embeddings don't include non-linearity
         output = self.dropout(output)
         output = output.reshape(output.shape[0], -1)  # (batch_size, c_in * d_model)
         output = self.projection(output)  # (batch_size, num_classes)
         return output
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
-        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
+        if (
+            self.task_name == 'long_term_forecast'
+            or self.task_name == 'short_term_forecast'
+        ):
             dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
-            return dec_out[:, -self.pred_len:, :]  # [B, L, D]
+            return dec_out[:, -self.pred_len :, :]  # [B, L, D]
         if self.task_name == 'imputation':
             dec_out = self.imputation(x_enc, x_mark_enc, x_dec, x_mark_dec, mask)
             return dec_out  # [B, L, D]
@@ -149,7 +172,7 @@ class Model(nn.Module):
 class iTransformerAdapter(EntityAwareMixin, TorchModelAdapter):
     """
     Adapter for iTransformer model to liulian ExecutableModel interface.
-    
+
     Expected config parameters:
         - seq_len: Input sequence length
         - pred_len: Prediction sequence length
@@ -165,7 +188,7 @@ class iTransformerAdapter(EntityAwareMixin, TorchModelAdapter):
         - factor: Attention factor (default: 1)
         - task_name: Task type (default: 'long_term_forecast')
     """
-    
+
     def __init__(self, config: Dict[str, Any]):
         default_config = {
             'd_model': 512,
@@ -180,19 +203,29 @@ class iTransformerAdapter(EntityAwareMixin, TorchModelAdapter):
             'task_name': 'long_term_forecast',
         }
         default_config.update(config)
-        
+
         model_cfg = self._entity_model_config(default_config)
         model = Model(self._dict_to_namespace(model_cfg))
         super().__init__(model, default_config)
         self._init_entity_support(default_config)
-    
+
     def _prepare_model_inputs(self, inputs: Dict[str, torch.Tensor]) -> tuple:
         """Prepare inputs for iTransformer forward pass"""
         x_enc = inputs['x_enc']
         batch_size, seq_len, n_features = x_enc.shape
-        
-        x_mark_enc = inputs.get('x_mark_enc', torch.zeros(batch_size, seq_len, 4, device=x_enc.device))
-        x_dec = inputs.get('x_dec', torch.zeros(batch_size, self.config['pred_len'], n_features, device=x_enc.device))
-        x_mark_dec = inputs.get('x_mark_dec', torch.zeros(batch_size, self.config['pred_len'], 4, device=x_enc.device))
-        
+
+        x_mark_enc = inputs.get(
+            'x_mark_enc', torch.zeros(batch_size, seq_len, 4, device=x_enc.device)
+        )
+        x_dec = inputs.get(
+            'x_dec',
+            torch.zeros(
+                batch_size, self.config['pred_len'], n_features, device=x_enc.device
+            ),
+        )
+        x_mark_dec = inputs.get(
+            'x_mark_dec',
+            torch.zeros(batch_size, self.config['pred_len'], 4, device=x_enc.device),
+        )
+
         return (x_enc, x_mark_enc, x_dec, x_mark_dec)

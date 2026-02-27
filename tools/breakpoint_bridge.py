@@ -34,7 +34,9 @@ def _write_bridge(path: Path, payload: Dict[str, Any]) -> None:
     payload['updated_at'] = _now_iso()
     payload['version'] = 1
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + '\n', encoding='utf-8')
+    path.write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False) + '\n', encoding='utf-8'
+    )
 
 
 def _dedupe_breakpoints(items: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -91,7 +93,12 @@ def _parse_pycharm_workspace(workspace_xml: Path) -> Tuple[List[Dict[str, Any]],
         url_node = node.find('./url')
         line_node = node.find('./line')
         ts_node = node.find("./option[@name='timeStamp']")
-        if url_node is None or line_node is None or not url_node.text or not line_node.text:
+        if (
+            url_node is None
+            or line_node is None
+            or not url_node.text
+            or not line_node.text
+        ):
             continue
 
         url = url_node.text.strip()
@@ -104,7 +111,13 @@ def _parse_pycharm_workspace(workspace_xml: Path) -> Tuple[List[Dict[str, Any]],
         except ValueError:
             continue
         enabled = node.attrib.get('enabled', 'true').lower() == 'true'
-        result.append({'path': _norm_rel_path(rel_path), 'line': zero_based + 1, 'enabled': enabled})
+        result.append(
+            {
+                'path': _norm_rel_path(rel_path),
+                'line': zero_based + 1,
+                'enabled': enabled,
+            }
+        )
 
         if ts_node is not None:
             try:
@@ -129,7 +142,9 @@ def export_pycharm(workspace_xml: Path, bridge_path: Path, merge: bool) -> None:
     print(f'Exported {len(py_bps)} PyCharm breakpoints to {bridge_path}')
 
 
-def import_pycharm(workspace_xml: Path, bridge_path: Path, replace_python: bool) -> None:
+def import_pycharm(
+    workspace_xml: Path, bridge_path: Path, replace_python: bool
+) -> None:
     payload = _read_bridge(bridge_path)
     bridge_bps = _dedupe_breakpoints(list(payload.get('breakpoints', [])))
 
@@ -142,7 +157,11 @@ def import_pycharm(workspace_xml: Path, bridge_path: Path, replace_python: bool)
 
     kept: List[ET.Element] = []
     for node in list(bps_root):
-        if node.tag == 'line-breakpoint' and node.attrib.get('type') == 'python-line' and replace_python:
+        if (
+            node.tag == 'line-breakpoint'
+            and node.attrib.get('type') == 'python-line'
+            and replace_python
+        ):
             continue
         kept.append(node)
 
@@ -162,7 +181,7 @@ def import_pycharm(workspace_xml: Path, bridge_path: Path, replace_python: bool)
             },
         )
         url = ET.SubElement(lb, 'url')
-        url.text = f"file://$PROJECT_DIR$/{_norm_rel_path(bp['path'])}"
+        url.text = f'file://$PROJECT_DIR$/{_norm_rel_path(bp["path"])}'
         line = ET.SubElement(lb, 'line')
         line.text = str(int(bp['line']) - 1)
         ET.SubElement(lb, 'option', {'name': 'timeStamp', 'value': str(next_stamp)})
@@ -225,7 +244,9 @@ def _list_vscode_db_candidates(workspace_root: Path) -> List[Tuple[Path, int, bo
     return results
 
 
-def _read_vscode_breakpoints(db_path: Path, workspace_root: Path) -> List[Dict[str, Any]]:
+def _read_vscode_breakpoints(
+    db_path: Path, workspace_root: Path
+) -> List[Dict[str, Any]]:
     con = sqlite3.connect(db_path)
     cur = con.cursor()
     cur.execute("SELECT value FROM ItemTable WHERE key='debug.breakpoint'")
@@ -317,12 +338,17 @@ def _write_vscode_breakpoints(
             }
         )
 
-    cur.execute('INSERT OR REPLACE INTO ItemTable(key,value) VALUES(?,?)', ('debug.breakpoint', json.dumps(current)))
+    cur.execute(
+        'INSERT OR REPLACE INTO ItemTable(key,value) VALUES(?,?)',
+        ('debug.breakpoint', json.dumps(current)),
+    )
     con.commit()
     con.close()
 
 
-def export_vscode(workspace_root: Path, bridge_path: Path, db_path: Optional[Path], merge: bool) -> None:
+def export_vscode(
+    workspace_root: Path, bridge_path: Path, db_path: Optional[Path], merge: bool
+) -> None:
     current = _read_bridge(bridge_path)
     db = db_path or _find_vscode_db(workspace_root)
     if db is None:
@@ -339,7 +365,12 @@ def export_vscode(workspace_root: Path, bridge_path: Path, db_path: Optional[Pat
     print(f'Exported {len(vs_bps)} VS Code breakpoints from {db} to {bridge_path}')
 
 
-def import_vscode(workspace_root: Path, bridge_path: Path, db_path: Optional[Path], replace_for_workspace: bool) -> None:
+def import_vscode(
+    workspace_root: Path,
+    bridge_path: Path,
+    db_path: Optional[Path],
+    replace_for_workspace: bool,
+) -> None:
     payload = _read_bridge(bridge_path)
     bridge_bps = _dedupe_breakpoints(list(payload.get('breakpoints', [])))
 
@@ -359,26 +390,48 @@ def clear_bridge(bridge_path: Path) -> None:
 
 
 def _build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(description='Breakpoint bridge between VS Code and PyCharm.')
-    p.add_argument('--bridge', default='.debug/breakpoints.bridge.json', help='Path to shared bridge JSON file.')
-    p.add_argument('--workspace-root', default='.', help='Workspace root path for relative file paths.')
+    p = argparse.ArgumentParser(
+        description='Breakpoint bridge between VS Code and PyCharm.'
+    )
+    p.add_argument(
+        '--bridge',
+        default='.debug/breakpoints.bridge.json',
+        help='Path to shared bridge JSON file.',
+    )
+    p.add_argument(
+        '--workspace-root',
+        default='.',
+        help='Workspace root path for relative file paths.',
+    )
 
     sub = p.add_subparsers(dest='cmd', required=True)
 
-    s = sub.add_parser('export-pycharm', help='Read PyCharm breakpoints into bridge file.')
+    s = sub.add_parser(
+        'export-pycharm', help='Read PyCharm breakpoints into bridge file.'
+    )
     s.add_argument('--workspace-xml', default='.idea/workspace.xml')
     s.add_argument('--merge', action='store_true')
 
-    s = sub.add_parser('import-pycharm', help='Write bridge breakpoints into PyCharm workspace.xml.')
+    s = sub.add_parser(
+        'import-pycharm', help='Write bridge breakpoints into PyCharm workspace.xml.'
+    )
     s.add_argument('--workspace-xml', default='.idea/workspace.xml')
     s.add_argument('--replace-python', action='store_true', default=True)
 
-    s = sub.add_parser('export-vscode', help='Read VS Code breakpoints into bridge file.')
-    s.add_argument('--db-path', default=None, help='Optional explicit VS Code state.vscdb path.')
+    s = sub.add_parser(
+        'export-vscode', help='Read VS Code breakpoints into bridge file.'
+    )
+    s.add_argument(
+        '--db-path', default=None, help='Optional explicit VS Code state.vscdb path.'
+    )
     s.add_argument('--merge', action='store_true')
 
-    s = sub.add_parser('import-vscode', help='Write bridge breakpoints into VS Code state.vscdb.')
-    s.add_argument('--db-path', default=None, help='Optional explicit VS Code state.vscdb path.')
+    s = sub.add_parser(
+        'import-vscode', help='Write bridge breakpoints into VS Code state.vscdb.'
+    )
+    s.add_argument(
+        '--db-path', default=None, help='Optional explicit VS Code state.vscdb path.'
+    )
     s.add_argument('--replace-workspace', action='store_true', default=True)
 
     sub.add_parser('list-vscode-dbs', help='List candidate VS Code state.vscdb files.')
@@ -398,7 +451,9 @@ def main() -> int:
         if args.cmd == 'export-pycharm':
             export_pycharm(Path(args.workspace_xml).resolve(), bridge, bool(args.merge))
         elif args.cmd == 'import-pycharm':
-            import_pycharm(Path(args.workspace_xml).resolve(), bridge, bool(args.replace_python))
+            import_pycharm(
+                Path(args.workspace_xml).resolve(), bridge, bool(args.replace_python)
+            )
         elif args.cmd == 'export-vscode':
             db = Path(args.db_path).resolve() if args.db_path else None
             export_vscode(workspace_root, bridge, db, bool(args.merge))

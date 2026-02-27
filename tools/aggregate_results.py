@@ -119,7 +119,9 @@ def generate_markdown_report(
     """Generate a full markdown benchmark report."""
     lines: List[str] = []
     lines.append('# Liulian Benchmark Results\n')
-    lines.append(f'*Generated from {sum(len(v) for v in groups.values())} result files*\n')
+    lines.append(
+        f'*Generated from {sum(len(v) for v in groups.values())} result files*\n'
+    )
 
     # --- Summary ---
     lines.append('## Summary\n')
@@ -198,8 +200,8 @@ def generate_markdown_report(
         lines.append('|-------|-------|---------|------|-------|')
         for gname, r in all_failed[:50]:  # Limit to 50
             lines.append(
-                f"| {gname} | {r.get('model', '?')} | {r.get('dataset', '?')} | "
-                f"{r.get('seed', '?')} | {str(r.get('error', '?'))[:80]} |"
+                f'| {gname} | {r.get("model", "?")} | {r.get("dataset", "?")} | '
+                f'{r.get("seed", "?")} | {str(r.get("error", "?"))[:80]} |'
             )
         if len(all_failed) > 50:
             lines.append(f'\n*... and {len(all_failed) - 50} more*\n')
@@ -251,7 +253,7 @@ def _model_dataset_table(
                 std = agg[(model, ds)]['std']
                 cell = _fmt(val)
                 if std > 0:
-                    cell += f" ±{_fmt(std, '.3f')}"
+                    cell += f' ±{_fmt(std, ".3f")}'
                 # Bold best
                 is_best = ds in best_per_ds and abs(val - best_per_ds[ds]) < 1e-8
                 if is_best:
@@ -339,7 +341,7 @@ def _to_latex(
     lines.append(f'\\begin{{table}}[htbp]')
     lines.append(f'\\centering')
     lines.append(f'\\caption{{{caption}}}')
-    lines.append(f"\\begin{{tabular}}{{{'l' + 'c' * len(datasets)}}}")
+    lines.append(f'\\begin{{tabular}}{{{"l" + "c" * len(datasets)}}}')
     lines.append(f'\\toprule')
     lines.append('Model & ' + ' & '.join(datasets) + ' \\\\')
     lines.append('\\midrule')
@@ -382,7 +384,7 @@ def _to_latex_entity(
     lines.append(f'\\begin{{table}}[htbp]')
     lines.append(f'\\centering')
     lines.append(f'\\caption{{Entity identifier ablation on {dataset}}}')
-    lines.append(f"\\begin{{tabular}}{{{'l' + 'c' * len(modes)}}}")
+    lines.append(f'\\begin{{tabular}}{{{"l" + "c" * len(modes)}}}')
     lines.append(f'\\toprule')
     lines.append('Model & ' + ' & '.join(modes) + ' \\\\')
     lines.append('\\midrule')
@@ -404,13 +406,25 @@ def _to_latex_entity(
 
 def main() -> None:
     parser = argparse.ArgumentParser(description='Aggregate benchmark results')
-    parser.add_argument('--results-dir', type=str, default=str(DEFAULT_RESULTS_DIR),
-                        help='Directory containing result JSON files')
-    parser.add_argument('--output', type=str, default=None,
-                        help='Output file path (default: stdout for markdown)')
-    parser.add_argument('--format', type=str, default='markdown',
-                        choices=['markdown', 'latex'],
-                        help='Output format')
+    parser.add_argument(
+        '--results-dir',
+        type=str,
+        default=str(DEFAULT_RESULTS_DIR),
+        help='Directory containing result JSON files',
+    )
+    parser.add_argument(
+        '--output',
+        type=str,
+        default=None,
+        help='Output file path (default: stdout for markdown)',
+    )
+    parser.add_argument(
+        '--format',
+        type=str,
+        default='markdown',
+        choices=['markdown', 'latex'],
+        help='Output format',
+    )
     args = parser.parse_args()
 
     results_dir = Path(args.results_dir)
@@ -423,7 +437,9 @@ def main() -> None:
         print('No result files found', file=sys.stderr)
         sys.exit(1)
 
-    print(f"Loaded results: {', '.join(f'{k}({len(v)})' for k, v in sorted(groups.items()))}")
+    print(
+        f'Loaded results: {", ".join(f"{k}({len(v)})" for k, v in sorted(groups.items()))}'
+    )
 
     if args.format == 'latex':
         output_dir = Path(args.output) if args.output else results_dir / 'tables'

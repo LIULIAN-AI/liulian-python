@@ -173,15 +173,33 @@ class TestRegistry:
     def test_register_custom(self):
         class DummyBackend(ArrayBackend):
             name = 'dummy'
-            def asarray(self, data, dtype='float32'): return np.asarray(data)
-            def zeros(self, shape, dtype='float32'): return np.zeros(shape)
-            def ones(self, shape, dtype='float32'): return np.ones(shape)
-            def empty(self, shape, dtype='float32'): return np.empty(shape)
-            def stack(self, arrays, axis=0): return np.stack(arrays, axis=axis)
-            def concatenate(self, arrays, axis=0): return np.concatenate(arrays, axis=axis)
-            def pad(self, array, pad_width, constant_values=0): return np.pad(array, pad_width)
-            def arange(self, *args): return np.arange(*args)
-            def to_numpy(self, array): return np.asarray(array)
+
+            def asarray(self, data, dtype='float32'):
+                return np.asarray(data)
+
+            def zeros(self, shape, dtype='float32'):
+                return np.zeros(shape)
+
+            def ones(self, shape, dtype='float32'):
+                return np.ones(shape)
+
+            def empty(self, shape, dtype='float32'):
+                return np.empty(shape)
+
+            def stack(self, arrays, axis=0):
+                return np.stack(arrays, axis=axis)
+
+            def concatenate(self, arrays, axis=0):
+                return np.concatenate(arrays, axis=axis)
+
+            def pad(self, array, pad_width, constant_values=0):
+                return np.pad(array, pad_width)
+
+            def arange(self, *args):
+                return np.arange(*args)
+
+            def to_numpy(self, array):
+                return np.asarray(array)
 
         register_backend('dummy', DummyBackend)
         b = get_backend('dummy')
@@ -277,6 +295,7 @@ class TestBaseDatasetBackend:
         from liulian.data.ts.timeseriesdataset import TimeSeriesDataset
 
         import pandas as pd
+
         df = pd.DataFrame({'epoch_day': range(100), 'x': range(100), 'y': range(100)})
         ds = TimeSeriesDataset(
             splits={'train': df},
@@ -289,6 +308,7 @@ class TestBaseDatasetBackend:
         split = ds.get_split('train')
         # TimeSeriesSplit is always torch-first
         import torch
+
         assert isinstance(split.X, torch.Tensor)
 
     def test_torch_backend(self):
@@ -296,6 +316,7 @@ class TestBaseDatasetBackend:
         from liulian.data.ts.timeseriesdataset import TimeSeriesDataset
 
         import pandas as pd
+
         df = pd.DataFrame({'epoch_day': range(100), 'x': range(100), 'y': range(100)})
         ds = TimeSeriesDataset(
             splits={'train': df},
@@ -341,7 +362,11 @@ class TestSpatialTempoGraphBackend:
             coordinates={'A': (1.0, 2.0), 'B': (3.0, 4.0), 'C': (5.0, 6.0)},
         )
         ds = SpatialTempoDataset(
-            splits={'train': pd.DataFrame({'epoch_day': range(50), 'x': range(50), 'y': range(50)})},
+            splits={
+                'train': pd.DataFrame(
+                    {'epoch_day': range(50), 'x': range(50), 'y': range(50)}
+                )
+            },
             time_col='epoch_day',
             feature_cols=['x'],
             target_cols=['y'],
@@ -376,7 +401,11 @@ class TestSpatialTempoGraphBackend:
         from liulian.data.st.spatialtempodataset import SpatialTempoDataset
 
         ds = SpatialTempoDataset(
-            splits={'train': pd.DataFrame({'epoch_day': range(50), 'x': range(50), 'y': range(50)})},
+            splits={
+                'train': pd.DataFrame(
+                    {'epoch_day': range(50), 'x': range(50), 'y': range(50)}
+                )
+            },
             time_col='epoch_day',
             feature_cols=['x'],
             target_cols=['y'],
@@ -397,11 +426,14 @@ _SWISS_ROOT = 'dataset/swiss_river'
 
 def _swiss_data_available() -> bool:
     from pathlib import Path
+
     root = Path(__file__).resolve().parents[1] / _SWISS_ROOT
     return (root / 'swiss-1990_train.csv').exists()
 
 
-@pytest.mark.skipif(not _swiss_data_available(), reason='Swiss River data not available')
+@pytest.mark.skipif(
+    not _swiss_data_available(), reason='Swiss River data not available'
+)
 class TestSwissRiverGraphOptional:
     """SwissRiverDataset works without graph data."""
 
@@ -461,6 +493,7 @@ class TestSwissRiverGraphOptional:
         split = ds.get_split('train')
         # TimeSeriesSplit is always torch-first (graph arrays follow backend)
         import torch
+
         assert isinstance(split.X, torch.Tensor)
 
 
@@ -476,12 +509,14 @@ class TestStandaloneTorchDatasets:
         pytest.importorskip('torch')
         pytest.importorskip('sklearn')
         from liulian.data.dataset_custom import DatasetCustom
+
         # Check class has B property
         assert hasattr(DatasetCustom, 'B')
 
     def test_sequence_dataset_has_backend(self):
         pytest.importorskip('torch')
         from liulian.data.seq_dataset import SequenceDataset
+
         assert hasattr(SequenceDataset, 'B')
 
     def test_sequence_full_inherits_backend(self):

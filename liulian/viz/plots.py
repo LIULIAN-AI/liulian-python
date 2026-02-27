@@ -42,11 +42,14 @@ def format_metrics_table(metrics: Dict[str, float], title: str = 'Metrics') -> s
 # matplotlib helpers
 # ---------------------------------------------------------------------------
 
+
 def _import_mpl():
     """Import matplotlib with Agg backend (safe for headless servers)."""
     import matplotlib
+
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
+
     return plt
 
 
@@ -94,8 +97,9 @@ def plot_predictions(
     if target_names is None:
         target_names = [f'Target {i}' for i in range(C)]
 
-    fig, axes = plt.subplots(C, 1, figsize=(figsize[0], figsize[1] * C),
-                             squeeze=False, sharex=True)
+    fig, axes = plt.subplots(
+        C, 1, figsize=(figsize[0], figsize[1] * C), squeeze=False, sharex=True
+    )
 
     for c in range(C):
         ax = axes[c, 0]
@@ -155,17 +159,22 @@ def plot_prediction_summary(
         pred_std = pred_std[:, None]
         true_mean = true_mean[:, None]
 
-    fig, axes = plt.subplots(C, 1, figsize=(figsize[0], figsize[1] * C),
-                             squeeze=False, sharex=True)
+    fig, axes = plt.subplots(
+        C, 1, figsize=(figsize[0], figsize[1] * C), squeeze=False, sharex=True
+    )
     for c in range(C):
         ax = axes[c, 0]
         ax.plot(time, true_mean[:, c], label='GT Mean', linewidth=1.2, color='#1f77b4')
-        ax.plot(time, pred_mean[:, c], label='Pred Mean', linewidth=1.2, color='#ff7f0e')
+        ax.plot(
+            time, pred_mean[:, c], label='Pred Mean', linewidth=1.2, color='#ff7f0e'
+        )
         ax.fill_between(
             time,
             pred_mean[:, c] - pred_std[:, c],
             pred_mean[:, c] + pred_std[:, c],
-            alpha=0.2, color='#ff7f0e', label='Pred ±1σ',
+            alpha=0.2,
+            color='#ff7f0e',
+            label='Pred ±1σ',
         )
         ax.legend(loc='upper right', fontsize=8)
         ax.grid(True, alpha=0.3)
@@ -269,17 +278,37 @@ def plot_prediction_range(
         target_names = [f'Target {i}' for i in range(C)]
 
     fig, axes = plt.subplots(
-        C, 1, figsize=(figsize[0], figsize[1] * C), squeeze=False, sharex=True,
+        C,
+        1,
+        figsize=(figsize[0], figsize[1] * C),
+        squeeze=False,
+        sharex=True,
     )
     for c in range(C):
         ax = axes[c, 0]
-        ax.plot(unique_times, true_vals[:, c], label='Ground Truth',
-                linewidth=1.2, color='#1f77b4', alpha=0.9)
-        ax.plot(unique_times, pred_mean[:, c], label='Pred Mean',
-                linewidth=1.0, color='#ff7f0e', alpha=0.9)
+        ax.plot(
+            unique_times,
+            true_vals[:, c],
+            label='Ground Truth',
+            linewidth=1.2,
+            color='#1f77b4',
+            alpha=0.9,
+        )
+        ax.plot(
+            unique_times,
+            pred_mean[:, c],
+            label='Pred Mean',
+            linewidth=1.0,
+            color='#ff7f0e',
+            alpha=0.9,
+        )
         ax.fill_between(
-            unique_times, pred_min[:, c], pred_max[:, c],
-            alpha=0.2, color='#ff7f0e', label='Pred Range',
+            unique_times,
+            pred_min[:, c],
+            pred_max[:, c],
+            alpha=0.2,
+            color='#ff7f0e',
+            label='Pred Range',
         )
         ax.set_ylabel(target_names[c])
         ax.legend(loc='upper right', fontsize=8)
@@ -337,7 +366,11 @@ def save_prediction_plots(
     from liulian.viz.prediction_aggregator import aggregate_predictions
 
     result = aggregate_predictions(
-        preds, trues, times, method=method, pred_len=pred_len,
+        preds,
+        trues,
+        times,
+        method=method,
+        pred_len=pred_len,
     )
 
     os.makedirs(output_dir, exist_ok=True)
@@ -346,7 +379,9 @@ def save_prediction_plots(
     # Full time-series plot
     ts_path = os.path.join(output_dir, 'pred_vs_gt.png')
     plot_predictions(
-        result['time'], result['true'], result['pred'],
+        result['time'],
+        result['true'],
+        result['pred'],
         title=f'{title_prefix}Predictions vs Ground Truth ({method})',
         target_names=target_names,
         save_path=ts_path,
@@ -356,7 +391,9 @@ def save_prediction_plots(
     # Prediction range plot (min/max/mean envelope)
     range_path = os.path.join(output_dir, 'pred_range.png')
     plot_prediction_range(
-        preds, trues, times,
+        preds,
+        trues,
+        times,
         pred_len=pred_len,
         title=f'{title_prefix}Prediction Range (Min/Max/Mean)',
         target_names=target_names,

@@ -9,6 +9,7 @@ import re
 import yaml
 from pathlib import Path
 
+
 def validate_skill(skill_path):
     """Basic validation of a skill"""
     skill_path = Path(skill_path)
@@ -45,8 +46,8 @@ def validate_skill(skill_path):
     unexpected_keys = set(frontmatter.keys()) - ALLOWED_PROPERTIES
     if unexpected_keys:
         return False, (
-            f"Unexpected key(s) in SKILL.md frontmatter: {', '.join(sorted(unexpected_keys))}. "
-            f"Allowed properties are: {', '.join(sorted(ALLOWED_PROPERTIES))}"
+            f'Unexpected key(s) in SKILL.md frontmatter: {", ".join(sorted(unexpected_keys))}. '
+            f'Allowed properties are: {", ".join(sorted(ALLOWED_PROPERTIES))}'
         )
 
     # Check required fields
@@ -63,12 +64,21 @@ def validate_skill(skill_path):
     if name:
         # Check naming convention (hyphen-case: lowercase with hyphens)
         if not re.match(r'^[a-z0-9-]+$', name):
-            return False, f"Name '{name}' should be hyphen-case (lowercase letters, digits, and hyphens only)"
+            return (
+                False,
+                f"Name '{name}' should be hyphen-case (lowercase letters, digits, and hyphens only)",
+            )
         if name.startswith('-') or name.endswith('-') or '--' in name:
-            return False, f"Name '{name}' cannot start/end with hyphen or contain consecutive hyphens"
+            return (
+                False,
+                f"Name '{name}' cannot start/end with hyphen or contain consecutive hyphens",
+            )
         # Check name length (max 64 characters per spec)
         if len(name) > 64:
-            return False, f'Name is too long ({len(name)} characters). Maximum is 64 characters.'
+            return (
+                False,
+                f'Name is too long ({len(name)} characters). Maximum is 64 characters.',
+            )
 
     # Extract and validate description
     description = frontmatter.get('description', '')
@@ -81,15 +91,19 @@ def validate_skill(skill_path):
             return False, 'Description cannot contain angle brackets (< or >)'
         # Check description length (max 1024 characters per spec)
         if len(description) > 1024:
-            return False, f'Description is too long ({len(description)} characters). Maximum is 1024 characters.'
+            return (
+                False,
+                f'Description is too long ({len(description)} characters). Maximum is 1024 characters.',
+            )
 
     return True, 'Skill is valid!'
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print('Usage: python quick_validate.py <skill_directory>')
         sys.exit(1)
-    
+
     valid, message = validate_skill(sys.argv[1])
     print(message)
     sys.exit(0 if valid else 1)

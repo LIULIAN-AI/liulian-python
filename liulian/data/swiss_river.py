@@ -126,7 +126,9 @@ class SwissRiverDataset(SpatialTempoDataset):
         self.max_samples = max_samples
 
         project_root = Path(__file__).resolve().parents[2]
-        self.root_path = Path(root_path) if root_path else project_root / 'dataset' / 'swiss_river'
+        self.root_path = (
+            Path(root_path) if root_path else project_root / 'dataset' / 'swiss_river'
+        )
 
         self._file_map = {
             'swiss-river-1990': {
@@ -322,9 +324,7 @@ class SwissRiverDataset(SpatialTempoDataset):
             for idx, station in enumerate(node_ids):
                 coords[station] = (float(x[idx, 0]), float(x[idx, 1]))
 
-        return TopologySpec(
-            node_ids=node_ids, edges=edges, coordinates=coords
-        )
+        return TopologySpec(node_ids=node_ids, edges=edges, coordinates=coords)
 
     # ------------------------------------------------------------------
     # Per-station DataFrame construction
@@ -455,9 +455,7 @@ class SwissRiverDataset(SpatialTempoDataset):
                 station_ids=self.station_ids,
                 identifier_mode=self.identifier_mode,
                 id_integration=self.id_integration,
-                coordinates=(
-                    self.topology.coordinates if self.topology else {}
-                ),
+                coordinates=(self.topology.coordinates if self.topology else {}),
                 station_name=station,
             )
             parts.append(ds_station.get_split(split_name))
@@ -525,9 +523,7 @@ class SwissRiverDataset(SpatialTempoDataset):
 
     def get_split(self, split_name: str) -> TimeSeriesSplit:
         if split_name not in ('train', 'val', 'test'):
-            raise KeyError(
-                f'Unknown split: {split_name!r}. Use train/val/test.'
-            )
+            raise KeyError(f'Unknown split: {split_name!r}. Use train/val/test.')
         if split_name not in self._split_cache:
             if self.split_mode == 'st':
                 self._split_cache[split_name] = self._build_st_split(split_name)
@@ -590,10 +586,10 @@ class SwissRiverDataset(SpatialTempoDataset):
             xs, ys, x_mark, y_mark = fields[0], fields[1], fields[2], fields[3]
             entity_id_strs = list(fields[4]) if n_fields > 4 else None
 
-            x = torch.stack(xs)       # (B, seq_len, D_x)
-            y = torch.stack(ys)       # (B, pred_len, D_y)
-            xt = torch.stack(x_mark)   # (B, seq_len, 1)
-            yt = torch.stack(y_mark)   # (B, pred_len, 1)
+            x = torch.stack(xs)  # (B, seq_len, D_x)
+            y = torch.stack(ys)  # (B, pred_len, D_y)
+            xt = torch.stack(x_mark)  # (B, seq_len, 1)
+            yt = torch.stack(y_mark)  # (B, pred_len, 1)
 
             # batch_x: encoder features (first seq_len steps)
             batch_x = x[:, :seq_len, :]
@@ -601,7 +597,7 @@ class SwissRiverDataset(SpatialTempoDataset):
             batch_y = y
 
             # Marks carry time information (expanded to 3-D)
-            batch_x_mark = xt[:, :seq_len]   # (B, seq_len, 1)
+            batch_x_mark = xt[:, :seq_len]  # (B, seq_len, 1)
             # (B, win, 1): full window of time marks for loss computation:
             batch_y_mark = torch.cat([xt[:, :seq_len], yt], dim=1)
 
@@ -611,7 +607,14 @@ class SwissRiverDataset(SpatialTempoDataset):
                     [_station_to_idx.get(s, 0) for s in entity_id_strs],
                     dtype=torch.long,
                 )
-                return batch_x, batch_y, batch_x_mark, batch_y_mark, entity_id_strs, entity_idx
+                return (
+                    batch_x,
+                    batch_y,
+                    batch_x_mark,
+                    batch_y_mark,
+                    entity_id_strs,
+                    entity_idx,
+                )
             return batch_x, batch_y, batch_x_mark, batch_y_mark
 
         def _make(split_name: str) -> DataLoader:

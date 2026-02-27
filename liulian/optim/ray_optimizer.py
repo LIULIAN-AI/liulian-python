@@ -91,7 +91,9 @@ def make_trainable(
 
         # Disable early stopping inside HPO trials — ASHA handles pruning
         merged['disable_early_stopping'] = True
-        trainer = ForecastTrainer(config=merged, device=device)  # todo: checkpoint_dir and exp_logger?
+        trainer = ForecastTrainer(
+            config=merged, device=device
+        )  # todo: checkpoint_dir and exp_logger?
 
         train_loader = loaders['train']
         val_loader = loaders['val']
@@ -107,7 +109,10 @@ def make_trainable(
 
         # Reuse the *same* training loop as the standard single-trial path
         trainer.fit(
-            model, train_loader, val_loader, test_loader,
+            model,
+            train_loader,
+            val_loader,
+            test_loader,
             epoch_callback=_epoch_callback,
         )
 
@@ -153,10 +158,14 @@ def _make_ray_epoch_callback(
             if val_key in epoch_record:
                 report_dict[metric_name] = epoch_record[val_key]
             elif 'train_loss' in epoch_record:
-                raise ValueError('train_loss reported as metric — ASHA pruning may be unreliable!')
+                raise ValueError(
+                    'train_loss reported as metric — ASHA pruning may be unreliable!'
+                )
                 report_dict[metric_name] = epoch_record['train_loss']
             else:
-                raise ValueError(f'Metric "{metric_name}" not found in epoch_record — ASHA pruning may be unreliable!')
+                raise ValueError(
+                    f'Metric "{metric_name}" not found in epoch_record — ASHA pruning may be unreliable!'
+                )
                 # Fallback: use the first val_* numeric value
                 for k, v in epoch_record.items():
                     if k.startswith('val_') and isinstance(v, (int, float)):
@@ -180,6 +189,7 @@ def _make_ray_epoch_callback(
         # Fallback: report without checkpoint
         try:
             from ray.tune import report as tune_report
+
             tune_report(report_dict)
         except ImportError:
             pass
@@ -220,11 +230,11 @@ def _get_metrics_from_ray_trial(
     from pathlib import Path
 
     result: Dict[str, Any] = {
-        "best_value": None,
-        "best_epoch": None,
-        "best_metrics": {},
-        "n_epochs": None,
-        "last_metrics": {},
+        'best_value': None,
+        'best_epoch': None,
+        'best_metrics': {},
+        'n_epochs': None,
+        'last_metrics': {},
     }
 
     # ── Get best anchor value from metric_analysis ──────────────────
@@ -232,20 +242,23 @@ def _get_metrics_from_ray_trial(
     try:
         best_anchor = trial.metric_analysis.get(anchor_metric, {}).get(mode)
     except (AttributeError, TypeError):
-        raise ValueError(f'Metric analysis for "{anchor_metric}" not found — best_value may be inaccurate!')
+        raise ValueError(
+            f'Metric analysis for "{anchor_metric}" not found — best_value may be inaccurate!'
+        )
         pass
 
     # ── Read progress.csv ───────────────────────────────────────────
-    progress_path = Path(trial.path) / "progress.csv"
+    progress_path = Path(trial.path) / 'progress.csv'
     if progress_path.exists() and best_anchor is not None:
         try:
             df = pd.read_csv(progress_path)
             # Last-epoch metrics
             if not df.empty:
                 last_row = df.iloc[-1]
-                result["n_epochs"] = int(last_row.get("training_iteration", len(df)))
-                result["last_metrics"] = {
-                    k: v for k, v in last_row.to_dict().items()
+                result['n_epochs'] = int(last_row.get('training_iteration', len(df)))
+                result['last_metrics'] = {
+                    k: v
+                    for k, v in last_row.to_dict().items()
                     if isinstance(v, (int, float)) and not np.isnan(v)
                 }
 
@@ -254,30 +267,32 @@ def _get_metrics_from_ray_trial(
                 matching = df[np.abs(df[anchor_metric] - best_anchor) < 1e-9]
                 if not matching.empty:
                     best_row = matching.iloc[-1]  # last occurrence if tied
-                    result["best_value"] = best_anchor
-                    result["best_epoch"] = int(
-                        best_row.get("training_iteration", 0)
-                    )
-                    result["best_metrics"] = {
-                        k: v for k, v in best_row.to_dict().items()
+                    result['best_value'] = best_anchor
+                    result['best_epoch'] = int(best_row.get('training_iteration', 0))
+                    result['best_metrics'] = {
+                        k: v
+                        for k, v in best_row.to_dict().items()
                         if isinstance(v, (int, float)) and not np.isnan(v)
                     }
                     return result
         except Exception as exc:
-            logger.debug("progress.csv parsing failed for trial %s: %s", trial.trial_id, exc)
+            logger.debug(
+                'progress.csv parsing failed for trial %s: %s', trial.trial_id, exc
+            )
 
-    raise ValueError(f'Could not extract best epoch metrics from progress.csv for trial {trial.trial_id} — best_epoch will be None and best_metrics will fallback to last_metrics!')
+    raise ValueError(
+        f'Could not extract best epoch metrics from progress.csv for trial {trial.trial_id} — best_epoch will be None and best_metrics will fallback to last_metrics!'
+    )
 
     # ── Fallback: use last_result / metric_analysis directly ────────
-    result["best_value"] = best_anchor
-    result["n_epochs"] = trial.last_result.get("training_iteration")
-    result["last_metrics"] = {
-        k: v for k, v in trial.last_result.items()
-        if isinstance(v, (int, float))
+    result['best_value'] = best_anchor
+    result['n_epochs'] = trial.last_result.get('training_iteration')
+    result['last_metrics'] = {
+        k: v for k, v in trial.last_result.items() if isinstance(v, (int, float))
     }
     # Without progress.csv we cannot determine best_epoch reliably
-    result["best_epoch"] = None
-    result["best_metrics"] = result["last_metrics"]
+    result['best_epoch'] = None
+    result['best_metrics'] = result['last_metrics']
     return result
 
 
@@ -342,25 +357,25 @@ class RayOptimizer(BaseOptimizer):
                   deprecated Ray ``local_mode`` flag.)
         """
         self.config: Dict[str, Any] = {
-            "num_samples": 4,
-            "max_epochs": 2,
-            "metric": "loss",
-            "mode": "min",
-            "scheduler": "asha",
-            "grace_period": 1,
-            "reduction_factor": 3,
-            "storage_path": None,
-            "resources_per_trial": {"cpu": 1, "gpu": 0},
-            "num_cpus": None,
-            "max_concurrent_trials": None,
-            "resume": False,
-            "save_checkpoints": True,
-            "trim_checkpoints": True,
-            "keep_best_n": 10,
-            "trim_best_n": True,
-            "trim_keep_best": True,
-            "trim_keep_last": False,
-            "experiment_name": None,
+            'num_samples': 4,
+            'max_epochs': 2,
+            'metric': 'loss',
+            'mode': 'min',
+            'scheduler': 'asha',
+            'grace_period': 1,
+            'reduction_factor': 3,
+            'storage_path': None,
+            'resources_per_trial': {'cpu': 1, 'gpu': 0},
+            'num_cpus': None,
+            'max_concurrent_trials': None,
+            'resume': False,
+            'save_checkpoints': True,
+            'trim_checkpoints': True,
+            'keep_best_n': 10,
+            'trim_best_n': True,
+            'trim_keep_best': True,
+            'trim_keep_last': False,
+            'experiment_name': None,
             **(config or {}),
         }
         self._ray_available = False
@@ -371,7 +386,7 @@ class RayOptimizer(BaseOptimizer):
             self._ray_available = True
         except ImportError:
             logger.info(
-                "ray[tune] not installed — RayOptimizer will use fallback grid sweep."
+                'ray[tune] not installed — RayOptimizer will use fallback grid sweep.'
             )
 
     # ------------------------------------------------------------------
@@ -453,9 +468,9 @@ class RayOptimizer(BaseOptimizer):
         from pathlib import Path
 
         # ── Disable Ray UV / runtime-env hooks ──────────────────────────
-        os.environ["RAY_CHDIR_TO_TRIAL_DIR"] = "0"
-        os.environ["RAY_ENABLE_UV_RUN_RUNTIME_ENV"] = "0"
-        os.environ.pop("RAY_RUNTIME_ENV_HOOK", None)
+        os.environ['RAY_CHDIR_TO_TRIAL_DIR'] = '0'
+        os.environ['RAY_ENABLE_UV_RUN_RUNTIME_ENV'] = '0'
+        os.environ.pop('RAY_RUNTIME_ENV_HOOK', None)
 
         import ray  # noqa: E402
         from ray import tune
@@ -486,7 +501,7 @@ class RayOptimizer(BaseOptimizer):
                 default=None,
             )
             if _last_idx is not None:
-                _base = str(PurePosixPath(*_parts[:_last_idx + 1]))
+                _base = str(PurePosixPath(*_parts[: _last_idx + 1]))
                 _hash = hashlib.md5(_base.encode()).hexdigest()[:8]
                 _link = f'/tmp/ray_nospace_{_hash}'
                 try:
@@ -506,16 +521,21 @@ class RayOptimizer(BaseOptimizer):
                     os.chdir(_cwd.replace(_base, _link))
                     sys.executable = sys.executable.replace(_base, _link)
                     if 'PYTHONPATH' in os.environ:
-                        os.environ['PYTHONPATH'] = (
-                            os.environ['PYTHONPATH'].replace(_base, _link)
+                        os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'].replace(
+                            _base, _link
                         )
 
                     _spaces_patch = (
-                        _base, _link, _saved_cwd, _saved_exe, _saved_pypath,
+                        _base,
+                        _link,
+                        _saved_cwd,
+                        _saved_exe,
+                        _saved_pypath,
                     )
                     logger.info(
                         'Ray spaces-in-path fix: symlinked %s → %s',
-                        _link, _base,
+                        _link,
+                        _base,
                     )
                 except OSError as exc:
                     logger.warning('Cannot create spaces symlink: %s', exc)
@@ -528,15 +548,15 @@ class RayOptimizer(BaseOptimizer):
         # ── ray.init ────────────────────────────────────────────────────
         if not ray.is_initialized():
             init_kwargs: Dict[str, Any] = {
-                "ignore_reinit_error": True,
-                "include_dashboard": False,
-                "_temp_dir": _ray_tmpdir,
+                'ignore_reinit_error': True,
+                'include_dashboard': False,
+                '_temp_dir': _ray_tmpdir,
             }
-            num_cpus = self.config.get("num_cpus")
+            num_cpus = self.config.get('num_cpus')
             if num_cpus is not None:
                 if num_cpus <= 0:
                     num_cpus = os.cpu_count() + num_cpus  # subtract from total
-                init_kwargs["num_cpus"] = max(num_cpus, 1)
+                init_kwargs['num_cpus'] = max(num_cpus, 1)
 
             # Debug mode: sequential trials via num_cpus=1.
             # This replaces the deprecated ``local_mode`` flag.
@@ -556,25 +576,27 @@ class RayOptimizer(BaseOptimizer):
 
             # Suppress Ray FutureWarning / DeprecationWarning noise
             import warnings
+
             with warnings.catch_warnings():
+                warnings.filterwarnings('ignore', category=FutureWarning, module=r'ray')
                 warnings.filterwarnings(
-                    'ignore', category=FutureWarning, module=r'ray')
-                warnings.filterwarnings(
-                    'ignore', category=DeprecationWarning, module=r'ray')
+                    'ignore', category=DeprecationWarning, module=r'ray'
+                )
                 ray.init(**init_kwargs)
             # Redirect Ray's internal loggers from stderr → stdout so
             # that IDEs like PyCharm don't render them in red.
             from liulian.utils.log_tags import redirect_ray_loggers
+
             redirect_ray_loggers()
             logger.info(
-                "Ray initialised — cluster resources: %s",
+                'Ray initialised — cluster resources: %s',
                 ray.cluster_resources(),
             )
 
-        metric = self.config["metric"]
-        mode = self.config["mode"]
-        num_samples = self.config["num_samples"]
-        max_epochs = self.config["max_epochs"]
+        metric = self.config['metric']
+        mode = self.config['mode']
+        num_samples = self.config['num_samples']
+        max_epochs = self.config['max_epochs']
 
         if trainable is None:
             # Placeholder trainable — report a random loss so the API works
@@ -584,18 +606,18 @@ class RayOptimizer(BaseOptimizer):
                 tune.report({metric: random.random()})
 
         # ── Scheduler ───────────────────────────────────────────────────
-        scheduler_name = self.config.get("scheduler", "asha")
+        scheduler_name = self.config.get('scheduler', 'asha')
         scheduler = None
-        if scheduler_name == "asha":
+        if scheduler_name == 'asha':
             from ray.tune.schedulers import ASHAScheduler
 
-            grace = self.config.get("grace_period", 1)
+            grace = self.config.get('grace_period', 1)
             grace = min(grace, max_epochs)
 
             scheduler = ASHAScheduler(
                 max_t=max_epochs,
                 grace_period=grace,
-                reduction_factor=self.config.get("reduction_factor", 3),
+                reduction_factor=self.config.get('reduction_factor', 3),
             )
 
         # Auto-convert plain lists → tune.grid_search()
@@ -607,29 +629,30 @@ class RayOptimizer(BaseOptimizer):
                 ray_search_space[k] = v
 
         # ── Storage path ────────────────────────────────────────────────
-        storage_path_cfg = self.config.get("storage_path")
+        storage_path_cfg = self.config.get('storage_path')
         if storage_path_cfg is None:
-            storage_path = str(Path("artifacts/ray_results").resolve())
+            storage_path = str(Path('artifacts/ray_results').resolve())
         else:
             storage_path = str(Path(storage_path_cfg).resolve())
 
         # Ensure the directory exists
         Path(storage_path).mkdir(parents=True, exist_ok=True)
-        logger.info("Ray Tune storage_path: %s", storage_path)
+        logger.info('Ray Tune storage_path: %s', storage_path)
 
         # ── Experiment name ──────────────────────────────────────────────
         # Convention: {data}_{model}_{task}_{mode}[_{extra}]_{timestamp}
-        exp_name = self.config.get("experiment_name")
+        exp_name = self.config.get('experiment_name')
         if not exp_name:
             import datetime
+
             ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
             parts = [
-                self.config.get("data", "data"),
-                self.config.get("model", "model"),
-                self.config.get("task", "forecast"),
-                self.config.get("mode_tag", "ts"),
+                self.config.get('data', 'data'),
+                self.config.get('model', 'model'),
+                self.config.get('task', 'forecast'),
+                self.config.get('mode_tag', 'ts'),
             ]
-            extra = self.config.get("experiment_tag")
+            extra = self.config.get('experiment_tag')
             if extra:
                 parts.append(extra)
             parts.append(ts)
@@ -637,26 +660,26 @@ class RayOptimizer(BaseOptimizer):
 
         # ── tune.run kwargs ─────────────────────────────────────────────
         run_kwargs: Dict[str, Any] = {
-            "name": exp_name,
-            "config": ray_search_space,
-            "num_samples": num_samples,
-            "metric": metric,
-            "mode": mode,
-            "verbose": 0,
-            "storage_path": storage_path,
-            "resources_per_trial": self.config.get(
-                "resources_per_trial", {"cpu": 1, "gpu": 0}
+            'name': exp_name,
+            'config': ray_search_space,
+            'num_samples': num_samples,
+            'metric': metric,
+            'mode': mode,
+            'verbose': 0,
+            'storage_path': storage_path,
+            'resources_per_trial': self.config.get(
+                'resources_per_trial', {'cpu': 1, 'gpu': 0}
             ),
         }
         if scheduler is not None:
-            run_kwargs["scheduler"] = scheduler
+            run_kwargs['scheduler'] = scheduler
 
-        max_concurrent = self.config.get("max_concurrent_trials")
+        max_concurrent = self.config.get('max_concurrent_trials')
         if max_concurrent is not None:
-            run_kwargs["max_concurrent_trials"] = max_concurrent
+            run_kwargs['max_concurrent_trials'] = max_concurrent
 
-        if self.config.get("resume", False):
-            run_kwargs["resume"] = True
+        if self.config.get('resume', False):
+            run_kwargs['resume'] = True
 
         try:
             analysis = tune.run(trainable, **run_kwargs)
@@ -690,20 +713,20 @@ class RayOptimizer(BaseOptimizer):
             best_value = best_trial.metric_analysis[metric][mode]
         except (KeyError, TypeError, AttributeError):
             # Fallback to last_result if metric_analysis is unavailable
-            raise ValueError(f'Metric analysis for "{metric}" not found — best_value may be inaccurate!')
-            best_value = best_trial.last_result.get(metric, float("inf"))
+            raise ValueError(
+                f'Metric analysis for "{metric}" not found — best_value may be inaccurate!'
+            )
+            best_value = best_trial.last_result.get(metric, float('inf'))
 
         # Try to get the best checkpoint path — ``get_best_checkpoint``
         # with the same (metric, mode) returns the checkpoint from the
         # *epoch* that achieved the best metric value.
         best_checkpoint_path: Optional[str] = None
         try:
-            best_ck = analysis.get_best_checkpoint(
-                best_trial, metric=metric, mode=mode
-            )
+            best_ck = analysis.get_best_checkpoint(best_trial, metric=metric, mode=mode)
             if best_ck is not None:
                 best_checkpoint_path = best_ck.path
-                logger.ok("Best checkpoint (best epoch): %s", best_checkpoint_path)
+                logger.ok('Best checkpoint (best epoch): %s', best_checkpoint_path)
             else:
                 raise ValueError('get_best_checkpoint returned None.')
         except Exception as e:
@@ -714,34 +737,38 @@ class RayOptimizer(BaseOptimizer):
         for i, t in enumerate(analysis.trials):
             trial_info = _get_metrics_from_ray_trial(t, anchor_metric=metric, mode=mode)
             entry: Dict[str, Any] = {
-                "trial_id": i,
-                "config": t.config,
+                'trial_id': i,
+                'config': t.config,
                 **trial_info,
             }
             trials_summary.append(entry)
 
         # ── Post-run checkpoint trimming ────────────────────────────────
-        if self.config.get("trim_checkpoints", True):
+        if self.config.get('trim_checkpoints', True):
             try:
                 from liulian.optim.trim import trim_checkpoints
 
                 n_removed, mb_freed = trim_checkpoints(
                     root_path=analysis.experiment_path,
-                    keep_best_n=self.config.get("keep_best_n", 10),
+                    keep_best_n=self.config.get('keep_best_n', 10),
                     anchor_metric=metric,
                     mode=mode,
-                    if_trim_best_n=self.config.get("trim_best_n", True),
-                    keep_best_for_trimmed_trials=self.config.get("trim_keep_best", True),
-                    keep_last_for_trimmed_trials=self.config.get("trim_keep_last", False),
+                    if_trim_best_n=self.config.get('trim_best_n', True),
+                    keep_best_for_trimmed_trials=self.config.get(
+                        'trim_keep_best', True
+                    ),
+                    keep_last_for_trimmed_trials=self.config.get(
+                        'trim_keep_last', False
+                    ),
                 )
                 if n_removed > 0:
                     logger.info(
-                        "Checkpoint trimming: removed %d files, freed %.2f MB",
+                        'Checkpoint trimming: removed %d files, freed %.2f MB',
                         n_removed,
                         mb_freed,
                     )
             except Exception as exc:
-                logger.warning("Checkpoint trimming failed: %s", exc)
+                logger.warning('Checkpoint trimming failed: %s', exc)
 
         return OptimizationResult(
             best_config=best_config,
@@ -777,13 +804,13 @@ class RayOptimizer(BaseOptimizer):
         # Normalise scalar values into single-element lists
         values = [v if isinstance(v, list) else [v] for v in search_space.values()]
 
-        max_trials = self.config.get("num_samples", 4)
-        metric = self.config["metric"]
-        mode = self.config["mode"]
+        max_trials = self.config.get('num_samples', 4)
+        metric = self.config['metric']
+        mode = self.config['mode']
 
         trials_summary: List[Dict[str, Any]] = []
         best_config: Dict[str, Any] = {}
-        best_value = float("inf") if mode == "min" else float("-inf")
+        best_value = float('inf') if mode == 'min' else float('-inf')
 
         for i, combo in enumerate(itertools.product(*values)):
             config = dict(zip(keys, combo))
@@ -798,16 +825,16 @@ class RayOptimizer(BaseOptimizer):
             trial_metrics = {metric: proxy}
             trials_summary.append(
                 {
-                    "trial_id": i,
-                    "config": config,
-                    "last_metrics": trial_metrics,
-                    "best_value": proxy,
-                    "best_epoch": 1,
-                    "n_epochs": 1,
+                    'trial_id': i,
+                    'config': config,
+                    'last_metrics': trial_metrics,
+                    'best_value': proxy,
+                    'best_epoch': 1,
+                    'n_epochs': 1,
                 }
             )
 
-            is_better = proxy < best_value if mode == "min" else proxy > best_value
+            is_better = proxy < best_value if mode == 'min' else proxy > best_value
             if is_better:
                 best_value = proxy
                 best_config = config

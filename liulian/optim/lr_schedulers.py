@@ -106,19 +106,22 @@ def build_scheduler(
     builder = SCHEDULER_REGISTRY.get(lradj)
     if builder is None:
         supported = ', '.join(sorted(SUPPORTED_LRADJ))
-        raise ValueError(
-            f'Unknown lradj={lradj!r}. Supported: {supported}'
-        )
+        raise ValueError(f'Unknown lradj={lradj!r}. Supported: {supported}')
 
     sched, step_mode = builder(optimizer, config, steps_per_epoch)
-    logger.debug('LR scheduler: lradj=%s → %s (step_mode=%s)',
-                 lradj, type(sched).__name__ if sched else 'None', step_mode)
+    logger.debug(
+        'LR scheduler: lradj=%s → %s (step_mode=%s)',
+        lradj,
+        type(sched).__name__ if sched else 'None',
+        step_mode,
+    )
     return sched, step_mode
 
 
 # ---------------------------------------------------------------------------
 # Individual builders
 # ---------------------------------------------------------------------------
+
 
 def _build_none(optimizer, config, steps_per_epoch):
     """No scheduling — constant LR."""
@@ -159,7 +162,10 @@ def _build_cosine_warmup(optimizer, config, steps_per_epoch):
     T_mult = config.get('cos_T_mult', 2)
     eta_min = config.get('cos_eta_min', 1e-8)
     sched = _lr.CosineAnnealingWarmRestarts(
-        optimizer, T_0=T_0, T_mult=T_mult, eta_min=eta_min,
+        optimizer,
+        T_0=T_0,
+        T_mult=T_mult,
+        eta_min=eta_min,
     )
     return sched, 'epoch'
 
@@ -211,8 +217,12 @@ def _build_plateau(optimizer, config, steps_per_epoch):
     threshold = config.get('sched_threshold', 1e-4)
     mode = config.get('sched_mode', 'min')
     sched = _lr.ReduceLROnPlateau(
-        optimizer, mode=mode, factor=factor, patience=patience,
-        threshold=threshold, verbose=True,
+        optimizer,
+        mode=mode,
+        factor=factor,
+        patience=patience,
+        threshold=threshold,
+        verbose=True,
     )
     return sched, 'plateau'
 
@@ -257,6 +267,7 @@ SUPPORTED_LRADJ = frozenset(SCHEDULER_REGISTRY.keys())
 # Manual LR adjustment (for type1/type2/type3/PEMS)
 # ---------------------------------------------------------------------------
 
+
 def adjust_learning_rate(
     optimizer: torch.optim.Optimizer,
     epoch: int,
@@ -283,8 +294,13 @@ def adjust_learning_rate(
         lr = initial_lr * (0.5 ** ((epoch - 1) // 1))
     elif lradj == 'type2':
         table = {
-            2: 5e-5, 4: 1e-5, 6: 5e-6, 8: 1e-6,
-            10: 5e-7, 15: 1e-7, 20: 5e-8,
+            2: 5e-5,
+            4: 1e-5,
+            6: 5e-6,
+            8: 1e-6,
+            10: 5e-7,
+            15: 1e-7,
+            20: 5e-8,
         }
         lr = table.get(epoch, None)
         if lr is None:

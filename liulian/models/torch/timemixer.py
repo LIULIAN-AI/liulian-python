@@ -456,7 +456,7 @@ class Model(nn.Module):
             padding_mask = x_mark_enc[:, :, 0]
         else:
             padding_mask = x_mark_enc
-        output = output * padding_mask[:, :output.shape[1]].unsqueeze(-1)
+        output = output * padding_mask[:, : output.shape[1]].unsqueeze(-1)
         output = output.reshape(output.shape[0], -1)
         output = self.projection(output)
         return output

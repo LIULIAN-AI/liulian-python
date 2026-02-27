@@ -72,9 +72,9 @@ def main() -> None:
 
     # 7. Display results
     print()
-    print(f"Status : {summary['status']}")
-    print(f"Run ID : {summary['run_id']}")
-    print(f"State  : {summary['state']}")
+    print(f'Status : {summary["status"]}')
+    print(f'Run ID : {summary["run_id"]}')
+    print(f'State  : {summary["state"]}')
     print()
     print(format_metrics_table(summary['metrics'], title='Experiment Metrics'))
     print()

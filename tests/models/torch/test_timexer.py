@@ -79,7 +79,9 @@ class TestTimeXerForecast:
         model = TimeXerAdapter(config)
         # TimeXer returns None for non-forecast, adapter raises TypeError
         with pytest.raises(TypeError):
-            model.run({
-                'x_enc': __import__('torch').randn(4, 96, 7),
-                'x_mark_enc': __import__('torch').randn(4, 96, 4),
-            })
+            model.run(
+                {
+                    'x_enc': __import__('torch').randn(4, 96, 7),
+                    'x_mark_enc': __import__('torch').randn(4, 96, 4),
+                }
+            )

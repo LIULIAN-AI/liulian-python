@@ -106,9 +106,9 @@ class ForecastTrainer:
         )
         self.show_progress = bool(self.config.get('show_progress', True))
         self.nan_mask_loss = bool(self.config.get('nan_mask_loss', False))
-        self.teacher_forcing = str(
-            self.config.get('teacher_forcing', 'label')
-        ).strip().lower()
+        self.teacher_forcing = (
+            str(self.config.get('teacher_forcing', 'label')).strip().lower()
+        )
         self.eval_denorm = bool(self.config.get('eval_denorm', False))
         self.use_entity_embedding = (
             str(self.config.get('identifier_mode', 'none')).strip().lower()
@@ -118,7 +118,9 @@ class ForecastTrainer:
         # Data augmentation during training
         aug_cfg = self.config.get('augmentation', None)
         if isinstance(aug_cfg, str):
-            self.augmentation_list = [s.strip() for s in aug_cfg.split(',') if s.strip()]
+            self.augmentation_list = [
+                s.strip() for s in aug_cfg.split(',') if s.strip()
+            ]
         elif isinstance(aug_cfg, (list, tuple)):
             self.augmentation_list = list(aug_cfg)
         else:
@@ -191,7 +193,10 @@ class ForecastTrainer:
         # Accelerator wrapping
         if self.accelerator is not None:
             model, model_optim, train_loader, sched = self.accelerator.prepare(
-                model, model_optim, train_loader, sched,
+                model,
+                model_optim,
+                train_loader,
+                sched,
             )
             if val_loader is not None:
                 val_loader = self.accelerator.prepare(val_loader)
@@ -205,9 +210,9 @@ class ForecastTrainer:
         eval_metric_names = self._dedupe_metric_names(
             [self.loss_name] + list(self.metric_names)
         )
-        monitor_key = str(
-            cfg.get('monitor_metric', f'val_{self.loss_name}')
-        ).strip().lower()
+        monitor_key = (
+            str(cfg.get('monitor_metric', f'val_{self.loss_name}')).strip().lower()
+        )
 
         for epoch in range(train_epochs):
             # --- train one epoch ---
@@ -314,7 +319,9 @@ class ForecastTrainer:
                 try:
                     epoch_callback(epoch_record, model, self.checkpoint_dir)
                 except Exception as e:
-                    raise RuntimeError(f'Epoch callback failed at epoch {epoch + 1}') from e
+                    raise RuntimeError(
+                        f'Epoch callback failed at epoch {epoch + 1}'
+                    ) from e
                     pass  # callback failure should not abort training
 
             if early_stopping.early_stop and not disable_es:
@@ -414,7 +421,9 @@ class ForecastTrainer:
                 batch_entity_ids = batch[4] if len(batch) > 4 else None
                 batch_entity_idx = batch[5] if len(batch) > 5 else None
 
-                batch_x = batch_x.float().to(self.device)  # todo: always to float as timellm?
+                batch_x = batch_x.float().to(
+                    self.device
+                )  # todo: always to float as timellm?
                 batch_y = batch_y.float()
                 batch_x_mark = batch_x_mark.float().to(self.device)
                 batch_y_mark = batch_y_mark.float().to(self.device)
@@ -430,7 +439,9 @@ class ForecastTrainer:
                 fwd_kwargs: Dict[str, Any] = {}
                 if self.use_entity_embedding and batch_entity_idx is not None:
                     fwd_kwargs['entity_ids'] = batch_entity_idx
-                outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs)
+                outputs = model(
+                    batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs
+                )
                 if isinstance(outputs, tuple):
                     outputs = outputs[0]
 
@@ -448,18 +459,28 @@ class ForecastTrainer:
                         inv_kwargs: Dict[str, Any] = {}
                         if batch_entity_ids is not None:
                             inv_kwargs['entity_ids'] = batch_entity_ids
-                        inv_kwargs['timestamps'] = batch_y_mark.detach()  # todo: is this useful or correct?
-                        out_dn = self.inverse_transform_fn(outputs.detach(), **inv_kwargs)
-                        tgt_dn = self.inverse_transform_fn(batch_y.detach(), **inv_kwargs)
+                        inv_kwargs['timestamps'] = (
+                            batch_y_mark.detach()
+                        )  # todo: is this useful or correct?
+                        out_dn = self.inverse_transform_fn(
+                            outputs.detach(), **inv_kwargs
+                        )
+                        tgt_dn = self.inverse_transform_fn(
+                            batch_y.detach(), **inv_kwargs
+                        )
                         if out_dn is None:
                             out_dn = outputs.detach()
                         if tgt_dn is None:
                             tgt_dn = batch_y.detach()
-                        dn_metrics = self._compute_metrics(out_dn, tgt_dn, resolved_metric_names)
+                        dn_metrics = self._compute_metrics(
+                            out_dn, tgt_dn, resolved_metric_names
+                        )
                         for name, value in dn_metrics.items():
                             denorm_collected[name].append(value)
                     except Exception as exc:
-                        logger.debug('inverse_transform failed (batch %d): %s', idx, exc)
+                        logger.debug(
+                            'inverse_transform failed (batch %d): %s', idx, exc
+                        )
 
                 if tqdm is not None and hasattr(iterator, 'set_postfix'):
                     iterator.set_postfix(
@@ -527,7 +548,12 @@ class ForecastTrainer:
                 if max_iters is not None and idx >= max_iters:
                     break
 
-                batch_x, batch_y, batch_x_mark, batch_y_mark = batch[0], batch[1], batch[2], batch[3]
+                batch_x, batch_y, batch_x_mark, batch_y_mark = (
+                    batch[0],
+                    batch[1],
+                    batch[2],
+                    batch[3],
+                )
                 batch_entity_idx = batch[5] if len(batch) > 5 else None
                 batch_x = batch_x.float().to(self.device)
                 batch_y = batch_y.float()
@@ -542,7 +568,9 @@ class ForecastTrainer:
                 fwd_kwargs: Dict[str, Any] = {}
                 if self.use_entity_embedding and batch_entity_idx is not None:
                     fwd_kwargs['entity_ids'] = batch_entity_idx
-                outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs)
+                outputs = model(
+                    batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs
+                )
                 if isinstance(outputs, tuple):
                     outputs = outputs[0]
 
@@ -600,7 +628,12 @@ class ForecastTrainer:
 
             optimizer.zero_grad()
 
-            batch_x, batch_y, batch_x_mark, batch_y_mark = batch[0], batch[1], batch[2], batch[3]
+            batch_x, batch_y, batch_x_mark, batch_y_mark = (
+                batch[0],
+                batch[1],
+                batch[2],
+                batch[3],
+            )
             batch_entity_idx = batch[5] if len(batch) > 5 else None
             batch_x = batch_x.float().to(self.device)
             batch_y = batch_y.float().to(self.device)
@@ -642,7 +675,10 @@ class ForecastTrainer:
                 loss.backward()
             optimizer.step()
 
-            if scheduler is not None and getattr(self, '_sched_step_mode', 'batch') == 'batch':
+            if (
+                scheduler is not None
+                and getattr(self, '_sched_step_mode', 'batch') == 'batch'
+            ):
                 scheduler.step()
 
             if tqdm is not None and hasattr(iterator, 'set_postfix'):
@@ -728,12 +764,8 @@ class ForecastTrainer:
         if loss_name == 'mae':
             return nn.L1Loss()
         if loss_name == 'rmse':
-            return lambda pred, true: torch.sqrt(
-                torch.mean((pred - true) ** 2) + 1e-12
-            )
-        raise ValueError(
-            f'Unsupported loss={loss_name!r}. Supported: mse, mae, rmse'
-        )
+            return lambda pred, true: torch.sqrt(torch.mean((pred - true) ** 2) + 1e-12)
+        raise ValueError(f'Unsupported loss={loss_name!r}. Supported: mse, mae, rmse')
 
     def _compute_metrics(
         self,

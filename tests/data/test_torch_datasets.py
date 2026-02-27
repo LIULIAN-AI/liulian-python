@@ -8,6 +8,7 @@ Tests verify:
 - Train/val/test splits are correct
 - Tensor shapes match expectations
 """
+
 import os
 import tempfile
 from pathlib import Path
@@ -45,7 +46,7 @@ def ett_hour_data(tmp_path):
     # Generate enough hourly data for ETT splits (20 months = 14400 hours)
     # ETT splits: train(12 months), val(4 months), test(4 months)
     dates = pd.date_range('2020-01-01', periods=14400, freq='h')
-    
+
     # 7 features: HUFL, HULL, MUFL, MULL, LUFL, LULL, OT
     data = {
         'date': dates,
@@ -58,11 +59,11 @@ def ett_hour_data(tmp_path):
         'OT': np.random.randn(14400),
     }
     df = pd.DataFrame(data)
-    
+
     # Save to CSV
     csv_path = tmp_path / 'ETTh_test.csv'
     df.to_csv(csv_path, index=False)
-    
+
     return str(tmp_path), 'ETTh_test.csv'
 
 
@@ -71,7 +72,7 @@ def ett_minute_data(tmp_path):
     """Create a synthetic ETT minute dataset (15-min intervals)."""
     # Generate 10 days of 15-minute data (960 samples)
     dates = pd.date_range('2020-01-01', periods=960, freq='15min')
-    
+
     # 7 features
     data = {
         'date': dates,
@@ -84,11 +85,11 @@ def ett_minute_data(tmp_path):
         'OT': np.random.randn(960),
     }
     df = pd.DataFrame(data)
-    
+
     # Save to CSV
     csv_path = tmp_path / 'ETTm_test.csv'
     df.to_csv(csv_path, index=False)
-    
+
     return str(tmp_path), 'ETTm_test.csv'
 
 
@@ -97,7 +98,7 @@ def custom_csv_data(tmp_path):
     """Create a synthetic custom CSV dataset."""
     # Generate 60 days of hourly data (1440 samples) for 80/10/10 split
     dates = pd.date_range('2020-01-01', periods=1440, freq='h')
-    
+
     data = {
         'date': dates,
         'feature1': np.random.randn(1440),
@@ -106,21 +107,21 @@ def custom_csv_data(tmp_path):
         'target_value': np.random.randn(1440),  # Custom target name
     }
     df = pd.DataFrame(data)
-    
+
     # Save to CSV
     csv_path = tmp_path / 'custom_test.csv'
     df.to_csv(csv_path, index=False)
-    
+
     return str(tmp_path), 'custom_test.csv'
 
 
 class TestETTHourDataset:
     """Tests for ETTHourDataset."""
-    
+
     def test_basic_loading(self, ett_hour_data):
         """Test basic dataset loading."""
         root_path, data_path = ett_hour_data
-        
+
         container = ETTHourDataset(
             root_path=root_path,
             data_path=data_path,
@@ -128,14 +129,14 @@ class TestETTHourDataset:
             features='M',
         )
         dataset = container.get_split('train')
-        
+
         # Check dataset length
         assert len(dataset) > 0
-    
+
     def test_returns_torch_tensors(self, ett_hour_data):
         """Test that dataset returns torch tensors."""
         root_path, data_path = ett_hour_data
-        
+
         container = ETTHourDataset(
             root_path=root_path,
             data_path=data_path,
@@ -143,20 +144,20 @@ class TestETTHourDataset:
             features='M',
         )
         dataset = container.get_split('train')
-        
+
         # Get a sample
         seq_x, seq_y, seq_x_mark, seq_y_mark = dataset[0]
-        
+
         # Check all are torch tensors
         assert isinstance(seq_x, torch.Tensor)
         assert isinstance(seq_y, torch.Tensor)
         assert isinstance(seq_x_mark, torch.Tensor)
         assert isinstance(seq_y_mark, torch.Tensor)
-    
+
     def test_tensor_shapes(self, ett_hour_data):
         """Test tensor shapes match specifications."""
         root_path, data_path = ett_hour_data
-        
+
         seq_len, label_len, pred_len = 96, 48, 96
         container = ETTHourDataset(
             root_path=root_path,
@@ -165,23 +166,23 @@ class TestETTHourDataset:
             features='M',
         )
         dataset = container.get_split('train')
-        
+
         seq_x, seq_y, seq_x_mark, seq_y_mark = dataset[0]
-        
+
         # Check shapes
         assert seq_x.shape[0] == seq_len
         assert seq_y.shape[0] == label_len + pred_len
         assert seq_x_mark.shape[0] == seq_len
         assert seq_y_mark.shape[0] == label_len + pred_len
-        
+
         # Check features (7 columns in ETT data)
         assert seq_x.shape[1] == 7
         assert seq_y.shape[1] == 7
-    
+
     def test_univariate_mode(self, ett_hour_data):
         """Test univariate (S) mode."""
         root_path, data_path = ett_hour_data
-        
+
         container = ETTHourDataset(
             root_path=root_path,
             data_path=data_path,
@@ -190,17 +191,17 @@ class TestETTHourDataset:
             target='OT',
         )
         dataset = container.get_split('train')
-        
+
         seq_x, seq_y, seq_x_mark, seq_y_mark = dataset[0]
-        
+
         # Should only have 1 feature
         assert seq_x.shape[1] == 1
         assert seq_y.shape[1] == 1
-    
+
     def test_inverse_transform(self, ett_hour_data):
         """Test inverse transformation."""
         root_path, data_path = ett_hour_data
-        
+
         container = ETTHourDataset(
             root_path=root_path,
             data_path=data_path,
@@ -208,28 +209,28 @@ class TestETTHourDataset:
             scale=True,
         )
         dataset = container.get_split('train')
-        
+
         seq_x, _, _, _ = dataset[0]
-        
+
         # Inverse transform should work
         original = container.inverse_transform(seq_x)
         assert isinstance(original, torch.Tensor)
         assert original.shape == seq_x.shape
-    
+
     def test_train_val_test_splits(self, ett_hour_data):
         """Test that train/val/test splits are different."""
         root_path, data_path = ett_hour_data
-        
+
         container = ETTHourDataset(
             root_path=root_path,
             data_path=data_path,
             size=(96, 48, 96),
         )
-        
+
         train_dataset = container.get_split('train')
         val_dataset = container.get_split('val')
         test_dataset = container.get_split('test')
-        
+
         # All should have data
         assert len(train_dataset) > 0
         assert len(val_dataset) > 0
@@ -238,11 +239,11 @@ class TestETTHourDataset:
 
 class TestETTMinuteDataset:
     """Tests for ETTMinuteDataset."""
-    
+
     def test_basic_loading(self, ett_minute_data):
         """Test basic dataset loading."""
         root_path, data_path = ett_minute_data
-        
+
         container = ETTMinuteDataset(
             root_path=root_path,
             data_path=data_path,
@@ -250,52 +251,52 @@ class TestETTMinuteDataset:
             features='M',
         )
         dataset = container.get_split('train')
-        
+
         assert len(dataset) > 0
-    
+
     def test_returns_torch_tensors(self, ett_minute_data):
         """Test that dataset returns torch tensors."""
         root_path, data_path = ett_minute_data
-        
+
         container = ETTMinuteDataset(
             root_path=root_path,
             data_path=data_path,
             size=(96, 48, 96),
         )
         dataset = container.get_split('train')
-        
+
         seq_x, seq_y, seq_x_mark, seq_y_mark = dataset[0]
-        
+
         # Check all are torch tensors
         assert isinstance(seq_x, torch.Tensor)
         assert isinstance(seq_y, torch.Tensor)
         assert isinstance(seq_x_mark, torch.Tensor)
         assert isinstance(seq_y_mark, torch.Tensor)
-    
+
     def test_timeenc_categorical(self, ett_minute_data):
         """Test categorical time encoding (includes minute)."""
         root_path, data_path = ett_minute_data
-        
+
         container = ETTMinuteDataset(
             root_path=root_path,
             data_path=data_path,
             timeenc=0,  # Categorical
         )
         dataset = container.get_split('train')
-        
+
         _, _, seq_x_mark, _ = dataset[0]
-        
+
         # Should have 5 time features for minute data: month, day, weekday, hour, minute
         assert seq_x_mark.shape[1] == 5
 
 
 class TestCustomCSVDataset:
     """Tests for CustomCSVDataset."""
-    
+
     def test_basic_loading(self, custom_csv_data):
         """Test basic dataset loading."""
         root_path, data_path = custom_csv_data
-        
+
         container = CustomCSVDataset(
             root_path=root_path,
             data_path=data_path,
@@ -303,31 +304,31 @@ class TestCustomCSVDataset:
             target='target_value',
         )
         dataset = container.get_split('train')
-        
+
         assert len(dataset) > 0
-    
+
     def test_returns_torch_tensors(self, custom_csv_data):
         """Test that dataset returns torch tensors."""
         root_path, data_path = custom_csv_data
-        
+
         container = CustomCSVDataset(
             root_path=root_path,
             data_path=data_path,
             target='target_value',
         )
         dataset = container.get_split('train')
-        
+
         seq_x, seq_y, seq_x_mark, seq_y_mark = dataset[0]
-        
+
         assert isinstance(seq_x, torch.Tensor)
         assert isinstance(seq_y, torch.Tensor)
         assert isinstance(seq_x_mark, torch.Tensor)
         assert isinstance(seq_y_mark, torch.Tensor)
-    
+
     def test_custom_split_ratios(self, custom_csv_data):
         """Test custom train/val/test ratios."""
         root_path, data_path = custom_csv_data
-        
+
         # 80/10/10 split
         container = CustomCSVDataset(
             root_path=root_path,
@@ -336,11 +337,11 @@ class TestCustomCSVDataset:
             train_ratio=0.8,
             test_ratio=0.1,
         )
-        
+
         train_dataset = container.get_split('train')
         val_dataset = container.get_split('val')
         test_dataset = container.get_split('test')
-        
+
         # All should have data
         assert len(train_dataset) > 0
         assert len(val_dataset) > 0
@@ -349,11 +350,11 @@ class TestCustomCSVDataset:
 
 class TestDataFactory:
     """Tests for data factory functions."""
-    
+
     def test_create_dataloader_ett(self, ett_hour_data):
         """Test creating DataLoader via factory."""
         root_path, data_path = ett_hour_data
-        
+
         loader = create_dataloader(
             data_name='ETTh1',
             root_path=root_path,
@@ -362,22 +363,22 @@ class TestDataFactory:
             size=(96, 48, 96),
             batch_size=16,
         )
-        
+
         # Check loader is created
         assert loader is not None
-        
+
         # Get a batch
         batch = next(iter(loader))
         seq_x, seq_y, seq_x_mark, seq_y_mark = batch
-        
+
         # Check batch dimensions
         assert seq_x.shape[0] == 16  # batch size
         assert seq_x.shape[1] == 96  # seq_len
-    
+
     def test_create_dataloader_custom(self, custom_csv_data):
         """Test creating custom DataLoader via factory."""
         root_path, data_path = custom_csv_data
-        
+
         loader = create_dataloader(
             data_name='custom',
             root_path=root_path,
@@ -386,17 +387,17 @@ class TestDataFactory:
             target='target_value',
             batch_size=8,
         )
-        
+
         assert loader is not None
-        
+
         batch = next(iter(loader))
         seq_x, _, _, _ = batch
         assert seq_x.shape[0] == 8  # batch size
-    
+
     def test_create_all_dataloaders(self, ett_hour_data):
         """Test creating all splits at once."""
         root_path, data_path = ett_hour_data
-        
+
         loaders = create_dataloaders(
             data_name='ETTh1',
             root_path=root_path,
@@ -404,16 +405,16 @@ class TestDataFactory:
             size=(96, 48, 96),
             batch_size=16,
         )
-        
+
         # Should have all three splits
         assert 'train' in loaders
         assert 'val' in loaders
         assert 'test' in loaders
-        
+
         # All should be DataLoaders
         for loader in loaders.values():
             assert loader is not None
-    
+
     def test_unknown_dataset_error(self):
         """Test error on unknown dataset name."""
         with pytest.raises(ValueError, match='Unknown dataset'):
@@ -422,14 +423,14 @@ class TestDataFactory:
                 root_path='/tmp',
                 data_path='data.csv',
             )
-    
+
     def test_register_custom_dataset(self, custom_csv_data):
         """Test registering a custom dataset class."""
         root_path, data_path = custom_csv_data
-        
+
         # Register under new name
         register_dataset('my_custom', CustomCSVDataset)
-        
+
         # Should be able to create loader with new name
         loader = create_dataloader(
             data_name='my_custom',
@@ -438,17 +439,17 @@ class TestDataFactory:
             target='target_value',
             batch_size=4,
         )
-        
+
         assert loader is not None
 
 
 class TestEndToEnd:
     """End-to-end integration tests."""
-    
+
     def test_data_pipeline(self, ett_hour_data):
         """Test complete data loading pipeline."""
         root_path, data_path = ett_hour_data
-        
+
         # Create DataLoader
         train_loader = create_dataloader(
             data_name='ETTh1',
@@ -460,22 +461,22 @@ class TestEndToEnd:
             batch_size=16,
             shuffle=True,
         )
-        
+
         # Iterate through a few batches
         for i, batch in enumerate(train_loader):
             seq_x, seq_y, seq_x_mark, seq_y_mark = batch
-            
+
             # Verify tensors
             assert isinstance(seq_x, torch.Tensor)
             assert isinstance(seq_y, torch.Tensor)
             assert isinstance(seq_x_mark, torch.Tensor)
             assert isinstance(seq_y_mark, torch.Tensor)
-            
+
             # Verify shapes
             assert seq_x.shape[0] <= 16  # batch size (may be smaller for last batch)
             assert seq_x.shape[1] == 96  # seq_len
             assert seq_y.shape[1] == 48 + 96  # label_len + pred_len
-            
+
             # Only test a few batches
             if i >= 2:
                 break

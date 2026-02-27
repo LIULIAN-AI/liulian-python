@@ -14,6 +14,7 @@ https://github.com/thuml/Time-Series-Library/blob/main/data_provider/data_factor
 
 MIT License
 """
+
 from typing import Dict, Any, Optional
 from torch.utils.data import DataLoader
 
@@ -71,7 +72,7 @@ def create_dataloader(
     num_workers: int = 0,
     shuffle: bool = True,
     drop_last: bool = False,
-    **kwargs
+    **kwargs,
 ) -> DataLoader:
     """
     Create a PyTorch DataLoader for time series forecasting.
@@ -102,7 +103,7 @@ def create_dataloader(
 
     Raises:
         ValueError: If `data_name` is not registered in the dataset registry.
-        
+
     Examples:
         >>> train_loader = create_dataloader(
         ...     data_name='ETTh1',
@@ -111,9 +112,9 @@ def create_dataloader(
         ...     flag='train',
         ...     size=(96, 48, 96),
         ...     batch_size=32,
-        ...     shuffle=True
+        ...     shuffle=True,
         ... )
-        
+
         >>> val_loader = create_dataloader(
         ...     data_name='custom',
         ...     root_path='./data',
@@ -122,7 +123,7 @@ def create_dataloader(
         ...     features='S',
         ...     target='value',
         ...     batch_size=32,
-        ...     shuffle=False
+        ...     shuffle=False,
         ... )
     """
     # Get dataset class from registry
@@ -131,7 +132,7 @@ def create_dataloader(
             f'Unknown dataset: {data_name}. '
             f'Available datasets: {list(DATASET_REGISTRY.keys())}'
         )
-    
+
     dataset_class = DATASET_REGISTRY[data_name]
 
     # Build kwargs for constructor
@@ -148,7 +149,9 @@ def create_dataloader(
     # Multi-split datasets (TimeSeriesDataset subclasses)
     if isinstance(dataset_class, type) and issubclass(dataset_class, BaseDataset):
         # Cache key to avoid re-loading per flag
-        cache_key = f'{data_name}:{root_path}:{data_path}:{size}:{features}:{target}:{scale}'
+        cache_key = (
+            f'{data_name}:{root_path}:{data_path}:{size}:{features}:{target}:{scale}'
+        )
         if cache_key not in _DATASET_CACHE:
             # Filter out flag — these datasets create all splits at once
             ctor_kwargs.pop('flag', None)
@@ -166,13 +169,13 @@ def create_dataloader(
         ctor_kwargs['timeenc'] = timeenc
         ctor_kwargs['freq'] = freq
         dataset = dataset_class(**ctor_kwargs)
-    
+
     # Determine shuffle based on flag if not explicitly set
     if flag == 'train' and shuffle is None:
         shuffle = True
     elif flag in ['val', 'test'] and shuffle is None:
         shuffle = False
-    
+
     # Create DataLoader
     dataloader = DataLoader(
         dataset,
@@ -181,7 +184,7 @@ def create_dataloader(
         num_workers=num_workers,
         drop_last=drop_last,
     )
-    
+
     return dataloader
 
 
@@ -197,13 +200,13 @@ def create_dataloaders(
     freq: str = 'h',
     batch_size: int = 32,
     num_workers: int = 0,
-    **kwargs
+    **kwargs,
 ) -> Dict[str, DataLoader]:
     """
     Create train/val/test DataLoaders for a dataset.
-    
+
     Convenience function to create all three splits at once with consistent settings.
-    
+
     Args:
         data_name: Dataset name (e.g., 'ETTh1', 'ETTm1', 'custom')
         root_path: Root directory containing the data file
@@ -217,28 +220,28 @@ def create_dataloaders(
         batch_size: Batch size for DataLoader
         num_workers: Number of worker processes for data loading
         **kwargs: Additional dataset-specific arguments
-        
+
     Returns:
         Dictionary with keys 'train', 'val', 'test' containing DataLoaders
-        
+
     Examples:
         >>> loaders = create_dataloaders(
         ...     data_name='ETTh1',
         ...     root_path='./data/ETT',
         ...     data_path='ETTh1.csv',
         ...     size=(96, 48, 96),
-        ...     batch_size=32
+        ...     batch_size=32,
         ... )
         >>> train_loader = loaders['train']
         >>> val_loader = loaders['val']
         >>> test_loader = loaders['test']
     """
     loaders = {}
-    
+
     for flag in ['train', 'val', 'test']:
         # Train shuffles, val/test don't
-        shuffle = (flag == 'train')
-        
+        shuffle = flag == 'train'
+
         loaders[flag] = create_dataloader(
             data_name=data_name,
             root_path=root_path,
@@ -254,22 +257,22 @@ def create_dataloaders(
             num_workers=num_workers,
             shuffle=shuffle,
             drop_last=False,
-            **kwargs
+            **kwargs,
         )
-    
+
     return loaders
 
 
 def register_dataset(name: str, dataset_class: type):
     """
     Register a new dataset class in the registry.
-    
+
     Allows extending the factory with custom dataset classes.
-    
+
     Args:
         name: Name to register the dataset under
         dataset_class: Dataset class (must inherit from torch.utils.data.Dataset)
-        
+
     Examples:
         >>> class MyCustomDataset(Dataset):
         ...     def __init__(self, root_path, data_path, flag, **kwargs):

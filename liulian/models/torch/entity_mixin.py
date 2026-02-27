@@ -22,6 +22,7 @@ Usage in an adapter
 
     from liulian.models.torch.entity_mixin import EntityAwareMixin
 
+
     class DLinearAdapter(EntityAwareMixin, TorchModelAdapter):
         def __init__(self, config):
             # _entity_model_config is identity — no enc_in change needed

@@ -41,7 +41,7 @@ class EarlyStopping:
             val_loss = validate(model, val_loader)
             es(val_loss, model, checkpoint_dir)
             if es.early_stop:
-                print("Stopping early.")
+                print('Stopping early.')
                 break
     """
 
@@ -101,14 +101,13 @@ class EarlyStopping:
                 self._save_checkpoint(val_loss, model, path)
             self.counter = 0
 
-    def _save_checkpoint(
-        self, val_loss: float, model: nn.Module, path: str
-    ) -> None:
+    def _save_checkpoint(self, val_loss: float, model: nn.Module, path: str) -> None:
         """Save model checkpoint."""
         if self.verbose:
             logger.ok(
                 'Validation loss decreased (%.6f -> %.6f). Saving model ...',
-                self.val_loss_min, val_loss,
+                self.val_loss_min,
+                val_loss,
             )
         os.makedirs(path, exist_ok=True)
         torch.save(model.state_dict(), os.path.join(path, self.checkpoint_name))

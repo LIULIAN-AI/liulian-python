@@ -13,7 +13,7 @@ Usage::
 
     from liulian.data.ts.channel_independent import ChannelIndependentDataset
 
-    base_split = dataset.get_split('train')   # TimeSeriesSplit
+    base_split = dataset.get_split('train')  # TimeSeriesSplit
     ci_split = ChannelIndependentDataset(base_split)
     # len(ci_split) == len(base_split) * n_features
     # ci_split[i] returns (feat, target, time) with feat.shape == (T, 1)
@@ -83,13 +83,11 @@ class ChannelIndependentDataset(Dataset):
         if isinstance(sample, (tuple, list)):
             feat, target, time = sample[0], sample[1], sample[2]
         else:
-            raise TypeError(
-                f'Expected (feat, target, time) tuple, got {type(sample)}'
-            )
+            raise TypeError(f'Expected (feat, target, time) tuple, got {type(sample)}')
 
         # Extract single feature channel
         if feat.ndim >= 2:
-            feat = feat[:, channel_idx: channel_idx + 1]
+            feat = feat[:, channel_idx : channel_idx + 1]
         else:
             feat = feat.unsqueeze(-1)
 
@@ -99,6 +97,6 @@ class ChannelIndependentDataset(Dataset):
             and target.ndim >= 2
             and target.shape[-1] == self.n_channels
         ):
-            target = target[:, channel_idx: channel_idx + 1]
+            target = target[:, channel_idx : channel_idx + 1]
 
         return feat, target, time

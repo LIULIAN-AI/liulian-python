@@ -26,9 +26,14 @@ _TSL_ADAPTERS: list[tuple[str, str, dict]] = [
     ('liulian.models.torch.itransformer', 'iTransformerAdapter', {}),
     ('liulian.models.torch.patchtst', 'PatchTSTAdapter', {}),
     ('liulian.models.torch.timesnet', 'TimesNetAdapter', {}),
-    ('liulian.models.torch.timemixer', 'TimeMixerAdapter', {
-        'down_sampling_layers': 1, 'down_sampling_window': 2,
-    }),
+    (
+        'liulian.models.torch.timemixer',
+        'TimeMixerAdapter',
+        {
+            'down_sampling_layers': 1,
+            'down_sampling_window': 2,
+        },
+    ),
     ('liulian.models.torch.timexer', 'TimeXerAdapter', {'c_out': 1}),
 ]
 
@@ -36,20 +41,20 @@ _TSL_ADAPTERS: list[tuple[str, str, dict]] = [
 _HAS_MAMBA = False
 try:
     import importlib
+
     _mamba_mod = importlib.import_module('mamba_ssm')
     _HAS_MAMBA = True
 except Exception:
     pass
 
 if _HAS_MAMBA:
-    _TSL_ADAPTERS.append(
-        ('liulian.models.torch.mamba_model', 'MambaAdapter', {})
-    )
+    _TSL_ADAPTERS.append(('liulian.models.torch.mamba_model', 'MambaAdapter', {}))
 
 
 def _get_adapter_cls(module_path: str, cls_name: str):
     """Import and return adapter class."""
     import importlib
+
     mod = importlib.import_module(module_path)
     return getattr(mod, cls_name)
 
@@ -98,7 +103,9 @@ def _forward_adapter(adapter, batch_size: int = 2) -> torch.Tensor:
     return out['predictions']
 
 
-def _forward_model_direct(model, cfg, adapter_cfg=None, batch_size: int = 2) -> torch.Tensor:
+def _forward_model_direct(
+    model, cfg, adapter_cfg=None, batch_size: int = 2
+) -> torch.Tensor:
     """Call model(x_enc, x_mark_enc, x_dec, x_mark_dec) directly (trainer path).
 
     For EntityWrapper models, the wrapper augments x_enc/x_dec internally,
@@ -156,7 +163,13 @@ class TestEntityAwareMixin:
         assert result['enc_in'] == 7
 
     def test_transparent_mode_returns_same_config(self):
-        for mode in ('onehot', 'coordinates', 'sinusoidal', 'descriptors', 'numeric_id'):
+        for mode in (
+            'onehot',
+            'coordinates',
+            'sinusoidal',
+            'descriptors',
+            'numeric_id',
+        ):
             cfg = {'enc_in': 7, 'identifier_mode': mode}
             result = EntityAwareMixin._entity_model_config(cfg)
             assert result is cfg
@@ -172,14 +185,16 @@ class TestEntityWrapper:
                 super().__init__()
                 self.proj = torch.nn.Linear(4, 3)  # enc_in=4
 
-            def forward(self, x_enc, x_mark_enc=None, x_dec=None,
-                        x_mark_dec=None, mask=None):
+            def forward(
+                self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None, mask=None
+            ):
                 return self.proj(x_enc)
 
         model = FakeModel()
         # Wrapper projects (4 + 10) → 4, then FakeModel projects 4 → 3
-        wrapper = EntityWrapper(model, enc_in=4, num_embeddings=10,
-                                embedding_size=10, entity_id_col=0)
+        wrapper = EntityWrapper(
+            model, enc_in=4, num_embeddings=10, embedding_size=10, entity_id_col=0
+        )
 
         B, T, C = 2, 8, 4
         x_enc = torch.randn(B, T, C)
@@ -193,12 +208,14 @@ class TestEntityWrapper:
         """Without x_mark_enc, wrapper should pass x_enc unchanged."""
 
         class Identity(torch.nn.Module):
-            def forward(self, x_enc, x_mark_enc=None, x_dec=None,
-                        x_mark_dec=None, mask=None):
+            def forward(
+                self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None, mask=None
+            ):
                 return x_enc
 
-        wrapper = EntityWrapper(Identity(), enc_in=3, num_embeddings=5,
-                                embedding_size=4)
+        wrapper = EntityWrapper(
+            Identity(), enc_in=3, num_embeddings=5, embedding_size=4
+        )
         x = torch.randn(2, 8, 3)
         out = wrapper(x)
         assert torch.equal(out, x)

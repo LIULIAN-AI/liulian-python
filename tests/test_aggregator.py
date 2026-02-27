@@ -67,8 +67,7 @@ class TestMean:
         trues = np.array([[[0.5], [0.6]], [[0.5], [0.7]]], dtype=np.float32)
         # Window 0: context=[0,1,2,3,4], predict=[5,6]
         # Window 1: context=[1,2,3,4,5], predict=[6,7]
-        times = np.array([[0, 1, 2, 3, 4, 5, 6],
-                          [1, 2, 3, 4, 5, 6, 7]])
+        times = np.array([[0, 1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6, 7]])
         result = aggregate_predictions(preds, trues, times, method='mean')
         # Unique prediction times: 5, 6, 7
         np.testing.assert_array_equal(result['time'], [5, 6, 7])
@@ -95,17 +94,22 @@ class TestMedian:
         # Window 0: pred_times=[6,7], preds=[10,11]
         # Window 1: pred_times=[7,8], preds=[20,21]
         # Window 2: pred_times=[8,9], preds=[30,31]
-        preds = np.array([
-            [[10.0], [11.0]],
-            [[20.0], [21.0]],
-            [[30.0], [31.0]],
-        ], dtype=np.float32)
+        preds = np.array(
+            [
+                [[10.0], [11.0]],
+                [[20.0], [21.0]],
+                [[30.0], [31.0]],
+            ],
+            dtype=np.float32,
+        )
         trues = np.ones((3, 2, 1), dtype=np.float32)
-        times = np.array([
-            [0, 1, 2, 3, 4, 5, 6, 7],
-            [1, 2, 3, 4, 5, 6, 7, 8],
-            [2, 3, 4, 5, 6, 7, 8, 9],
-        ])
+        times = np.array(
+            [
+                [0, 1, 2, 3, 4, 5, 6, 7],
+                [1, 2, 3, 4, 5, 6, 7, 8],
+                [2, 3, 4, 5, 6, 7, 8, 9],
+            ]
+        )
         result = aggregate_predictions(preds, trues, times, method='median')
         # t=7: w0 pred=11, w1 pred=20 → median of [11,20] = 15.5
         idx_t7 = np.where(result['time'] == 7)[0][0]
@@ -131,11 +135,8 @@ class TestLongestHistory:
         # t=6 appears in window 0 (first) and window 1 (second)
         preds = np.array([[[1.0], [2.0]], [[3.0], [4.0]]], dtype=np.float32)
         trues = np.ones((2, 2, 1), dtype=np.float32)
-        times = np.array([[0, 1, 2, 3, 4, 5, 6],
-                          [1, 2, 3, 4, 5, 6, 7]])
-        result = aggregate_predictions(
-            preds, trues, times, method='longest_history'
-        )
+        times = np.array([[0, 1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6, 7]])
+        result = aggregate_predictions(preds, trues, times, method='longest_history')
         idx_t6 = np.where(result['time'] == 6)[0][0]
         # Window 0 predicts 2.0 at t=6 — should be kept
         assert result['pred'][idx_t6, 0] == pytest.approx(2.0)
@@ -150,8 +151,7 @@ class TestLast:
     def test_keeps_last(self):
         preds = np.array([[[1.0], [2.0]], [[3.0], [4.0]]], dtype=np.float32)
         trues = np.ones((2, 2, 1), dtype=np.float32)
-        times = np.array([[0, 1, 2, 3, 4, 5, 6],
-                          [1, 2, 3, 4, 5, 6, 7]])
+        times = np.array([[0, 1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6, 7]])
         result = aggregate_predictions(preds, trues, times, method='last')
         idx_t6 = np.where(result['time'] == 6)[0][0]
         # Window 1 predicts 3.0 at t=6 — should be kept
@@ -168,8 +168,7 @@ class TestBest:
         # t=6: window 0 pred=2.0, window 1 pred=3.0, true=2.1 → best=2.0
         preds = np.array([[[1.0], [2.0]], [[3.0], [4.0]]], dtype=np.float32)
         trues = np.array([[[0.0], [2.1]], [[0.0], [2.1]]], dtype=np.float32)
-        times = np.array([[0, 1, 2, 3, 4, 5, 6],
-                          [1, 2, 3, 4, 5, 6, 7]])
+        times = np.array([[0, 1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6, 7]])
         result = aggregate_predictions(preds, trues, times, method='best')
         idx_t6 = np.where(result['time'] == 6)[0][0]
         # Window 0 pred 2.0 has error |2.0 - 2.1| = 0.1
@@ -186,8 +185,7 @@ class TestWorst:
     def test_picks_farthest(self):
         preds = np.array([[[1.0], [2.0]], [[3.0], [4.0]]], dtype=np.float32)
         trues = np.array([[[0.0], [2.1]], [[0.0], [2.1]]], dtype=np.float32)
-        times = np.array([[0, 1, 2, 3, 4, 5, 6],
-                          [1, 2, 3, 4, 5, 6, 7]])
+        times = np.array([[0, 1, 2, 3, 4, 5, 6], [1, 2, 3, 4, 5, 6, 7]])
         result = aggregate_predictions(preds, trues, times, method='worst')
         idx_t6 = np.where(result['time'] == 6)[0][0]
         # Window 1 pred 3.0 has larger error → should be picked
@@ -208,24 +206,30 @@ class TestSingle:
         # so we should see only windows 0 and 3 (indices 0, 3)
         # Window 0 pred_times = [5,6,7], Window 3 pred_times = [8,9,10]
         unique_times = result['time']
-        assert len(unique_times) == len(np.unique(unique_times)), \
+        assert len(unique_times) == len(np.unique(unique_times)), (
             'single method should produce unique timesteps'
+        )
 
     def test_values_from_correct_window(self):
         """Values should come from the selected (strided) windows."""
-        preds = np.array([
-            [[10.0], [11.0]],
-            [[20.0], [21.0]],
-            [[30.0], [31.0]],
-            [[40.0], [41.0]],
-        ], dtype=np.float32)
+        preds = np.array(
+            [
+                [[10.0], [11.0]],
+                [[20.0], [21.0]],
+                [[30.0], [31.0]],
+                [[40.0], [41.0]],
+            ],
+            dtype=np.float32,
+        )
         trues = np.ones((4, 2, 1), dtype=np.float32)
-        times = np.array([
-            [0, 1, 2, 3],
-            [1, 2, 3, 4],
-            [2, 3, 4, 5],
-            [3, 4, 5, 6],
-        ])
+        times = np.array(
+            [
+                [0, 1, 2, 3],
+                [1, 2, 3, 4],
+                [2, 3, 4, 5],
+                [3, 4, 5, 6],
+            ]
+        )
         result = aggregate_predictions(preds, trues, times, method='single')
         # pred_len=2, stride=2 → select windows 0 and 2
         # Window 0 pred: [10, 11], Window 2 pred: [30, 31]
@@ -285,7 +289,16 @@ def test_pred_len_override():
 def test_output_is_chronological():
     """Returned time axis should be sorted."""
     preds, trues, times = _make_windows()
-    for method in ('mean', 'median', 'last', 'longest_history', 'best', 'worst', 'single'):
+    for method in (
+        'mean',
+        'median',
+        'last',
+        'longest_history',
+        'best',
+        'worst',
+        'single',
+    ):
         result = aggregate_predictions(preds, trues, times, method=method)
-        assert np.all(np.diff(result['time']) >= 0), \
+        assert np.all(np.diff(result['time']) >= 0), (
             f'method={method!r}: time not sorted'
+        )

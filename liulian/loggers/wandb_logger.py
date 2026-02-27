@@ -30,7 +30,7 @@ class WandbLogger(LoggerInterface):
         project: str,
         entity: Optional[str] = None,
         config: Optional[Dict[str, Any]] = None,
-        run_dir: str = "artifacts/logs",
+        run_dir: str = 'artifacts/logs',
     ) -> None:
         """Initialise WandB run, or fall back to local logging.
 
@@ -75,7 +75,7 @@ class WandbLogger(LoggerInterface):
             assert self._fallback is not None
             self._fallback.log_metrics(step, metrics)
             return
-        self._wandb.log({**metrics, "step": step})
+        self._wandb.log({**metrics, 'step': step})
 
     def log_artifact(
         self, path: str, metadata: Optional[Dict[str, Any]] = None
@@ -92,7 +92,7 @@ class WandbLogger(LoggerInterface):
             return
 
         artifact_name = os.path.splitext(os.path.basename(path))[0]
-        artifact = self._wandb.Artifact(name=artifact_name, type="checkpoint")
+        artifact = self._wandb.Artifact(name=artifact_name, type='checkpoint')
         artifact.add_file(path)
         if metadata:
             artifact.metadata = metadata

@@ -25,7 +25,11 @@ class TestCliParsing:
     def test_no_subcommand_prints_help(self, capsys):
         main([])
         captured = capsys.readouterr()
-        assert 'usage' in captured.out.lower() or 'subcommand' in captured.out.lower() or 'liulian' in captured.out.lower()
+        assert (
+            'usage' in captured.out.lower()
+            or 'subcommand' in captured.out.lower()
+            or 'liulian' in captured.out.lower()
+        )
 
     # --- Validate that each subcommand accepts its expected positional args ---
     # (We do NOT actually run them — just ensure the parser doesn't error.)
@@ -33,6 +37,7 @@ class TestCliParsing:
     def test_train_parser_accepts_config(self):
         """``liulian train`` parser should accept config + optional overrides."""
         from liulian.cli import main as _m
+
         # Build the parser manually to inspect
         parser = argparse.ArgumentParser()
         sub = parser.add_subparsers(dest='command')
@@ -41,7 +46,9 @@ class TestCliParsing:
         sp.add_argument('--epochs', type=int)
         sp.add_argument('--lr', type=float)
         sp.add_argument('--wandb-project')
-        args = parser.parse_args(['train', 'exp.yaml', '--epochs', '5', '--lr', '0.001'])
+        args = parser.parse_args(
+            ['train', 'exp.yaml', '--epochs', '5', '--lr', '0.001']
+        )
         assert args.config == 'exp.yaml'
         assert args.epochs == 5
         assert args.lr == pytest.approx(0.001)
@@ -77,7 +84,9 @@ class TestCliSubcommandsMissing:
     the file doesn't exist.
     """
 
-    @pytest.mark.parametrize('subcmd', ['run', 'eval', 'train', 'predict', 'viz', 'hparam'])
+    @pytest.mark.parametrize(
+        'subcmd', ['run', 'eval', 'train', 'predict', 'viz', 'hparam']
+    )
     def test_missing_config_exits(self, subcmd):
         with pytest.raises(SystemExit):
             main([subcmd, '/nonexistent/__fake__.yaml'])

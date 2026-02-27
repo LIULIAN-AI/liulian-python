@@ -12,9 +12,11 @@ import pytest
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _force_mode(mode):
     """Context-manager-like helper: set mode, rebuild, yield, restore."""
     from liulian.utils.log_tags import set_output_mode, get_output_mode, _rebuild_tags
+
     original = get_output_mode()
     set_output_mode(mode)
     return original
@@ -22,6 +24,7 @@ def _force_mode(mode):
 
 def _restore_mode(original):
     from liulian.utils.log_tags import set_output_mode
+
     set_output_mode(original)
 
 
@@ -29,20 +32,35 @@ def _restore_mode(original):
 # Basic tag strings
 # ---------------------------------------------------------------------------
 
+
 class TestTagStrings:
     """Verify the pre-built tag constants."""
 
     def test_tags_are_non_empty(self) -> None:
         from liulian.utils.log_tags import (
-            INFO_TAG, SUCCESS_TAG, WARNING_TAG, ERROR_TAG, DEBUG_TAG,
-            HINT_TAG, PROGRESS_TAG,
+            INFO_TAG,
+            SUCCESS_TAG,
+            WARNING_TAG,
+            ERROR_TAG,
+            DEBUG_TAG,
+            HINT_TAG,
+            PROGRESS_TAG,
         )
-        for tag in (INFO_TAG, SUCCESS_TAG, WARNING_TAG, ERROR_TAG,
-                     DEBUG_TAG, HINT_TAG, PROGRESS_TAG):
+
+        for tag in (
+            INFO_TAG,
+            SUCCESS_TAG,
+            WARNING_TAG,
+            ERROR_TAG,
+            DEBUG_TAG,
+            HINT_TAG,
+            PROGRESS_TAG,
+        ):
             assert isinstance(tag, str) and len(tag) > 0
 
     def test_tag_labels_plain(self) -> None:
         from liulian.utils.log_tags import strip_ansi, INFO_TAG, SUCCESS_TAG
+
         assert '[info]' in strip_ansi(INFO_TAG)
         assert '[ok]' in strip_ansi(SUCCESS_TAG)
 
@@ -51,12 +69,17 @@ class TestTagStrings:
 # Output modes
 # ---------------------------------------------------------------------------
 
+
 class TestOutputModes:
     def test_set_and_get(self) -> None:
         from liulian.utils.log_tags import (
-            set_output_mode, get_output_mode,
-            MODE_ANSI, MODE_PLAIN, MODE_HTML,
+            set_output_mode,
+            get_output_mode,
+            MODE_ANSI,
+            MODE_PLAIN,
+            MODE_HTML,
         )
+
         original = get_output_mode()
         try:
             for m in (MODE_ANSI, MODE_PLAIN, MODE_HTML):
@@ -67,14 +90,19 @@ class TestOutputModes:
 
     def test_invalid_mode_raises(self) -> None:
         from liulian.utils.log_tags import set_output_mode
+
         with pytest.raises(ValueError, match='mode must be'):
             set_output_mode('invalid')
 
     def test_backward_compat(self) -> None:
         from liulian.utils.log_tags import (
-            set_colour_enabled, colour_enabled, get_output_mode,
-            MODE_ANSI, MODE_PLAIN,
+            set_colour_enabled,
+            colour_enabled,
+            get_output_mode,
+            MODE_ANSI,
+            MODE_PLAIN,
         )
+
         original = get_output_mode()
         try:
             set_colour_enabled(True)
@@ -85,11 +113,13 @@ class TestOutputModes:
             assert get_output_mode() == MODE_PLAIN
         finally:
             from liulian.utils.log_tags import set_output_mode
+
             set_output_mode(original)
 
     def test_pycharm_detection(self, monkeypatch) -> None:
         """PYCHARM_HOSTED env var triggers ANSI mode even without isatty."""
         from liulian.utils.log_tags import _detect_mode, MODE_ANSI
+
         monkeypatch.setenv('PYCHARM_HOSTED', '1')
         monkeypatch.delenv('LIULIAN_LOG_HTML', raising=False)
         monkeypatch.delenv('NO_COLOR', raising=False)
@@ -100,6 +130,7 @@ class TestOutputModes:
     def test_vscode_detection(self, monkeypatch) -> None:
         """TERM_PROGRAM=vscode triggers ANSI mode even without isatty."""
         from liulian.utils.log_tags import _detect_mode, MODE_ANSI
+
         monkeypatch.setenv('TERM_PROGRAM', 'vscode')
         monkeypatch.delenv('LIULIAN_LOG_HTML', raising=False)
         monkeypatch.delenv('NO_COLOR', raising=False)
@@ -113,11 +144,13 @@ class TestOutputModes:
 # ANSI mode: coloured tag, plain message
 # ---------------------------------------------------------------------------
 
+
 class TestAnsiMode:
     def test_info_tag_colour_then_reset(self) -> None:
         orig = _force_mode('ansi')
         try:
             from liulian.utils.log_tags import INFO_TAG, _RESET
+
             # Tag must contain ANSI colour and end with reset before message
             assert '\033[' in INFO_TAG
             assert _RESET in INFO_TAG
@@ -130,6 +163,7 @@ class TestAnsiMode:
         orig = _force_mode('ansi')
         try:
             from liulian.utils.log_tags import ERROR_TAG
+
             assert '[ERROR]' in ERROR_TAG
         finally:
             _restore_mode(orig)
@@ -139,11 +173,13 @@ class TestAnsiMode:
 # Plain mode
 # ---------------------------------------------------------------------------
 
+
 class TestPlainMode:
     def test_no_ansi_codes(self) -> None:
         orig = _force_mode('plain')
         try:
             from liulian.utils.log_tags import INFO_TAG, ERROR_TAG
+
             assert '\033[' not in INFO_TAG
             assert '\033[' not in ERROR_TAG
             assert INFO_TAG == '[info] '
@@ -156,11 +192,13 @@ class TestPlainMode:
 # HTML mode
 # ---------------------------------------------------------------------------
 
+
 class TestHtmlMode:
     def test_html_info_tag(self) -> None:
         orig = _force_mode('html')
         try:
             from liulian.utils.log_tags import INFO_TAG
+
             assert '<span' in INFO_TAG
             assert '[info]' in INFO_TAG
             assert '</span>' in INFO_TAG
@@ -171,6 +209,7 @@ class TestHtmlMode:
         orig = _force_mode('html')
         try:
             from liulian.utils.log_tags import _error_format
+
             result = _error_format('ERROR', 'crash')
             assert '<span' in result
             assert 'background-color' in result
@@ -185,11 +224,13 @@ class TestHtmlMode:
 # Error line styling (ANSI)
 # ---------------------------------------------------------------------------
 
+
 class TestErrorFormat:
     def test_ansi_error_full_line(self) -> None:
         orig = _force_mode('ansi')
         try:
             from liulian.utils.log_tags import _error_format, _BG_DARK_RED, _RESET
+
             result = _error_format('ERROR', 'disk full')
             assert _BG_DARK_RED in result
             assert '[ERROR]' in result
@@ -202,6 +243,7 @@ class TestErrorFormat:
         orig = _force_mode('plain')
         try:
             from liulian.utils.log_tags import _error_format
+
             result = _error_format('ERROR', 'disk full')
             assert result == '[ERROR] disk full'
         finally:
@@ -212,14 +254,17 @@ class TestErrorFormat:
 # Convenience printers
 # ---------------------------------------------------------------------------
 
+
 class TestConveniencePrinters:
     def test_info_prints_to_stdout(self, capsys) -> None:
         from liulian.utils.log_tags import info
+
         info('hello')
         assert 'hello' in capsys.readouterr().out
 
     def test_error_prints_to_stderr(self, capsys) -> None:
         from liulian.utils.log_tags import error
+
         error('fail')
         captured = capsys.readouterr().err
         assert 'fail' in captured
@@ -230,22 +275,27 @@ class TestConveniencePrinters:
 # strip_ansi / strip_html_tags / strip_formatting
 # ---------------------------------------------------------------------------
 
+
 class TestStripUtilities:
     def test_strip_ansi_plain(self) -> None:
         from liulian.utils.log_tags import strip_ansi
+
         assert strip_ansi('[info] hello') == '[info] hello'
 
     def test_strip_ansi_codes(self) -> None:
         from liulian.utils.log_tags import strip_ansi
+
         assert strip_ansi('\033[94m[info]\033[0m hello') == '[info] hello'
 
     def test_strip_html(self) -> None:
         from liulian.utils.log_tags import strip_html_tags
+
         html = '<span style="color:red">[ERROR]</span> msg'
         assert strip_html_tags(html) == '[ERROR] msg'
 
     def test_strip_formatting_both(self) -> None:
         from liulian.utils.log_tags import strip_formatting
+
         mixed = '\033[91m<span>[x]</span>\033[0m'
         assert strip_formatting(mixed) == '[x]'
 
@@ -254,23 +304,28 @@ class TestStripUtilities:
 # _msg_has_tag detection
 # ---------------------------------------------------------------------------
 
+
 class TestMsgHasTag:
     def test_plain_tag(self) -> None:
         from liulian.utils.log_tags import _msg_has_tag
+
         assert _msg_has_tag('[info] something')
         assert _msg_has_tag('[ok] done')
         assert _msg_has_tag('[ERROR] oops')
 
     def test_ansi_tag(self) -> None:
         from liulian.utils.log_tags import _msg_has_tag
+
         assert _msg_has_tag('\033[94m\033[1m[info]\033[0m something')
 
     def test_html_tag(self) -> None:
         from liulian.utils.log_tags import _msg_has_tag
+
         assert _msg_has_tag('<span style="color:red">[ERROR]</span> oops')
 
     def test_no_tag(self) -> None:
         from liulian.utils.log_tags import _msg_has_tag
+
         assert not _msg_has_tag('plain text')
         assert not _msg_has_tag('[custom] tag')
 
@@ -278,6 +333,7 @@ class TestMsgHasTag:
 # ---------------------------------------------------------------------------
 # TaggedFormatter
 # ---------------------------------------------------------------------------
+
 
 class TestTaggedFormatter:
     """Test the logging.Formatter subclass."""
@@ -291,6 +347,7 @@ class TestTaggedFormatter:
 
     def _make_logger(self, stream, *, auto_tag=True):
         from liulian.utils.log_tags import TaggedFormatter
+
         lgr = logging.getLogger(f'_test_{id(stream)}')
         lgr.handlers.clear()
         lgr.setLevel(logging.DEBUG)
@@ -330,6 +387,7 @@ class TestTaggedFormatter:
         _restore_mode('ansi')  # switch to ansi for this test
         try:
             from liulian.utils.log_tags import _BG_DARK_RED
+
             buf = io.StringIO()
             lgr = self._make_logger(buf)
             lgr.error('crash')
@@ -342,6 +400,7 @@ class TestTaggedFormatter:
     def test_explicit_tag_skips_auto(self) -> None:
         """If message already has a tag, auto-tag is skipped."""
         from liulian.utils.log_tags import SUCCESS_TAG
+
         buf = io.StringIO()
         lgr = self._make_logger(buf)
         lgr.info(f'{SUCCESS_TAG}done!')
@@ -383,6 +442,7 @@ class TestTaggedFormatter:
     def test_ok_level_between_info_and_warning(self) -> None:
         """OK_LEVEL (25) is between INFO (20) and WARNING (30)."""
         from liulian.utils.log_tags import OK_LEVEL, HINT_LEVEL, PROGRESS_LEVEL
+
         assert logging.INFO < HINT_LEVEL < PROGRESS_LEVEL < OK_LEVEL < logging.WARNING
 
     def test_ok_not_emitted_at_warning_level(self) -> None:
@@ -405,6 +465,7 @@ class TestTaggedFormatter:
         _restore_mode('ansi')
         try:
             from liulian.utils.log_tags import _GREEN
+
             buf = io.StringIO()
             lgr = self._make_logger(buf)
             lgr.ok('done')
@@ -419,9 +480,11 @@ class TestTaggedFormatter:
 # setup_logging
 # ---------------------------------------------------------------------------
 
+
 class TestSetupLogging:
     def test_returns_logger(self) -> None:
         from liulian.utils.log_tags import setup_logging
+
         lgr = setup_logging('_test_setup', stream=io.StringIO())
         assert isinstance(lgr, logging.Logger)
         assert lgr.name == '_test_setup'
@@ -429,39 +492,40 @@ class TestSetupLogging:
 
     def test_root_logger(self) -> None:
         from liulian.utils.log_tags import setup_logging, TaggedFormatter
+
         root = setup_logging(stream=io.StringIO())
         assert root.name == 'root'
-        assert any(isinstance(h.formatter, TaggedFormatter)
-                    for h in root.handlers)
+        assert any(isinstance(h.formatter, TaggedFormatter) for h in root.handlers)
         # Cleanup: remove our handler
         root.handlers[:] = [
-            h for h in root.handlers
-            if not isinstance(h.formatter, TaggedFormatter)
+            h for h in root.handlers if not isinstance(h.formatter, TaggedFormatter)
         ]
 
     def test_no_duplicate_handlers(self) -> None:
         from liulian.utils.log_tags import setup_logging, TaggedFormatter
+
         buf = io.StringIO()
         lgr = setup_logging('_test_dup', stream=buf)
-        n1 = sum(1 for h in lgr.handlers
-                 if isinstance(h.formatter, TaggedFormatter))
+        n1 = sum(1 for h in lgr.handlers if isinstance(h.formatter, TaggedFormatter))
         setup_logging('_test_dup', stream=buf)  # second call
-        n2 = sum(1 for h in lgr.handlers
-                 if isinstance(h.formatter, TaggedFormatter))
+        n2 = sum(1 for h in lgr.handlers if isinstance(h.formatter, TaggedFormatter))
         assert n1 == n2 == 1
         lgr.handlers.clear()
 
     def test_mode_switch(self) -> None:
         from liulian.utils.log_tags import (
-            setup_logging, get_output_mode, MODE_HTML,
+            setup_logging,
+            get_output_mode,
+            MODE_HTML,
         )
+
         orig = get_output_mode()
         try:
-            setup_logging('_test_mode', stream=io.StringIO(),
-                          mode=MODE_HTML)
+            setup_logging('_test_mode', stream=io.StringIO(), mode=MODE_HTML)
             assert get_output_mode() == MODE_HTML
         finally:
             from liulian.utils.log_tags import set_output_mode
+
             set_output_mode(orig)
             lgr = logging.getLogger('_test_mode')
             lgr.handlers.clear()
@@ -471,12 +535,15 @@ class TestSetupLogging:
 # redirect_ray_loggers
 # ---------------------------------------------------------------------------
 
+
 class TestRedirectRayLoggers:
     def test_redirects_stream(self) -> None:
         """redirect_ray_loggers switches handler streams to stdout."""
         from liulian.utils.log_tags import redirect_ray_loggers
+
         # Create a fake 'ray' logger with a stderr handler
         import sys
+
         rl = logging.getLogger('ray._test_redirect')
         rl.handlers.clear()
         h = logging.StreamHandler(sys.stderr)
@@ -491,9 +558,11 @@ class TestRedirectRayLoggers:
 # Custom level registration
 # ---------------------------------------------------------------------------
 
+
 class TestCustomLevels:
     def test_level_names_registered(self) -> None:
         from liulian.utils.log_tags import OK_LEVEL, HINT_LEVEL, PROGRESS_LEVEL
+
         assert logging.getLevelName(OK_LEVEL) == 'OK'
         assert logging.getLevelName(HINT_LEVEL) == 'HINT'
         assert logging.getLevelName(PROGRESS_LEVEL) == 'PROGRESS'

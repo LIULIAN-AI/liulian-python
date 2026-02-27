@@ -95,7 +95,8 @@ class SpatialTempoDataset(TimeSeriesDataset):
                 dst_list.append(id_to_idx[d])
         if src_list:
             self._edge_index = self.B.asarray(
-                [src_list, dst_list], dtype='int64',
+                [src_list, dst_list],
+                dtype='int64',
             )
         else:
             self._edge_index = self.B.empty((2, 0), dtype='int64')
@@ -133,9 +134,7 @@ class SpatialTempoDataset(TimeSeriesDataset):
             return None
         coords = []
         for nid in self.topology.node_ids:
-            coords.append(
-                list(self.topology.coordinates.get(nid, (0.0, 0.0)))
-            )
+            coords.append(list(self.topology.coordinates.get(nid, (0.0, 0.0))))
         return self.B.asarray(coords, dtype='float32')
 
     # ------------------------------------------------------------------

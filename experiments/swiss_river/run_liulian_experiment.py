@@ -50,9 +50,7 @@ from tqdm import tqdm
 # ---------------------------------------------------------------------------
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.abspath(os.path.join(SCRIPT_DIR, '..', '..'))
-TIMELLM_ROOT = os.path.join(
-    PROJECT_ROOT, 'refer_projects', 'Time-LLM_20260209_154911'
-)
+TIMELLM_ROOT = os.path.join(PROJECT_ROOT, 'refer_projects', 'Time-LLM_20260209_154911')
 
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
@@ -68,6 +66,7 @@ from liulian.loggers.local_logger import LocalFileLogger
 from liulian.models.torch.training_utils import EarlyStopping
 
 from liulian.utils.log_tags import setup_logging as _setup_logging
+
 _setup_logging(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -86,14 +85,17 @@ def build_model(model_name: str, config: Dict[str, Any]) -> nn.Module:
         PyTorch nn.Module ready for training.
     """
     from types import SimpleNamespace
+
     cfg = SimpleNamespace(**config)
 
     if model_name == 'lstm':
         from liulian.models.torch.lstm import Model as LSTMModel
+
         return LSTMModel(cfg).float()
 
     elif model_name == 'timellm':
         from liulian.models.torch.timellm import Model as TimeLLMModel
+
         # Load prompt content
         prompt_map = {
             'swiss-river-1990': 'wt-swiss-1990',
@@ -135,9 +137,7 @@ class SwissRiverTrainer:
     def __init__(self, model_name: str, config: Dict[str, Any]) -> None:
         self.model_name = model_name
         self.config = config
-        self.device = torch.device(
-            'cuda' if torch.cuda.is_available() else 'cpu'
-        )
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     def run(self, train: bool = True, eval_only: bool = False) -> Dict[str, Any]:
         """Execute the training/evaluation pipeline.
@@ -170,18 +170,36 @@ class SwissRiverTrainer:
 
         spec = ExperimentSpec(
             name=f'swiss_river_{self.model_name}',
-            task={'type': 'PredictionTask', 'pred_len': cfg['pred_len'],
-                  'seq_len': cfg['seq_len']},
+            task={
+                'type': 'PredictionTask',
+                'pred_len': cfg['pred_len'],
+                'seq_len': cfg['seq_len'],
+            },
             dataset={'type': 'SwissRiverDataset', 'data': cfg.get('data')},
-            model={'type': self.model_name, **{k: v for k, v in cfg.items()
-                    if k in ('d_model', 'e_layers', 'd_ff', 'n_heads',
-                             'llm_model', 'llm_dim')}},
+            model={
+                'type': self.model_name,
+                **{
+                    k: v
+                    for k, v in cfg.items()
+                    if k
+                    in (
+                        'd_model',
+                        'e_layers',
+                        'd_ff',
+                        'n_heads',
+                        'llm_model',
+                        'llm_dim',
+                    )
+                },
+            },
             metadata={'seed': cfg.get('seed', 2026), 'device': str(self.device)},
         )
 
         artifacts_dir = os.path.join(
-            PROJECT_ROOT, 'artifacts', 'experiments',
-            f"{spec.name}_{time.strftime('%Y%m%d_%H%M%S')}"
+            PROJECT_ROOT,
+            'artifacts',
+            'experiments',
+            f'{spec.name}_{time.strftime("%Y%m%d_%H%M%S")}',
         )
         os.makedirs(artifacts_dir, exist_ok=True)
         spec.to_yaml(os.path.join(artifacts_dir, 'spec.yaml'))
@@ -192,6 +210,7 @@ class SwissRiverTrainer:
         # Use Time-LLM data_provider for proper Swiss River handling
         os.chdir(TIMELLM_ROOT)
         from data_provider.data_factory import data_provider
+
         args = dataset._build_args()
         # Override batch_size from config
         args.batch_size = cfg.get('batch_size', 8)
@@ -205,7 +224,9 @@ class SwissRiverTrainer:
 
         logger.info(
             'Data loaded: train=%d, val=%d, test=%d',
-            len(train_data), len(val_data), len(test_data),
+            len(train_data),
+            len(val_data),
+            len(test_data),
         )
 
         # --- Model ---
@@ -213,12 +234,12 @@ class SwissRiverTrainer:
         model = model.to(self.device)
 
         total_params = sum(p.numel() for p in model.parameters())
-        trainable_params = sum(
-            p.numel() for p in model.parameters() if p.requires_grad
-        )
+        trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
         logger.info(
             'Model: %s | Params: %s total, %s trainable (%.1f%%)',
-            self.model_name, f'{total_params:,}', f'{trainable_params:,}',
+            self.model_name,
+            f'{total_params:,}',
+            f'{trainable_params:,}',
             100 * trainable_params / max(total_params, 1),
         )
 
@@ -236,9 +257,7 @@ class SwissRiverTrainer:
         if eval_only:
             ckpt_path = os.path.join(ckpt_dir, 'checkpoint')
             if os.path.exists(ckpt_path):
-                model.load_state_dict(
-                    torch.load(ckpt_path, map_location=self.device)
-                )
+                model.load_state_dict(torch.load(ckpt_path, map_location=self.device))
                 logger.ok('Loaded checkpoint: %s', ckpt_path)
             else:
                 logger.warning('No checkpoint found, using random init.')
@@ -252,9 +271,7 @@ class SwissRiverTrainer:
 
         # --- Training ---
         trained_params = [p for p in model.parameters() if p.requires_grad]
-        model_optim = optim.Adam(
-            trained_params, lr=cfg.get('learning_rate', 0.001)
-        )
+        model_optim = optim.Adam(trained_params, lr=cfg.get('learning_rate', 0.001))
 
         train_epochs = cfg.get('train_epochs', 30)
         train_steps = len(train_loader)
@@ -274,9 +291,7 @@ class SwissRiverTrainer:
 
         criterion = nn.MSELoss()
         mae_metric = nn.L1Loss()
-        early_stopping = EarlyStopping(
-            patience=cfg.get('patience', 10), verbose=True
-        )
+        early_stopping = EarlyStopping(patience=cfg.get('patience', 10), verbose=True)
 
         # Training loop
         for epoch in range(train_epochs):
@@ -304,12 +319,14 @@ class SwissRiverTrainer:
                 # Decoder input
                 label_len = cfg.get('label_len', 0)
                 pred_len = cfg['pred_len']
-                dec_inp = torch.zeros_like(
-                    batch_y[:, -pred_len:, :]
-                ).float().to(self.device)
-                dec_inp = torch.cat(
-                    [batch_y[:, :label_len, :], dec_inp], dim=1
-                ).float().to(self.device)
+                dec_inp = (
+                    torch.zeros_like(batch_y[:, -pred_len:, :]).float().to(self.device)
+                )
+                dec_inp = (
+                    torch.cat([batch_y[:, :label_len, :], dec_inp], dim=1)
+                    .float()
+                    .to(self.device)
+                )
 
                 # Forward
                 outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
@@ -353,8 +370,12 @@ class SwissRiverTrainer:
             logger.info(
                 'Epoch %d (%.1fs) | Train: %.6f | Val MSE: %.6f | '
                 'Test MSE: %.6f MAE: %.6f',
-                epoch + 1, epoch_cost, train_loss,
-                val_metrics['mse'], test_metrics['mse'], test_metrics['mae'],
+                epoch + 1,
+                epoch_cost,
+                train_loss,
+                val_metrics['mse'],
+                test_metrics['mse'],
+                test_metrics['mae'],
             )
 
             early_stopping(val_metrics['mse'], model, ckpt_dir)
@@ -368,16 +389,17 @@ class SwissRiverTrainer:
         # Load best and final eval
         best_ckpt = os.path.join(ckpt_dir, 'checkpoint')
         if os.path.exists(best_ckpt):
-            model.load_state_dict(
-                torch.load(best_ckpt, map_location=self.device)
-            )
+            model.load_state_dict(torch.load(best_ckpt, map_location=self.device))
 
         final_test = self._evaluate(model, test_loader, cfg)
         summary['metrics']['final_test'] = final_test
         exp_logger.log_metrics(step=train_epochs + 1, metrics=final_test)
 
-        logger.ok('=== Final Test: MSE=%.6f  MAE=%.6f ===',
-                  final_test['mse'], final_test['mae'])
+        logger.ok(
+            '=== Final Test: MSE=%.6f  MAE=%.6f ===',
+            final_test['mse'],
+            final_test['mae'],
+        )
 
         # Use liulian task to compute metrics on a sample
         try:
@@ -390,8 +412,10 @@ class SwissRiverTrainer:
             model.eval()
             with torch.no_grad():
                 dec = torch.zeros(
-                    x_tensor.size(0), cfg['pred_len'],
-                    x_tensor.size(2), device=self.device
+                    x_tensor.size(0),
+                    cfg['pred_len'],
+                    x_tensor.size(2),
+                    device=self.device,
                 )
                 mark = torch.zeros(
                     x_tensor.size(0), cfg['seq_len'], 1, device=self.device
@@ -402,7 +426,7 @@ class SwissRiverTrainer:
                 pred = model(x_tensor, mark, dec, mark_dec)
                 if isinstance(pred, tuple):
                     pred = pred[0]
-                pred = pred[:, -cfg['pred_len']:, :]
+                pred = pred[:, -cfg['pred_len'] :, :]
 
             model_output = {'predictions': pred.cpu().numpy()}
             task_metrics = task.compute_metrics(model_output, batch)
@@ -431,7 +455,9 @@ class SwissRiverTrainer:
         max_iters = cfg.get('max_eval_iters')
 
         with torch.no_grad():
-            for idx, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(loader):
+            for idx, (batch_x, batch_y, batch_x_mark, batch_y_mark) in enumerate(
+                loader
+            ):
                 if max_iters is not None and idx >= max_iters:
                     break
                 batch_x = batch_x.float().to(self.device)
@@ -441,12 +467,12 @@ class SwissRiverTrainer:
 
                 label_len = cfg.get('label_len', 0)
                 pred_len = cfg['pred_len']
-                dec_inp = torch.zeros_like(
-                    batch_y[:, -pred_len:, :]
-                ).float()
-                dec_inp = torch.cat(
-                    [batch_y[:, :label_len, :], dec_inp], dim=1
-                ).float().to(self.device)
+                dec_inp = torch.zeros_like(batch_y[:, -pred_len:, :]).float()
+                dec_inp = (
+                    torch.cat([batch_y[:, :label_len, :], dec_inp], dim=1)
+                    .float()
+                    .to(self.device)
+                )
 
                 outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
                 if isinstance(outputs, tuple):
@@ -473,13 +499,21 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         description='Swiss River experiment (liulian framework)'
     )
-    p.add_argument('--model', type=str, default='lstm',
-                    choices=['lstm', 'timellm'],
-                    help='Model to use (default: lstm)')
-    p.add_argument('--quick_test', action='store_true',
-                    help='Quick test: 2 epochs, max_samples=500')
-    p.add_argument('--eval_only', action='store_true',
-                    help='Evaluate from checkpoint only')
+    p.add_argument(
+        '--model',
+        type=str,
+        default='lstm',
+        choices=['lstm', 'timellm'],
+        help='Model to use (default: lstm)',
+    )
+    p.add_argument(
+        '--quick_test',
+        action='store_true',
+        help='Quick test: 2 epochs, max_samples=500',
+    )
+    p.add_argument(
+        '--eval_only', action='store_true', help='Evaluate from checkpoint only'
+    )
     p.add_argument('--seed', type=int, default=2026)
 
     # Data
@@ -552,15 +586,15 @@ def main():
     trainer = SwissRiverTrainer(model_name=args.model, config=config)
     summary = trainer.run(train=not args.eval_only, eval_only=args.eval_only)
 
-    print(f"\n{'='*60}")
+    print(f'\n{"=" * 60}')
     print(f'Experiment complete: {args.model}')
-    print(f"Artifacts: {summary.get('artifacts_dir', 'N/A')}")
+    print(f'Artifacts: {summary.get("artifacts_dir", "N/A")}')
     for metric_group, metrics in summary.get('metrics', {}).items():
         if isinstance(metrics, dict):
             print(f'  {metric_group}: {metrics}')
         else:
             print(f'  {metric_group}: {metrics}')
-    print(f"{'='*60}")
+    print(f'{"=" * 60}')
 
 
 if __name__ == '__main__':

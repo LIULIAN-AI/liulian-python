@@ -10,7 +10,7 @@ full training loop (gradient optimisation, LR scheduling, early stopping,
 checkpoint management).  Experiment scripts stay minimal::
 
     exp = Experiment(spec, task, dataset, model, data_loaders=loaders)
-    summary = exp.run()             # train + eval + final test
+    summary = exp.run()  # train + eval + final test
     summary = exp.run(train=False)  # evaluate from checkpoint
 """
 
@@ -51,7 +51,7 @@ class Experiment:
         summary = exp.run()
 
         # PyTorch with data loaders -------------------------------------------
-        loaders = {"train": train_dl, "val": val_dl, "test": test_dl}
+        loaders = {'train': train_dl, 'val': val_dl, 'test': test_dl}
         exp = Experiment(spec, task, dataset, model, data_loaders=loaders)
         summary = exp.run()
     """
@@ -309,15 +309,15 @@ class Experiment:
             times = times.detach().cpu().numpy()
 
         if output_dir is None:
-            output_dir = os.path.join(
-                self._artifacts_dir or 'artifacts', 'figures'
-            )
+            output_dir = os.path.join(self._artifacts_dir or 'artifacts', 'figures')
 
         viz_method = self.config.get('viz_method', method)
         pred_len = self.config.get('pred_len')
 
         paths = save_prediction_plots(
-            preds, trues, times,
+            preds,
+            trues,
+            times,
             method=viz_method,
             pred_len=pred_len,
             output_dir=output_dir,
@@ -386,7 +386,11 @@ class Experiment:
                 inner_model_cls = type(torch_model.inner)
                 model_args = getattr(torch_model.inner, '_args', None)
                 # Capture EntityWrapper parameters so we can re-wrap per trial todo: these arg names may change.
-                _ew_enc_in = self.config.get('enc_in', torch_model.enc_proj.in_features - torch_model.embedding.embedding_dim)
+                _ew_enc_in = self.config.get(
+                    'enc_in',
+                    torch_model.enc_proj.in_features
+                    - torch_model.embedding.embedding_dim,
+                )
                 _ew_num_embeddings = torch_model.embedding.num_embeddings
                 _ew_entity_id_col = torch_model.entity_id_col
             else:
@@ -395,11 +399,13 @@ class Experiment:
 
             if model_args is None:
                 from types import SimpleNamespace
+
                 model_args = SimpleNamespace(**self.config)
 
             # Build a model factory that rebuilds the full model (including
             # EntityWrapper wrapping) from a namespace of args.
             if is_entity_wrapped:
+
                 def _model_factory(args):
                     inner = inner_model_cls(args).float()
                     emb_size = getattr(args, 'embedding_size', 10)
@@ -434,7 +440,9 @@ class Experiment:
                 logger.warning('Could not build HPO trainable: %s', exc)
 
             hpo_result = self.optimizer.run(
-                self.spec, search_space, trainable,
+                self.spec,
+                search_space,
+                trainable,
             )
             summary['metrics']['hpo'] = {
                 'best_config': hpo_result.best_config,
@@ -462,6 +470,7 @@ class Experiment:
             # Rebuild model with best hypers
             try:
                 from types import SimpleNamespace as _NS
+
                 best_args = _NS(**{**vars(model_args), **hpo_result.best_config})
                 if _model_factory is not None:
                     torch_model = _model_factory(best_args)
@@ -477,13 +486,15 @@ class Experiment:
                     ckpt_dir_path = hpo_result.best_checkpoint_path
                     # Find .pth file in the checkpoint directory
                     pth_files = [
-                        f for f in os.listdir(ckpt_dir_path)
-                        if f.endswith('.pth')
+                        f for f in os.listdir(ckpt_dir_path) if f.endswith('.pth')
                     ]  #  todo: maybe this is incorrect if multiple checkpoints are saved?
                     if pth_files:
                         import torch as _torch
+
                         state_path = os.path.join(ckpt_dir_path, sorted(pth_files)[0])
-                        torch_model.load_state_dict(_torch.load(state_path, weights_only=True))
+                        torch_model.load_state_dict(
+                            _torch.load(state_path, weights_only=True)
+                        )
                         torch_model.eval()
                         logger.ok('Loaded best checkpoint from %s', state_path)
                         _loaded_checkpoint = True
@@ -511,7 +522,10 @@ class Experiment:
                     'may have been disabled). Retraining with best config.'
                 )
                 train_result = trainer.fit(
-                    torch_model, train_loader, val_loader, test_loader,
+                    torch_model,
+                    train_loader,
+                    val_loader,
+                    test_loader,
                 )
             summary['metrics']['training'] = {
                 'best_val_mse': train_result['best_val_mse'],
@@ -525,7 +539,9 @@ class Experiment:
             self._fire('on_eval_end', metrics=train_result.get('final_test', {}))
 
             # Compute task metrics + predictions on the retrained model
-            self._compute_task_metrics(summary, torch_model, trainer)  # todo: is this necessary if trainer.evaluate is already done?
+            self._compute_task_metrics(
+                summary, torch_model, trainer
+            )  # todo: is this necessary if trainer.evaluate is already done?
             if test_loader is not None:
                 pred_result = trainer.predict(torch_model, test_loader)
                 summary['predictions'] = pred_result
@@ -623,12 +639,15 @@ class Experiment:
 
             # For forecast windows: X_sample and y_sample span seq_len+pred_len.
             # Slice to match model expectations.
-            x_enc = X_sample[:, :seq_len, :]   # encoder input
-            y_true = y_sample[:, -pred_len:, :] # ground truth for loss
+            x_enc = X_sample[:, :seq_len, :]  # encoder input
+            y_true = y_sample[:, -pred_len:, :]  # ground truth for loss
 
-            batch = self.task.prepare_batch({
-                'X': x_enc, 'y': y_true,
-            })  # these are numpy arrays.
+            batch = self.task.prepare_batch(
+                {
+                    'X': x_enc,
+                    'y': y_true,
+                }
+            )  # these are numpy arrays.
 
             x_tensor = _torch.tensor(batch['X'], dtype=_torch.float32).to(
                 trainer.device
@@ -781,7 +800,8 @@ class Experiment:
                 )
             except Exception as exc:
                 logger.warning(
-                    'Could not create WandbLogger (%s); falling back to local.', exc,
+                    'Could not create WandbLogger (%s); falling back to local.',
+                    exc,
                 )
 
         from liulian.loggers.local_logger import LocalFileLogger

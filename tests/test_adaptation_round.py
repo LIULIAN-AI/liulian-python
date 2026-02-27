@@ -42,7 +42,13 @@ def dummy_loaders():
     x = torch.randn(B, seq_len, C)
     y = torch.randn(B, pred_len + seq_len, 1)
     xm = torch.arange(seq_len).float().unsqueeze(0).expand(B, -1).unsqueeze(-1)
-    ym = torch.arange(pred_len + seq_len).float().unsqueeze(0).expand(B, -1).unsqueeze(-1)
+    ym = (
+        torch.arange(pred_len + seq_len)
+        .float()
+        .unsqueeze(0)
+        .expand(B, -1)
+        .unsqueeze(-1)
+    )
     ds = TensorDataset(x, y, xm, ym)
     loader = DataLoader(ds, batch_size=4)
     return {
@@ -86,7 +92,7 @@ class _TinyModel(nn.Module):
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         B = x_enc.size(0)
-        out = self.proj(x_enc[:, :self.pred_len, :])
+        out = self.proj(x_enc[:, : self.pred_len, :])
         return out
 
 
@@ -96,20 +102,23 @@ class _TinyModel(nn.Module):
 
 
 class TestRayOptimizer:
-
     def test_asha_config(self):
         from liulian.optim.ray_optimizer import RayOptimizer
-        opt = RayOptimizer(config={
-            'scheduler': 'asha',
-            'grace_period': 2,
-            'reduction_factor': 4,
-        })
+
+        opt = RayOptimizer(
+            config={
+                'scheduler': 'asha',
+                'grace_period': 2,
+                'reduction_factor': 4,
+            }
+        )
         assert opt.config['scheduler'] == 'asha'
         assert opt.config['grace_period'] == 2
         assert opt.config['reduction_factor'] == 4
 
     def test_fallback_grid_sweep(self):
         from liulian.optim.ray_optimizer import RayOptimizer
+
         opt = RayOptimizer(config={'num_samples': 2})
         result = opt.run(
             spec=None,
@@ -122,6 +131,7 @@ class TestRayOptimizer:
 
     def test_make_trainable_factory(self):
         from liulian.optim.ray_optimizer import make_trainable
+
         loaders = {
             'train': DataLoader(
                 TensorDataset(
@@ -143,9 +153,15 @@ class TestRayOptimizer:
             ),
         }
         base_config = {
-            'seq_len': 16, 'pred_len': 4, 'label_len': 0,
-            'features': 'M', 'train_epochs': 1, 'learning_rate': 0.01,
-            'patience': 1, 'loss': 'mse', 'show_progress': False,
+            'seq_len': 16,
+            'pred_len': 4,
+            'label_len': 0,
+            'features': 'M',
+            'train_epochs': 1,
+            'learning_rate': 0.01,
+            'patience': 1,
+            'loss': 'mse',
+            'show_progress': False,
         }
         args = SimpleNamespace(enc_in=2, pred_len=4, c_out=1)
         trainable = make_trainable(_TinyModel, args, loaders, base_config)
@@ -158,16 +174,18 @@ class TestRayOptimizer:
 
 
 class TestEntityIdentifiers:
-
     def test_descriptors_mode(self):
         from liulian.data.ts.timeseriesdataset import make_entity_features
+
         descriptors = {
             'station_a': [0.1, 0.2, 0.3, 0.4],
             'station_b': [0.5, 0.6, 0.7, 0.8],
         }
         result = make_entity_features(
-            'station_a', ['station_a', 'station_b'],
-            mode='descriptors', seq_len=10,
+            'station_a',
+            ['station_a', 'station_b'],
+            mode='descriptors',
+            seq_len=10,
             descriptors=descriptors,
         )
         assert result is not None
@@ -176,10 +194,13 @@ class TestEntityIdentifiers:
 
     def test_descriptors_fallback(self):
         from liulian.data.ts.timeseriesdataset import make_entity_features
+
         descriptors = {'station_a': [1.0, 2.0]}
         result = make_entity_features(
-            'unknown', ['station_a'],
-            mode='descriptors', seq_len=5,
+            'unknown',
+            ['station_a'],
+            mode='descriptors',
+            seq_len=5,
             descriptors=descriptors,
         )
         assert result is not None
@@ -188,6 +209,7 @@ class TestEntityIdentifiers:
 
     def test_station_embedding(self):
         from liulian.data.ts.timeseriesdataset import StationEmbedding
+
         emb = StationEmbedding(num_stations=10, embed_dim=4)
         x = torch.randn(3, 16, 5)
         ids = torch.tensor([0, 3, 7])
@@ -196,6 +218,7 @@ class TestEntityIdentifiers:
 
     def test_all_identifier_modes(self):
         from liulian.data.ts.timeseriesdataset import make_entity_features
+
         ids = ['s1', 's2', 's3']
         for mode in ['embedding_idx', 'onehot', 'numeric_id', 'sinusoidal']:
             result = make_entity_features('s1', ids, mode=mode, seq_len=8)
@@ -204,6 +227,7 @@ class TestEntityIdentifiers:
 
     def test_none_mode(self):
         from liulian.data.ts.timeseriesdataset import make_entity_features
+
         result = make_entity_features('s1', ['s1'], mode='none', seq_len=8)
         assert result is None
 
@@ -214,12 +238,12 @@ class TestEntityIdentifiers:
 
 
 class TestChannelIndependent:
-
     def test_wrapping_increases_length(self):
         from liulian.data.ts.channel_independent import ChannelIndependentDataset
+
         base_ds = TensorDataset(
             torch.randn(10, 16, 3),  # feat
-            torch.randn(10, 4, 1),   # target
+            torch.randn(10, 4, 1),  # target
             torch.arange(16).float().unsqueeze(0).expand(10, -1),  # time
         )
         ci = ChannelIndependentDataset(base_ds, n_channels=3)
@@ -227,6 +251,7 @@ class TestChannelIndependent:
 
     def test_single_channel_output(self):
         from liulian.data.ts.channel_independent import ChannelIndependentDataset
+
         base_ds = TensorDataset(
             torch.randn(5, 16, 4),
             torch.randn(5, 4, 2),
@@ -240,6 +265,7 @@ class TestChannelIndependent:
 
     def test_match_target_channel(self):
         from liulian.data.ts.channel_independent import ChannelIndependentDataset
+
         n_ch = 3
         base_ds = TensorDataset(
             torch.randn(5, 16, n_ch),
@@ -247,7 +273,9 @@ class TestChannelIndependent:
             torch.arange(16).float().unsqueeze(0).expand(5, -1),
         )
         ci = ChannelIndependentDataset(
-            base_ds, n_channels=n_ch, match_target_channel=True,
+            base_ds,
+            n_channels=n_ch,
+            match_target_channel=True,
         )
         feat, target, time = ci[1]  # channel 1
         assert feat.shape == (16, 1)
@@ -255,6 +283,7 @@ class TestChannelIndependent:
 
     def test_auto_detect_channels(self):
         from liulian.data.ts.channel_independent import ChannelIndependentDataset
+
         base_ds = TensorDataset(
             torch.randn(3, 8, 5),
             torch.randn(3, 4, 1),
@@ -271,7 +300,6 @@ class TestChannelIndependent:
 
 
 class TestWandbLogging:
-
     def test_auto_create_local_logger(self, dummy_config, dummy_loaders):
         """When no wandb_project is set, Experiment creates LocalFileLogger."""
         from liulian.runtime import Experiment, ExperimentSpec
@@ -285,8 +313,11 @@ class TestWandbLogging:
         model = _TinyModel()
 
         exp = Experiment(
-            spec=spec, task=task, dataset=MagicMock(),
-            model=None, torch_model=model,
+            spec=spec,
+            task=task,
+            dataset=MagicMock(),
+            model=None,
+            torch_model=model,
             data_loaders=dummy_loaders,
             config=dummy_config,
         )
@@ -308,20 +339,29 @@ class TestWandbLogging:
         model = _TinyModel()
 
         exp = Experiment(
-            spec=spec, task=task, dataset=MagicMock(),
-            model=None, torch_model=model,
+            spec=spec,
+            task=task,
+            dataset=MagicMock(),
+            model=None,
+            torch_model=model,
             data_loaders={
                 'train': DataLoader(
                     TensorDataset(
-                        torch.randn(4, 16, 2), torch.randn(4, 20, 1),
-                        torch.zeros(4, 16, 1), torch.zeros(4, 20, 1),
-                    ), batch_size=2,
+                        torch.randn(4, 16, 2),
+                        torch.randn(4, 20, 1),
+                        torch.zeros(4, 16, 1),
+                        torch.zeros(4, 20, 1),
+                    ),
+                    batch_size=2,
                 ),
                 'val': DataLoader(
                     TensorDataset(
-                        torch.randn(4, 16, 2), torch.randn(4, 20, 1),
-                        torch.zeros(4, 16, 1), torch.zeros(4, 20, 1),
-                    ), batch_size=2,
+                        torch.randn(4, 16, 2),
+                        torch.randn(4, 20, 1),
+                        torch.zeros(4, 16, 1),
+                        torch.zeros(4, 20, 1),
+                    ),
+                    batch_size=2,
                 ),
             },
             config=cfg,
@@ -336,7 +376,6 @@ class TestWandbLogging:
 
 
 class TestAggregatorEnhancements:
-
     @pytest.fixture
     def sample_data(self):
         """Create sample sliding-window prediction data."""
@@ -350,6 +389,7 @@ class TestAggregatorEnhancements:
 
     def test_best_method(self, sample_data):
         from liulian.viz.prediction_aggregator import aggregate_predictions
+
         preds, trues, times = sample_data
         result = aggregate_predictions(preds, trues, times, method='best')
         assert 'time' in result
@@ -358,12 +398,14 @@ class TestAggregatorEnhancements:
 
     def test_worst_method(self, sample_data):
         from liulian.viz.prediction_aggregator import aggregate_predictions
+
         preds, trues, times = sample_data
         result = aggregate_predictions(preds, trues, times, method='worst')
         assert len(result['time']) > 0
 
     def test_single_method(self, sample_data):
         from liulian.viz.prediction_aggregator import aggregate_predictions
+
         preds, trues, times = sample_data
         result = aggregate_predictions(preds, trues, times, method='single')
         assert len(result['time']) > 0
@@ -373,15 +415,24 @@ class TestAggregatorEnhancements:
 
     def test_all_methods(self, sample_data):
         from liulian.viz.prediction_aggregator import aggregate_predictions
+
         preds, trues, times = sample_data
-        for method in ['longest_history', 'last', 'mean', 'median',
-                        'best', 'worst', 'single']:
+        for method in [
+            'longest_history',
+            'last',
+            'mean',
+            'median',
+            'best',
+            'worst',
+            'single',
+        ]:
             result = aggregate_predictions(preds, trues, times, method=method)
             assert result['pred'].ndim == 2
             assert result['true'].ndim == 2
 
     def test_unknown_method_raises(self, sample_data):
         from liulian.viz.prediction_aggregator import aggregate_predictions
+
         preds, trues, times = sample_data
         with pytest.raises(ValueError, match='Unknown aggregation'):
             aggregate_predictions(preds, trues, times, method='invalid')
@@ -393,9 +444,9 @@ class TestAggregatorEnhancements:
 
 
 class TestPredictionRangePlots:
-
     def test_plot_prediction_range(self, tmp_path):
         from liulian.viz.plots import plot_prediction_range
+
         N, pred_len, C = 10, 4, 1
         preds = np.random.randn(N, pred_len, C).astype(np.float32)
         trues = np.random.randn(N, pred_len, C).astype(np.float32)
@@ -404,12 +455,16 @@ class TestPredictionRangePlots:
 
         save_path = str(tmp_path / 'range.png')
         plot_prediction_range(
-            preds, trues, times, save_path=save_path,
+            preds,
+            trues,
+            times,
+            save_path=save_path,
         )
         assert os.path.exists(save_path)
 
     def test_save_prediction_plots_includes_range(self, tmp_path):
         from liulian.viz.plots import save_prediction_plots
+
         N, pred_len, C = 10, 4, 1
         preds = np.random.randn(N, pred_len, C).astype(np.float32)
         trues = np.random.randn(N, pred_len, C).astype(np.float32)
@@ -417,7 +472,9 @@ class TestPredictionRangePlots:
         times = np.array([np.arange(i, i + win_len) for i in range(N)])
 
         paths = save_prediction_plots(
-            preds, trues, times,
+            preds,
+            trues,
+            times,
             output_dir=str(tmp_path),
         )
         assert 'pred_vs_gt' in paths
@@ -431,39 +488,44 @@ class TestPredictionRangePlots:
 
 
 class TestCLIEnhancements:
-
     def test_train_subcommand_exists(self):
         from liulian.cli import main
+
         with pytest.raises(SystemExit) as exc_info:
             main(['train', '--help'])
         assert exc_info.value.code == 0
 
     def test_predict_subcommand_exists(self):
         from liulian.cli import main
+
         with pytest.raises(SystemExit) as exc_info:
             main(['predict', '--help'])
         assert exc_info.value.code == 0
 
     def test_viz_subcommand_exists(self):
         from liulian.cli import main
+
         with pytest.raises(SystemExit) as exc_info:
             main(['viz', '--help'])
         assert exc_info.value.code == 0
 
     def test_hparam_subcommand_exists(self):
         from liulian.cli import main
+
         with pytest.raises(SystemExit) as exc_info:
             main(['hparam', '--help'])
         assert exc_info.value.code == 0
 
     def test_info_still_works(self, capsys):
         from liulian.cli import main
+
         main(['info'])
         captured = capsys.readouterr()
         assert 'liulian' in captured.out
 
     def test_run_still_works_help(self):
         from liulian.cli import main
+
         with pytest.raises(SystemExit) as exc_info:
             main(['run', '--help'])
         assert exc_info.value.code == 0
@@ -475,7 +537,6 @@ class TestCLIEnhancements:
 
 
 class TestExperimentHPO:
-
     def test_hpo_branch_with_fallback(self, dummy_config, dummy_loaders):
         """Test that HPO branch works with fallback grid sweep."""
         from liulian.optim.ray_optimizer import RayOptimizer
@@ -488,10 +549,12 @@ class TestExperimentHPO:
                 'learning_rate': [0.001, 0.01],
             },
         }
-        optimizer = RayOptimizer(config={
-            'num_samples': 2,
-            'max_epochs': 1,
-        })
+        optimizer = RayOptimizer(
+            config={
+                'num_samples': 2,
+                'max_epochs': 1,
+            }
+        )
         task = PredictionTask(
             regime=PredictionRegime(horizon=4, context_length=16),
         )
@@ -499,8 +562,11 @@ class TestExperimentHPO:
         model = _TinyModel()
 
         exp = Experiment(
-            spec=spec, task=task, dataset=MagicMock(),
-            model=None, torch_model=model,
+            spec=spec,
+            task=task,
+            dataset=MagicMock(),
+            model=None,
+            torch_model=model,
             optimizer=optimizer,
             data_loaders=dummy_loaders,
             config=cfg,
@@ -519,7 +585,6 @@ class TestExperimentHPO:
 
 
 class TestExperimentAutoViz:
-
     def test_auto_viz_generates_plots(self, dummy_config, dummy_loaders, tmp_path):
         from liulian.runtime import Experiment, ExperimentSpec
         from liulian.tasks.base import PredictionRegime, PredictionTask
@@ -532,8 +597,11 @@ class TestExperimentAutoViz:
         model = _TinyModel()
 
         exp = Experiment(
-            spec=spec, task=task, dataset=MagicMock(),
-            model=None, torch_model=model,
+            spec=spec,
+            task=task,
+            dataset=MagicMock(),
+            model=None,
+            torch_model=model,
             data_loaders=dummy_loaders,
             config=cfg,
         )
@@ -566,10 +634,14 @@ class TestE2EDummy:
         loaders = {'train': loader, 'val': loader, 'test': loader}
 
         config = {
-            'seq_len': seq_len, 'pred_len': pred_len,
-            'label_len': 0, 'features': 'M',
-            'train_epochs': 2, 'learning_rate': 0.01,
-            'patience': 2, 'loss': 'mse',
+            'seq_len': seq_len,
+            'pred_len': pred_len,
+            'label_len': 0,
+            'features': 'M',
+            'train_epochs': 2,
+            'learning_rate': 0.01,
+            'patience': 2,
+            'loss': 'mse',
             'metrics': ['rmse', 'mae'],
             'show_progress': False,
         }
@@ -578,14 +650,21 @@ class TestE2EDummy:
             regime=PredictionRegime(horizon=pred_len, context_length=seq_len),
         )
         spec = ExperimentSpec(
-            name='e2e_dummy', task={}, dataset={}, model={},
+            name='e2e_dummy',
+            task={},
+            dataset={},
+            model={},
         )
         model = _TinyModel(enc_in=C, pred_len=pred_len)
 
         exp = Experiment(
-            spec=spec, task=task, dataset=MagicMock(),
-            model=None, torch_model=model,
-            data_loaders=loaders, config=config,
+            spec=spec,
+            task=task,
+            dataset=MagicMock(),
+            model=None,
+            torch_model=model,
+            data_loaders=loaders,
+            config=config,
         )
         summary = exp.run(train=True, eval=True)
 

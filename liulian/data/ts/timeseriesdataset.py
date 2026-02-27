@@ -130,8 +130,8 @@ class StationEmbedding(torch.nn.Module):
 
         emb = StationEmbedding(num_stations=50, embed_dim=8)
         station_ids = torch.tensor([0, 3, 12])  # (B,)
-        x = torch.randn(3, 96, 7)               # (B, T, C)
-        x_with_emb = emb(x, station_ids)         # (B, T, C + embed_dim)
+        x = torch.randn(3, 96, 7)  # (B, T, C)
+        x_with_emb = emb(x, station_ids)  # (B, T, C + embed_dim)
     """
 
     def __init__(self, num_stations: int, embed_dim: int = 8) -> None:
@@ -152,7 +152,7 @@ class StationEmbedding(torch.nn.Module):
         Returns:
             Augmented tensor ``(B, T, C + embed_dim)``.
         """
-        emb = self.embedding(station_ids)     # (B, embed_dim)
+        emb = self.embedding(station_ids)  # (B, embed_dim)
         emb = emb.unsqueeze(1).expand(-1, x.size(1), -1)  # (B, T, embed_dim)
         return torch.cat([x, emb], dim=-1)
 
@@ -271,7 +271,9 @@ def _handle_short_subsequences(
             if length < window_len:
                 n_pad = window_len - length
                 pad_df = pd.DataFrame(
-                    0, index=range(n_pad), columns=chunk.columns,
+                    0,
+                    index=range(n_pad),
+                    columns=chunk.columns,
                 )
                 pad_df[time_col] = -1
                 if 'time_mask' in pad_df.columns:
@@ -432,7 +434,11 @@ class TimeSeriesSplit(Dataset):
             length = int(self._raw_seg_lengths[seg_i].item())
             x = self.feat[start : start + length]
             y = self.targ[start : start + length]
-            t = self.time_vals[start : start + length] if self.time_vals is not None else torch.arange(length, dtype=torch.float32)
+            t = (
+                self.time_vals[start : start + length]
+                if self.time_vals is not None
+                else torch.arange(length, dtype=torch.float32)
+            )
             # Pad to max segment length for uniform batching
             if length < self._max_seg_len:
                 pad_len = self._max_seg_len - length
@@ -443,7 +449,11 @@ class TimeSeriesSplit(Dataset):
             start = int(self._seg_starts[seg_i].item()) + offset
             x = self.feat[start : start + self.window_len]
             y = self.targ[start : start + self.window_len]
-            t = self.time_vals[start : start + self.window_len] if self.time_vals is not None else torch.arange(self.window_len, dtype=torch.float32)
+            t = (
+                self.time_vals[start : start + self.window_len]
+                if self.time_vals is not None
+                else torch.arange(self.window_len, dtype=torch.float32)
+            )
 
         # Ensure time is 2-D: (T, 1)
         if t.ndim == 1:
@@ -457,8 +467,8 @@ class TimeSeriesSplit(Dataset):
             # label_len: include decoder warmup overlap (TSLib compat)
             ll = self.label_len
             if ll is not None and ll > 0:
-                y_dec = y[s - ll:]
-                y_mark = t[s - ll:]
+                y_dec = y[s - ll :]
+                y_mark = t[s - ll :]
             else:
                 y_dec = y[s:]
                 y_mark = t[s:]
@@ -736,12 +746,13 @@ class TimeSeriesDataset(BaseDataset):
         **kwargs,
     ) -> None:
         super().__init__(
-            manifest=manifest, topology=topology,
-            fields=fields, backend=backend,
+            manifest=manifest,
+            topology=topology,
+            fields=fields,
+            backend=backend,
         )
         self.splits_raw = {
-            k: v.copy().reset_index(drop=True)
-            for k, v in splits.items()
+            k: v.copy().reset_index(drop=True) for k, v in splits.items()
         }
         self.time_col = time_col
         self.feature_cols = list(feature_cols) if feature_cols else []
@@ -787,7 +798,9 @@ class TimeSeriesDataset(BaseDataset):
         seen = set()
         scale_cols = []
         for c in self.feature_cols + self.target_cols:
-            if c not in seen and any(c in df.columns for df in self.splits_raw.values()):
+            if c not in seen and any(
+                c in df.columns for df in self.splits_raw.values()
+            ):
                 seen.add(c)
                 scale_cols.append(c)
         if not scale_cols:
@@ -846,6 +859,7 @@ class TimeSeriesDataset(BaseDataset):
 
         try:
             import torch as _torch
+
             is_tensor = isinstance(data, _torch.Tensor)
         except ImportError:
             is_tensor = False
@@ -878,7 +892,8 @@ class TimeSeriesDataset(BaseDataset):
                     f'Available: {list(self.splits_raw.keys())}'
                 )
             self._split_cache[split_name] = self._prepare_split(
-                self.splits_raw[split_name], split_name,
+                self.splits_raw[split_name],
+                split_name,
             )
         return self._split_cache[split_name]
 
@@ -924,7 +939,9 @@ class TimeSeriesDataset(BaseDataset):
         if self.noise_type is not None:
             for col in (c for c in self.feature_cols if c in df.columns):
                 df[col] = add_noise_to_array(
-                    df[col].values, self.noise_type, self.noise_kwargs,
+                    df[col].values,
+                    self.noise_type,
+                    self.noise_kwargs,
                 )
 
         # 3. Detect contiguous segments
@@ -943,8 +960,12 @@ class TimeSeriesDataset(BaseDataset):
             win = self.seq_len
 
         df, seg_starts, eff_lengths, raw_lengths = _handle_short_subsequences(
-            df, seg_starts, raw_lengths, win,
-            self.short_subsequence_method, self.time_col,
+            df,
+            seg_starts,
+            raw_lengths,
+            win,
+            self.short_subsequence_method,
+            self.time_col,
         )
 
         if len(seg_starts) == 0 or eff_lengths.sum() == 0:
@@ -1016,11 +1037,13 @@ class TimeSeriesDataset(BaseDataset):
         tf_cols = [c for c in self.time_feature_cols if c in df.columns]
         if tf_cols:
             time_tensor = torch.tensor(
-                df[tf_cols].values, dtype=torch.float32,
+                df[tf_cols].values,
+                dtype=torch.float32,
             )
         else:
             time_tensor = torch.tensor(
-                df[self.time_col].values, dtype=torch.float32,
+                df[self.time_col].values,
+                dtype=torch.float32,
             )
 
         # Historical predicted y → extra features
@@ -1046,8 +1069,10 @@ class TimeSeriesDataset(BaseDataset):
         # Entity identifiers (optional)
         if self.identifier_mode != 'none' and self.station_name is not None:
             ent = make_entity_features(
-                self.station_name, self.station_ids,
-                self.identifier_mode, N,
+                self.station_name,
+                self.station_ids,
+                self.identifier_mode,
+                N,
                 coordinates=self.coordinates,
             )
             if ent is not None:
@@ -1061,9 +1086,7 @@ class TimeSeriesDataset(BaseDataset):
                         ent = ent[:, :d_feat]
                     feat = feat + ent
                 else:
-                    raise ValueError(
-                        f'Unknown id_integration: {self.id_integration!r}'
-                    )
+                    raise ValueError(f'Unknown id_integration: {self.id_integration!r}')
 
         return feat, targ, time_tensor
 
@@ -1073,17 +1096,19 @@ class TimeSeriesDataset(BaseDataset):
 
     def info(self) -> Dict[str, Any]:
         out = super().info()
-        out.update({
-            'task': self.task,
-            'seq_len': self.seq_len,
-            'pred_len': self.pred_len,
-            'feature_cols': self.feature_cols,
-            'target_cols': self.target_cols,
-            'use_current_x': self.use_current_x,
-            'use_full_history': self.use_full_history,
-            'gap_mode': self.gap_mode,
-            'noise_type': self.noise_type,
-            'identifier_mode': self.identifier_mode,
-            'id_integration': self.id_integration,
-        })
+        out.update(
+            {
+                'task': self.task,
+                'seq_len': self.seq_len,
+                'pred_len': self.pred_len,
+                'feature_cols': self.feature_cols,
+                'target_cols': self.target_cols,
+                'use_current_x': self.use_current_x,
+                'use_full_history': self.use_full_history,
+                'gap_mode': self.gap_mode,
+                'noise_type': self.noise_type,
+                'identifier_mode': self.identifier_mode,
+                'id_integration': self.id_integration,
+            }
+        )
         return out

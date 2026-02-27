@@ -18,14 +18,13 @@ import pytest
 def _torch_available():
     try:
         import torch  # noqa: F401
+
         return True
     except ImportError:
         return False
 
 
-pytestmark = pytest.mark.skipif(
-    not _torch_available(), reason='torch not installed'
-)
+pytestmark = pytest.mark.skipif(not _torch_available(), reason='torch not installed')
 
 # Lazy imports — only resolved when torch is available
 if _torch_available():
@@ -55,9 +54,7 @@ def _make_loader(n: int, seq_len: int, pred_len: int, batch_size: int) -> 'DataL
     return DataLoader(ds, batch_size=batch_size, shuffle=False)
 
 
-def _make_loaders(
-    seq_len: int = 30, pred_len: int = 7, batch_size: int = 4
-) -> dict:
+def _make_loaders(seq_len: int = 30, pred_len: int = 7, batch_size: int = 4) -> dict:
     return {
         'train': _make_loader(40, seq_len, pred_len, batch_size),
         'val': _make_loader(20, seq_len, pred_len, batch_size),
@@ -84,6 +81,7 @@ class SyntheticDataset(BaseDataset):
 
 
 # ── Fixtures ────────────────────────────────────────────────────────────
+
 
 @pytest.fixture()
 def cfg():
@@ -140,9 +138,7 @@ def dataset():
 
 @pytest.fixture()
 def task():
-    return PredictionTask(
-        regime=PredictionRegime(horizon=7, context_length=30)
-    )
+    return PredictionTask(regime=PredictionRegime(horizon=7, context_length=30))
 
 
 # ── ForecastTrainer tests ──────────────────────────────────────────────
@@ -298,6 +294,7 @@ class TestExperimentTorchPath:
 
 
 # ── Cleanup ─────────────────────────────────────────────────────────────
+
 
 @pytest.fixture(autouse=True)
 def cleanup_artifacts():

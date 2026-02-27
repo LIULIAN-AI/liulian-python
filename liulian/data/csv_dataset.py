@@ -240,7 +240,9 @@ class CSVTimeSeriesDataset(TimeSeriesDataset):
         # Build time features
         dates = pd.to_datetime(df_raw['date'])
         time_feats = _time_features_from_dates(
-            dates.dt, freq=self.freq, timeenc=self.timeenc,
+            dates.dt,
+            freq=self.freq,
+            timeenc=self.timeenc,
         )
         time_feat_cols = [f'_tf_{i}' for i in range(time_feats.shape[1])]
 
@@ -266,7 +268,8 @@ class CSVTimeSeriesDataset(TimeSeriesDataset):
         return splits, feature_cols, target_cols, '_time_idx', time_feat_cols
 
     def _compute_borders(
-        self, n: int,
+        self,
+        n: int,
     ) -> Tuple[list[int], list[int]]:
         """Return ``(border1s, border2s)`` for train/val/test.
 
@@ -371,7 +374,12 @@ class ETTMinuteDataset(CSVTimeSeriesDataset):
     def _compute_borders(self, n: int):
         # 12 months train, 4 months val, 4 months test (15-min)
         m = 4  # 4x hourly
-        b = [0, 12*30*24*m, 12*30*24*m + 4*30*24*m, 12*30*24*m + 8*30*24*m]
+        b = [
+            0,
+            12 * 30 * 24 * m,
+            12 * 30 * 24 * m + 4 * 30 * 24 * m,
+            12 * 30 * 24 * m + 8 * 30 * 24 * m,
+        ]
         b = [min(v, n) for v in b]
         border1s = [b[0], max(b[1] - self.seq_len, 0), max(b[2] - self.seq_len, 0)]
         border2s = [b[1], b[2], b[3]]

@@ -54,6 +54,7 @@ class _TinyModel(nn.Module):
 
 class _SyntheticDataset(BaseDataset):
     """Deterministic synthetic dataset for e2e tests."""
+
     domain = 'test'
     version = '0.0.1'
 
@@ -80,10 +81,14 @@ def _make_loaders(
         X = rng.normal(size=(n_samples, seq_len, n_features)).astype(np.float32)
         y = X[:, -pred_len:, :]  # target = last pred_len steps of input
         xm = np.zeros((n_samples, seq_len, 1), dtype=np.float32)
-        ym = np.arange(seq_len, dtype=np.float32)[None, :, None].repeat(n_samples, axis=0)
+        ym = np.arange(seq_len, dtype=np.float32)[None, :, None].repeat(
+            n_samples, axis=0
+        )
         ym = ym[:, :pred_len, :]  # time marks for pred_len
         # Expand ym to full seq_len for marks
-        ym_full = np.arange(seq_len, dtype=np.float32)[None, :, None].repeat(n_samples, axis=0)
+        ym_full = np.arange(seq_len, dtype=np.float32)[None, :, None].repeat(
+            n_samples, axis=0
+        )
 
         ds = TensorDataset(
             torch.from_numpy(X),
@@ -91,7 +96,9 @@ def _make_loaders(
             torch.from_numpy(xm),
             torch.from_numpy(ym_full[:, :pred_len, :]),
         )
-        loaders[split] = DataLoader(ds, batch_size=batch_size, shuffle=(split == 'train'))
+        loaders[split] = DataLoader(
+            ds, batch_size=batch_size, shuffle=(split == 'train')
+        )
     return loaders
 
 
@@ -274,9 +281,7 @@ class TestExperimentE2E:
             dataset={'type': 'Synthetic'},
             model={'type': 'TinyModel'},
         )
-        task = PredictionTask(
-            regime=PredictionRegime(horizon=4, context_length=16)
-        )
+        task = PredictionTask(regime=PredictionRegime(horizon=4, context_length=16))
         dataset = _SyntheticDataset()
         model = _TinyModel(model_args)
 
@@ -306,9 +311,7 @@ class TestExperimentE2E:
             dataset={'type': 'Synthetic'},
             model={'type': 'TinyModel'},
         )
-        task = PredictionTask(
-            regime=PredictionRegime(horizon=4, context_length=16)
-        )
+        task = PredictionTask(regime=PredictionRegime(horizon=4, context_length=16))
         dataset = _SyntheticDataset()
         model = _TinyModel(model_args)
 

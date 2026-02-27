@@ -49,8 +49,7 @@ class SinusoidalPositionalEncoding(nn.Module):
         pe = torch.zeros(max_len, d_model)
         position = torch.arange(0, max_len, dtype=torch.float32).unsqueeze(1)
         div_term = torch.exp(
-            torch.arange(0, d_model, 2).float()
-            * (-math.log(10000.0) / d_model)
+            torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model)
         )
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
@@ -75,9 +74,15 @@ class LearnablePositionalEncoding(nn.Module):
 # Entity-identifier constants (shared with swiss_lstm)
 # ======================================================================
 
-_TRANSPARENT_MODES = frozenset({
-    'onehot', 'coordinates', 'sinusoidal', 'descriptors', 'numeric_id',
-})
+_TRANSPARENT_MODES = frozenset(
+    {
+        'onehot',
+        'coordinates',
+        'sinusoidal',
+        'descriptors',
+        'numeric_id',
+    }
+)
 _EMBEDDING_MODE = 'embedding'
 _FEATURE_CONCAT_MODE = 'feature_concat'
 
@@ -142,9 +147,7 @@ class SwissTransformerEmbeddingModel(nn.Module):
 
         # Entity embedding (integer-ID mode)
         self.embedding = (
-            nn.Embedding(num_embeddings, embedding_size)
-            if num_embeddings > 0
-            else None
+            nn.Embedding(num_embeddings, embedding_size) if num_embeddings > 0 else None
         )
 
         # d_model resolution
@@ -207,10 +210,11 @@ class SwissTransformerEmbeddingModel(nn.Module):
             self.future_step_embedding = nn.Parameter(
                 torch.zeros(1, future_steps, d_future_emb)
             )
-            proj_in = (embedding_size + d_future_emb) if self.embedding else d_future_emb
+            proj_in = (
+                (embedding_size + d_future_emb) if self.embedding else d_future_emb
+            )
             self.future_proj = (
-                nn.Identity() if proj_in == d_model
-                else nn.Linear(proj_in, d_model)
+                nn.Identity() if proj_in == d_model else nn.Linear(proj_in, d_model)
             )
             self._target_postprocessor = lambda t: t[:, -future_steps:, :]
 
@@ -241,7 +245,7 @@ class SwissTransformerEmbeddingModel(nn.Module):
             if self.embedding is not None and e is not None:
                 emb = self.embedding(e)
                 x_hist = torch.cat([emb[:, : -self.future_steps, :], x_hist], -1)
-                x_fut = torch.cat([emb[:, -self.future_steps:, :], x_fut], -1)
+                x_fut = torch.cat([emb[:, -self.future_steps :, :], x_fut], -1)
             x_hist = self.input_proj(x_hist)
             x_fut = self.future_proj(x_fut)
             x = torch.cat([x_hist, x_fut], dim=1)
@@ -270,7 +274,9 @@ class SwissTransformerEmbeddingModel(nn.Module):
                 hf_mask = hf_mask & (~time_masks).bool().unsqueeze(1)
             if pad_masks is not None:
                 hf_mask = hf_mask & (~pad_masks).bool().unsqueeze(1)
-            out = self.transformer(inputs_embeds=x, attention_mask=hf_mask).last_hidden_state
+            out = self.transformer(
+                inputs_embeds=x, attention_mask=hf_mask
+            ).last_hidden_state
         else:
             skp = None if self.use_mask_embedding else time_masks
             if pad_masks is not None:
@@ -418,8 +424,10 @@ class _TransformerBaseAdapter(TorchModelAdapter):
                 e = x_mark[:, :, self._entity_id_col].long()
             else:
                 e = torch.zeros(
-                    x_enc.size(0), x_enc.size(1),
-                    dtype=torch.long, device=self.device,
+                    x_enc.size(0),
+                    x_enc.size(1),
+                    dtype=torch.long,
+                    device=self.device,
                 )
             output = self._model(e, x_enc)
 
@@ -463,17 +471,26 @@ class TransformerEncoderAdapter(_TransformerBaseAdapter):
     Examples::
 
         # Traffic dataset (862 channels)
-        TransformerEncoderAdapter({
-            'enc_in': 862, 'c_out': 862,
-            'n_heads': 8, 'e_layers': 3, 'd_model': 64,
-        })
+        TransformerEncoderAdapter(
+            {
+                'enc_in': 862,
+                'c_out': 862,
+                'n_heads': 8,
+                'e_layers': 3,
+                'd_model': 64,
+            }
+        )
 
         # Swiss-river with station embedding
-        TransformerEncoderAdapter({
-            'enc_in': 1, 'c_out': 1,
-            'identifier_mode': 'embedding',
-            'num_embeddings': 50, 'embedding_size': 10,
-        })
+        TransformerEncoderAdapter(
+            {
+                'enc_in': 1,
+                'c_out': 1,
+                'identifier_mode': 'embedding',
+                'num_embeddings': 50,
+                'embedding_size': 10,
+            }
+        )
     """
 
     def __init__(self, config: Dict[str, Any]):

@@ -120,7 +120,8 @@ class ExtrapoLstmModelLIMO(nn.Module):
             dropout=dropout if num_layers > 1 else 0.0,
         )
         self.linear = nn.Sequential(
-            nn.ReLU(), nn.Linear(hidden_size, future_steps * c_out),
+            nn.ReLU(),
+            nn.Linear(hidden_size, future_steps * c_out),
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -290,9 +291,15 @@ class LstmEntityFeatureModel(nn.Module):
 
 # Modes where the entity features are already concatenated into x_enc by
 # the data layer — the adapter doesn't need to do anything special.
-_TRANSPARENT_MODES = frozenset({
-    'onehot', 'coordinates', 'sinusoidal', 'descriptors', 'numeric_id',
-})
+_TRANSPARENT_MODES = frozenset(
+    {
+        'onehot',
+        'coordinates',
+        'sinusoidal',
+        'descriptors',
+        'numeric_id',
+    }
+)
 
 # The mode that needs nn.Embedding inside the model.
 _EMBEDDING_MODE = 'embedding'
@@ -363,7 +370,9 @@ class _LSTMBaseAdapter(TorchModelAdapter):
                 e = x_mark[:, :, self._entity_id_col].long()
             else:
                 e = torch.zeros(
-                    x_enc.size(0), x_enc.size(1), dtype=torch.long,
+                    x_enc.size(0),
+                    x_enc.size(1),
+                    dtype=torch.long,
                     device=self.device,
                 )
             output = self._model(e, x_enc)
@@ -410,15 +419,21 @@ class LSTMAdapter(_LSTMBaseAdapter):
         LSTMAdapter({'enc_in': 862, 'c_out': 862, 'd_model': 128})
 
         # Swiss-river (1 channel, with station embedding)
-        LSTMAdapter({
-            'enc_in': 1, 'c_out': 1, 'd_model': 64,
-            'identifier_mode': 'embedding',
-            'num_embeddings': 50, 'embedding_size': 10,
-        })
+        LSTMAdapter(
+            {
+                'enc_in': 1,
+                'c_out': 1,
+                'd_model': 64,
+                'identifier_mode': 'embedding',
+                'num_embeddings': 50,
+                'embedding_size': 10,
+            }
+        )
 
         # ETT dataset with one-hot entity features (already in x_enc)
-        LSTMAdapter({'enc_in': 7 + 10, 'c_out': 7, 'd_model': 64,
-                     'identifier_mode': 'onehot'})
+        LSTMAdapter(
+            {'enc_in': 7 + 10, 'c_out': 7, 'd_model': 64, 'identifier_mode': 'onehot'}
+        )
     """
 
     def __init__(self, config: Dict[str, Any]):

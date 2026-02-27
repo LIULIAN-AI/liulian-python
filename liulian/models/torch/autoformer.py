@@ -15,8 +15,17 @@ import torch.nn.functional as F
 import numpy as np
 from typing import Dict, Any
 from liulian.models.torch.layers.embed import DataEmbedding, DataEmbedding_wo_pos
-from liulian.models.torch.layers.autocorrelation import AutoCorrelation, AutoCorrelationLayer
-from liulian.models.torch.layers.autoformer_blocks import Encoder, Decoder, EncoderLayer, DecoderLayer, my_Layernorm
+from liulian.models.torch.layers.autocorrelation import (
+    AutoCorrelation,
+    AutoCorrelationLayer,
+)
+from liulian.models.torch.layers.autoformer_blocks import (
+    Encoder,
+    Decoder,
+    EncoderLayer,
+    DecoderLayer,
+    my_Layernorm,
+)
 from liulian.models.torch.layers.decomposition import series_decomp
 from liulian.models.torch.base_adapter import TorchModelAdapter
 from liulian.models.torch.entity_mixin import EntityAwareMixin
@@ -41,40 +50,72 @@ class Model(nn.Module):
         self.decomp = series_decomp(kernel_size)
 
         # Embedding
-        self.enc_embedding = DataEmbedding_wo_pos(configs.enc_in, configs.d_model, configs.embed, configs.freq,
-                                                  configs.dropout)
+        self.enc_embedding = DataEmbedding_wo_pos(
+            configs.enc_in,
+            configs.d_model,
+            configs.embed,
+            configs.freq,
+            configs.dropout,
+        )
         # Encoder
         self.encoder = Encoder(
             [
                 EncoderLayer(
                     AutoCorrelationLayer(
-                        AutoCorrelation(False, configs.factor, attention_dropout=configs.dropout,
-                                        output_attention=False),
-                        configs.d_model, configs.n_heads),
+                        AutoCorrelation(
+                            False,
+                            configs.factor,
+                            attention_dropout=configs.dropout,
+                            output_attention=False,
+                        ),
+                        configs.d_model,
+                        configs.n_heads,
+                    ),
                     configs.d_model,
                     configs.d_ff,
                     moving_avg=configs.moving_avg,
                     dropout=configs.dropout,
-                    activation=configs.activation
-                ) for l in range(configs.e_layers)
+                    activation=configs.activation,
+                )
+                for l in range(configs.e_layers)
             ],
-            norm_layer=my_Layernorm(configs.d_model)
+            norm_layer=my_Layernorm(configs.d_model),
         )
         # Decoder
-        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
-            self.dec_embedding = DataEmbedding_wo_pos(configs.dec_in, configs.d_model, configs.embed, configs.freq,
-                                                      configs.dropout)
+        if (
+            self.task_name == 'long_term_forecast'
+            or self.task_name == 'short_term_forecast'
+        ):
+            self.dec_embedding = DataEmbedding_wo_pos(
+                configs.dec_in,
+                configs.d_model,
+                configs.embed,
+                configs.freq,
+                configs.dropout,
+            )
             self.decoder = Decoder(
                 [
                     DecoderLayer(
                         AutoCorrelationLayer(
-                            AutoCorrelation(True, configs.factor, attention_dropout=configs.dropout,
-                                            output_attention=False),
-                            configs.d_model, configs.n_heads),
+                            AutoCorrelation(
+                                True,
+                                configs.factor,
+                                attention_dropout=configs.dropout,
+                                output_attention=False,
+                            ),
+                            configs.d_model,
+                            configs.n_heads,
+                        ),
                         AutoCorrelationLayer(
-                            AutoCorrelation(False, configs.factor, attention_dropout=configs.dropout,
-                                            output_attention=False),
-                            configs.d_model, configs.n_heads),
+                            AutoCorrelation(
+                                False,
+                                configs.factor,
+                                attention_dropout=configs.dropout,
+                                output_attention=False,
+                            ),
+                            configs.d_model,
+                            configs.n_heads,
+                        ),
                         configs.d_model,
                         configs.c_out,
                         configs.d_ff,
@@ -85,39 +126,39 @@ class Model(nn.Module):
                     for l in range(configs.d_layers)
                 ],
                 norm_layer=my_Layernorm(configs.d_model),
-                projection=nn.Linear(configs.d_model, configs.c_out, bias=True)
+                projection=nn.Linear(configs.d_model, configs.c_out, bias=True),
             )
         if self.task_name == 'imputation':
-            self.projection = nn.Linear(
-                configs.d_model, configs.c_out, bias=True)
+            self.projection = nn.Linear(configs.d_model, configs.c_out, bias=True)
         if self.task_name == 'anomaly_detection':
-            self.projection = nn.Linear(
-                configs.d_model, configs.c_out, bias=True)
+            self.projection = nn.Linear(configs.d_model, configs.c_out, bias=True)
         if self.task_name == 'classification':
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
             self.projection = nn.Linear(
-                configs.d_model * configs.seq_len, configs.num_class)
+                configs.d_model * configs.seq_len, configs.num_class
+            )
 
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         # decomp init
-        mean = torch.mean(x_enc, dim=1).unsqueeze(
-            1).repeat(1, self.pred_len, 1)
-        zeros = torch.zeros([x_dec.shape[0], self.pred_len,
-                             x_dec.shape[2]], device=x_enc.device)
+        mean = torch.mean(x_enc, dim=1).unsqueeze(1).repeat(1, self.pred_len, 1)
+        zeros = torch.zeros(
+            [x_dec.shape[0], self.pred_len, x_dec.shape[2]], device=x_enc.device
+        )
         seasonal_init, trend_init = self.decomp(x_enc)
         # decoder input
-        trend_init = torch.cat(
-            [trend_init[:, -self.label_len:, :], mean], dim=1)
+        trend_init = torch.cat([trend_init[:, -self.label_len :, :], mean], dim=1)
         seasonal_init = torch.cat(
-            [seasonal_init[:, -self.label_len:, :], zeros], dim=1)
+            [seasonal_init[:, -self.label_len :, :], zeros], dim=1
+        )
         # enc
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
         # dec
         dec_out = self.dec_embedding(seasonal_init, x_mark_dec)
-        seasonal_part, trend_part = self.decoder(dec_out, enc_out, x_mask=None, cross_mask=None,
-                                                 trend=trend_init)
+        seasonal_part, trend_part = self.decoder(
+            dec_out, enc_out, x_mask=None, cross_mask=None, trend=trend_init
+        )
         # final
         dec_out = trend_part + seasonal_part
         return dec_out
@@ -160,12 +201,14 @@ class Model(nn.Module):
         return output
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
-        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
+        if (
+            self.task_name == 'long_term_forecast'
+            or self.task_name == 'short_term_forecast'
+        ):
             dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
-            return dec_out[:, -self.pred_len:, :]  # [B, L, D]
+            return dec_out[:, -self.pred_len :, :]  # [B, L, D]
         if self.task_name == 'imputation':
-            dec_out = self.imputation(
-                x_enc, x_mark_enc, x_dec, x_mark_dec, mask)
+            dec_out = self.imputation(x_enc, x_mark_enc, x_dec, x_mark_dec, mask)
             return dec_out  # [B, L, D]
         if self.task_name == 'anomaly_detection':
             dec_out = self.anomaly_detection(x_enc)
@@ -179,7 +222,7 @@ class Model(nn.Module):
 class AutoformerAdapter(EntityAwareMixin, TorchModelAdapter):
     """
     Adapter for Autoformer model to liulian ExecutableModel interface.
-    
+
     Expected config parameters:
         - seq_len: Input sequence length
         - label_len: Start token length for decoder
@@ -200,7 +243,7 @@ class AutoformerAdapter(EntityAwareMixin, TorchModelAdapter):
         - freq: Time features encoding frequency (default: 'h')
         - task_name: Task type (default: 'long_term_forecast')
     """
-    
+
     def __init__(self, config: Dict[str, Any]):
         default_config = {
             'd_model': 512,
@@ -219,37 +262,45 @@ class AutoformerAdapter(EntityAwareMixin, TorchModelAdapter):
             'c_out': None,
         }
         default_config.update(config)
-        
+
         # Set c_out, dec_in to enc_in if not specified
         if default_config['c_out'] is None:
             default_config['c_out'] = default_config['enc_in']
         if 'dec_in' not in default_config:
             default_config['dec_in'] = default_config['enc_in']
-        
+
         model_cfg = self._entity_model_config(default_config)
         model = Model(self._dict_to_namespace(model_cfg))
         super().__init__(model, default_config)
         self._init_entity_support(default_config)
-    
+
     def _prepare_model_inputs(self, inputs: Dict[str, torch.Tensor]) -> tuple:
         """Prepare inputs for Autoformer forward pass"""
         x_enc = inputs['x_enc']
         batch_size, seq_len, n_features = x_enc.shape
-        
+
         label_len = self.config.get('label_len', min(48, seq_len // 2))
         pred_len = self.config['pred_len']
-        
-        x_mark_enc = inputs.get('x_mark_enc', torch.zeros(batch_size, seq_len, 4, device=x_enc.device))
-        
+
+        x_mark_enc = inputs.get(
+            'x_mark_enc', torch.zeros(batch_size, seq_len, 4, device=x_enc.device)
+        )
+
         # Decoder input: last label_len of encoder + pred_len zeros
         if 'x_dec' not in inputs:
-            x_dec = torch.cat([
-                x_enc[:, -label_len:, :],
-                torch.zeros(batch_size, pred_len, n_features, device=x_enc.device)
-            ], dim=1)
+            x_dec = torch.cat(
+                [
+                    x_enc[:, -label_len:, :],
+                    torch.zeros(batch_size, pred_len, n_features, device=x_enc.device),
+                ],
+                dim=1,
+            )
         else:
             x_dec = inputs['x_dec']
-        
-        x_mark_dec = inputs.get('x_mark_dec', torch.zeros(batch_size, label_len + pred_len, 4, device=x_enc.device))
-        
+
+        x_mark_dec = inputs.get(
+            'x_mark_dec',
+            torch.zeros(batch_size, label_len + pred_len, 4, device=x_enc.device),
+        )
+
         return (x_enc, x_mark_enc, x_dec, x_mark_dec)

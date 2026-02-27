@@ -5,13 +5,13 @@ Tests for data components: DatasetCustom, prompt_bank, seq_dataset.
 import numpy as np
 import pandas as pd
 import pytest
-import tempfile
 import os
 
 
 def _torch_available():
     try:
         import torch  # noqa: F401
+
         return True
     except ImportError:
         return False
@@ -20,6 +20,7 @@ def _torch_available():
 def _sklearn_available():
     try:
         import sklearn  # noqa: F401
+
         return True
     except ImportError:
         return False

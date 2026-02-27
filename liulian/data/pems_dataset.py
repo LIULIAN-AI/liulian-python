@@ -117,7 +117,9 @@ class PEMSDataset(TimeSeriesDataset):
 
         # Load .npz and build split DataFrames
         splits, feature_cols, tf_cols = self._load_npz(
-            root_path, data_path, seq_len,
+            root_path,
+            data_path,
+            seq_len,
         )
 
         super().__init__(
@@ -142,7 +144,8 @@ class PEMSDataset(TimeSeriesDataset):
     ) -> Tuple[dict[str, pd.DataFrame], list[str], list[str]]:
         """Load PEMS .npz and return split DataFrames."""
         raw: np.ndarray = np.load(
-            os.path.join(root_path, data_path), allow_pickle=True,
+            os.path.join(root_path, data_path),
+            allow_pickle=True,
         )['data'].astype(np.float32)
 
         # Use first feature only (flow) → (T, N)

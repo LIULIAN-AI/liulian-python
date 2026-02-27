@@ -26,10 +26,12 @@ expand=2, d_conv=4.
 Usage::
 
     from liulian.optim.search_spaces import swiss_lstm_space
+
     space = swiss_lstm_space()
 
     # With Ray Tune:
     from ray import tune
+
     ray_space = {k: tune.choice(v) for k, v in space.items()}
 """
 
@@ -303,9 +305,9 @@ def dlinear_space() -> Dict[str, List[Any]]:
     epochs=10) unchanged for DLinear.
     """
     return {
-        'batch_size': [16, 32, 64, 128],          # TSLib default: 32
+        'batch_size': [16, 32, 64, 128],  # TSLib default: 32
         'learning_rate': [0.0001, 0.0005, 0.001, 0.005],  # TSLib default: 0.0001
-        'train_epochs': [10, 20, 50],              # TSLib default: 10
+        'train_epochs': [10, 20, 50],  # TSLib default: 10
     }
 
 
@@ -320,15 +322,15 @@ def transformer_tsl_space() -> Dict[str, List[Any]]:
     n_heads=8, e_layers=2, d_layers=1, dropout=0.1.
     """
     return {
-        'batch_size': [16, 32],                    # TSLib default: 32
+        'batch_size': [16, 32],  # TSLib default: 32
         'learning_rate': [0.0001, 0.0005, 0.001],  # TSLib default: 0.0001
-        'd_model': [128, 256, 512],                # TSLib default: 512
-        'd_ff': [256, 512, 2048],                  # TSLib default: 2048
-        'n_heads': [4, 8],                         # TSLib default: 8
-        'e_layers': [2, 3],                        # TSLib default: 2
-        'd_layers': [1, 2],                        # TSLib default: 1
-        'dropout': [0.0, 0.1, 0.2],               # TSLib default: 0.1
-        'train_epochs': [10, 20, 50],              # TSLib default: 10
+        'd_model': [128, 256, 512],  # TSLib default: 512
+        'd_ff': [256, 512, 2048],  # TSLib default: 2048
+        'n_heads': [4, 8],  # TSLib default: 8
+        'e_layers': [2, 3],  # TSLib default: 2
+        'd_layers': [1, 2],  # TSLib default: 1
+        'dropout': [0.0, 0.1, 0.2],  # TSLib default: 0.1
+        'train_epochs': [10, 20, 50],  # TSLib default: 10
     }
 
 
@@ -346,16 +348,16 @@ def informer_space() -> Dict[str, List[Any]]:
     ``distil=True`` by default (argparse ``store_false``).
     """
     return {
-        'batch_size': [16, 32],                    # TSLib default: 32
+        'batch_size': [16, 32],  # TSLib default: 32
         'learning_rate': [0.0001, 0.0005, 0.001],  # TSLib default: 0.0001
-        'd_model': [256, 512],                     # TSLib default: 512
-        'd_ff': [512, 1024, 2048],                 # TSLib default: 2048
-        'n_heads': [4, 8],                         # TSLib default: 8
-        'e_layers': [2, 3],                        # TSLib default: 2
-        'd_layers': [1, 2],                        # TSLib default: 1
-        'dropout': [0.0, 0.1, 0.2],               # TSLib default: 0.1
-        'factor': [1, 3, 5],                       # TSLib scripts: 3; controls ProbSparse sampling
-        'train_epochs': [10, 20, 50],              # TSLib default: 10
+        'd_model': [256, 512],  # TSLib default: 512
+        'd_ff': [512, 1024, 2048],  # TSLib default: 2048
+        'n_heads': [4, 8],  # TSLib default: 8
+        'e_layers': [2, 3],  # TSLib default: 2
+        'd_layers': [1, 2],  # TSLib default: 1
+        'dropout': [0.0, 0.1, 0.2],  # TSLib default: 0.1
+        'factor': [1, 3, 5],  # TSLib scripts: 3; controls ProbSparse sampling
+        'train_epochs': [10, 20, 50],  # TSLib default: 10
     }
 
 
@@ -373,17 +375,17 @@ def autoformer_space() -> Dict[str, List[Any]]:
     moving_avg=25.
     """
     return {
-        'batch_size': [16, 32],                    # TSLib default: 32
+        'batch_size': [16, 32],  # TSLib default: 32
         'learning_rate': [0.0001, 0.0005, 0.001],  # TSLib default: 0.0001
-        'd_model': [256, 512],                     # TSLib default: 512
-        'd_ff': [512, 1024, 2048],                 # TSLib default: 2048
-        'n_heads': [4, 8],                         # TSLib default: 8
-        'e_layers': [2, 3],                        # TSLib default: 2
-        'd_layers': [1],                           # TSLib default: 1
-        'dropout': [0.0, 0.1, 0.2],               # TSLib default: 0.1
-        'moving_avg': [13, 25],                    # TSLib default: 25
-        'factor': [1, 3],                          # TSLib scripts: 3
-        'train_epochs': [10, 20, 50],              # TSLib default: 10
+        'd_model': [256, 512],  # TSLib default: 512
+        'd_ff': [512, 1024, 2048],  # TSLib default: 2048
+        'n_heads': [4, 8],  # TSLib default: 8
+        'e_layers': [2, 3],  # TSLib default: 2
+        'd_layers': [1],  # TSLib default: 1
+        'dropout': [0.0, 0.1, 0.2],  # TSLib default: 0.1
+        'moving_avg': [13, 25],  # TSLib default: 25
+        'factor': [1, 3],  # TSLib scripts: 3
+        'train_epochs': [10, 20, 50],  # TSLib default: 10
     }
 
 
@@ -400,16 +402,16 @@ def fedformer_space() -> Dict[str, List[Any]]:
     e_layers=2, d_layers=1, factor=3, moving_avg=25.
     """
     return {
-        'batch_size': [16, 32],                    # TSLib default: 32
+        'batch_size': [16, 32],  # TSLib default: 32
         'learning_rate': [0.0001, 0.0005, 0.001],  # TSLib default: 0.0001
-        'd_model': [256, 512],                     # TSLib default: 512
-        'd_ff': [512, 1024, 2048],                 # TSLib default: 2048
-        'n_heads': [4, 8],                         # TSLib default: 8
-        'e_layers': [2, 3],                        # TSLib default: 2
-        'd_layers': [1],                           # TSLib default: 1
-        'dropout': [0.0, 0.1, 0.2],               # TSLib default: 0.1
-        'moving_avg': [13, 25],                    # TSLib default: 25
-        'train_epochs': [10, 20, 50],              # TSLib default: 10
+        'd_model': [256, 512],  # TSLib default: 512
+        'd_ff': [512, 1024, 2048],  # TSLib default: 2048
+        'n_heads': [4, 8],  # TSLib default: 8
+        'e_layers': [2, 3],  # TSLib default: 2
+        'd_layers': [1],  # TSLib default: 1
+        'dropout': [0.0, 0.1, 0.2],  # TSLib default: 0.1
+        'moving_avg': [13, 25],  # TSLib default: 25
+        'train_epochs': [10, 20, 50],  # TSLib default: 10
     }
 
 
@@ -427,14 +429,14 @@ def itransformer_space() -> Dict[str, List[Any]]:
     equals d_model — this is intentional for the inverted architecture.
     """
     return {
-        'batch_size': [16, 32],                    # TSLib default: 32
+        'batch_size': [16, 32],  # TSLib default: 32
         'learning_rate': [0.0001, 0.0005, 0.001],  # TSLib default: 0.0001
-        'd_model': [128, 256, 512],                # TSLib Weather: 512
-        'd_ff': [128, 256, 512],                   # TSLib Weather: 512 (intentionally = d_model)
-        'n_heads': [4, 8],                         # TSLib default: 8
-        'e_layers': [2, 3, 4],                     # TSLib Weather: 3
-        'dropout': [0.0, 0.1, 0.2],               # TSLib default: 0.1
-        'train_epochs': [10, 20, 50],              # TSLib default: 10
+        'd_model': [128, 256, 512],  # TSLib Weather: 512
+        'd_ff': [128, 256, 512],  # TSLib Weather: 512 (intentionally = d_model)
+        'n_heads': [4, 8],  # TSLib default: 8
+        'e_layers': [2, 3, 4],  # TSLib Weather: 3
+        'dropout': [0.0, 0.1, 0.2],  # TSLib default: 0.1
+        'train_epochs': [10, 20, 50],  # TSLib default: 10
     }
 
 
@@ -452,14 +454,14 @@ def patchtst_space() -> Dict[str, List[Any]]:
     horizons (96), n_heads=2/8/16 depending on pred_len.
     """
     return {
-        'batch_size': [16, 32, 64, 128],           # TSLib default: 32
+        'batch_size': [16, 32, 64, 128],  # TSLib default: 32
         'learning_rate': [0.0001, 0.0005, 0.001],  # TSLib default: 0.0001
-        'd_model': [128, 256, 512],                # TSLib default: 512
-        'd_ff': [256, 512, 2048],                  # TSLib default: 2048
-        'n_heads': [2, 4, 8, 16],                  # TSLib scripts: 2/8/16 by pred_len
-        'e_layers': [1, 2, 3],                     # TSLib scripts: 1 (short), varies
-        'dropout': [0.0, 0.1, 0.2],               # TSLib default: 0.1
-        'train_epochs': [10, 50, 100],             # TSLib default: 10
+        'd_model': [128, 256, 512],  # TSLib default: 512
+        'd_ff': [256, 512, 2048],  # TSLib default: 2048
+        'n_heads': [2, 4, 8, 16],  # TSLib scripts: 2/8/16 by pred_len
+        'e_layers': [1, 2, 3],  # TSLib scripts: 1 (short), varies
+        'dropout': [0.0, 0.1, 0.2],  # TSLib default: 0.1
+        'train_epochs': [10, 50, 100],  # TSLib default: 10
     }
 
 
@@ -477,15 +479,15 @@ def timesnet_space() -> Dict[str, List[Any]]:
     because the 2D-variation mechanism is already parameter-heavy.
     """
     return {
-        'batch_size': [16, 32],                    # TSLib default: 32
+        'batch_size': [16, 32],  # TSLib default: 32
         'learning_rate': [0.0001, 0.0005, 0.001],  # TSLib default: 0.0001
-        'd_model': [16, 32, 64, 128],              # TSLib Weather: 16 (!)
-        'd_ff': [32, 64, 128, 256],                # TSLib Weather: 32 (!)
-        'e_layers': [2, 3],                        # TSLib default: 2
-        'top_k': [3, 5],                           # TSLib default: 5
-        'num_kernels': [3, 6],                     # TSLib default: 6
-        'dropout': [0.0, 0.1, 0.2],               # TSLib default: 0.1
-        'train_epochs': [10, 20, 50],              # TSLib default: 10
+        'd_model': [16, 32, 64, 128],  # TSLib Weather: 16 (!)
+        'd_ff': [32, 64, 128, 256],  # TSLib Weather: 32 (!)
+        'e_layers': [2, 3],  # TSLib default: 2
+        'top_k': [3, 5],  # TSLib default: 5
+        'num_kernels': [3, 6],  # TSLib default: 6
+        'dropout': [0.0, 0.1, 0.2],  # TSLib default: 0.1
+        'train_epochs': [10, 20, 50],  # TSLib default: 10
     }
 
 
@@ -503,15 +505,15 @@ def timemixer_space() -> Dict[str, List[Any]]:
     Like TimesNet, TimeMixer uses very small d_model/d_ff values.
     """
     return {
-        'batch_size': [16, 32, 128],               # TSLib Weather: 128
-        'learning_rate': [0.0001, 0.001, 0.01],    # TSLib Weather: 0.01
-        'd_model': [16, 32, 64, 128],              # TSLib Weather: 16
-        'd_ff': [32, 64, 128, 256],                # TSLib Weather: 32
-        'e_layers': [2, 3, 4],                     # TSLib Weather: 3
-        'dropout': [0.0, 0.1, 0.2],               # TSLib default: 0.1
-        'down_sampling_layers': [2, 3],            # TSLib Weather: 3
-        'down_sampling_window': [2],               # TSLib Weather: 2
-        'train_epochs': [10, 20, 50],              # TSLib Weather: 20
+        'batch_size': [16, 32, 128],  # TSLib Weather: 128
+        'learning_rate': [0.0001, 0.001, 0.01],  # TSLib Weather: 0.01
+        'd_model': [16, 32, 64, 128],  # TSLib Weather: 16
+        'd_ff': [32, 64, 128, 256],  # TSLib Weather: 32
+        'e_layers': [2, 3, 4],  # TSLib Weather: 3
+        'dropout': [0.0, 0.1, 0.2],  # TSLib default: 0.1
+        'down_sampling_layers': [2, 3],  # TSLib Weather: 3
+        'down_sampling_window': [2],  # TSLib Weather: 2
+        'train_epochs': [10, 20, 50],  # TSLib Weather: 20
     }
 
 
@@ -528,14 +530,14 @@ def timexer_space() -> Dict[str, List[Any]]:
     d_ff=512/1024, e_layers=1/3, patch_len=16 (argparse default).
     """
     return {
-        'batch_size': [4, 16, 32],                 # TSLib Weather: 4
+        'batch_size': [4, 16, 32],  # TSLib Weather: 4
         'learning_rate': [0.0001, 0.0005, 0.001],  # TSLib default: 0.0001
-        'd_model': [128, 256, 512],                # TSLib Weather: 128/256
-        'd_ff': [256, 512, 1024],                  # TSLib Weather: 512/1024
-        'n_heads': [4, 8],                         # TSLib default: 8
-        'e_layers': [1, 2, 3],                     # TSLib Weather: 1/3
-        'dropout': [0.0, 0.1, 0.2],               # TSLib default: 0.1
-        'train_epochs': [10, 20, 50],              # TSLib default: 10
+        'd_model': [128, 256, 512],  # TSLib Weather: 128/256
+        'd_ff': [256, 512, 1024],  # TSLib Weather: 512/1024
+        'n_heads': [4, 8],  # TSLib default: 8
+        'e_layers': [1, 2, 3],  # TSLib Weather: 1/3
+        'dropout': [0.0, 0.1, 0.2],  # TSLib default: 0.1
+        'train_epochs': [10, 20, 50],  # TSLib default: 10
     }
 
 
@@ -555,16 +557,16 @@ def mamba_space() -> Dict[str, List[Any]]:
     kernel size in the Mamba block.
     """
     return {
-        'batch_size': [16, 32],                    # TSLib default: 32
+        'batch_size': [16, 32],  # TSLib default: 32
         'learning_rate': [0.0001, 0.0005, 0.001],  # TSLib default: 0.0001
-        'd_model': [64, 128, 256],                 # TSLib Weather: 128
-        'd_ff': [16, 32, 64],                      # TSLib Weather: 16 (!); NOT the usual 2048
-        'e_layers': [2, 4],                        # TSLib Weather: 2
-        'd_state': [16, 32],                       # SSM state dimension
-        'expand': [2],                             # TSLib default: 2; Mamba expansion factor
-        'd_conv': [4],                             # TSLib default: 4; local conv kernel size
-        'dropout': [0.0, 0.1],                     # TSLib default: 0.1
-        'train_epochs': [10, 20, 50],              # TSLib default: 10
+        'd_model': [64, 128, 256],  # TSLib Weather: 128
+        'd_ff': [16, 32, 64],  # TSLib Weather: 16 (!); NOT the usual 2048
+        'e_layers': [2, 4],  # TSLib Weather: 2
+        'd_state': [16, 32],  # SSM state dimension
+        'expand': [2],  # TSLib default: 2; Mamba expansion factor
+        'd_conv': [4],  # TSLib default: 4; local conv kernel size
+        'dropout': [0.0, 0.1],  # TSLib default: 0.1
+        'train_epochs': [10, 20, 50],  # TSLib default: 10
     }
 
 
@@ -704,8 +706,7 @@ def get_search_space(name: str) -> Dict[str, List[Any]]:
     fn = _SPACE_REGISTRY.get(name.strip().lower())
     if fn is None:
         raise ValueError(
-            f"Unknown search space '{name}'. "
-            f'Available: {sorted(_SPACE_REGISTRY)}'
+            f"Unknown search space '{name}'. Available: {sorted(_SPACE_REGISTRY)}"
         )
     return fn()
 
@@ -723,7 +724,6 @@ def get_asha_preset(name: str = 'default') -> Dict[str, Any]:
     fn = _ASHA_REGISTRY.get(name.strip().lower())
     if fn is None:
         raise ValueError(
-            f"Unknown ASHA preset '{name}'. "
-            f'Available: {sorted(_ASHA_REGISTRY)}'
+            f"Unknown ASHA preset '{name}'. Available: {sorted(_ASHA_REGISTRY)}"
         )
     return fn()

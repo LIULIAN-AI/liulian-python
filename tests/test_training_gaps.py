@@ -24,6 +24,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 try:
     import sklearn  # noqa: F401
+
     _HAS_SKLEARN = True
 except ImportError:
     _HAS_SKLEARN = False
@@ -77,8 +78,7 @@ class TestDisableEarlyStopping:
 
     def test_early_stopping_fires(self):
         """With patience=1 and high LR, val loss oscillates → early stop."""
-        trainer = self._make_trainer(patience=1, train_epochs=100,
-                                     learning_rate=0.5)
+        trainer = self._make_trainer(patience=1, train_epochs=100, learning_rate=0.5)
         model = self._tiny_model()
         summary = trainer.fit(model, self._make_loader(), self._make_loader())
         assert summary['epochs_run'] < 100
@@ -86,7 +86,9 @@ class TestDisableEarlyStopping:
     def test_disable_early_stopping(self):
         """With disable_early_stopping=True, all epochs must run."""
         trainer = self._make_trainer(
-            patience=1, train_epochs=5, disable_early_stopping=True,
+            patience=1,
+            train_epochs=5,
+            disable_early_stopping=True,
         )
         model = self._tiny_model()
         summary = trainer.fit(model, self._make_loader(), self._make_loader())
@@ -135,7 +137,8 @@ class TestScalers:
         np.testing.assert_array_equal(s.inverse_transform(x), x)
 
     @pytest.mark.skipif(
-        not _HAS_SKLEARN, reason='scikit-learn not installed',
+        not _HAS_SKLEARN,
+        reason='scikit-learn not installed',
     )
     def test_standard_scaler(self):
         from liulian.data.scalers import get_scaler
@@ -149,7 +152,8 @@ class TestScalers:
         np.testing.assert_allclose(inv, x, atol=1e-6)
 
     @pytest.mark.skipif(
-        not _HAS_SKLEARN, reason='scikit-learn not installed',
+        not _HAS_SKLEARN,
+        reason='scikit-learn not installed',
     )
     def test_minmax_scaler(self):
         from liulian.data.scalers import get_scaler
@@ -168,7 +172,8 @@ class TestScalers:
             get_scaler('foobar')
 
     @pytest.mark.skipif(
-        not _HAS_SKLEARN, reason='scikit-learn not installed',
+        not _HAS_SKLEARN,
+        reason='scikit-learn not installed',
     )
     def test_dim_split_scaler(self):
         from sklearn.preprocessing import MinMaxScaler as MMS
@@ -204,7 +209,9 @@ class TestSwissModels:
     def test_extrapo_limo(self):
         from liulian.models.torch.swiss_lstm import ExtrapoLstmModelLIMO
 
-        m = ExtrapoLstmModelLIMO(input_size=2, hidden_size=16, num_layers=1, future_steps=3)
+        m = ExtrapoLstmModelLIMO(
+            input_size=2, hidden_size=16, num_layers=1, future_steps=3
+        )
         x = torch.randn(2, 13, 2)  # 10 + 3 future
         out = m(x)
         assert out.shape == (2, 3, 1)
@@ -213,7 +220,11 @@ class TestSwissModels:
         from liulian.models.torch.swiss_lstm import ExtrapoLstmModelFEmbed
 
         m = ExtrapoLstmModelFEmbed(
-            input_size=2, hidden_size=16, num_layers=1, future_steps=3, d_future_emb=8,
+            input_size=2,
+            hidden_size=16,
+            num_layers=1,
+            future_steps=3,
+            d_future_emb=8,
         )
         x = torch.randn(2, 13, 2)
         out = m(x)
@@ -223,8 +234,11 @@ class TestSwissModels:
         from liulian.models.torch.swiss_lstm import LstmEmbeddingModel
 
         m = LstmEmbeddingModel(
-            input_size=2, num_embeddings=10, embedding_size=4,
-            hidden_size=16, num_layers=1,
+            input_size=2,
+            num_embeddings=10,
+            embedding_size=4,
+            hidden_size=16,
+            num_layers=1,
         )
         e = torch.randint(0, 10, (2, 10))
         x = torch.randn(2, 10, 2)
@@ -235,19 +249,30 @@ class TestSwissModels:
         from liulian.models.torch.swiss_transformer import SwissTransformerModel
 
         m = SwissTransformerModel(
-            input_size=3, num_heads=2, num_layers=1,
-            dim_feedforward=32, d_model=8, positional_encoding='sinusoidal',
+            input_size=3,
+            num_heads=2,
+            num_layers=1,
+            dim_feedforward=32,
+            d_model=8,
+            positional_encoding='sinusoidal',
         )
         x = torch.randn(2, 10, 3)
         out = m(x)
         assert out.shape == (2, 10, 1)
 
     def test_swiss_transformer_embedding(self):
-        from liulian.models.torch.swiss_transformer import SwissTransformerEmbeddingModel
+        from liulian.models.torch.swiss_transformer import (
+            SwissTransformerEmbeddingModel,
+        )
 
         m = SwissTransformerEmbeddingModel(
-            input_size=3, num_embeddings=5, embedding_size=4,
-            num_heads=2, num_layers=1, dim_feedforward=32, d_model=8,
+            input_size=3,
+            num_embeddings=5,
+            embedding_size=4,
+            num_heads=2,
+            num_layers=1,
+            dim_feedforward=32,
+            d_model=8,
             positional_encoding='sinusoidal',
         )
         e = torch.randint(0, 5, (2, 10))
@@ -267,11 +292,16 @@ class TestSwissModels:
     def test_swiss_transformer_adapter(self):
         from liulian.models.torch.swiss_transformer import SwissTransformerAdapter
 
-        adapter = SwissTransformerAdapter({
-            'enc_in': 3, 'n_heads': 2, 'e_layers': 1,
-            'd_ff': 32, 'd_model': 8,
-            'positional_encoding': 'sinusoidal',
-        })
+        adapter = SwissTransformerAdapter(
+            {
+                'enc_in': 3,
+                'n_heads': 2,
+                'e_layers': 1,
+                'd_ff': 32,
+                'd_model': 8,
+                'positional_encoding': 'sinusoidal',
+            }
+        )
         batch = {'x_enc': torch.randn(2, 10, 3)}
         out = adapter.forward(batch)
         assert 'predictions' in out
@@ -301,7 +331,11 @@ class TestGeneralizedModels:
         from liulian.models.torch.swiss_lstm import ExtrapoLstmModelLIMO
 
         m = ExtrapoLstmModelLIMO(
-            input_size=7, hidden_size=32, num_layers=1, future_steps=24, c_out=7,
+            input_size=7,
+            hidden_size=32,
+            num_layers=1,
+            future_steps=24,
+            c_out=7,
         )
         x = torch.randn(2, 96 + 24, 7)
         out = m(x)
@@ -311,8 +345,12 @@ class TestGeneralizedModels:
         from liulian.models.torch.swiss_lstm import ExtrapoLstmModelFEmbed
 
         m = ExtrapoLstmModelFEmbed(
-            input_size=7, hidden_size=32, num_layers=1,
-            future_steps=24, d_future_emb=16, c_out=7,
+            input_size=7,
+            hidden_size=32,
+            num_layers=1,
+            future_steps=24,
+            d_future_emb=16,
+            c_out=7,
         )
         x = torch.randn(2, 96 + 24, 7)
         out = m(x)
@@ -322,8 +360,12 @@ class TestGeneralizedModels:
         from liulian.models.torch.swiss_lstm import LstmEmbeddingModel
 
         m = LstmEmbeddingModel(
-            input_size=7, num_embeddings=20, embedding_size=8,
-            hidden_size=32, num_layers=1, c_out=7,
+            input_size=7,
+            num_embeddings=20,
+            embedding_size=8,
+            hidden_size=32,
+            num_layers=1,
+            c_out=7,
         )
         e = torch.randint(0, 20, (2, 96))
         x = torch.randn(2, 96, 7)
@@ -334,21 +376,33 @@ class TestGeneralizedModels:
         from liulian.models.torch.swiss_transformer import SwissTransformerModel
 
         m = SwissTransformerModel(
-            input_size=7, num_heads=2, num_layers=1,
-            dim_feedforward=32, d_model=8,
-            positional_encoding='sinusoidal', c_out=7,
+            input_size=7,
+            num_heads=2,
+            num_layers=1,
+            dim_feedforward=32,
+            d_model=8,
+            positional_encoding='sinusoidal',
+            c_out=7,
         )
         x = torch.randn(2, 96, 7)
         out = m(x)
         assert out.shape == (2, 96, 7)
 
     def test_transformer_embedding_multi_channel(self):
-        from liulian.models.torch.swiss_transformer import SwissTransformerEmbeddingModel
+        from liulian.models.torch.swiss_transformer import (
+            SwissTransformerEmbeddingModel,
+        )
 
         m = SwissTransformerEmbeddingModel(
-            input_size=7, num_embeddings=10, embedding_size=4,
-            num_heads=2, num_layers=1, dim_feedforward=32, d_model=8,
-            positional_encoding='sinusoidal', c_out=7,
+            input_size=7,
+            num_embeddings=10,
+            embedding_size=4,
+            num_heads=2,
+            num_layers=1,
+            dim_feedforward=32,
+            d_model=8,
+            positional_encoding='sinusoidal',
+            c_out=7,
         )
         e = torch.randint(0, 10, (2, 96))
         x = torch.randn(2, 96, 7)
@@ -361,9 +415,14 @@ class TestGeneralizedModels:
         """Traffic-like: 862 channels, no entities."""
         from liulian.models.torch.swiss_lstm import LSTMAdapter
 
-        adapter = LSTMAdapter({
-            'enc_in': 10, 'c_out': 10, 'd_model': 16, 'e_layers': 1,
-        })
+        adapter = LSTMAdapter(
+            {
+                'enc_in': 10,
+                'c_out': 10,
+                'd_model': 16,
+                'e_layers': 1,
+            }
+        )
         out = adapter.forward({'x_enc': torch.randn(2, 96, 10)})
         assert out['predictions'].shape == (2, 96, 10)
 
@@ -371,32 +430,47 @@ class TestGeneralizedModels:
         """Entity embedding mode — IDs from x_mark_enc."""
         from liulian.models.torch.swiss_lstm import LSTMAdapter
 
-        adapter = LSTMAdapter({
-            'enc_in': 3, 'c_out': 1, 'd_model': 16, 'e_layers': 1,
-            'identifier_mode': 'embedding',
-            'num_embeddings': 20, 'embedding_size': 4,
-        })
+        adapter = LSTMAdapter(
+            {
+                'enc_in': 3,
+                'c_out': 1,
+                'd_model': 16,
+                'e_layers': 1,
+                'identifier_mode': 'embedding',
+                'num_embeddings': 20,
+                'embedding_size': 4,
+            }
+        )
         x_mark = torch.zeros(2, 10, 2)
         x_mark[:, :, 0] = torch.randint(0, 20, (2, 10)).float()
-        out = adapter.forward({
-            'x_enc': torch.randn(2, 10, 3),
-            'x_mark_enc': x_mark,
-        })
+        out = adapter.forward(
+            {
+                'x_enc': torch.randn(2, 10, 3),
+                'x_mark_enc': x_mark,
+            }
+        )
         assert out['predictions'].shape == (2, 10, 1)
 
     def test_lstm_adapter_feature_concat_mode(self):
         """feature_concat mode — separate entity_features tensor."""
         from liulian.models.torch.swiss_lstm import LSTMAdapter
 
-        adapter = LSTMAdapter({
-            'enc_in': 3, 'c_out': 1, 'd_model': 16, 'e_layers': 1,
-            'identifier_mode': 'feature_concat',
-            'entity_dim': 8,
-        })
-        out = adapter.forward({
-            'x_enc': torch.randn(2, 10, 3),
-            'entity_features': torch.randn(2, 10, 8),
-        })
+        adapter = LSTMAdapter(
+            {
+                'enc_in': 3,
+                'c_out': 1,
+                'd_model': 16,
+                'e_layers': 1,
+                'identifier_mode': 'feature_concat',
+                'entity_dim': 8,
+            }
+        )
+        out = adapter.forward(
+            {
+                'x_enc': torch.randn(2, 10, 3),
+                'entity_features': torch.randn(2, 10, 8),
+            }
+        )
         assert out['predictions'].shape == (2, 10, 1)
 
     def test_lstm_adapter_onehot_transparent(self):
@@ -404,10 +478,15 @@ class TestGeneralizedModels:
         from liulian.models.torch.swiss_lstm import LSTMAdapter
 
         # 3 raw features + 5 one-hot = 8
-        adapter = LSTMAdapter({
-            'enc_in': 8, 'c_out': 1, 'd_model': 16, 'e_layers': 1,
-            'identifier_mode': 'onehot',
-        })
+        adapter = LSTMAdapter(
+            {
+                'enc_in': 8,
+                'c_out': 1,
+                'd_model': 16,
+                'e_layers': 1,
+                'identifier_mode': 'onehot',
+            }
+        )
         out = adapter.forward({'x_enc': torch.randn(2, 10, 8)})
         assert out['predictions'].shape == (2, 10, 1)
 
@@ -417,44 +496,67 @@ class TestGeneralizedModels:
         """Multi-channel output for traffic/ETT."""
         from liulian.models.torch.swiss_transformer import TransformerEncoderAdapter
 
-        adapter = TransformerEncoderAdapter({
-            'enc_in': 7, 'c_out': 7,
-            'n_heads': 2, 'e_layers': 1, 'd_ff': 32, 'd_model': 8,
-            'positional_encoding': 'sinusoidal',
-        })
+        adapter = TransformerEncoderAdapter(
+            {
+                'enc_in': 7,
+                'c_out': 7,
+                'n_heads': 2,
+                'e_layers': 1,
+                'd_ff': 32,
+                'd_model': 8,
+                'positional_encoding': 'sinusoidal',
+            }
+        )
         out = adapter.forward({'x_enc': torch.randn(2, 96, 7)})
         assert out['predictions'].shape == (2, 96, 7)
 
     def test_transformer_adapter_embedding_mode(self):
         from liulian.models.torch.swiss_transformer import TransformerEncoderAdapter
 
-        adapter = TransformerEncoderAdapter({
-            'enc_in': 3, 'c_out': 1,
-            'n_heads': 2, 'e_layers': 1, 'd_ff': 32, 'd_model': 8,
-            'identifier_mode': 'embedding',
-            'num_embeddings': 20, 'embedding_size': 4,
-        })
+        adapter = TransformerEncoderAdapter(
+            {
+                'enc_in': 3,
+                'c_out': 1,
+                'n_heads': 2,
+                'e_layers': 1,
+                'd_ff': 32,
+                'd_model': 8,
+                'identifier_mode': 'embedding',
+                'num_embeddings': 20,
+                'embedding_size': 4,
+            }
+        )
         x_mark = torch.zeros(2, 10, 2)
         x_mark[:, :, 0] = torch.randint(0, 20, (2, 10)).float()
-        out = adapter.forward({
-            'x_enc': torch.randn(2, 10, 3),
-            'x_mark_enc': x_mark,
-        })
+        out = adapter.forward(
+            {
+                'x_enc': torch.randn(2, 10, 3),
+                'x_mark_enc': x_mark,
+            }
+        )
         assert out['predictions'].shape == (2, 10, 1)
 
     def test_transformer_adapter_feature_concat(self):
         from liulian.models.torch.swiss_transformer import TransformerEncoderAdapter
 
-        adapter = TransformerEncoderAdapter({
-            'enc_in': 3, 'c_out': 1,
-            'n_heads': 2, 'e_layers': 1, 'd_ff': 32, 'd_model': 8,
-            'identifier_mode': 'feature_concat',
-            'entity_dim': 6,
-        })
-        out = adapter.forward({
-            'x_enc': torch.randn(2, 10, 3),
-            'entity_features': torch.randn(2, 10, 6),
-        })
+        adapter = TransformerEncoderAdapter(
+            {
+                'enc_in': 3,
+                'c_out': 1,
+                'n_heads': 2,
+                'e_layers': 1,
+                'd_ff': 32,
+                'd_model': 8,
+                'identifier_mode': 'feature_concat',
+                'entity_dim': 6,
+            }
+        )
+        out = adapter.forward(
+            {
+                'x_enc': torch.randn(2, 10, 3),
+                'entity_features': torch.randn(2, 10, 6),
+            }
+        )
         assert out['predictions'].shape == (2, 10, 1)
 
     # — Entity feature model (standalone) ———————————————————————————
@@ -463,8 +565,11 @@ class TestGeneralizedModels:
         from liulian.models.torch.swiss_lstm import LstmEntityFeatureModel
 
         m = LstmEntityFeatureModel(
-            input_size=3, entity_dim=5, hidden_size=16,
-            num_layers=1, c_out=1,
+            input_size=3,
+            entity_dim=5,
+            hidden_size=16,
+            num_layers=1,
+            c_out=1,
         )
         x = torch.randn(2, 10, 3)
         ef = torch.randn(2, 10, 5)
@@ -475,8 +580,12 @@ class TestGeneralizedModels:
         from liulian.models.torch.swiss_transformer import TransformerEntityFeatureModel
 
         m = TransformerEntityFeatureModel(
-            input_size=3, entity_dim=5,
-            num_heads=2, num_layers=1, dim_feedforward=32, d_model=8,
+            input_size=3,
+            entity_dim=5,
+            num_heads=2,
+            num_layers=1,
+            dim_feedforward=32,
+            d_model=8,
             c_out=3,
         )
         x = torch.randn(2, 10, 3)
@@ -489,10 +598,15 @@ class TestGeneralizedModels:
     def test_extrapo_adapter_multi_channel(self):
         from liulian.models.torch.swiss_lstm import ExtrapoLSTMAdapter
 
-        adapter = ExtrapoLSTMAdapter({
-            'enc_in': 7, 'c_out': 7, 'd_model': 16, 'e_layers': 1,
-            'pred_len': 24,
-        })
+        adapter = ExtrapoLSTMAdapter(
+            {
+                'enc_in': 7,
+                'c_out': 7,
+                'd_model': 16,
+                'e_layers': 1,
+                'pred_len': 24,
+            }
+        )
         out = adapter.forward({'x_enc': torch.randn(2, 96, 7)})
         assert out['predictions'].shape == (2, 24, 7)
 
@@ -505,7 +619,8 @@ class TestGeneralizedModels:
 
     def test_swiss_transformer_adapter_is_encoder_adapter(self):
         from liulian.models.torch.swiss_transformer import (
-            SwissTransformerAdapter, TransformerEncoderAdapter,
+            SwissTransformerAdapter,
+            TransformerEncoderAdapter,
         )
 
         assert SwissTransformerAdapter is TransformerEncoderAdapter
@@ -513,18 +628,29 @@ class TestGeneralizedModels:
     def test_swiss_embedding_adapter_sets_mode(self):
         from liulian.models.torch.swiss_lstm import SwissLSTMEmbeddingAdapter
 
-        adapter = SwissLSTMEmbeddingAdapter({
-            'enc_in': 2, 'd_model': 16, 'e_layers': 1,
-        })
+        adapter = SwissLSTMEmbeddingAdapter(
+            {
+                'enc_in': 2,
+                'd_model': 16,
+                'e_layers': 1,
+            }
+        )
         assert adapter._entity_mode == 'embedding'
 
     def test_swiss_transformer_embedding_adapter_sets_mode(self):
-        from liulian.models.torch.swiss_transformer import SwissTransformerEmbeddingAdapter
+        from liulian.models.torch.swiss_transformer import (
+            SwissTransformerEmbeddingAdapter,
+        )
 
-        adapter = SwissTransformerEmbeddingAdapter({
-            'enc_in': 2, 'n_heads': 2, 'e_layers': 1,
-            'd_ff': 32, 'd_model': 8,
-        })
+        adapter = SwissTransformerEmbeddingAdapter(
+            {
+                'enc_in': 2,
+                'n_heads': 2,
+                'e_layers': 1,
+                'd_ff': 32,
+                'd_model': 8,
+            }
+        )
         assert adapter._entity_mode == 'embedding'
 
     # — Dropout support ————————————————————————————————————————————
@@ -533,7 +659,11 @@ class TestGeneralizedModels:
         from liulian.models.torch.swiss_lstm import SwissLstmModel
 
         m = SwissLstmModel(
-            input_size=3, hidden_size=16, num_layers=3, c_out=1, dropout=0.2,
+            input_size=3,
+            hidden_size=16,
+            num_layers=3,
+            c_out=1,
+            dropout=0.2,
         )
         x = torch.randn(2, 10, 3)
         out = m(x)
@@ -748,7 +878,8 @@ class TestSearchSpaces:
             get_search_space('nonexistent_space')
 
     @pytest.mark.parametrize(
-        'name', ['default', 'soft', 'single_soft', 'single_hard'],
+        'name',
+        ['default', 'soft', 'single_soft', 'single_hard'],
     )
     def test_asha_preset(self, name: str):
         from liulian.optim.search_spaces import get_asha_preset

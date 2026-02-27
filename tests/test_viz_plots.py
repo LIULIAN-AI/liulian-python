@@ -78,7 +78,9 @@ class TestPlotPredictions:
         pred = np.zeros((T, C), dtype=np.float32)
         save_path = os.path.join(tmpdir, 'labels.png')
         plot_predictions(
-            time, true, pred,
+            time,
+            true,
+            pred,
             target_names=['Discharge', 'Level'],
             title='Custom Plot',
             xlabel='Day',
@@ -99,11 +101,13 @@ class TestPlotPredictionSummary:
         # Simulate 4 entities
         results = []
         for i in range(4):
-            results.append({
-                'time': np.arange(T),
-                'pred': np.random.randn(T, C).astype(np.float32),
-                'true': np.random.randn(T, C).astype(np.float32),
-            })
+            results.append(
+                {
+                    'time': np.arange(T),
+                    'pred': np.random.randn(T, C).astype(np.float32),
+                    'true': np.random.randn(T, C).astype(np.float32),
+                }
+            )
         save_path = str(tmp_path / 'summary.png')
         plot_prediction_summary(results, save_path=save_path)
         assert os.path.isfile(save_path)
@@ -140,7 +144,9 @@ class TestPlotPredictionRange:
         times = np.array([np.arange(i, i + win_len) for i in range(N)])
         save_path = str(tmp_path / 'range_mv.png')
         plot_prediction_range(
-            preds, trues, times,
+            preds,
+            trues,
+            times,
             target_names=['Q', 'H', 'T'],
             save_path=save_path,
         )
@@ -162,7 +168,9 @@ class TestSavePredictionPlots:
         times = np.array([np.arange(i, i + win_len) for i in range(N)])
         out_dir = str(tmp_path / 'viz_out')
         paths = save_prediction_plots(
-            preds, trues, times,
+            preds,
+            trues,
+            times,
             method='mean',
             output_dir=out_dir,
         )
@@ -179,11 +187,20 @@ class TestSavePredictionPlots:
         preds = np.random.randn(N, pred_len, C).astype(np.float32)
         trues = np.random.randn(N, pred_len, C).astype(np.float32)
         times = np.array([np.arange(i, i + win_len) for i in range(N)])
-        for method in ('mean', 'median', 'last', 'longest_history',
-                        'best', 'worst', 'single'):
+        for method in (
+            'mean',
+            'median',
+            'last',
+            'longest_history',
+            'best',
+            'worst',
+            'single',
+        ):
             out_dir = str(tmp_path / f'viz_{method}')
             paths = save_prediction_plots(
-                preds, trues, times,
+                preds,
+                trues,
+                times,
                 method=method,
                 output_dir=out_dir,
             )

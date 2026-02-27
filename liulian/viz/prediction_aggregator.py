@@ -39,7 +39,13 @@ import torch
 
 
 AggMethod = Literal[
-    'longest_history', 'last', 'mean', 'median', 'best', 'worst', 'single',
+    'longest_history',
+    'last',
+    'mean',
+    'median',
+    'best',
+    'worst',
+    'single',
 ]
 
 
@@ -115,6 +121,7 @@ def aggregate_predictions(
 # ---------------------------------------------------------------------------
 # Internal helpers
 # ---------------------------------------------------------------------------
+
 
 def _to_numpy(x: torch.Tensor | np.ndarray) -> np.ndarray:
     if isinstance(x, torch.Tensor):
@@ -219,8 +226,8 @@ def _agg_best_worst(
     agg_true = np.zeros((T, C), dtype=np.float32)
 
     for i in range(T):
-        preds_arr = np.array(pred_groups[i])   # (K, C)
-        trues_arr = np.array(true_groups[i])   # (K, C)
+        preds_arr = np.array(pred_groups[i])  # (K, C)
+        trues_arr = np.array(true_groups[i])  # (K, C)
         errors = np.mean(np.abs(preds_arr - trues_arr), axis=1)  # (K,)
         if best:
             pick = int(np.argmin(errors))
@@ -254,8 +261,8 @@ def _agg_single(
     if not selected_indices:
         selected_indices = [0]
 
-    sel_preds = preds[selected_indices]       # (S, pred_len, C)
-    sel_trues = trues[selected_indices]       # (S, pred_len, C)
+    sel_preds = preds[selected_indices]  # (S, pred_len, C)
+    sel_trues = trues[selected_indices]  # (S, pred_len, C)
     sel_times = times[selected_indices, -pred_len:]  # (S, pred_len)
 
     # Flatten to a single time-series

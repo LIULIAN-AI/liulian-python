@@ -17,9 +17,7 @@ import pytest
 # Mark the entire module so it's easy to skip in CI feature branches
 pytestmark = pytest.mark.main_branch
 
-DATASET_ROOT = os.path.join(
-    os.path.dirname(__file__), '..', 'dataset', 'swiss_river'
-)
+DATASET_ROOT = os.path.join(os.path.dirname(__file__), '..', 'dataset', 'swiss_river')
 SKIP_REASON = 'Swiss River CSV data not found under dataset/swiss_river'
 
 
@@ -76,6 +74,7 @@ class TestSwissRiverDatasetLoading:
     @pytest.mark.skipif(not _data_available(), reason=SKIP_REASON)
     def test_values_are_finite(self, swiss_dataset):
         import torch
+
         ts_split = swiss_dataset.get_split('train')
         x, y, xm, ym = ts_split[0][:4]
         assert torch.all(torch.isfinite(x)), 'x contains non-finite values'
@@ -139,8 +138,8 @@ class TestSwissRiverE2ETraining:
 
         assert result['epochs_run'] == 1
         h = result['history'][0]
-        assert np.isfinite(h['train_loss']), f'train_loss={h['train_loss']}'
-        assert np.isfinite(h['val_mse']), f'val_mse={h['val_mse']}'
+        assert np.isfinite(h['train_loss']), f'train_loss={h["train_loss"]}'
+        assert np.isfinite(h['val_mse']), f'val_mse={h["val_mse"]}'
         assert np.isfinite(h['val_rmse'])
         assert np.isfinite(h['val_mae'])
 

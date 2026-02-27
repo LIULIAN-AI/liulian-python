@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 @dataclass
 class AdaptationConfig:
     """Configuration for an adaptation run."""
-    
+
     reference_projects: List[str] = field(default_factory=list)
     target_project: Optional[str] = None
     items: List[str] = field(default_factory=list)
@@ -31,38 +31,38 @@ class AdaptationConfig:
 def parse_slash_command(command: str) -> Optional[AdaptationConfig]:
     """
     Parse /adapt slash command into AdaptationConfig.
-    
+
     Example:
         /adapt reference=https://github.com/org/repo.git target=. items=task,model
-    
+
     Args:
         command: Slash command string
-        
+
     Returns:
         AdaptationConfig if parsing succeeds, None otherwise
     """
     if not command.strip().startswith('/adapt'):
         return None
-    
+
     config = AdaptationConfig()
-    
+
     # Extract reference projects
     ref_match = re.search(r'reference=([^\s]+)', command)
     if ref_match:
         refs = ref_match.group(1).split(',')
         config.reference_projects = [r.strip() for r in refs]
-    
+
     # Extract target project
     target_match = re.search(r'target=([^\s]+)', command)
     if target_match:
         config.target_project = target_match.group(1)
-    
+
     # Extract items
     items_match = re.search(r'items=\[([^\]]+)\]', command)
     if items_match:
         items = items_match.group(1).split(',')
         config.items = [i.strip() for i in items]
-    
+
     # Extract options if present
     options_match = re.search(r'options=\{([^\}]+)\}', command)
     if options_match:
@@ -73,7 +73,7 @@ def parse_slash_command(command: str) -> Optional[AdaptationConfig]:
                 key, value = opt.split(':', 1)
                 key = key.strip()
                 value = value.strip()
-                
+
                 # Set config values
                 if key == 'dry_run':
                     config.dry_run = value.lower() == 'true'
@@ -89,20 +89,20 @@ def parse_slash_command(command: str) -> Optional[AdaptationConfig]:
                     config.token_budget = int(value)
                 elif key == 'copilot_premium_request_budget':
                     config.copilot_premium_request_budget = int(value)
-    
+
     return config
 
 
 def parse_natural_language(request: str) -> Optional[AdaptationConfig]:
     """
     Parse natural language request into AdaptationConfig.
-    
+
     Example:
         "Adapt the SwissRiver dataset from the reference project"
-    
+
     Args:
         request: Natural language request string
-        
+
     Returns:
         AdaptationConfig with detected parameters, or None if not an adapt request
     """
@@ -110,9 +110,9 @@ def parse_natural_language(request: str) -> Optional[AdaptationConfig]:
     adapt_keywords = ['adapt', 'import', 'bring in', 'port', 'migrate']
     if not any(kw in request.lower() for kw in adapt_keywords):
         return None
-    
+
     config = AdaptationConfig()
-    
+
     # Try to extract component types
     component_patterns = {
         'dataset': r'dataset[:\s]+(\w+)',
@@ -122,7 +122,7 @@ def parse_natural_language(request: str) -> Optional[AdaptationConfig]:
         'tests': r'test',
         'docs': r'doc',
     }
-    
+
     for comp_type, pattern in component_patterns.items():
         match = re.search(pattern, request, re.IGNORECASE)
         if match:
@@ -130,18 +130,18 @@ def parse_natural_language(request: str) -> Optional[AdaptationConfig]:
                 config.items.append(f'{comp_type}:{match.group(1)}')
             else:
                 config.items.append(comp_type)
-    
+
     # Try to extract reference project mentions
     ref_patterns = [
         r'from\s+([^\s]+(?:\.git|repository|repo|project))',
         r'reference\s+project[:\s]+([^\s]+)',
     ]
-    
+
     for pattern in ref_patterns:
         match = re.search(pattern, request, re.IGNORECASE)
         if match:
             config.reference_projects.append(match.group(1))
-    
+
     return config
 
 

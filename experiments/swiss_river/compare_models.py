@@ -48,6 +48,7 @@ from liulian.runtime import Experiment, ExperimentSpec
 from liulian.tasks.base import PredictionRegime, PredictionTask
 
 from liulian.utils.log_tags import setup_logging as _setup_logging
+
 _setup_logging(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -157,9 +158,7 @@ def build_model(name: str, cfg: dict) -> torch.nn.Module:
     }
 
     if name not in model_map:
-        raise ValueError(
-            f'Unknown model: {name!r}. Choose from: {list(model_map)}'
-        )
+        raise ValueError(f'Unknown model: {name!r}. Choose from: {list(model_map)}')
 
     import importlib
 
@@ -174,9 +173,9 @@ def run_single_model(
     task: PredictionTask,
 ) -> dict[str, Any]:
     """Train + evaluate one model and return metrics."""
-    logger.info(f'{'=' * 60}')
+    logger.info(f'{"=" * 60}')
     logger.info(f'Starting model: {model_name}')
-    logger.info(f'{'=' * 60}')
+    logger.info(f'{"=" * 60}')
 
     t0 = time.time()
     try:
@@ -241,10 +240,10 @@ def run_single_model(
 
 def print_comparison_table(results: list[dict]) -> None:
     """Pretty-print the comparison results."""
-    print(f'\n{'=' * 80}')
+    print(f'\n{"=" * 80}')
     print('SWISS RIVER MULTI-MODEL COMPARISON')
-    print(f'{'=' * 80}')
-    header = f'{'Model':<15} {'Params':>10} {'MSE':>10} {'MAE':>10} {'RMSE':>10} {'Time(s)':>8} {'Status':<10}'
+    print(f'{"=" * 80}')
+    header = f'{"Model":<15} {"Params":>10} {"MSE":>10} {"MAE":>10} {"RMSE":>10} {"Time(s)":>8} {"Status":<10}'
     print(header)
     print('-' * 80)
 
@@ -252,15 +251,15 @@ def print_comparison_table(results: list[dict]) -> None:
     sorted_results = sorted(results, key=lambda r: (r['mse'] != r['mse'], r['mse']))
 
     for r in sorted_results:
-        mse_s = f'{r['mse']:.6f}' if r['mse'] == r['mse'] else 'N/A'
-        mae_s = f'{r['mae']:.6f}' if r['mae'] == r['mae'] else 'N/A'
-        rmse_s = f'{r['rmse']:.6f}' if r['rmse'] == r['rmse'] else 'N/A'
+        mse_s = f'{r["mse"]:.6f}' if r['mse'] == r['mse'] else 'N/A'
+        mae_s = f'{r["mae"]:.6f}' if r['mae'] == r['mae'] else 'N/A'
+        rmse_s = f'{r["rmse"]:.6f}' if r['rmse'] == r['rmse'] else 'N/A'
         print(
-            f'{r['model']:<15} {r['params']:>10,} {mse_s:>10} {mae_s:>10} '
-            f'{rmse_s:>10} {r['time_s']:>8.1f} {r['status']:<10}'
+            f'{r["model"]:<15} {r["params"]:>10,} {mse_s:>10} {mae_s:>10} '
+            f'{rmse_s:>10} {r["time_s"]:>8.1f} {r["status"]:<10}'
         )
 
-    print(f'{'=' * 80}\n')
+    print(f'{"=" * 80}\n')
 
 
 def parse_args() -> argparse.Namespace:
@@ -334,9 +333,7 @@ def main() -> None:
     print_comparison_table(results)
 
     # Save JSON
-    out_path = args.output or os.path.join(
-        _SCRIPT_DIR, 'comparison_results.json'
-    )
+    out_path = args.output or os.path.join(_SCRIPT_DIR, 'comparison_results.json')
     with open(out_path, 'w') as f:
         json.dump(results, f, indent=2, default=str)
     logger.ok(f'Results saved to {out_path}')

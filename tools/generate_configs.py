@@ -40,64 +40,186 @@ DEFAULT_OUTPUT_DIR = ROOT / 'experiments' / 'configs'
 # --- Models ---
 
 TSL_MODELS = [
-    'DLinear', 'Transformer', 'Informer', 'Autoformer', 'FEDformer',
-    'iTransformer', 'PatchTST', 'TimesNet', 'TimeMixer', 'TimeXer',
-    'Mamba', 'TimeLLM',
+    'DLinear',
+    'Transformer',
+    'Informer',
+    'Autoformer',
+    'FEDformer',
+    'iTransformer',
+    'PatchTST',
+    'TimesNet',
+    'TimeMixer',
+    'TimeXer',
+    'Mamba',
+    'TimeLLM',
 ]
 
 CUSTOM_MODELS = [
-    'LSTMAdapter', 'ExtrapoLSTMAdapter', 'TransformerEncoderAdapter',
+    'LSTMAdapter',
+    'ExtrapoLSTMAdapter',
+    'TransformerEncoderAdapter',
 ]
 
 ALL_MODELS = TSL_MODELS + CUSTOM_MODELS
 
 ENCODER_DECODER_MODELS = [
-    'Transformer', 'Informer', 'Autoformer', 'FEDformer',
+    'Transformer',
+    'Informer',
+    'Autoformer',
+    'FEDformer',
 ]
 
 # --- Datasets ---
 
 LONG_TERM_DATASETS = {
-    'ETTh1':    {'root_path': 'dataset/ETT-small', 'data_path': 'ETTh1.csv', 'data_name': 'ETTh1',   'freq': 'h', 'enc_in': 7, 'target': 'OT'},
-    'ETTh2':    {'root_path': 'dataset/ETT-small', 'data_path': 'ETTh2.csv', 'data_name': 'ETTh2',   'freq': 'h', 'enc_in': 7, 'target': 'OT'},
-    'ETTm1':    {'root_path': 'dataset/ETT-small', 'data_path': 'ETTm1.csv', 'data_name': 'ETTm1',   'freq': 't', 'enc_in': 7, 'target': 'OT'},
-    'ETTm2':    {'root_path': 'dataset/ETT-small', 'data_path': 'ETTm2.csv', 'data_name': 'ETTm2',   'freq': 't', 'enc_in': 7, 'target': 'OT'},
-    'Weather':  {'root_path': 'dataset/weather',   'data_path': 'weather.csv','data_name': 'weather', 'freq': '10min', 'enc_in': 21, 'target': 'OT'},
-    'Electricity': {'root_path': 'dataset/electricity', 'data_path': 'electricity.csv', 'data_name': 'electricity', 'freq': 'h', 'enc_in': 321, 'target': 'OT'},
-    'Traffic':  {'root_path': 'dataset/traffic',   'data_path': 'traffic.csv','data_name': 'traffic', 'freq': 'h', 'enc_in': 862, 'target': 'OT'},
-    'Exchange': {'root_path': 'dataset/exchange_rate', 'data_path': 'exchange_rate.csv', 'data_name': 'exchange_rate', 'freq': 'd', 'enc_in': 8, 'target': 'OT'},
-    'ILI':      {'root_path': 'dataset/illness',   'data_path': 'national_illness.csv', 'data_name': 'illness', 'freq': 'w', 'enc_in': 7, 'target': 'OT'},
-    'Swiss1990': {'root_path': 'dataset/swiss_river', 'data_path': '1990.csv', 'data_name': 'custom', 'freq': 'd', 'enc_in': 64, 'target': 'OT'},
-    'Swiss2010': {'root_path': 'dataset/swiss_river', 'data_path': '2010.csv', 'data_name': 'custom', 'freq': 'd', 'enc_in': 64, 'target': 'OT'},
-    'SwissZurich': {'root_path': 'dataset/swiss_river', 'data_path': 'zurich.csv', 'data_name': 'custom', 'freq': 'd', 'enc_in': 15, 'target': 'OT'},
+    'ETTh1': {
+        'root_path': 'dataset/ETT-small',
+        'data_path': 'ETTh1.csv',
+        'data_name': 'ETTh1',
+        'freq': 'h',
+        'enc_in': 7,
+        'target': 'OT',
+    },
+    'ETTh2': {
+        'root_path': 'dataset/ETT-small',
+        'data_path': 'ETTh2.csv',
+        'data_name': 'ETTh2',
+        'freq': 'h',
+        'enc_in': 7,
+        'target': 'OT',
+    },
+    'ETTm1': {
+        'root_path': 'dataset/ETT-small',
+        'data_path': 'ETTm1.csv',
+        'data_name': 'ETTm1',
+        'freq': 't',
+        'enc_in': 7,
+        'target': 'OT',
+    },
+    'ETTm2': {
+        'root_path': 'dataset/ETT-small',
+        'data_path': 'ETTm2.csv',
+        'data_name': 'ETTm2',
+        'freq': 't',
+        'enc_in': 7,
+        'target': 'OT',
+    },
+    'Weather': {
+        'root_path': 'dataset/weather',
+        'data_path': 'weather.csv',
+        'data_name': 'weather',
+        'freq': '10min',
+        'enc_in': 21,
+        'target': 'OT',
+    },
+    'Electricity': {
+        'root_path': 'dataset/electricity',
+        'data_path': 'electricity.csv',
+        'data_name': 'electricity',
+        'freq': 'h',
+        'enc_in': 321,
+        'target': 'OT',
+    },
+    'Traffic': {
+        'root_path': 'dataset/traffic',
+        'data_path': 'traffic.csv',
+        'data_name': 'traffic',
+        'freq': 'h',
+        'enc_in': 862,
+        'target': 'OT',
+    },
+    'Exchange': {
+        'root_path': 'dataset/exchange_rate',
+        'data_path': 'exchange_rate.csv',
+        'data_name': 'exchange_rate',
+        'freq': 'd',
+        'enc_in': 8,
+        'target': 'OT',
+    },
+    'ILI': {
+        'root_path': 'dataset/illness',
+        'data_path': 'national_illness.csv',
+        'data_name': 'illness',
+        'freq': 'w',
+        'enc_in': 7,
+        'target': 'OT',
+    },
+    'Swiss1990': {
+        'root_path': 'dataset/swiss_river',
+        'data_path': '1990.csv',
+        'data_name': 'custom',
+        'freq': 'd',
+        'enc_in': 64,
+        'target': 'OT',
+    },
+    'Swiss2010': {
+        'root_path': 'dataset/swiss_river',
+        'data_path': '2010.csv',
+        'data_name': 'custom',
+        'freq': 'd',
+        'enc_in': 64,
+        'target': 'OT',
+    },
+    'SwissZurich': {
+        'root_path': 'dataset/swiss_river',
+        'data_path': 'zurich.csv',
+        'data_name': 'custom',
+        'freq': 'd',
+        'enc_in': 15,
+        'target': 'OT',
+    },
 }
 
 ENTITY_DATASETS = {
-    'Traffic':    LONG_TERM_DATASETS['Traffic'],
+    'Traffic': LONG_TERM_DATASETS['Traffic'],
     'Electricity': LONG_TERM_DATASETS['Electricity'],
-    'Exchange':   LONG_TERM_DATASETS['Exchange'],
-    'Swiss1990':  LONG_TERM_DATASETS['Swiss1990'],
-    'Swiss2010':  LONG_TERM_DATASETS['Swiss2010'],
+    'Exchange': LONG_TERM_DATASETS['Exchange'],
+    'Swiss1990': LONG_TERM_DATASETS['Swiss1990'],
+    'Swiss2010': LONG_TERM_DATASETS['Swiss2010'],
     'SwissZurich': LONG_TERM_DATASETS['SwissZurich'],
-    'PEMS03':     {'root_path': 'dataset/PEMS', 'data_path': 'PEMS03.npz', 'data_name': 'PEMS03', 'freq': 'h', 'enc_in': 358},
-    'PEMS04':     {'root_path': 'dataset/PEMS', 'data_path': 'PEMS04.npz', 'data_name': 'PEMS04', 'freq': 'h', 'enc_in': 307},
-    'PEMS07':     {'root_path': 'dataset/PEMS', 'data_path': 'PEMS07.npz', 'data_name': 'PEMS07', 'freq': 'h', 'enc_in': 883},
-    'PEMS08':     {'root_path': 'dataset/PEMS', 'data_path': 'PEMS08.npz', 'data_name': 'PEMS08', 'freq': 'h', 'enc_in': 170},
+    'PEMS03': {
+        'root_path': 'dataset/PEMS',
+        'data_path': 'PEMS03.npz',
+        'data_name': 'PEMS03',
+        'freq': 'h',
+        'enc_in': 358,
+    },
+    'PEMS04': {
+        'root_path': 'dataset/PEMS',
+        'data_path': 'PEMS04.npz',
+        'data_name': 'PEMS04',
+        'freq': 'h',
+        'enc_in': 307,
+    },
+    'PEMS07': {
+        'root_path': 'dataset/PEMS',
+        'data_path': 'PEMS07.npz',
+        'data_name': 'PEMS07',
+        'freq': 'h',
+        'enc_in': 883,
+    },
+    'PEMS08': {
+        'root_path': 'dataset/PEMS',
+        'data_path': 'PEMS08.npz',
+        'data_name': 'PEMS08',
+        'freq': 'h',
+        'enc_in': 170,
+    },
 }
 
 SWISS_DATASETS = {
-    'Swiss1990':  LONG_TERM_DATASETS['Swiss1990'],
-    'Swiss2010':  LONG_TERM_DATASETS['Swiss2010'],
+    'Swiss1990': LONG_TERM_DATASETS['Swiss1990'],
+    'Swiss2010': LONG_TERM_DATASETS['Swiss2010'],
     'SwissZurich': LONG_TERM_DATASETS['SwissZurich'],
 }
 
 SPATIAL_DATASETS = {
-    'PEMS03':     ENTITY_DATASETS['PEMS03'],
-    'PEMS04':     ENTITY_DATASETS['PEMS04'],
-    'PEMS07':     ENTITY_DATASETS['PEMS07'],
-    'PEMS08':     ENTITY_DATASETS['PEMS08'],
-    'Swiss1990':  LONG_TERM_DATASETS['Swiss1990'],
-    'Swiss2010':  LONG_TERM_DATASETS['Swiss2010'],
+    'PEMS03': ENTITY_DATASETS['PEMS03'],
+    'PEMS04': ENTITY_DATASETS['PEMS04'],
+    'PEMS07': ENTITY_DATASETS['PEMS07'],
+    'PEMS08': ENTITY_DATASETS['PEMS08'],
+    'Swiss1990': LONG_TERM_DATASETS['Swiss1990'],
+    'Swiss2010': LONG_TERM_DATASETS['Swiss2010'],
     'SwissZurich': LONG_TERM_DATASETS['SwissZurich'],
 }
 
@@ -106,21 +228,176 @@ M4_FREQS = ['Yearly', 'Quarterly', 'Monthly', 'Weekly', 'Daily', 'Hourly']
 # --- Default hyperparameters per model ---
 
 _DEFAULT_HPARAMS: Dict[str, Dict[str, Any]] = {
-    'DLinear':     {'d_model': 128, 'd_ff': 256, 'n_heads': 1, 'e_layers': 1, 'd_layers': 0, 'dropout': 0.0, 'learning_rate': 0.001, 'batch_size': 32, 'train_epochs': 50},
-    'Transformer': {'d_model': 512, 'd_ff': 2048, 'n_heads': 8, 'e_layers': 2, 'd_layers': 1, 'dropout': 0.1, 'learning_rate': 0.0001, 'batch_size': 32, 'train_epochs': 20},
-    'Informer':    {'d_model': 512, 'd_ff': 2048, 'n_heads': 8, 'e_layers': 2, 'd_layers': 1, 'dropout': 0.1, 'factor': 5, 'learning_rate': 0.0001, 'batch_size': 32, 'train_epochs': 20},
-    'Autoformer':  {'d_model': 512, 'd_ff': 2048, 'n_heads': 8, 'e_layers': 2, 'd_layers': 1, 'dropout': 0.1, 'moving_avg': 25, 'factor': 1, 'learning_rate': 0.0001, 'batch_size': 32, 'train_epochs': 20},
-    'FEDformer':   {'d_model': 512, 'd_ff': 2048, 'n_heads': 8, 'e_layers': 2, 'd_layers': 1, 'dropout': 0.1, 'moving_avg': 25, 'learning_rate': 0.0001, 'batch_size': 32, 'train_epochs': 20},
-    'iTransformer': {'d_model': 512, 'd_ff': 2048, 'n_heads': 8, 'e_layers': 3, 'd_layers': 0, 'dropout': 0.1, 'learning_rate': 0.0001, 'batch_size': 32, 'train_epochs': 20},
-    'PatchTST':    {'d_model': 128, 'd_ff': 256, 'n_heads': 16, 'e_layers': 3, 'd_layers': 0, 'dropout': 0.2, 'learning_rate': 0.0001, 'batch_size': 128, 'train_epochs': 100},
-    'TimesNet':    {'d_model': 64, 'd_ff': 64, 'n_heads': 1, 'e_layers': 2, 'd_layers': 0, 'dropout': 0.1, 'top_k': 5, 'num_kernels': 6, 'learning_rate': 0.0001, 'batch_size': 32, 'train_epochs': 20},
-    'TimeMixer':   {'d_model': 64, 'd_ff': 64, 'n_heads': 1, 'e_layers': 4, 'd_layers': 0, 'dropout': 0.1, 'down_sampling_layers': 3, 'down_sampling_window': 2, 'learning_rate': 0.001, 'batch_size': 32, 'train_epochs': 20},
-    'TimeXer':     {'d_model': 256, 'd_ff': 512, 'n_heads': 8, 'e_layers': 2, 'd_layers': 0, 'dropout': 0.1, 'learning_rate': 0.0001, 'batch_size': 32, 'train_epochs': 20},
-    'Mamba':       {'d_model': 128, 'd_ff': 256, 'n_heads': 1, 'e_layers': 2, 'd_layers': 0, 'dropout': 0.1, 'd_state': 16, 'expand': 2, 'learning_rate': 0.0001, 'batch_size': 32, 'train_epochs': 20},
-    'TimeLLM':     {'d_model': 32, 'd_ff': 128, 'n_heads': 8, 'e_layers': 1, 'd_layers': 0, 'dropout': 0.1, 'learning_rate': 0.01, 'batch_size': 16, 'train_epochs': 30, 'llm_model': 'GPT2', 'llm_dim': 768},
-    'LSTMAdapter': {'hidden_size': 64, 'num_layers': 2, 'dropout': 0.1, 'learning_rate': 0.001, 'batch_size': 64, 'train_epochs': 50},
-    'ExtrapoLSTMAdapter': {'hidden_size': 64, 'num_layers': 2, 'dropout': 0.1, 'learning_rate': 0.001, 'batch_size': 64, 'train_epochs': 50},
-    'TransformerEncoderAdapter': {'dropout': 0.1, 'num_t_heads': 4, 'ratio_heads_to_d_model': 8, 'dim_feedforward': 128, 'num_layers': 2, 'learning_rate': 0.001, 'batch_size': 64, 'train_epochs': 50},
+    'DLinear': {
+        'd_model': 128,
+        'd_ff': 256,
+        'n_heads': 1,
+        'e_layers': 1,
+        'd_layers': 0,
+        'dropout': 0.0,
+        'learning_rate': 0.001,
+        'batch_size': 32,
+        'train_epochs': 50,
+    },
+    'Transformer': {
+        'd_model': 512,
+        'd_ff': 2048,
+        'n_heads': 8,
+        'e_layers': 2,
+        'd_layers': 1,
+        'dropout': 0.1,
+        'learning_rate': 0.0001,
+        'batch_size': 32,
+        'train_epochs': 20,
+    },
+    'Informer': {
+        'd_model': 512,
+        'd_ff': 2048,
+        'n_heads': 8,
+        'e_layers': 2,
+        'd_layers': 1,
+        'dropout': 0.1,
+        'factor': 5,
+        'learning_rate': 0.0001,
+        'batch_size': 32,
+        'train_epochs': 20,
+    },
+    'Autoformer': {
+        'd_model': 512,
+        'd_ff': 2048,
+        'n_heads': 8,
+        'e_layers': 2,
+        'd_layers': 1,
+        'dropout': 0.1,
+        'moving_avg': 25,
+        'factor': 1,
+        'learning_rate': 0.0001,
+        'batch_size': 32,
+        'train_epochs': 20,
+    },
+    'FEDformer': {
+        'd_model': 512,
+        'd_ff': 2048,
+        'n_heads': 8,
+        'e_layers': 2,
+        'd_layers': 1,
+        'dropout': 0.1,
+        'moving_avg': 25,
+        'learning_rate': 0.0001,
+        'batch_size': 32,
+        'train_epochs': 20,
+    },
+    'iTransformer': {
+        'd_model': 512,
+        'd_ff': 2048,
+        'n_heads': 8,
+        'e_layers': 3,
+        'd_layers': 0,
+        'dropout': 0.1,
+        'learning_rate': 0.0001,
+        'batch_size': 32,
+        'train_epochs': 20,
+    },
+    'PatchTST': {
+        'd_model': 128,
+        'd_ff': 256,
+        'n_heads': 16,
+        'e_layers': 3,
+        'd_layers': 0,
+        'dropout': 0.2,
+        'learning_rate': 0.0001,
+        'batch_size': 128,
+        'train_epochs': 100,
+    },
+    'TimesNet': {
+        'd_model': 64,
+        'd_ff': 64,
+        'n_heads': 1,
+        'e_layers': 2,
+        'd_layers': 0,
+        'dropout': 0.1,
+        'top_k': 5,
+        'num_kernels': 6,
+        'learning_rate': 0.0001,
+        'batch_size': 32,
+        'train_epochs': 20,
+    },
+    'TimeMixer': {
+        'd_model': 64,
+        'd_ff': 64,
+        'n_heads': 1,
+        'e_layers': 4,
+        'd_layers': 0,
+        'dropout': 0.1,
+        'down_sampling_layers': 3,
+        'down_sampling_window': 2,
+        'learning_rate': 0.001,
+        'batch_size': 32,
+        'train_epochs': 20,
+    },
+    'TimeXer': {
+        'd_model': 256,
+        'd_ff': 512,
+        'n_heads': 8,
+        'e_layers': 2,
+        'd_layers': 0,
+        'dropout': 0.1,
+        'learning_rate': 0.0001,
+        'batch_size': 32,
+        'train_epochs': 20,
+    },
+    'Mamba': {
+        'd_model': 128,
+        'd_ff': 256,
+        'n_heads': 1,
+        'e_layers': 2,
+        'd_layers': 0,
+        'dropout': 0.1,
+        'd_state': 16,
+        'expand': 2,
+        'learning_rate': 0.0001,
+        'batch_size': 32,
+        'train_epochs': 20,
+    },
+    'TimeLLM': {
+        'd_model': 32,
+        'd_ff': 128,
+        'n_heads': 8,
+        'e_layers': 1,
+        'd_layers': 0,
+        'dropout': 0.1,
+        'learning_rate': 0.01,
+        'batch_size': 16,
+        'train_epochs': 30,
+        'llm_model': 'GPT2',
+        'llm_dim': 768,
+    },
+    'LSTMAdapter': {
+        'hidden_size': 64,
+        'num_layers': 2,
+        'dropout': 0.1,
+        'learning_rate': 0.001,
+        'batch_size': 64,
+        'train_epochs': 50,
+    },
+    'ExtrapoLSTMAdapter': {
+        'hidden_size': 64,
+        'num_layers': 2,
+        'dropout': 0.1,
+        'learning_rate': 0.001,
+        'batch_size': 64,
+        'train_epochs': 50,
+    },
+    'TransformerEncoderAdapter': {
+        'dropout': 0.1,
+        'num_t_heads': 4,
+        'ratio_heads_to_d_model': 8,
+        'dim_feedforward': 128,
+        'num_layers': 2,
+        'learning_rate': 0.001,
+        'batch_size': 64,
+        'train_epochs': 50,
+    },
 }
 
 
@@ -193,7 +470,14 @@ def generate_long_term(output_dir: Path) -> int:
             seq_len, label_len = 96, 48
 
         for h in horizons:
-            cfg = _base_config(model, ds_name, ds_info, seq_len=seq_len, label_len=label_len, pred_len=h)
+            cfg = _base_config(
+                model,
+                ds_name,
+                ds_info,
+                seq_len=seq_len,
+                label_len=label_len,
+                pred_len=h,
+            )
             stem = f'{model.lower()}_{ds_name.lower()}_H{h}'
             _write_yaml(cfg, output_dir / 'long_term' / f'{stem}.yaml')
             count += 1
@@ -215,9 +499,15 @@ def generate_entity(output_dir: Path) -> int:
             modes.append('coordinates')
 
         for mode in modes:
-            cfg = _base_config(model, ds_name, ds_info,
-                             seq_len=seq_len, label_len=label_len, pred_len=pred_len,
-                             identifier_mode=mode)
+            cfg = _base_config(
+                model,
+                ds_name,
+                ds_info,
+                seq_len=seq_len,
+                label_len=label_len,
+                pred_len=pred_len,
+                identifier_mode=mode,
+            )
             stem = f'{model.lower()}_{ds_name.lower()}_{mode}'
             _write_yaml(cfg, output_dir / 'entity' / f'{stem}.yaml')
             count += 1
@@ -231,10 +521,17 @@ def generate_nowcasting(output_dir: Path) -> int:
     count = 0
     for model, (ds_name, ds_info) in product(ALL_MODELS, SWISS_DATASETS.items()):
         for window, mode in product(windows, entity_modes):
-            cfg = _base_config(model, ds_name, ds_info,
-                             seq_len=30, label_len=0, pred_len=window,
-                             identifier_mode=mode, nan_mask_loss=True,
-                             teacher_forcing='zeros')
+            cfg = _base_config(
+                model,
+                ds_name,
+                ds_info,
+                seq_len=30,
+                label_len=0,
+                pred_len=window,
+                identifier_mode=mode,
+                nan_mask_loss=True,
+                teacher_forcing='zeros',
+            )
             cfg['metrics'] = ['mse', 'mae', 'rmse', 'nse']
             stem = f'{model.lower()}_{ds_name.lower()}_W{window}_{mode}'
             _write_yaml(cfg, output_dir / 'nowcasting' / f'{stem}.yaml')
@@ -273,9 +570,15 @@ def generate_spatial(output_dir: Path) -> int:
 
         for variant in ['baseline', 'entity']:
             mode = 'none' if variant == 'baseline' else 'embedding'
-            cfg = _base_config(model, ds_name, ds_info,
-                             seq_len=seq_len, label_len=label_len, pred_len=pred_len,
-                             identifier_mode=mode)
+            cfg = _base_config(
+                model,
+                ds_name,
+                ds_info,
+                seq_len=seq_len,
+                label_len=label_len,
+                pred_len=pred_len,
+                identifier_mode=mode,
+            )
             stem = f'{model.lower()}_{ds_name.lower()}_{variant}'
             _write_yaml(cfg, output_dir / 'spatial' / f'{stem}.yaml')
             count += 1
@@ -284,14 +587,20 @@ def generate_spatial(output_dir: Path) -> int:
 
 def generate_ablation_norm(output_dir: Path) -> int:
     """E.2.6A — Normalization Effect."""
-    datasets = {'ETTh1': LONG_TERM_DATASETS['ETTh1'],
-                'Weather': LONG_TERM_DATASETS['Weather'],
-                'Electricity': LONG_TERM_DATASETS['Electricity']}
+    datasets = {
+        'ETTh1': LONG_TERM_DATASETS['ETTh1'],
+        'Weather': LONG_TERM_DATASETS['Weather'],
+        'Electricity': LONG_TERM_DATASETS['Electricity'],
+    }
     scalers = ['none', 'standard', 'minmax']
     count = 0
-    for model, (ds_name, ds_info), scaler in product(ALL_MODELS, datasets.items(), scalers):
+    for model, (ds_name, ds_info), scaler in product(
+        ALL_MODELS, datasets.items(), scalers
+    ):
         scale = scaler != 'none'
-        cfg = _base_config(model, ds_name, ds_info, pred_len=96, scale=scale, scaler_type=scaler)
+        cfg = _base_config(
+            model, ds_name, ds_info, pred_len=96, scale=scale, scaler_type=scaler
+        )
         stem = f'{model.lower()}_{ds_name.lower()}_{scaler}'
         _write_yaml(cfg, output_dir / 'ablation_norm' / f'{stem}.yaml')
         count += 1
@@ -300,9 +609,11 @@ def generate_ablation_norm(output_dir: Path) -> int:
 
 def generate_ablation_aug(output_dir: Path) -> int:
     """E.2.6B — Augmentation Effect."""
-    datasets = {'ETTh1': LONG_TERM_DATASETS['ETTh1'],
-                'Weather': LONG_TERM_DATASETS['Weather'],
-                'Traffic': LONG_TERM_DATASETS['Traffic']}
+    datasets = {
+        'ETTh1': LONG_TERM_DATASETS['ETTh1'],
+        'Weather': LONG_TERM_DATASETS['Weather'],
+        'Traffic': LONG_TERM_DATASETS['Traffic'],
+    }
     aug_sets = {
         'none': [],
         'jitter': ['jitter'],
@@ -310,7 +621,9 @@ def generate_ablation_aug(output_dir: Path) -> int:
         'jitter_scaling_warp': ['jitter', 'scaling', 'window_warp'],
     }
     count = 0
-    for model, (ds_name, ds_info), (aug_key, aug_list) in product(ALL_MODELS, datasets.items(), aug_sets.items()):
+    for model, (ds_name, ds_info), (aug_key, aug_list) in product(
+        ALL_MODELS, datasets.items(), aug_sets.items()
+    ):
         cfg = _base_config(model, ds_name, ds_info, pred_len=96)
         if aug_list:
             cfg['augmentation'] = aug_list
@@ -322,13 +635,19 @@ def generate_ablation_aug(output_dir: Path) -> int:
 
 def generate_ablation_seqlen(output_dir: Path) -> int:
     """E.2.6C — Input Length Sensitivity."""
-    datasets = {'ETTh1': LONG_TERM_DATASETS['ETTh1'],
-                'Weather': LONG_TERM_DATASETS['Weather'],
-                'Electricity': LONG_TERM_DATASETS['Electricity']}
+    datasets = {
+        'ETTh1': LONG_TERM_DATASETS['ETTh1'],
+        'Weather': LONG_TERM_DATASETS['Weather'],
+        'Electricity': LONG_TERM_DATASETS['Electricity'],
+    }
     input_lengths = [48, 96, 192, 336, 512]
     count = 0
-    for model, (ds_name, ds_info), L in product(ALL_MODELS, datasets.items(), input_lengths):
-        cfg = _base_config(model, ds_name, ds_info, seq_len=L, label_len=L // 2, pred_len=96)
+    for model, (ds_name, ds_info), L in product(
+        ALL_MODELS, datasets.items(), input_lengths
+    ):
+        cfg = _base_config(
+            model, ds_name, ds_info, seq_len=L, label_len=L // 2, pred_len=96
+        )
         stem = f'{model.lower()}_{ds_name.lower()}_L{L}'
         _write_yaml(cfg, output_dir / 'ablation_seqlen' / f'{stem}.yaml')
         count += 1
@@ -337,15 +656,25 @@ def generate_ablation_seqlen(output_dir: Path) -> int:
 
 def generate_ablation_tf(output_dir: Path) -> int:
     """E.2.6D — Teacher Forcing Effect (encoder-decoder models only)."""
-    datasets = {'ETTh1': LONG_TERM_DATASETS['ETTh1'],
-                'Weather': LONG_TERM_DATASETS['Weather'],
-                'Electricity': LONG_TERM_DATASETS['Electricity']}
+    datasets = {
+        'ETTh1': LONG_TERM_DATASETS['ETTh1'],
+        'Weather': LONG_TERM_DATASETS['Weather'],
+        'Electricity': LONG_TERM_DATASETS['Electricity'],
+    }
     tf_modes = ['label', 'zeros', 'none']
     count = 0
-    for model, (ds_name, ds_info), tf in product(ENCODER_DECODER_MODELS, datasets.items(), tf_modes):
+    for model, (ds_name, ds_info), tf in product(
+        ENCODER_DECODER_MODELS, datasets.items(), tf_modes
+    ):
         label_len = 48 if tf == 'label' else 0
-        cfg = _base_config(model, ds_name, ds_info, pred_len=96,
-                         label_len=label_len, teacher_forcing=tf)
+        cfg = _base_config(
+            model,
+            ds_name,
+            ds_info,
+            pred_len=96,
+            label_len=label_len,
+            teacher_forcing=tf,
+        )
         stem = f'{model.lower()}_{ds_name.lower()}_tf_{tf}'
         _write_yaml(cfg, output_dir / 'ablation_tf' / f'{stem}.yaml')
         count += 1
@@ -358,14 +687,33 @@ def generate_ablation_tf(output_dir: Path) -> int:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description='Generate benchmark experiment configs')
-    parser.add_argument('--output-dir', type=str, default=str(DEFAULT_OUTPUT_DIR),
-                        help='Output directory for YAML configs')
-    parser.add_argument('--group', type=str, default='all',
-                        choices=['all', 'long_term', 'entity', 'nowcasting', 'm4',
-                                 'spatial', 'ablation_norm', 'ablation_aug',
-                                 'ablation_seqlen', 'ablation_tf'],
-                        help='Generate only a specific experiment group')
+    parser = argparse.ArgumentParser(
+        description='Generate benchmark experiment configs'
+    )
+    parser.add_argument(
+        '--output-dir',
+        type=str,
+        default=str(DEFAULT_OUTPUT_DIR),
+        help='Output directory for YAML configs',
+    )
+    parser.add_argument(
+        '--group',
+        type=str,
+        default='all',
+        choices=[
+            'all',
+            'long_term',
+            'entity',
+            'nowcasting',
+            'm4',
+            'spatial',
+            'ablation_norm',
+            'ablation_aug',
+            'ablation_seqlen',
+            'ablation_tf',
+        ],
+        help='Generate only a specific experiment group',
+    )
     args = parser.parse_args()
     output_dir = Path(args.output_dir)
 

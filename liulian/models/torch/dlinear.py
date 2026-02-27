@@ -30,7 +30,11 @@ class Model(nn.Module):
         super(Model, self).__init__()
         self.task_name = configs.task_name
         self.seq_len = configs.seq_len
-        if self.task_name == 'classification' or self.task_name == 'anomaly_detection' or self.task_name == 'imputation':
+        if (
+            self.task_name == 'classification'
+            or self.task_name == 'anomaly_detection'
+            or self.task_name == 'imputation'
+        ):
             self.pred_len = configs.seq_len
         else:
             self.pred_len = configs.pred_len
@@ -44,42 +48,51 @@ class Model(nn.Module):
             self.Linear_Trend = nn.ModuleList()
 
             for i in range(self.channels):
-                self.Linear_Seasonal.append(
-                    nn.Linear(self.seq_len, self.pred_len))
-                self.Linear_Trend.append(
-                    nn.Linear(self.seq_len, self.pred_len))
+                self.Linear_Seasonal.append(nn.Linear(self.seq_len, self.pred_len))
+                self.Linear_Trend.append(nn.Linear(self.seq_len, self.pred_len))
 
                 self.Linear_Seasonal[i].weight = nn.Parameter(
-                    (1 / self.seq_len) * torch.ones([self.pred_len, self.seq_len]))
+                    (1 / self.seq_len) * torch.ones([self.pred_len, self.seq_len])
+                )
                 self.Linear_Trend[i].weight = nn.Parameter(
-                    (1 / self.seq_len) * torch.ones([self.pred_len, self.seq_len]))
+                    (1 / self.seq_len) * torch.ones([self.pred_len, self.seq_len])
+                )
         else:
             self.Linear_Seasonal = nn.Linear(self.seq_len, self.pred_len)
             self.Linear_Trend = nn.Linear(self.seq_len, self.pred_len)
 
             self.Linear_Seasonal.weight = nn.Parameter(
-                (1 / self.seq_len) * torch.ones([self.pred_len, self.seq_len]))
+                (1 / self.seq_len) * torch.ones([self.pred_len, self.seq_len])
+            )
             self.Linear_Trend.weight = nn.Parameter(
-                (1 / self.seq_len) * torch.ones([self.pred_len, self.seq_len]))
+                (1 / self.seq_len) * torch.ones([self.pred_len, self.seq_len])
+            )
 
         if self.task_name == 'classification':
             self.projection = nn.Linear(
-                configs.enc_in * configs.seq_len, configs.num_class)
+                configs.enc_in * configs.seq_len, configs.num_class
+            )
 
     def encoder(self, x):
         seasonal_init, trend_init = self.decompsition(x)
-        seasonal_init, trend_init = seasonal_init.permute(
-            0, 2, 1), trend_init.permute(0, 2, 1)
+        seasonal_init, trend_init = (
+            seasonal_init.permute(0, 2, 1),
+            trend_init.permute(0, 2, 1),
+        )
         if self.individual:
-            seasonal_output = torch.zeros([seasonal_init.size(0), seasonal_init.size(1), self.pred_len],
-                                          dtype=seasonal_init.dtype).to(seasonal_init.device)
-            trend_output = torch.zeros([trend_init.size(0), trend_init.size(1), self.pred_len],
-                                       dtype=trend_init.dtype).to(trend_init.device)
+            seasonal_output = torch.zeros(
+                [seasonal_init.size(0), seasonal_init.size(1), self.pred_len],
+                dtype=seasonal_init.dtype,
+            ).to(seasonal_init.device)
+            trend_output = torch.zeros(
+                [trend_init.size(0), trend_init.size(1), self.pred_len],
+                dtype=trend_init.dtype,
+            ).to(trend_init.device)
             for i in range(self.channels):
                 seasonal_output[:, i, :] = self.Linear_Seasonal[i](
-                    seasonal_init[:, i, :])
-                trend_output[:, i, :] = self.Linear_Trend[i](
-                    trend_init[:, i, :])
+                    seasonal_init[:, i, :]
+                )
+                trend_output[:, i, :] = self.Linear_Trend[i](trend_init[:, i, :])
         else:
             seasonal_output = self.Linear_Seasonal(seasonal_init)
             trend_output = self.Linear_Trend(trend_init)
@@ -109,9 +122,12 @@ class Model(nn.Module):
         return output
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
-        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
+        if (
+            self.task_name == 'long_term_forecast'
+            or self.task_name == 'short_term_forecast'
+        ):
             dec_out = self.forecast(x_enc)
-            return dec_out[:, -self.pred_len:, :]  # [B, L, D]
+            return dec_out[:, -self.pred_len :, :]  # [B, L, D]
         if self.task_name == 'imputation':
             dec_out = self.imputation(x_enc)
             return dec_out  # [B, L, D]
@@ -127,7 +143,7 @@ class Model(nn.Module):
 class DLinearAdapter(EntityAwareMixin, TorchModelAdapter):
     """
     Adapter for DLinear model to liulian ExecutableModel interface.
-    
+
     Expected config parameters:
         - seq_len: Input sequence length
         - pred_len: Prediction sequence length
@@ -136,7 +152,7 @@ class DLinearAdapter(EntityAwareMixin, TorchModelAdapter):
         - individual: Whether to use individual linear layers per variate (default: False)
         - task_name: 'long_term_forecast', 'short_term_forecast', 'classification', etc.
     """
-    
+
     def __init__(self, config: Dict[str, Any]):
         # Set default values
         default_config = {
@@ -145,20 +161,22 @@ class DLinearAdapter(EntityAwareMixin, TorchModelAdapter):
             'task_name': 'long_term_forecast',
         }
         default_config.update(config)
-        
+
         # Adjust enc_in for entity embedding if needed
         model_cfg = self._entity_model_config(default_config)
         # Create model instance
-        model = Model(self._dict_to_namespace(model_cfg), 
-                     individual=model_cfg.get('individual', False))
-        
+        model = Model(
+            self._dict_to_namespace(model_cfg),
+            individual=model_cfg.get('individual', False),
+        )
+
         super().__init__(model, default_config)
         self._init_entity_support(default_config)
-    
+
     def _prepare_model_inputs(self, inputs: Dict[str, torch.Tensor]) -> tuple:
         """
         Prepare inputs for DLinear forward pass.
-        
+
         Expected inputs:
             - x_enc: [batch, seq_len, enc_in] - encoder input
             - x_mark_enc: [batch, seq_len, mark_dim] - encoder time features (optional)
@@ -167,10 +185,20 @@ class DLinearAdapter(EntityAwareMixin, TorchModelAdapter):
         """
         x_enc = inputs['x_enc']
         batch_size, seq_len, n_features = x_enc.shape
-        
+
         # DLinear doesn't really use time marks, decoder inputs
-        x_mark_enc = inputs.get('x_mark_enc', torch.zeros(batch_size, seq_len, 1, device=x_enc.device))
-        x_dec = inputs.get('x_dec', torch.zeros(batch_size, self.config['pred_len'], n_features, device=x_enc.device))
-        x_mark_dec = inputs.get('x_mark_dec', torch.zeros(batch_size, self.config['pred_len'], 1, device=x_enc.device))
-        
+        x_mark_enc = inputs.get(
+            'x_mark_enc', torch.zeros(batch_size, seq_len, 1, device=x_enc.device)
+        )
+        x_dec = inputs.get(
+            'x_dec',
+            torch.zeros(
+                batch_size, self.config['pred_len'], n_features, device=x_enc.device
+            ),
+        )
+        x_mark_dec = inputs.get(
+            'x_mark_dec',
+            torch.zeros(batch_size, self.config['pred_len'], 1, device=x_enc.device),
+        )
+
         return (x_enc, x_mark_enc, x_dec, x_mark_dec)

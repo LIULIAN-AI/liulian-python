@@ -30,10 +30,10 @@ Works with **both** ``print()`` and the standard :mod:`logging` module::
     import logging
     from liulian.utils.log_tags import setup_logging
 
-    setup_logging()                                 # configures root logger
+    setup_logging()  # configures root logger
     logger = logging.getLogger(__name__)
-    logger.info('Training started')                 # → [info] Training started
-    logger.error('CUDA OOM')                        # → [ERROR] CUDA OOM  (all red)
+    logger.info('Training started')  # → [info] Training started
+    logger.error('CUDA OOM')  # → [ERROR] CUDA OOM  (all red)
 
 Output mode is determined **once** at import time by :func:`_detect_mode`.
 Override programmatically with :func:`set_output_mode` or env vars.
@@ -52,9 +52,9 @@ from typing import IO, Optional
 # Custom log levels  (registered early so they're usable everywhere)
 # ═══════════════════════════════════════════════════════════════════════════
 
-HINT_LEVEL = 21       # advisory hint — just above INFO (20)
-PROGRESS_LEVEL = 22   # progress marker
-OK_LEVEL = 25         # success milestone — between INFO (20) and WARNING (30)
+HINT_LEVEL = 21  # advisory hint — just above INFO (20)
+PROGRESS_LEVEL = 22  # progress marker
+OK_LEVEL = 25  # success milestone — between INFO (20) and WARNING (30)
 
 _logging.addLevelName(OK_LEVEL, 'OK')
 _logging.addLevelName(HINT_LEVEL, 'HINT')
@@ -77,8 +77,8 @@ def _log_progress(self: _logging.Logger, message: str, *args, **kwargs) -> None:
 
 
 # Monkey-patch Logger so every logger gains .ok(), .hint(), .progress()
-_logging.Logger.ok = _log_ok            # type: ignore[attr-defined]
-_logging.Logger.hint = _log_hint        # type: ignore[attr-defined]
+_logging.Logger.ok = _log_ok  # type: ignore[attr-defined]
+_logging.Logger.hint = _log_hint  # type: ignore[attr-defined]
 _logging.Logger.progress = _log_progress  # type: ignore[attr-defined]
 
 
@@ -139,8 +139,9 @@ def set_output_mode(mode: str) -> None:
     """Switch output mode (``'ansi'``, ``'plain'``, or ``'html'``)."""
     global _OUTPUT_MODE
     if mode not in (MODE_ANSI, MODE_PLAIN, MODE_HTML):
-        raise ValueError(f"mode must be one of {MODE_ANSI!r}, "
-                         f"{MODE_PLAIN!r}, {MODE_HTML!r}")
+        raise ValueError(
+            f'mode must be one of {MODE_ANSI!r}, {MODE_PLAIN!r}, {MODE_HTML!r}'
+        )
     _OUTPUT_MODE = mode
     _rebuild_tags()
 
@@ -203,6 +204,7 @@ _HTML_ERROR_BG = '#3d0000'
 # Tag builders
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 def _tag(label: str, ansi_colour: str, html_colour_key: str) -> str:
     """Build a **prefix** tag ``[label] `` for *non-error* levels.
 
@@ -212,8 +214,7 @@ def _tag(label: str, ansi_colour: str, html_colour_key: str) -> str:
         return f'{ansi_colour}{_BOLD}[{label}]{_RESET} '
     if _OUTPUT_MODE == MODE_HTML:
         c = _HTML_COLOURS.get(html_colour_key, html_colour_key)
-        return (f'<span style="color:{c};font-weight:bold">'
-                f'[{label}]</span> ')
+        return f'<span style="color:{c};font-weight:bold">[{label}]</span> '
     return f'[{label}] '
 
 
@@ -227,9 +228,11 @@ def _error_format(label: str, msg: str) -> str:
     if _OUTPUT_MODE == MODE_ANSI:
         return f'{_RED}{_BG_DARK_RED}{_BOLD}[{label}]{_RESET}{_RED}{_BG_DARK_RED} {msg}{_RESET}'
     if _OUTPUT_MODE == MODE_HTML:
-        return (f'<span style="color:{_HTML_ERROR_FG};'
-                f'background-color:{_HTML_ERROR_BG};'
-                f'font-weight:bold">[{label}] {msg}</span>')
+        return (
+            f'<span style="color:{_HTML_ERROR_FG};'
+            f'background-color:{_HTML_ERROR_BG};'
+            f'font-weight:bold">[{label}] {msg}</span>'
+        )
     return f'[{label}] {msg}'
 
 
@@ -240,7 +243,7 @@ def _error_format(label: str, msg: str) -> str:
 INFO_TAG: str = ''
 SUCCESS_TAG: str = ''
 WARNING_TAG: str = ''
-ERROR_TAG: str = ''      # tag-only prefix (for print f-string use)
+ERROR_TAG: str = ''  # tag-only prefix (for print f-string use)
 DEBUG_TAG: str = ''
 HINT_TAG: str = ''
 PROGRESS_TAG: str = ''
@@ -266,11 +269,17 @@ _rebuild_tags()
 # Convenience printers
 # ═══════════════════════════════════════════════════════════════════════════
 
-def tagged(label: str, ansi_colour: str, html_colour_key: str,
-           msg: str, *, file: Optional[IO] = None) -> None:
+
+def tagged(
+    label: str,
+    ansi_colour: str,
+    html_colour_key: str,
+    msg: str,
+    *,
+    file: Optional[IO] = None,
+) -> None:
     """Print *msg* with a custom coloured ``[label]`` prefix."""
-    print(f'{_tag(label, ansi_colour, html_colour_key)}{msg}',
-          file=file or sys.stdout)
+    print(f'{_tag(label, ansi_colour, html_colour_key)}{msg}', file=file or sys.stdout)
 
 
 def info(msg: str, *, file: Optional[IO] = None) -> None:
@@ -354,6 +363,7 @@ def _msg_has_tag(msg: str) -> bool:
 # Python ``logging`` integration
 # ═══════════════════════════════════════════════════════════════════════════
 
+
 class TaggedFormatter(_logging.Formatter):
     """Logging formatter that auto-prepends coloured severity tags.
 
@@ -380,18 +390,18 @@ class TaggedFormatter(_logging.Formatter):
         logger.addHandler(handler)
         logger.setLevel(logging.DEBUG)
 
-        logger.info('starting')     # → [info] starting
-        logger.error('crash')       # → [ERROR] crash  (all red)
+        logger.info('starting')  # → [info] starting
+        logger.error('crash')  # → [ERROR] crash  (all red)
     """
 
     _LEVEL_SPEC: dict[int, tuple[str, str, str]] = {
-        _logging.DEBUG:    ('debug', _GREY, 'grey'),
-        _logging.INFO:     ('info', _BLUE, 'blue'),
-        HINT_LEVEL:        ('hint', _CYAN, 'cyan'),
-        PROGRESS_LEVEL:    ('...', _MAGENTA, 'magenta'),
-        OK_LEVEL:          ('ok', _GREEN, 'green'),
-        _logging.WARNING:  ('warn', _YELLOW, 'yellow'),
-        _logging.ERROR:    ('ERROR', _RED, 'red'),
+        _logging.DEBUG: ('debug', _GREY, 'grey'),
+        _logging.INFO: ('info', _BLUE, 'blue'),
+        HINT_LEVEL: ('hint', _CYAN, 'cyan'),
+        PROGRESS_LEVEL: ('...', _MAGENTA, 'magenta'),
+        OK_LEVEL: ('ok', _GREEN, 'green'),
+        _logging.WARNING: ('warn', _YELLOW, 'yellow'),
+        _logging.ERROR: ('ERROR', _RED, 'red'),
         _logging.CRITICAL: ('CRIT', _RED, 'red'),
     }
 
@@ -461,10 +471,7 @@ def setup_logging(
     lgr.setLevel(level)
 
     # Avoid duplicate handlers on repeated calls
-    if not any(
-        isinstance(h.formatter, TaggedFormatter)
-        for h in lgr.handlers
-    ):
+    if not any(isinstance(h.formatter, TaggedFormatter) for h in lgr.handlers):
         handler = _logging.StreamHandler(stream or sys.stdout)
         handler.setFormatter(
             TaggedFormatter(fmt=fmt, datefmt=datefmt, auto_tag=auto_tag),
@@ -484,9 +491,15 @@ def redirect_ray_loggers(stream: Optional[IO] = None) -> None:
     handlers to *stream*.
     """
     target = stream or sys.stdout
-    for logger_name in ('ray', 'ray.tune', 'ray._private',
-                        'ray.data', 'ray.train', 'ray.air',
-                        'ray._private.worker'):
+    for logger_name in (
+        'ray',
+        'ray.tune',
+        'ray._private',
+        'ray.data',
+        'ray.train',
+        'ray.air',
+        'ray._private.worker',
+    ):
         rl = _logging.getLogger(logger_name)
         for h in rl.handlers:
             if isinstance(h, _logging.StreamHandler):

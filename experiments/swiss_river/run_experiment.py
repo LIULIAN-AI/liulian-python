@@ -89,7 +89,8 @@ class EarlyStopping:
         elif score < self.best_score + self.delta:
             self.counter += 1
             logging.getLogger(__name__).info(
-                'EarlyStopping counter: %d out of %d', self.counter, self.patience)
+                'EarlyStopping counter: %d out of %d', self.counter, self.patience
+            )
             if self.counter >= self.patience:
                 self.early_stop = True
         else:
@@ -102,7 +103,9 @@ class EarlyStopping:
         if self.verbose:
             logging.getLogger(__name__).ok(
                 'Validation loss decreased (%.6f → %.6f). Saving model ...',
-                self.val_loss_min, val_loss)
+                self.val_loss_min,
+                val_loss,
+            )
         torch.save(model.state_dict(), os.path.join(path, 'checkpoint'))
         self.val_loss_min = val_loss
 
@@ -151,10 +154,12 @@ def validate(args, model, vali_loader, criterion, mae_metric, device):
             batch_y_mark = batch_y_mark.float().to(device)
 
             # Decoder input: label_len of ground truth + zeros for pred_len
-            dec_inp = torch.zeros_like(batch_y[:, -args.pred_len:, :]).float()
-            dec_inp = torch.cat(
-                [batch_y[:, :args.label_len, :], dec_inp], dim=1
-            ).float().to(device)
+            dec_inp = torch.zeros_like(batch_y[:, -args.pred_len :, :]).float()
+            dec_inp = (
+                torch.cat([batch_y[:, : args.label_len, :], dec_inp], dim=1)
+                .float()
+                .to(device)
+            )
 
             if args.output_attention:
                 outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark)[0]
@@ -162,8 +167,8 @@ def validate(args, model, vali_loader, criterion, mae_metric, device):
                 outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
 
             f_dim = -1 if args.features == 'MS' else 0
-            outputs = outputs[:, -args.pred_len:, f_dim:]
-            batch_y = batch_y[:, -args.pred_len:, f_dim:].to(device)
+            outputs = outputs[:, -args.pred_len :, f_dim:]
+            batch_y = batch_y[:, -args.pred_len :, f_dim:].to(device)
 
             loss = criterion(outputs, batch_y)
             mae_loss = mae_metric(outputs, batch_y)
@@ -182,24 +187,42 @@ def train(args, device):
     print(f'=== Training: {args.model_id} ===')
     print(f'Model: {args.model}, Data: {args.data}')
     print(f'seq_len={args.seq_len}, pred_len={args.pred_len}, features={args.features}')
-    print(f'LLM backbone: {args.llm_model} (dim={args.llm_dim}, layers={args.llm_layers})')
+    print(
+        f'LLM backbone: {args.llm_model} (dim={args.llm_dim}, layers={args.llm_layers})'
+    )
     print(f'Device: {device}')
 
     for ii in range(args.itr):
         # Setting record
         setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_{}_{}'.format(
-            args.task_name, args.model_id, args.model, args.data,
-            args.features, args.seq_len, args.label_len, args.pred_len,
-            args.d_model, args.n_heads, args.e_layers, args.d_layers,
-            args.d_ff, args.factor, args.embed, args.des, ii)
+            args.task_name,
+            args.model_id,
+            args.model,
+            args.data,
+            args.features,
+            args.seq_len,
+            args.label_len,
+            args.pred_len,
+            args.d_model,
+            args.n_heads,
+            args.e_layers,
+            args.d_layers,
+            args.d_ff,
+            args.factor,
+            args.embed,
+            args.des,
+            ii,
+        )
 
         # Data
         train_data, train_loader = data_provider(args, 'train')
         vali_data, vali_loader = data_provider(args, 'val')
         test_data, test_loader = data_provider(args, 'test')
 
-        print(f'Train samples: {len(train_data)}, Val samples: {len(vali_data)}, '
-              f'Test samples: {len(test_data)}')
+        print(
+            f'Train samples: {len(train_data)}, Val samples: {len(vali_data)}, '
+            f'Test samples: {len(test_data)}'
+        )
 
         # Model
         model = TimeLLMModel(args).float().to(device)
@@ -215,8 +238,10 @@ def train(args, device):
         trained_parameters = [p for p in model.parameters() if p.requires_grad]
         total_params = sum(p.numel() for p in model.parameters())
         trainable_params = sum(p.numel() for p in trained_parameters)
-        print(f'Total params: {total_params:,}, Trainable: {trainable_params:,} '
-              f'({100 * trainable_params / total_params:.1f}%)')
+        print(
+            f'Total params: {total_params:,}, Trainable: {trainable_params:,} '
+            f'({100 * trainable_params / total_params:.1f}%)'
+        )
 
         # Optimizer
         model_optim = optim.Adam(trained_parameters, lr=args.learning_rate)
@@ -225,14 +250,16 @@ def train(args, device):
         train_steps = len(train_loader)
         if args.lradj == 'COS':
             scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-                model_optim, T_max=20, eta_min=1e-8)
+                model_optim, T_max=20, eta_min=1e-8
+            )
         else:
             scheduler = lr_scheduler.OneCycleLR(
                 optimizer=model_optim,
                 steps_per_epoch=train_steps,
                 pct_start=args.pct_start,
                 epochs=args.train_epochs,
-                max_lr=args.learning_rate)
+                max_lr=args.learning_rate,
+            )
 
         criterion = nn.MSELoss()
         mae_metric = nn.L1Loss()
@@ -246,9 +273,10 @@ def train(args, device):
             epoch_time = time.time()
 
             for i, (batch_x, batch_y, batch_x_mark, batch_y_mark) in tqdm(
-                    enumerate(train_loader), total=len(train_loader),
-                    desc=f'Epoch {epoch + 1}/{args.train_epochs}'):
-
+                enumerate(train_loader),
+                total=len(train_loader),
+                desc=f'Epoch {epoch + 1}/{args.train_epochs}',
+            ):
                 iter_count += 1
                 model_optim.zero_grad()
 
@@ -258,10 +286,14 @@ def train(args, device):
                 batch_y_mark = batch_y_mark.float().to(device)
 
                 # Decoder input
-                dec_inp = torch.zeros_like(batch_y[:, -args.pred_len:, :]).float().to(device)
-                dec_inp = torch.cat(
-                    [batch_y[:, :args.label_len, :], dec_inp], dim=1
-                ).float().to(device)
+                dec_inp = (
+                    torch.zeros_like(batch_y[:, -args.pred_len :, :]).float().to(device)
+                )
+                dec_inp = (
+                    torch.cat([batch_y[:, : args.label_len, :], dec_inp], dim=1)
+                    .float()
+                    .to(device)
+                )
 
                 # Forward
                 if args.output_attention:
@@ -270,8 +302,8 @@ def train(args, device):
                     outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
 
                 f_dim = -1 if args.features == 'MS' else 0
-                outputs = outputs[:, -args.pred_len:, f_dim:]
-                batch_y = batch_y[:, -args.pred_len:, f_dim:]
+                outputs = outputs[:, -args.pred_len :, f_dim:]
+                batch_y = batch_y[:, -args.pred_len :, f_dim:]
 
                 loss = criterion(outputs, batch_y)
                 train_loss.append(loss.item())
@@ -279,29 +311,36 @@ def train(args, device):
                 if (i + 1) % 100 == 0:
                     speed = (time.time() - epoch_time) / iter_count
                     left_time = speed * ((args.train_epochs - epoch) * train_steps - i)
-                    print(f'\titers: {i + 1}, epoch: {epoch + 1} | loss: {loss.item():.7f} '
-                          f'| speed: {speed:.4f}s/iter | ETA: {left_time:.0f}s')
+                    print(
+                        f'\titers: {i + 1}, epoch: {epoch + 1} | loss: {loss.item():.7f} '
+                        f'| speed: {speed:.4f}s/iter | ETA: {left_time:.0f}s'
+                    )
 
                 loss.backward()
                 model_optim.step()
 
                 if args.lradj == 'TST':
-                    adjust_learning_rate(None, model_optim, scheduler, epoch + 1,
-                                         args, printout=False)
+                    adjust_learning_rate(
+                        None, model_optim, scheduler, epoch + 1, args, printout=False
+                    )
                     scheduler.step()
 
             epoch_cost = time.time() - epoch_time
             train_loss_avg = np.average(train_loss)
 
             vali_loss, vali_mae = validate(
-                args, model, vali_loader, criterion, mae_metric, device)
+                args, model, vali_loader, criterion, mae_metric, device
+            )
             test_loss, test_mae = validate(
-                args, model, test_loader, criterion, mae_metric, device)
+                args, model, test_loader, criterion, mae_metric, device
+            )
 
-            print(f'Epoch {epoch + 1} ({epoch_cost:.1f}s) | '
-                  f'Train: {train_loss_avg:.7f} | '
-                  f'Vali: {vali_loss:.7f} | '
-                  f'Test: {test_loss:.7f} (MAE: {test_mae:.7f})')
+            print(
+                f'Epoch {epoch + 1} ({epoch_cost:.1f}s) | '
+                f'Train: {train_loss_avg:.7f} | '
+                f'Vali: {vali_loss:.7f} | '
+                f'Test: {test_loss:.7f} (MAE: {test_mae:.7f})'
+            )
 
             early_stopping(vali_loss, model, path)
             if early_stopping.early_stop:
@@ -314,8 +353,9 @@ def train(args, device):
                 else:
                     if epoch == 0:
                         args.learning_rate = model_optim.param_groups[0]['lr']
-                    adjust_learning_rate(None, model_optim, scheduler, epoch + 1,
-                                         args, printout=True)
+                    adjust_learning_rate(
+                        None, model_optim, scheduler, epoch + 1, args, printout=True
+                    )
 
         # Load best model and evaluate
         best_model_path = os.path.join(path, 'checkpoint')
@@ -324,7 +364,8 @@ def train(args, device):
             print(f'Loaded best model from {best_model_path}')
 
         final_test_loss, final_test_mae = validate(
-            args, model, test_loader, criterion, mae_metric, device)
+            args, model, test_loader, criterion, mae_metric, device
+        )
         print(f'\n=== Final Test Results (iteration {ii}) ===')
         print(f'MSE: {final_test_loss:.7f}, MAE: {final_test_mae:.7f}')
 
@@ -345,11 +386,27 @@ def evaluate(args, device):
 
     # Find checkpoint
     setting = '{}_{}_{}_{}_ft{}_sl{}_ll{}_pl{}_dm{}_nh{}_el{}_dl{}_df{}_fc{}_eb{}_{}_{}'.format(
-        args.task_name, args.model_id, args.model, args.data,
-        args.features, args.seq_len, args.label_len, args.pred_len,
-        args.d_model, args.n_heads, args.e_layers, args.d_layers,
-        args.d_ff, args.factor, args.embed, args.des, 0)
-    ckpt_path = os.path.join(args.checkpoints, setting + '-' + args.model_comment, 'checkpoint')
+        args.task_name,
+        args.model_id,
+        args.model,
+        args.data,
+        args.features,
+        args.seq_len,
+        args.label_len,
+        args.pred_len,
+        args.d_model,
+        args.n_heads,
+        args.e_layers,
+        args.d_layers,
+        args.d_ff,
+        args.factor,
+        args.embed,
+        args.des,
+        0,
+    )
+    ckpt_path = os.path.join(
+        args.checkpoints, setting + '-' + args.model_comment, 'checkpoint'
+    )
 
     if os.path.exists(ckpt_path):
         model.load_state_dict(torch.load(ckpt_path, map_location=device))
@@ -360,7 +417,9 @@ def evaluate(args, device):
     criterion = nn.MSELoss()
     mae_metric = nn.L1Loss()
 
-    test_loss, test_mae = validate(args, model, test_loader, criterion, mae_metric, device)
+    test_loss, test_mae = validate(
+        args, model, test_loader, criterion, mae_metric, device
+    )
     print(f'Test MSE: {test_loss:.7f}, Test MAE: {test_mae:.7f}')
 
     return test_loss, test_mae
@@ -373,12 +432,20 @@ def build_parser():
     parser = argparse.ArgumentParser(description='Swiss River Time-LLM Experiment')
 
     # Experiment control
-    parser.add_argument('--config', type=str, default=None,
-                        help='Path to YAML config file (overrides CLI args)')
-    parser.add_argument('--eval_only', action='store_true',
-                        help='Skip training, evaluate from checkpoint')
-    parser.add_argument('--quick_test', action='store_true',
-                        help='Quick test: 1 epoch, batch_size=4')
+    parser.add_argument(
+        '--config',
+        type=str,
+        default=None,
+        help='Path to YAML config file (overrides CLI args)',
+    )
+    parser.add_argument(
+        '--eval_only',
+        action='store_true',
+        help='Skip training, evaluate from checkpoint',
+    )
+    parser.add_argument(
+        '--quick_test', action='store_true', help='Quick test: 1 epoch, batch_size=4'
+    )
 
     # Basic config (same as Time-LLM run_main.py)
     parser.add_argument('--task_name', type=str, default='long_term_forecast')
@@ -390,8 +457,12 @@ def build_parser():
 
     # Data loader
     parser.add_argument('--data', type=str, default='swiss-river-1990')
-    parser.add_argument('--root_path', type=str, default=None,
-                        help='Root path for dataset (default: auto-detect)')
+    parser.add_argument(
+        '--root_path',
+        type=str,
+        default=None,
+        help='Root path for dataset (default: auto-detect)',
+    )
     parser.add_argument('--data_path', type=str, default='swiss-1990.csv')
     parser.add_argument('--features', type=str, default='M')
     parser.add_argument('--target', type=str, default='OT')
@@ -448,6 +519,7 @@ def build_parser():
 def load_config_yaml(args, config_path):
     """Load YAML config and override args (same logic as run_main.py debug mode)."""
     import yaml
+
     with open(config_path, 'r') as f:
         cfg = yaml.safe_load(f)
     for k, v in cfg.items():
@@ -481,8 +553,9 @@ def main():
             args.root_path = candidate + '/'
             print(f'Auto-detected data root: {args.root_path}')
         else:
-            args.root_path = os.path.join(TIMELLM_ROOT,
-                                          args.root_path or 'dataset/swiss_river/')
+            args.root_path = os.path.join(
+                TIMELLM_ROOT, args.root_path or 'dataset/swiss_river/'
+            )
 
     # Quick test overrides
     if args.quick_test:

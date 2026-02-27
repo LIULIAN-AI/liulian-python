@@ -37,6 +37,7 @@ _ACCELERATE_AVAILABLE = False
 try:
     from accelerate import Accelerator, DeepSpeedPlugin  # type: ignore[import-untyped]
     from accelerate import DistributedDataParallelKwargs  # type: ignore[import-untyped]
+
     _ACCELERATE_AVAILABLE = True
 except ImportError:
     pass
@@ -76,6 +77,8 @@ def build_accelerator(config: Dict[str, Any]) -> Optional[Any]:
     )
     logger.info(
         'Accelerator created — device=%s, mp=%s, deepspeed=%s',
-        acc.device, mixed_precision, deepspeed_cfg or 'off',
+        acc.device,
+        mixed_precision,
+        deepspeed_cfg or 'off',
     )
     return acc

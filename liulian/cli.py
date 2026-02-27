@@ -317,8 +317,12 @@ def main(argv: list[str] | None = None) -> None:
     # train
     sp_train = subparsers.add_parser('train', help='Train a model')
     sp_train.add_argument('config', help='Path to experiment YAML config')
-    sp_train.add_argument('--epochs', type=int, default=None, help='Override train_epochs')
-    sp_train.add_argument('--lr', type=float, default=None, help='Override learning_rate')
+    sp_train.add_argument(
+        '--epochs', type=int, default=None, help='Override train_epochs'
+    )
+    sp_train.add_argument(
+        '--lr', type=float, default=None, help='Override learning_rate'
+    )
     sp_train.add_argument('--wandb-project', default=None, help='Enable wandb logging')
     sp_train.set_defaults(func=cmd_train)
 
@@ -330,10 +334,20 @@ def main(argv: list[str] | None = None) -> None:
     # viz
     sp_viz = subparsers.add_parser('viz', help='Generate visualizations')
     sp_viz.add_argument('config', help='Path to experiment YAML config')
-    sp_viz.add_argument('--method', default='mean',
-                        choices=['mean', 'median', 'last', 'longest_history',
-                                 'best', 'worst', 'single'],
-                        help='Aggregation method for overlapping predictions')
+    sp_viz.add_argument(
+        '--method',
+        default='mean',
+        choices=[
+            'mean',
+            'median',
+            'last',
+            'longest_history',
+            'best',
+            'worst',
+            'single',
+        ],
+        help='Aggregation method for overlapping predictions',
+    )
     sp_viz.set_defaults(func=cmd_viz)
 
     # hparam
@@ -345,6 +359,7 @@ def main(argv: list[str] | None = None) -> None:
 
     if args.verbose:
         from liulian.utils.log_tags import setup_logging as _setup_logging
+
         _setup_logging(level=logging.DEBUG, fmt='%(name)s %(message)s')
 
     if hasattr(args, 'func'):

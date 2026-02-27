@@ -16,8 +16,9 @@ into any class's ``__init__``.  The chosen backend is accessible as
         def forward(self):
             return self.B.zeros((3, 4))  # numpy or torch, transparently
 
-    ds = MyDataset(backend='numpy')   # self.B → NumpyBackend
-    ds = MyDataset(backend='torch')   # self.B → TorchBackend
+
+    ds = MyDataset(backend='numpy')  # self.B → NumpyBackend
+    ds = MyDataset(backend='torch')  # self.B → TorchBackend
 
 For the :class:`~liulian.data.base.BaseDataset` hierarchy the backend
 parameter is integrated directly into the class constructors and flows
@@ -179,35 +180,37 @@ class TorchBackend(ArrayBackend):
         if isinstance(data, self._torch.Tensor):
             return data.to(dtype=self._dtype(dtype))
         return self._torch.tensor(
-            np.asarray(data), dtype=self._dtype(dtype),
+            np.asarray(data),
+            dtype=self._dtype(dtype),
         )
 
     def zeros(self, shape, dtype='float32'):
         return self._torch.zeros(
-            self._ensure_shape(shape), dtype=self._dtype(dtype),
+            self._ensure_shape(shape),
+            dtype=self._dtype(dtype),
         )
 
     def ones(self, shape, dtype='float32'):
         return self._torch.ones(
-            self._ensure_shape(shape), dtype=self._dtype(dtype),
+            self._ensure_shape(shape),
+            dtype=self._dtype(dtype),
         )
 
     def empty(self, shape, dtype='float32'):
         return self._torch.empty(
-            self._ensure_shape(shape), dtype=self._dtype(dtype),
+            self._ensure_shape(shape),
+            dtype=self._dtype(dtype),
         )
 
     def stack(self, arrays, axis=0):
         tensors = [
-            a if isinstance(a, self._torch.Tensor) else self.asarray(a)
-            for a in arrays
+            a if isinstance(a, self._torch.Tensor) else self.asarray(a) for a in arrays
         ]
         return self._torch.stack(tensors, dim=axis)
 
     def concatenate(self, arrays, axis=0):
         tensors = [
-            a if isinstance(a, self._torch.Tensor) else self.asarray(a)
-            for a in arrays
+            a if isinstance(a, self._torch.Tensor) else self.asarray(a) for a in arrays
         ]
         return self._torch.cat(tensors, dim=axis)
 
@@ -257,9 +260,7 @@ def get_backend(name: Union[str, ArrayBackend]) -> ArrayBackend:
     if isinstance(name, ArrayBackend):
         return name
     if name not in _BACKENDS:
-        raise ValueError(
-            f'Unknown backend {name!r}. Available: {sorted(_BACKENDS)}'
-        )
+        raise ValueError(f'Unknown backend {name!r}. Available: {sorted(_BACKENDS)}')
     return _BACKENDS[name]()
 
 
@@ -281,10 +282,11 @@ def with_backend(cls=None, *, default: str = 'numpy'):
 
     Can be used bare or with arguments::
 
-        @with_backend                    # default='numpy'
+        @with_backend  # default='numpy'
         class A: ...
 
-        @with_backend(default='torch')   # default='torch'
+
+        @with_backend(default='torch')  # default='torch'
         class B: ...
     """
 

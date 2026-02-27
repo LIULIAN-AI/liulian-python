@@ -41,8 +41,10 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from liulian.utils.log_tags import setup_logging as _setup_logging
-_setup_logging(level=logging.INFO, fmt='%(asctime)s %(message)s',
-               datefmt='%Y-%m-%d %H:%M:%S')
+
+_setup_logging(
+    level=logging.INFO, fmt='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S'
+)
 log = logging.getLogger(__name__)
 
 RESULTS_DIR = ROOT / 'experiments' / 'results'
@@ -108,6 +110,7 @@ def run_single_experiment(
 
         # Build trainer
         from liulian.runtime.trainer import ForecastTrainer
+
         trainer = ForecastTrainer(config)
 
         # Train
@@ -119,8 +122,11 @@ def run_single_experiment(
             'model': model_name,
             'dataset': dataset_name,
             'seed': seed,
-            'config': {k: v for k, v in config.items()
-                       if not isinstance(v, (type, )) and k != 'model_class'},
+            'config': {
+                k: v
+                for k, v in config.items()
+                if not isinstance(v, (type,)) and k != 'model_class'
+            },
             'final_test': summary.get('final_test', {}),
             'best_val_score': summary.get('best_val_score', float('inf')),
             'epochs_run': summary.get('epochs_run', 0),
@@ -134,8 +140,7 @@ def run_single_experiment(
             'model': model_name,
             'dataset': dataset_name,
             'seed': seed,
-            'config': {k: v for k, v in config.items()
-                       if not isinstance(v, (type, ))},
+            'config': {k: v for k, v in config.items() if not isinstance(v, (type,))},
             'status': 'error',
             'error': str(e),
             'traceback': traceback.format_exc(),
@@ -154,14 +159,25 @@ def run_single_experiment(
 def _build_model(config: Dict[str, Any]):
     """Instantiate the model from config."""
     import torch
+
     model_name = config['model']
 
     # TSL models via adapter
     from liulian.models.torch import (
-        DLinearAdapter, TransformerAdapter, InformerAdapter, AutoformerAdapter,
-        FEDformerAdapter, iTransformerAdapter, PatchTSTAdapter, TimesNetAdapter,
-        TimeMixerAdapter, TimeXerAdapter, MambaAdapter,
-        LSTMAdapter, ExtrapoLSTMAdapter, TransformerEncoderAdapter,
+        DLinearAdapter,
+        TransformerAdapter,
+        InformerAdapter,
+        AutoformerAdapter,
+        FEDformerAdapter,
+        iTransformerAdapter,
+        PatchTSTAdapter,
+        TimesNetAdapter,
+        TimeMixerAdapter,
+        TimeXerAdapter,
+        MambaAdapter,
+        LSTMAdapter,
+        ExtrapoLSTMAdapter,
+        TransformerEncoderAdapter,
     )
 
     adapter_map = {
@@ -186,9 +202,11 @@ def _build_model(config: Dict[str, Any]):
         try:
             if model_name == 'TimeLLM':
                 from liulian.models.torch.timellm import TimeLLMAdapter
+
                 adapter_map['TimeLLM'] = TimeLLMAdapter
             else:
                 from liulian.models.torch.timemoe import TimeMoEAdapter
+
                 adapter_map['TimeMoE'] = TimeMoEAdapter
         except ImportError:
             raise ImportError(f'{model_name} requires transformers library')
@@ -228,9 +246,13 @@ def _build_dataloaders(config: Dict[str, Any]):
         batch_size=config.get('batch_size', 32),
     )
 
-    train_loader = create_dataloader(flag='train', shuffle=True, drop_last=True, **common)
+    train_loader = create_dataloader(
+        flag='train', shuffle=True, drop_last=True, **common
+    )
     val_loader = create_dataloader(flag='val', shuffle=False, drop_last=False, **common)
-    test_loader = create_dataloader(flag='test', shuffle=False, drop_last=False, **common)
+    test_loader = create_dataloader(
+        flag='test', shuffle=False, drop_last=False, **common
+    )
 
     return train_loader, val_loader, test_loader
 
@@ -248,18 +270,36 @@ def main() -> None:
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--config', type=str, help='Single config YAML file')
     group.add_argument('--config-dir', type=str, help='Directory of config YAML files')
-    parser.add_argument('--seeds', type=str, default='42',
-                        help='Comma-separated list of random seeds (default: 42)')
-    parser.add_argument('--results-dir', type=str, default=str(RESULTS_DIR),
-                        help='Output directory for results')
-    parser.add_argument('--resume', action='store_true',
-                        help='Skip configs whose results already exist')
-    parser.add_argument('--dry-run', action='store_true',
-                        help='List configs without running')
-    parser.add_argument('--max-train-iters', type=int, default=None,
-                        help='Cap training iterations per epoch (for smoke testing)')
-    parser.add_argument('--max-eval-iters', type=int, default=None,
-                        help='Cap eval iterations (for smoke testing)')
+    parser.add_argument(
+        '--seeds',
+        type=str,
+        default='42',
+        help='Comma-separated list of random seeds (default: 42)',
+    )
+    parser.add_argument(
+        '--results-dir',
+        type=str,
+        default=str(RESULTS_DIR),
+        help='Output directory for results',
+    )
+    parser.add_argument(
+        '--resume', action='store_true', help='Skip configs whose results already exist'
+    )
+    parser.add_argument(
+        '--dry-run', action='store_true', help='List configs without running'
+    )
+    parser.add_argument(
+        '--max-train-iters',
+        type=int,
+        default=None,
+        help='Cap training iterations per epoch (for smoke testing)',
+    )
+    parser.add_argument(
+        '--max-eval-iters',
+        type=int,
+        default=None,
+        help='Cap eval iterations (for smoke testing)',
+    )
     args = parser.parse_args()
 
     seeds = [int(s.strip()) for s in args.seeds.split(',')]
@@ -276,12 +316,19 @@ def main() -> None:
         sys.exit(1)
 
     total_runs = len(configs) * len(seeds)
-    log.info('Found %d configs × %d seeds = %d total runs', len(configs), len(seeds), total_runs)
+    log.info(
+        'Found %d configs × %d seeds = %d total runs',
+        len(configs),
+        len(seeds),
+        total_runs,
+    )
 
     if args.dry_run:
         for c in configs:
             for s in seeds:
-                skip = 'SKIP' if args.resume and is_completed(c, s, results_dir) else 'RUN'
+                skip = (
+                    'SKIP' if args.resume and is_completed(c, s, results_dir) else 'RUN'
+                )
                 print(f'  [{skip}] {c.stem} (seed {s})')
         return
 
@@ -292,7 +339,7 @@ def main() -> None:
     for i, config_path in enumerate(configs):
         cfg = load_config(config_path)
         for seed in seeds:
-            run_id = f'[{i+1}/{len(configs)}] {config_path.stem} seed={seed}'
+            run_id = f'[{i + 1}/{len(configs)}] {config_path.stem} seed={seed}'
 
             if args.resume and is_completed(config_path, seed, results_dir):
                 log.info('SKIP (exists): %s', run_id)
@@ -303,7 +350,9 @@ def main() -> None:
             out_path = result_path(config_path, seed, results_dir)
 
             result = run_single_experiment(
-                cfg, seed, out_path,
+                cfg,
+                seed,
+                out_path,
                 max_train_iters=args.max_train_iters,
                 max_eval_iters=args.max_eval_iters,
             )
@@ -312,13 +361,23 @@ def main() -> None:
                 completed += 1
                 test_metrics = result.get('final_test', {})
                 metric_str = ', '.join(f'{k}={v:.6f}' for k, v in test_metrics.items())
-                log.info('DONE: %s — %s (%.1fs)', run_id, metric_str, result['elapsed_seconds'])
+                log.info(
+                    'DONE: %s — %s (%.1fs)',
+                    run_id,
+                    metric_str,
+                    result['elapsed_seconds'],
+                )
             else:
                 failed += 1
 
     log.info('=' * 60)
-    log.info('Completed: %d | Skipped: %d | Failed: %d | Total: %d',
-             completed, skipped, failed, completed + skipped + failed)
+    log.info(
+        'Completed: %d | Skipped: %d | Failed: %d | Total: %d',
+        completed,
+        skipped,
+        failed,
+        completed + skipped + failed,
+    )
 
 
 if __name__ == '__main__':
