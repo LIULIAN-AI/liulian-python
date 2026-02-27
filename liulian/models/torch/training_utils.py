@@ -17,6 +17,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
+import liulian.utils.log_tags  # noqa: F401  — registers logger.ok
+
 logger = logging.getLogger(__name__)
 
 

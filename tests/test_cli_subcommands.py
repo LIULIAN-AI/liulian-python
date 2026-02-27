@@ -62,12 +62,12 @@ class TestCliParsing:
         args = parser.parse_args(['viz', 'cfg.yaml', '--method', 'median'])
         assert args.method == 'median'
 
-    def test_hparam_parser(self):
+    def test_tune_parser(self):
         parser = argparse.ArgumentParser()
         sub = parser.add_subparsers(dest='command')
-        sp = sub.add_parser('hparam')
+        sp = sub.add_parser('tune')
         sp.add_argument('config')
-        args = parser.parse_args(['hparam', 'hpo.yaml'])
+        args = parser.parse_args(['tune', 'hpo.yaml'])
         assert args.config == 'hpo.yaml'
 
     def test_predict_parser(self):
@@ -85,7 +85,7 @@ class TestCliSubcommandsMissing:
     """
 
     @pytest.mark.parametrize(
-        'subcmd', ['run', 'eval', 'train', 'predict', 'viz', 'hparam']
+        'subcmd', ['run', 'eval', 'train', 'predict', 'viz', 'tune']
     )
     def test_missing_config_exits(self, subcmd):
         with pytest.raises(SystemExit):

@@ -509,11 +509,11 @@ class TestCLIEnhancements:
             main(['viz', '--help'])
         assert exc_info.value.code == 0
 
-    def test_hparam_subcommand_exists(self):
+    def test_tune_subcommand_exists(self):
         from liulian.cli import main
 
         with pytest.raises(SystemExit) as exc_info:
-            main(['hparam', '--help'])
+            main(['tune', '--help'])
         assert exc_info.value.code == 0
 
     def test_info_still_works(self, capsys):
