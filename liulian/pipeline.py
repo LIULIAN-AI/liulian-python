@@ -230,6 +230,8 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
     - Model instantiation via ``liulian.models.torch.<name>.Model``
     - EntityWrapper wrapping when ``identifier_mode='embedding'``
       (uses ChannelEntityWrapper for ``split_mode='multi_channel'``)
+    - Patch-level entity embedding when ``identifier_mode='patch_embedding'``
+      (imports ``patchtst_entity.Model`` instead of ``patchtst.Model``)
     - Auto enc_in detection from dataset
 
     Args:
@@ -256,8 +258,14 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
         ns.content = _load_prompt_content(config)
 
     # Dynamic import for all models
+    # For 'patch_embedding' mode on PatchTST, use the specialised module
+    # that adds entity embeddings after patching (in d_model space).
+    _module_name = model_name
+    if model_name == 'patchtst' and config.get('identifier_mode') == 'patch_embedding':
+        _module_name = 'patchtst_entity'
+
     try:
-        mod = importlib.import_module(f'liulian.models.torch.{model_name}')
+        mod = importlib.import_module(f'liulian.models.torch.{_module_name}')
         model = mod.Model(ns).float()
     except (ImportError, ModuleNotFoundError, AttributeError) as exc:
         raise ValueError(
@@ -266,6 +274,7 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
         ) from exc
 
     # Wrap with entity embedding when configured
+    # (skip for 'patch_embedding' — entity embedding is built into the model)
     if config.get('identifier_mode') == 'embedding':
         num_emb = config.get('num_embeddings')
         if num_emb is None and dataset is not None:

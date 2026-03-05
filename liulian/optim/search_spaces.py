@@ -520,13 +520,15 @@ def patchtst_embedding_space() -> Dict[str, Any]:
     return base
 
 
-def patchtst_entity_space() -> Dict[str, Any]:
-    """PatchTST with patch-level entity embedding search space.
+def patchtst_patch_embedding_space() -> Dict[str, Any]:
+    """PatchTST + patch-level entity embedding search space.
 
     Same architecture hyperparameters as :func:`patchtst_space`.  The
     entity embedding is built into the model (``nn.Embedding(enc_in,
     d_model)``), so there is no ``embedding_size`` to tune — it is
     always ``d_model``.
+
+    Selected via ``model: patchtst``, ``identifier_mode: patch_embedding``.
     """
     return patchtst_space()
 
@@ -744,7 +746,7 @@ _SPACE_REGISTRY: Dict[str, Any] = {
     'itransformer': itransformer_space,
     'patchtst': patchtst_space,
     'patchtst_embedding': patchtst_embedding_space,
-    'patchtst_entity': patchtst_entity_space,
+    'patchtst_patch_embedding': patchtst_patch_embedding_space,
     'timesnet': timesnet_space,
     'timemixer': timemixer_space,
     'timexer': timexer_space,
@@ -805,9 +807,14 @@ def get_asha_preset(name: str = 'default') -> Dict[str, Any]:
 # Smart resolution: pick per-model, per-dataset, per-identifier space
 # ======================================================================
 
-# Mapping: (data_prefix, model, has_embedding) → registry key.
+# Mapping: (data_prefix, model, emb_flag) → registry key.
 # Checked in order; first match wins. ``None`` means "any".
-_RESOLVE_ORDER: list[tuple[str | None, str, bool | None, str]] = [
+# ``emb_flag`` can be:
+#   - ``True``  — matches identifier_mode in ('embedding', 'embedding_idx')
+#   - ``False`` — matches identifier_mode NOT in ('embedding', 'embedding_idx', 'patch_embedding')
+#   - a string  — matches identifier_mode == that string exactly
+#   - ``None``  — matches any identifier_mode
+_RESOLVE_ORDER: list[tuple[str | None, str, bool | str | None, str]] = [
     # Swiss-river specific
     ('swiss-river', 'lstm', True, 'swiss_lstm_embedding'),
     ('swiss-river', 'lstm', False, 'swiss_lstm'),
@@ -819,8 +826,8 @@ _RESOLVE_ORDER: list[tuple[str | None, str, bool | None, str]] = [
     # PatchTST (dataset-agnostic)
     (None, 'patchtst', True, 'patchtst_embedding'),
     (None, 'patchtst', False, 'patchtst'),
-    # PatchTST with patch-level entity embedding (no identifier_mode needed)
-    (None, 'patchtst_entity', None, 'patchtst_entity'),
+    # PatchTST with patch-level entity embedding
+    (None, 'patchtst', 'patch_embedding', 'patchtst_patch_embedding'),
     # TimeLLM swiss-river
     ('swiss-river', 'timellm', None, 'timellm_swissriver'),
 ]
@@ -847,7 +854,8 @@ def resolve_search_space(
     Args:
         model: Model name (e.g. ``'lstm'``, ``'dlinear'``).
         data: Dataset name (e.g. ``'swiss-river-1990'``).
-        identifier_mode: ``'embedding'`` / ``'embedding_idx'`` / ``'none'``.
+        identifier_mode: ``'embedding'`` / ``'embedding_idx'`` /
+            ``'patch_embedding'`` / ``'none'``.
 
     Returns:
         Search space dictionary with ``ray.tune.*`` values.
@@ -877,8 +885,14 @@ def resolve_search_space(
             continue
         if data_prefix is not None and not data.startswith(data_prefix):
             continue
-        if emb_flag is not None and emb_flag != has_emb:
-            continue
+        # Match emb_flag against identifier_mode
+        if emb_flag is not None:
+            if isinstance(emb_flag, str):
+                # Exact string match (e.g. 'patch_embedding')
+                if identifier_mode != emb_flag:
+                    continue
+            elif emb_flag != has_emb:
+                continue
         space = get_search_space(key)
         break
 

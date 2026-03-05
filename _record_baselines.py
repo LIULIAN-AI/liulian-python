@@ -109,8 +109,8 @@ SCENARIOS = {
     'patchtst_tune_no_emb': lambda: _base_config('none', True, model='patchtst', split_mode='multi_channel'),
     'patchtst_tune_emb': lambda: _base_config('embedding', True, model='patchtst', split_mode='multi_channel'),
     # PatchTST + patch-level entity embedding
-    'patchtst_entity_single': lambda: _base_config('none', False, model='patchtst_entity', split_mode='multi_channel'),
-    'patchtst_entity_tune': lambda: _base_config('none', True, model='patchtst_entity', split_mode='multi_channel'),
+    'patchtst_patch_emb_single': lambda: _base_config('patch_embedding', False, model='patchtst', split_mode='multi_channel'),
+    'patchtst_patch_emb_tune': lambda: _base_config('patch_embedding', True, model='patchtst', split_mode='multi_channel'),
 }
 
 

@@ -204,19 +204,19 @@ PATCHTST_SWISS1990: dict[str, dict] = {
 
 # ── PatchTST (patch-level entity emb) + Swiss River 1990 + multi_channel ──
 
-PATCHTST_ENTITY_SWISS1990: dict[str, dict] = {
+PATCHTST_PATCH_EMB_SWISS1990: dict[str, dict] = {
     'single': {
         'pred_shape': (80, 3, 28),
-        'test_mse': 0.028585020825266837,
-        'test_rmse': 0.16778430342674255,
+        'test_mse': 0.02858501859009266,
+        'test_rmse': 0.16778430044651033,
         'test_mae': 0.14712310284376146,
-        'test_nse': -2.0246125221252442,
+        'test_nse': -2.0246123313903808,
         'pred_first5': [
-            11.729756355285645,
-            10.764129638671875,
-            10.022446632385254,
-            8.863557815551758,
-            10.63394546508789,
+            11.729754447937012,
+            10.764131546020508,
+            10.022451400756836,
+            8.863563537597656,
+            10.63394832611084,
         ],
     },
     'tune': {

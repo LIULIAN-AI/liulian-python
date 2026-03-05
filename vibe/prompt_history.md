@@ -76,6 +76,12 @@ Now perform the following tasks:
   Notice, keep the current on-time-series entity embedding as well, since it is still useful for comparison.
 
 
+### prompt 2026.03.05 - 4:
+
+
+I am okay with all designs except: model name in config should always be patchtst. Revise the identifier mode and the related settings to choose from which embedding mode to use.
+
+
 ## Other issues:
 
 - Is it better to include the station embedding as a third feature for dlinear rather than concatenated to x beforehand?

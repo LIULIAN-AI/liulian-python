@@ -32,7 +32,7 @@ import os
 import numpy as np
 import pytest
 
-from tests.e2e.baselines import DLINEAR_SWISS1990, LSTM_SWISS1990, PATCHTST_SWISS1990, PATCHTST_ENTITY_SWISS1990
+from tests.e2e.baselines import DLINEAR_SWISS1990, LSTM_SWISS1990, PATCHTST_SWISS1990, PATCHTST_PATCH_EMB_SWISS1990
 
 pytestmark = pytest.mark.main_branch
 
@@ -453,11 +453,11 @@ class TestPatchTSTEntitySingle:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='patchtst_entity', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='patchtst', split_mode='multi_channel',
+            identifier_mode='patch_embedding', hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
-        _assert_baseline(result, PATCHTST_ENTITY_SWISS1990['single'], 'patchtst_entity_single')
+        _assert_baseline(result, PATCHTST_PATCH_EMB_SWISS1990['single'], 'patchtst_patch_emb_single')
 
 
 class TestPatchTSTEntityTune:
@@ -465,8 +465,8 @@ class TestPatchTSTEntityTune:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='patchtst_entity', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='patchtst', split_mode='multi_channel',
+            identifier_mode='patch_embedding', hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
-        _assert_baseline(result, PATCHTST_ENTITY_SWISS1990['tune'], 'patchtst_entity_tune')
+        _assert_baseline(result, PATCHTST_PATCH_EMB_SWISS1990['tune'], 'patchtst_patch_emb_tune')

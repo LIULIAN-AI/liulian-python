@@ -276,8 +276,11 @@ class EntityAwareMixin:
     Config keys
     -----------
     identifier_mode : str
-        One of ``'none'``, ``'embedding'``, ``'onehot'``, ``'coordinates'``,
-        ``'sinusoidal'``, ``'descriptors'``, ``'numeric_id'``.
+        One of ``'none'``, ``'embedding'``, ``'patch_embedding'``,
+        ``'onehot'``, ``'coordinates'``, ``'sinusoidal'``,
+        ``'descriptors'``, ``'numeric_id'``.
+        ``'patch_embedding'`` is handled by the model internally
+        (e.g. ``patchtst_entity.Model``); no wrapper is applied.
     entity_id_col : int
         Column index in ``x_mark_enc`` for integer station IDs
         (default ``0``).

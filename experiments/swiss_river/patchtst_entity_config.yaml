@@ -1,19 +1,19 @@
 # Swiss River experiment — PatchTST with patch-level entity embedding
 #
-# This config uses `patchtst_entity`, a PatchTST variant that adds
-# per-station entity embeddings at the PATCH level (in d_model space,
-# after patching and patch projection), rather than at the time-step
-# level (before normalisation, which gets the signal washed out).
+# This config uses `identifier_mode: patch_embedding` with PatchTST, which
+# adds per-station entity embeddings at the PATCH level (in d_model space,
+# after patching and patch projection), rather than at the time-step level
+# (before normalisation, which gets the signal washed out).
 #
 # The entity embedding maps channel index → d_model vector and is
 # added to every patch token for that channel, analogous to positional
-# encoding.  `identifier_mode` is `none` because the entity embedding
-# is built into the model — no external wrapper needed.
+# encoding.  The pipeline imports `patchtst_entity.Model` automatically
+# when `identifier_mode: patch_embedding`.
 #
 # To compare approaches:
-#   model: patchtst,        identifier_mode: none      → no entity info
-#   model: patchtst,        identifier_mode: embedding  → time-step embedding (bad for PatchTST)
-#   model: patchtst_entity, identifier_mode: none      → patch-level embedding (this config)
+#   model: patchtst, identifier_mode: none             → no entity info
+#   model: patchtst, identifier_mode: embedding        → time-step embedding (bad for PatchTST)
+#   model: patchtst, identifier_mode: patch_embedding  → patch-level embedding (this config)
 #
 # Usage:
 #   liulian run experiments/swiss_river/patchtst_entity_config.yaml
@@ -21,7 +21,7 @@
 #   liulian run experiments/swiss_river/patchtst_entity_config.yaml --pred_len 14
 
 # ── General ─────────────────────────────────────────────────────────────
-model: patchtst_entity
+model: patchtst
 seed: 2026
 quick_test: false
 eval_only: false
@@ -58,10 +58,9 @@ include_historical_y: none
 include_historical_predicted_y: false
 
 # ── Entity identifiers ─────────────────────────────────────────────────
-# Entity embedding is built into patchtst_entity at the patch level.
-# identifier_mode must be 'none' to prevent the pipeline from
-# double-wrapping with ChannelEntityWrapper.
-identifier_mode: none
+# 'patch_embedding': entity embedding added in d_model space after
+# patching.  The pipeline will import patchtst_entity.Model automatically.
+identifier_mode: patch_embedding
 id_integration: concat_to_x
 embedding_size: 10
 num_embeddings: null

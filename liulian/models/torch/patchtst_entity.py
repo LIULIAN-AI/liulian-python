@@ -44,10 +44,10 @@ representational space, analogous to positional encoding.
 
 **Usage:**
 
-Set ``model: patchtst_entity`` in the experiment config.  Entity
-embeddings are always active (the model is purpose-built for multi-channel
-station differentiation).  Use ``identifier_mode: none`` — the framework's
-external wrappers are not needed.
+Set ``model: patchtst``, ``identifier_mode: patch_embedding`` in the
+experiment config.  The pipeline will import this ``Model`` instead of
+the base ``patchtst.Model`` and will **not** wrap with
+``ChannelEntityWrapper``.
 
 To compare approaches:
 
@@ -56,16 +56,14 @@ To compare approaches:
 * ``model: patchtst``, ``identifier_mode: embedding``
   → PatchTST + time-step embedding (ChannelEntityWrapper — known to be
   ineffective due to instance normalisation)
-* ``model: patchtst_entity``, ``identifier_mode: none``
-  → PatchTST + patch-level entity embedding (this model)
+* ``model: patchtst``, ``identifier_mode: patch_embedding``
+  → PatchTST + patch-level entity embedding (this module)
 """
 
 import torch
 from torch import nn
-from typing import Dict, Any
 
 from liulian.models.torch.patchtst import Model as PatchTSTModel
-from liulian.models.torch.base_adapter import TorchModelAdapter
 
 
 class Model(PatchTSTModel):
@@ -256,78 +254,3 @@ class Model(PatchTSTModel):
 
     # classification is inherited — no entity injection needed
     # (classification is not used for multi-channel stations)
-
-
-class PatchTSTEntityAdapter(TorchModelAdapter):
-    """Adapter for PatchTST with patch-level entity embeddings.
-
-    This adapter does NOT use :class:`EntityAwareMixin` because the entity
-    embedding is handled internally by the model at the patch level.
-    ``identifier_mode`` should be ``'none'`` to prevent the pipeline from
-    double-wrapping with ``ChannelEntityWrapper``.
-
-    Expected config parameters:
-        - seq_len: Input sequence length
-        - pred_len: Prediction sequence length
-        - enc_in: Number of input features/channels/stations
-        - d_model: Model dimension (default: 128)
-        - n_heads: Number of attention heads (default: 16)
-        - e_layers: Number of encoder layers (default: 3)
-        - d_ff: Feed-forward dimension (default: 256)
-        - dropout: Dropout rate (default: 0.2)
-        - activation: Activation function (default: 'gelu')
-        - factor: Attention factor (default: 1)
-        - patch_len: Patch length (default: 16)
-        - stride: Patch stride (default: 8)
-        - task_name: Task type (default: 'long_term_forecast')
-    """
-
-    def __init__(self, config: Dict[str, Any]):
-        default_config = {
-            'd_model': 128,
-            'n_heads': 16,
-            'e_layers': 3,
-            'd_ff': 256,
-            'dropout': 0.2,
-            'activation': 'gelu',
-            'factor': 1,
-            'patch_len': 16,
-            'stride': 8,
-            'task_name': 'long_term_forecast',
-        }
-        default_config.update(config)
-
-        model = Model(
-            self._dict_to_namespace(default_config),
-            patch_len=default_config['patch_len'],
-            stride=default_config['stride'],
-        )
-        super().__init__(model, default_config)
-        # No _init_entity_support — entity embedding is internal
-
-    def _prepare_model_inputs(self, inputs: Dict[str, torch.Tensor]) -> tuple:
-        """Prepare inputs for PatchTST forward pass."""
-        x_enc = inputs['x_enc']
-        batch_size, seq_len, n_features = x_enc.shape
-
-        x_mark_enc = inputs.get(
-            'x_mark_enc',
-            torch.zeros(batch_size, seq_len, 1, device=x_enc.device),
-        )
-        x_dec = inputs.get(
-            'x_dec',
-            torch.zeros(
-                batch_size,
-                self.config['pred_len'],
-                n_features,
-                device=x_enc.device,
-            ),
-        )
-        x_mark_dec = inputs.get(
-            'x_mark_dec',
-            torch.zeros(
-                batch_size, self.config['pred_len'], 1, device=x_enc.device
-            ),
-        )
-
-        return (x_enc, x_mark_enc, x_dec, x_mark_dec)
