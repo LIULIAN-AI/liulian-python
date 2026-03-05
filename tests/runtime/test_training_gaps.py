@@ -924,7 +924,10 @@ class TestSearchSpaces:
         assert isinstance(space, dict)
         assert len(space) > 0
         for v in space.values():
-            assert isinstance(v, list)
+            # Values are ray.tune.* sample objects (choice, uniform, etc.)
+            assert not isinstance(v, (int, float, str)), (
+                f"Expected ray.tune.* object, got {type(v)}"
+            )
 
     def test_unknown_raises(self):
         from liulian.optim.search_spaces import get_search_space

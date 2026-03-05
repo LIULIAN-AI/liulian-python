@@ -397,13 +397,13 @@ class EntityScaler:
 
         if is_tensor:
             device = data.device
-            arr = data.detach().cpu().numpy().copy()
+            arr = data.detach().cpu().numpy().copy()  # todo: can this part use torch operations instead of numpy?
         else:
             arr = np.array(data, dtype=np.float64)
 
         orig_shape = arr.shape
 
-        # ----- per-sample entity_ids path (TS mode) ---------------------
+        # ----- per-sample entity_ids path (per-entity mode) ---------------------
         if entity_ids is not None:
             n_samples = arr.shape[0]
             if len(entity_ids) != n_samples:
@@ -435,7 +435,7 @@ class EntityScaler:
                 return _torch.from_numpy(result.astype(np.float32)).to(device)
             return result
 
-        # ----- ST-mode column mapping (entity_ids not provided) ---------
+        # ----- multi-channel-mode column mapping (entity_ids not provided) ---------
         # Build ordered list of per-entity target scalers
         entity_target_scalers: list[Any] = []
         for entity in self.entity_ids:
@@ -445,6 +445,7 @@ class EntityScaler:
                     entity_target_scalers.append(self._scalers[key])
 
         if not entity_target_scalers:
+            # No per-entity scalers fitted — return data unchanged.
             if is_tensor:
                 return _torch.from_numpy(arr.astype(np.float32)).to(device)
             return arr
@@ -453,22 +454,19 @@ class EntityScaler:
         arr_2d = arr.reshape(-1, n_cols)
 
         if n_cols == len(entity_target_scalers):
-            # ST mode: each column corresponds to one entity target
+            # multi-channel mode: each column corresponds to one entity target
             for col_idx, scaler in enumerate(entity_target_scalers):
                 col = arr_2d[:, col_idx : col_idx + 1]
                 arr_2d[:, col_idx : col_idx + 1] = scaler.inverse_transform(col)
         else:
-            logger.warning(
-                'inverse_transform called without entity_ids in TS mode '
-                '(C=%d != n_entity_scalers=%d). Results may be inaccurate.',
-                n_cols,
-                len(entity_target_scalers),
+            # per_entity mode without entity_ids: column count doesn't match.
+            # Raise so that callers (e.g. predict()) can fall back gracefully
+            # to normalised-scale predictions.
+            raise ValueError(
+                f'Column count ({n_cols}) does not match number of entity '
+                f'target scalers ({len(entity_target_scalers)}). '
+                f'Pass entity_ids for per-entity inverse transform.'
             )
-            # Fallback: average across all entity scalers
-            accum = np.zeros_like(arr_2d)
-            for scaler in entity_target_scalers:
-                accum += scaler.inverse_transform(arr_2d.copy())
-            arr_2d = accum / len(entity_target_scalers)
 
         arr = arr_2d.reshape(orig_shape)
 

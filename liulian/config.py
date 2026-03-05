@@ -55,7 +55,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     'max_samples': None,
     # ── Task & mode ─────────────────────────────────────────────────
     'task': 'forecast',
-    'split_mode': 'ts',
+    'split_mode': 'per_entity',
     'scaler': 'minmax',
     'use_current_x': True,
     'use_full_history': False,
@@ -163,6 +163,32 @@ MODEL_DEFAULTS: Dict[str, Dict[str, Any]] = {
         'batch_size': 256,
         'lradj': 'none',
     },
+    'dlinear': {
+        'dropout': 0.0,
+        'batch_size': 32,
+        'learning_rate': 0.0001,
+        'lradj': 'type1',
+        'scaler': 'standard',
+        'split_mode': 'multi_channel',
+        'identifier_mode': 'none',
+        'individual': False,
+        'moving_avg': 25,
+    },
+    'patchtst': {
+        'd_model': 128,
+        'd_ff': 256,
+        'n_heads': 16,
+        'e_layers': 3,
+        'dropout': 0.2,
+        'batch_size': 32,
+        'learning_rate': 0.0001,
+        'lradj': 'type1',
+        'scaler': 'standard',
+        'split_mode': 'multi_channel',
+        'identifier_mode': 'none',
+        'patch_len': 16,
+        'stride': 8,
+    },
 }
 
 # ── Quick-test overrides ───────────────────────────────────────────────
@@ -174,7 +200,6 @@ QUICK_TEST_OVERRIDES: Dict[str, Any] = {
     'max_train_iters': 100,
     'max_eval_iters': 50,
     'num_workers': 0,
-    'identifier_mode': 'embedding',
     'hpo_num_samples': 2,
     'hpo_local_mode': True,
 }
@@ -183,13 +208,41 @@ QUICK_TEST_OVERRIDES: Dict[str, Any] = {
 # ── Public API ─────────────────────────────────────────────────────────
 
 
+# ── Backward-compatible split_mode aliases ─────────────────────────────
+
+_SPLIT_MODE_ALIASES: Dict[str, str] = {
+    'ts': 'per_entity',
+    'st': 'multi_channel',
+}
+
+
+def normalize_split_mode(config: Dict[str, Any]) -> None:
+    """Replace legacy split_mode aliases (``ts`` / ``st``) in-place.
+
+    Logs a deprecation warning when a legacy alias is encountered.
+    """
+    mode = config.get('split_mode', '')
+    if mode in _SPLIT_MODE_ALIASES:
+        new_mode = _SPLIT_MODE_ALIASES[mode]
+        logger.warning(
+            "split_mode='%s' is deprecated, use '%s' instead.",
+            mode,
+            new_mode,
+        )
+        config['split_mode'] = new_mode
+
+
 def load_config(
     yaml_path: Optional[str] = None,
     cli_overrides: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Build a merged configuration dict.
 
-    Priority: *cli_overrides* > *yaml_path* > :data:`DEFAULT_CONFIG`.
+    Priority (highest wins):
+        *cli_overrides* > *yaml_path* > *MODEL_DEFAULTS* > :data:`DEFAULT_CONFIG`
+
+    Model-specific defaults are applied automatically based on the
+    ``model`` key found in *cli_overrides* or *yaml_path*.
 
     Args:
         yaml_path: Path to a YAML config file.  ``None`` → use defaults.
@@ -200,10 +253,23 @@ def load_config(
     """
     cfg = copy.deepcopy(DEFAULT_CONFIG)
 
-    # Layer 2: YAML file
+    # Peek at the model name from YAML / CLI before applying layers
+    yaml_cfg: Dict[str, Any] = {}
     if yaml_path is not None:
         yaml_cfg = _load_yaml(yaml_path)
-        cfg.update(yaml_cfg)
+
+    model_name = (
+        (cli_overrides or {}).get('model')
+        or yaml_cfg.get('model')
+        or cfg.get('model', '')
+    )
+
+    # Layer 1.5: Model-specific defaults (between DEFAULT and YAML)
+    model_defaults = MODEL_DEFAULTS.get(model_name, {})
+    cfg.update(model_defaults)
+
+    # Layer 2: YAML file
+    cfg.update(yaml_cfg)
 
     # Layer 3: CLI overrides (highest priority)
     if cli_overrides:
@@ -211,6 +277,9 @@ def load_config(
         for k, v in cli_overrides.items():
             if v is not None:
                 cfg[k] = v
+
+    # Normalize legacy split_mode aliases (ts → per_entity, st → multi_channel)
+    normalize_split_mode(cfg)
 
     return cfg
 
@@ -228,9 +297,14 @@ def apply_quick_test(config: Dict[str, Any]) -> Dict[str, Any]:
 
 
 def apply_model_defaults(config: Dict[str, Any]) -> Dict[str, Any]:
-    """Apply model-specific defaults (only for keys not already overridden).
+    """Apply model-specific defaults (idempotent).
 
-    Model defaults have lower priority than user-set values.
+    Model defaults are now applied automatically inside
+    :func:`load_config` as a priority layer between ``DEFAULT_CONFIG``
+    and YAML.  This function is kept for backward compatibility: it
+    applies model defaults only for keys still at their
+    ``DEFAULT_CONFIG`` value (i.e., not overridden by YAML, CLI, or
+    programmatic ``cfg.update(...)`` calls).
     """
     model_name = config.get('model', '')
     defaults = MODEL_DEFAULTS.get(model_name, {})

@@ -343,7 +343,7 @@ class Experiment:
 
         When ``self.optimizer`` is set and a ``search_space`` is present
         in ``self.config``, the method branches to an HPO flow that
-        delegates to :meth:`RayOptimizer.run`.  Otherwise it runs a
+        delegates to :meth:`RayOptimizer.run`. Otherwise, it runs a
         single-trial training loop as before.
         """
         from liulian.runtime.trainer import ForecastTrainer
@@ -377,12 +377,23 @@ class Experiment:
             self._sm.transition(LifecycleState.TRAIN)
             logger.info('Starting HPO via %s', type(self.optimizer).__name__)
 
-            # Detect EntityWrapper and extract the inner model class so that
-            # make_trainable can build fresh models per trial.
-            from liulian.models.torch.entity_mixin import EntityWrapper
+            # Detect EntityWrapper / ChannelEntityWrapper and extract the
+            # inner model class so that make_trainable can build fresh
+            # models per trial.
+            from liulian.models.torch.entity_mixin import (
+                ChannelEntityWrapper,
+                EntityWrapper,
+            )
 
             is_entity_wrapped = isinstance(torch_model, EntityWrapper)
-            if is_entity_wrapped:
+            is_channel_wrapped = isinstance(torch_model, ChannelEntityWrapper)
+
+            if is_channel_wrapped:
+                inner_model_cls = type(torch_model.inner)
+                model_args = getattr(torch_model.inner, '_args', None)
+                _cw_num_stations = torch_model.station_embedding.num_embeddings
+                _cw_emb_size = torch_model.station_embedding.embedding_dim
+            elif is_entity_wrapped:
                 inner_model_cls = type(torch_model.inner)
                 model_args = getattr(torch_model.inner, '_args', None)
                 # Capture EntityWrapper parameters so we can re-wrap per trial todo: these arg names may change.
@@ -403,8 +414,20 @@ class Experiment:
                 model_args = SimpleNamespace(**self.config)
 
             # Build a model factory that rebuilds the full model (including
-            # EntityWrapper wrapping) from a namespace of args.
-            if is_entity_wrapped:
+            # EntityWrapper / ChannelEntityWrapper wrapping) from a
+            # namespace of args.
+            if is_channel_wrapped:
+
+                def _model_factory(args):
+                    inner = inner_model_cls(args).float()
+                    emb_size = getattr(args, 'embedding_size', _cw_emb_size)
+                    return ChannelEntityWrapper(
+                        inner_model=inner,
+                        num_stations=_cw_num_stations,
+                        embedding_size=emb_size,
+                    )
+
+            elif is_entity_wrapped:
 
                 def _model_factory(args):
                     inner = inner_model_cls(args).float()
@@ -456,6 +479,38 @@ class Experiment:
                 hpo_result.best_value,
                 hpo_result.best_config,
             )
+
+            # Persist best hyper-parameters as a stand-alone YAML file
+            # so that the result is easily reusable without re-running HPO.
+            try:
+                import datetime
+                import yaml as _yaml
+
+                best_hparams_path = os.path.join(
+                    self._artifacts_dir, 'best_hparams.yaml'
+                )
+                best_hparams_record = {
+                    'best_config': hpo_result.best_config,
+                    'best_metric_value': float(hpo_result.best_value),
+                    'metric_name': str(
+                        self.config.get('loss', 'mse')
+                    ),
+                    'n_trials': hpo_result.n_trials,
+                    'dataset': str(self.config.get('data', '')),
+                    'model': str(self.config.get('model', '')),
+                    'timestamp': datetime.datetime.now().isoformat(
+                        timespec='seconds'
+                    ),
+                }
+                with open(best_hparams_path, 'w') as fh:
+                    _yaml.safe_dump(
+                        best_hparams_record, fh, default_flow_style=False
+                    )
+                logger.info(
+                    'Best hyper-parameters saved to %s', best_hparams_path
+                )
+            except Exception as exc:
+                logger.debug('Could not save best_hparams.yaml: %s', exc)
 
             # Retrain with best config
             best_cfg = {**self.config, **hpo_result.best_config}
@@ -514,9 +569,6 @@ class Experiment:
                     train_result['final_test'] = test_metrics
             else:
                 # No checkpoint available — retrain with best config
-                raise RuntimeError(
-                    'Best checkpoint not found after HPO.  Checkpoint saving may have been disabled. Please retrain with best config.'
-                )
                 logger.warning(
                     'No checkpoint available from HPO (checkpoint saving '
                     'may have been disabled). Retraining with best config.'
@@ -605,7 +657,7 @@ class Experiment:
         self._compute_task_metrics(summary, torch_model, trainer)
 
         # Collect raw predictions for downstream visualization
-        if test_loader is not None:
+        if test_loader is not None:  # todo: is this redundant with trainer.train with test_loader?
             pred_result = trainer.predict(torch_model, test_loader)
             summary['predictions'] = pred_result
             logger.info(

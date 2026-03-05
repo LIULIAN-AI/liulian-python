@@ -15,7 +15,7 @@ import numpy as np
 from typing import Dict, Any
 from liulian.models.torch.layers.transformer_blocks import Encoder, EncoderLayer
 from liulian.models.torch.layers.attention import FullAttention, AttentionLayer
-from liulian.models.torch.layers.embed import TimeLLMPatchEmbedding as PatchEmbedding
+from liulian.models.torch.layers.embed import PatchEmbedding
 from liulian.models.torch.base_adapter import TorchModelAdapter
 from liulian.models.torch.entity_mixin import EntityAwareMixin
 
@@ -125,7 +125,7 @@ class Model(nn.Module):
         means = x_enc.mean(1, keepdim=True).detach()
         x_enc = x_enc - means
         stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
-        x_enc /= stdev
+        x_enc = x_enc / stdev
 
         # do patching and embedding
         x_enc = x_enc.permute(0, 2, 1)
@@ -161,7 +161,7 @@ class Model(nn.Module):
             torch.sum(x_enc * x_enc, dim=1) / torch.sum(mask == 1, dim=1) + 1e-5
         )
         stdev = stdev.unsqueeze(1).detach()
-        x_enc /= stdev
+        x_enc = x_enc / stdev
 
         # do patching and embedding
         x_enc = x_enc.permute(0, 2, 1)
@@ -192,7 +192,7 @@ class Model(nn.Module):
         means = x_enc.mean(1, keepdim=True).detach()
         x_enc = x_enc - means
         stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
-        x_enc /= stdev
+        x_enc = x_enc / stdev
 
         # do patching and embedding
         x_enc = x_enc.permute(0, 2, 1)

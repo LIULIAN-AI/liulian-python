@@ -37,7 +37,7 @@ def swiss_dataset():
     return SwissRiverDataset(
         data_name='swiss-river-2010',
         root_path=DATASET_ROOT,
-        split_mode='ts',
+        split_mode='per_entity',
         seq_len=16,
         pred_len=4,
         task='forecast',

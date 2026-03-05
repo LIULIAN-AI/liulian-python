@@ -375,64 +375,64 @@ class DataEmbedding_wo_pos(nn.Module):
         return self.dropout(x)
 
 
-# class PatchEmbedding(nn.Module):
-#     """Patch-based embedding for PatchTST and similar models
-#
-#     Divides the time series into patches and embeds each patch.
-#     """
-#
-#     def __init__(
-#         self,
-#         d_model: int,
-#         patch_len: int,
-#         stride: int,
-#         padding: int,
-#         dropout: float
-#     ):
-#         """Initialize patch embedding
-#
-#         Args:
-#             d_model: Dimension of the model
-#             patch_len: Length of each patch
-#             stride: Stride for patching
-#             padding: Padding to add
-#             dropout: Dropout rate
-#         """
-#         super(PatchEmbedding, self).__init__()
-#         # Patching parameters
-#         self.patch_len = patch_len
-#         self.stride = stride
-#         self.padding_patch_layer = nn.ReplicationPad1d((0, padding))
-#
-#         # Input encoding: projection of patches onto d-dim vector space
-#         self.value_embedding = nn.Linear(patch_len, d_model, bias=False)
-#
-#         # Positional embedding
-#         self.position_embedding = PositionalEmbedding(d_model)
-#
-#         # Residual dropout
-#         self.dropout = nn.Dropout(dropout)
-#
-#     def forward(self, x):
-#         """Forward pass with patching
-#
-#         Args:
-#             x: Input data [batch_size, n_vars, seq_len]
-#
-#         Returns:
-#             Tuple of:
-#                 - Embedded patches [batch_size*n_vars, n_patches, d_model]
-#                 - Number of variables
-#         """
-#         # Do patching
-#         n_vars = x.shape[1]
-#         x = self.padding_patch_layer(x)
-#         x = x.unfold(dimension=-1, size=self.patch_len, step=self.stride)
-#         x = torch.reshape(x, (x.shape[0] * x.shape[1], x.shape[2], x.shape[3]))
-#
-#         # Input encoding
-#         x = self.value_embedding(x) + self.position_embedding(x)
-#         return self.dropout(x), n_vars
+class PatchEmbedding(nn.Module):
+    """Patch-based embedding for PatchTST and similar models
+
+    Divides the time series into patches and embeds each patch.
+    """
+
+    def __init__(
+        self,
+        d_model: int,
+        patch_len: int,
+        stride: int,
+        padding: int,
+        dropout: float
+    ):
+        """Initialize patch embedding
+
+        Args:
+            d_model: Dimension of the model
+            patch_len: Length of each patch
+            stride: Stride for patching
+            padding: Padding to add
+            dropout: Dropout rate
+        """
+        super(PatchEmbedding, self).__init__()
+        # Patching parameters
+        self.patch_len = patch_len
+        self.stride = stride
+        self.padding_patch_layer = nn.ReplicationPad1d((0, padding))
+
+        # Input encoding: projection of patches onto d-dim vector space
+        self.value_embedding = nn.Linear(patch_len, d_model, bias=False)
+
+        # Positional embedding
+        self.position_embedding = PositionalEmbedding(d_model)
+
+        # Residual dropout
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x):
+        """Forward pass with patching
+
+        Args:
+            x: Input data [batch_size, n_vars, seq_len]
+
+        Returns:
+            Tuple of:
+                - Embedded patches [batch_size*n_vars, n_patches, d_model]
+                - Number of variables
+        """
+        # Do patching
+        n_vars = x.shape[1]
+        x = self.padding_patch_layer(x)
+        x = x.unfold(dimension=-1, size=self.patch_len, step=self.stride)
+        x = torch.reshape(x, (x.shape[0] * x.shape[1], x.shape[2], x.shape[3]))
+
+        # Input encoding
+        x = self.value_embedding(x) + self.position_embedding(x)
+        return self.dropout(x), n_vars
 
 
 class TimeLLMPatchEmbedding(nn.Module):

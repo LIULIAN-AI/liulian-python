@@ -344,7 +344,7 @@ class ForecastTrainer:
             )
 
         final_test = {}
-        if test_loader is not None:
+        if test_loader is not None:  # todo: is this redundant with per-epoch test evaluation?
             final_test = self.evaluate(
                 model,
                 test_loader,
@@ -469,8 +469,10 @@ class ForecastTrainer:
                             batch_y.detach(), **inv_kwargs
                         )
                         if out_dn is None:
+                            raise ValueError('inverse_transform returned None for outputs.')
                             out_dn = outputs.detach()
                         if tgt_dn is None:
+                            raise ValueError('inverse_transform returned None for targets.')
                             tgt_dn = batch_y.detach()
                         dn_metrics = self._compute_metrics(
                             out_dn, tgt_dn, resolved_metric_names
@@ -587,10 +589,39 @@ class ForecastTrainer:
                 all_times.append(t)  # todo: should this use only y_mark?
 
         model.train()
+
+        preds_cat = torch.cat(all_preds, dim=0)
+        trues_cat = torch.cat(all_trues, dim=0)
+        times_cat = torch.cat(all_times, dim=0)
+
+        # Denormalise predictions and ground truth so that downstream
+        # visualisation and saved .npz files use real-world units.
+        if self.inverse_transform_fn is not None:
+            try:
+                preds_dn = self.inverse_transform_fn(preds_cat)
+                trues_dn = self.inverse_transform_fn(trues_cat)
+                if (
+                    isinstance(preds_dn, torch.Tensor)
+                    and isinstance(trues_dn, torch.Tensor)
+                ):
+                    preds_cat = preds_dn
+                    trues_cat = trues_dn
+                else:
+                    logger.warning(
+                        'inverse_transform returned non-tensor — '
+                        'predictions will remain in normalised scale.'
+                    )
+            except Exception as exc:
+                logger.warning(
+                    'inverse_transform failed in predict(): %s — '
+                    'predictions will remain in normalised scale.',
+                    exc,
+                )
+
         return {
-            'preds': torch.cat(all_preds, dim=0),
-            'trues': torch.cat(all_trues, dim=0),
-            'times': torch.cat(all_times, dim=0),
+            'preds': preds_cat,
+            'trues': trues_cat,
+            'times': times_cat,
         }
 
     # ------------------------------------------------------------------

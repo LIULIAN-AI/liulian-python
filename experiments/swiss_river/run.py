@@ -6,11 +6,14 @@ three-layer config system (DEFAULT_CONFIG < YAML < CLI overrides).
 
 Usage::
 
-    # LSTM quick test
+    # DLinear quick test (default config)
     python experiments/swiss_river/run.py --quick_test
 
-    # LSTM full training (from default config)
-    python experiments/swiss_river/run.py
+    # DLinear with entity embedding
+    python experiments/swiss_river/run.py --quick_test --identifier_mode embedding
+
+    # LSTM (uses LSTM-specific config)
+    python experiments/swiss_river/run.py --config experiments/swiss_river/default_config.yaml
 
     # Custom YAML + CLI overrides
     python experiments/swiss_river/run.py --config my.yaml --model timellm --train_epochs 50
@@ -50,7 +53,7 @@ def main() -> None:
     )
     p.add_argument(
         '--config',
-        default=os.path.join(_SCRIPT_DIR, 'default_config.yaml'),
+        default=os.path.join(_SCRIPT_DIR, 'patchtst_config.yaml'),
         help='Path to YAML config file.',
     )
     # Generate --key args from DEFAULT_CONFIG for full backward compat

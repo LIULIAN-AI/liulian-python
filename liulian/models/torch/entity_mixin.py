@@ -1,7 +1,8 @@
 """Entity-aware mixin and wrapper for TSL model adapters.
 
-Provides ``EntityAwareMixin`` and ``EntityWrapper`` to enable entity-identifier
-support on any Time-Series-Library model adapter with minimal changes.
+Provides ``EntityAwareMixin``, ``EntityWrapper``, and
+``ChannelEntityWrapper`` to enable entity-identifier support on any
+Time-Series-Library model adapter with minimal changes.
 
 Supported identifier modes
 ---------------------------
@@ -10,11 +11,13 @@ Supported identifier modes
   ``'descriptors'``, ``'numeric_id'``) — entity features are concatenated
   into ``x_enc`` by the data layer; no model changes needed other than setting
   ``enc_in`` to include the extra dimensions.
-* ``'embedding'``    — integer station IDs are extracted from
-  ``x_mark_enc[:, :, entity_id_col]`` and looked up via ``nn.Embedding``;
-  the resulting embedding vector is concatenated to ``x_enc`` and then
-  projected back to the original ``enc_in`` dimensions via a learned linear
-  layer before calling the inner model.
+* ``'embedding'``    — **per_entity mode**: integer station IDs are extracted
+  from ``x_mark_enc[:, :, entity_id_col]`` and looked up via
+  ``nn.Embedding``; the resulting embedding vector is concatenated to
+  ``x_enc`` and then projected back to the original ``enc_in`` dimensions
+  via a learned linear layer before calling the inner model.
+  **multi_channel mode**: a ``ChannelEntityWrapper`` injects per-channel
+  station embeddings.
 
 Usage in an adapter
 -------------------
@@ -150,6 +153,109 @@ class EntityWrapper(nn.Module):
         return self.inner(x_enc, x_mark_enc, x_dec, x_mark_dec)
 
 
+class ChannelEntityWrapper(nn.Module):
+    """Per-channel entity embedding for multi_channel mode.
+
+    In multi_channel mode every sample contains all stations as separate
+    channels: ``x_enc`` has shape ``(B, T, N)`` where ``N`` is the number
+    of stations.  This wrapper adds a learnable embedding per channel
+    (station), enabling the model to learn station-specific behaviour.
+
+    Architecture:
+
+    1. Look up all station embeddings: ``(N, d)``.
+    2. Reshape ``x_enc`` from ``(B, T, N)`` to ``(B, T, N, 1)``.
+    3. Broadcast embeddings to ``(B, T, N, d)``.
+    4. Concatenate: ``(B, T, N, 1+d)``.
+    5. Project per-element: ``Linear(1+d, 1)`` → ``(B, T, N)``.
+    6. The inner model receives original shape ``(B, T, N)``.
+
+    The same procedure is applied to ``x_dec`` when present
+    (encoder-decoder models).
+
+    Parameters
+    ----------
+    inner_model : nn.Module
+        The original TSL model (e.g. ``DLinear.Model``).
+    num_stations : int
+        Number of distinct stations / channels.
+    embedding_size : int
+        Dimensionality of each station embedding vector.
+    """
+
+    def __init__(
+        self,
+        inner_model: nn.Module,
+        num_stations: int,
+        embedding_size: int = 10,
+    ) -> None:
+        super().__init__()
+        self.inner = inner_model
+        self.station_embedding = nn.Embedding(num_stations, embedding_size)
+        # Per-element projection: (value + embedding) → value
+        self.enc_proj = nn.Linear(1 + embedding_size, 1)
+        self.dec_proj = nn.Linear(1 + embedding_size, 1)
+        # Fixed station indices [0, 1, ..., N-1]
+        self.register_buffer(
+            'station_ids', torch.arange(num_stations, dtype=torch.long)
+        )
+
+    def _augment(
+        self,
+        x: torch.Tensor,
+        proj: nn.Linear,
+    ) -> torch.Tensor:
+        """Inject station embeddings channel-wise.
+
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape ``(B, T, N)``.
+        proj : nn.Linear
+            Projection layer ``Linear(1+d, 1)``.
+
+        Returns
+        -------
+        torch.Tensor
+            Augmented tensor of shape ``(B, T, N)``.
+        """
+        B, T, N = x.shape
+        # (N, d) station embeddings
+        emb = self.station_embedding(self.station_ids)  # (N, d)
+        # Broadcast: (1, 1, N, d) → (B, T, N, d)
+        emb = emb.unsqueeze(0).unsqueeze(0).expand(B, T, -1, -1)
+        # Reshape x: (B, T, N) → (B, T, N, 1)
+        x_4d = x.unsqueeze(-1)
+        # Concat: (B, T, N, 1+d)
+        augmented = torch.cat([x_4d, emb], dim=-1)
+        # Project: (B, T, N, 1+d) → (B, T, N, 1) → (B, T, N)
+        return proj(augmented).squeeze(-1)
+
+    def forward(
+        self,
+        x_enc: torch.Tensor,
+        x_mark_enc: torch.Tensor | None = None,
+        x_dec: torch.Tensor | None = None,
+        x_mark_dec: torch.Tensor | None = None,
+        mask: torch.Tensor | None = None,
+        entity_ids: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        """Forward pass with per-channel station embedding injection.
+
+        Signature matches the TSL model convention plus optional
+        ``entity_ids`` (accepted but ignored — station indices are
+        pre-registered internally).
+        """
+        x_enc = self._augment(x_enc, self.enc_proj)
+
+        if x_dec is not None:
+            x_dec = self._augment(x_dec, self.dec_proj)
+
+        if mask is not None:
+            return self.inner(x_enc, x_mark_enc, x_dec, x_mark_dec, mask)
+        return self.inner(x_enc, x_mark_enc, x_dec, x_mark_dec)
+
+
 class EntityAwareMixin:
     """Mixin that adds entity-identifier support to any ``TorchModelAdapter``.
 
@@ -207,19 +313,27 @@ class EntityAwareMixin:
         """Finalise entity support after the model has been built.
 
         For ``'embedding'`` mode this wraps ``self._model`` inside an
-        :class:`EntityWrapper` and moves it to ``self.device``.
+        :class:`EntityWrapper` (per_entity mode) or :class:`ChannelEntityWrapper`
+        (multi_channel mode) and moves it to ``self.device``.
         """
         self._entity_mode = config.get('identifier_mode', 'none')
         self._entity_id_col = config.get('entity_id_col', 0)
 
         if self._entity_mode == 'embedding':
-            enc_in = config.get('enc_in', 1)
-            self._model = EntityWrapper(
-                self._model,
-                enc_in=enc_in,
-                num_embeddings=config.get('num_embeddings', 50),
-                embedding_size=config.get('embedding_size', 10),
-                entity_id_col=self._entity_id_col,
-            )
+            if config.get('split_mode') == 'multi_channel':
+                self._model = ChannelEntityWrapper(
+                    self._model,
+                    num_stations=config.get('num_embeddings', 50),
+                    embedding_size=config.get('embedding_size', 10),
+                )
+            else:
+                enc_in = config.get('enc_in', 1)
+                self._model = EntityWrapper(
+                    self._model,
+                    enc_in=enc_in,
+                    num_embeddings=config.get('num_embeddings', 50),
+                    embedding_size=config.get('embedding_size', 10),
+                    entity_id_col=self._entity_id_col,
+                )
             # Ensure the wrapper is on the correct device
             self._model = self._model.to(self.device)

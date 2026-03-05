@@ -18,7 +18,7 @@ Provides configurable handling for:
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Mapping, Optional, Union
+from typing import Any, Dict, Mapping, Optional
 
 import numpy as np
 import pandas as pd
@@ -43,7 +43,7 @@ class SwissRiverDataset(SpatialTempoDataset):
         ``None``.
     split_mode : str
         ``'ts'`` — per-station time-series (ConcatDataset-like).
-        ``'st'`` — multi-station spatial-temporal tensor.
+        ``'multi_channel'`` — multi-station multivariate tensor.
     seq_len : int
         Look-back window size (0 for full-sequence mode).
     pred_len : int
@@ -96,7 +96,7 @@ class SwissRiverDataset(SpatialTempoDataset):
         data_name: str = 'swiss-river-1990',
         root_path: Optional[str] = None,
         *,
-        split_mode: str = 'ts',
+        split_mode: str = 'per_entity',
         seq_len: int = 90,
         pred_len: int = 1,
         task: str = 'forecast',
@@ -284,7 +284,12 @@ class SwissRiverDataset(SpatialTempoDataset):
 
     @staticmethod
     def _infer_station_ids(df: pd.DataFrame) -> list[str]:
-        """Extract station identifiers from ``*_wt`` column names."""
+        """Extract station identifiers from ``*_wt`` column names.
+
+        Note:
+            this assumes that training, validation, and test .csv files have the same station column order. This
+            order will be used to auto-build entity scalers for the multichannel mode.
+        """
         station_cols = [col for col in df.columns if col.endswith('_wt')]
         return [col[:-3] for col in station_cols]
 
@@ -412,8 +417,8 @@ class SwissRiverDataset(SpatialTempoDataset):
     # Split builders
     # ------------------------------------------------------------------
 
-    def _build_ts_split(self, split_name: str) -> TimeSeriesSplit:
-        """Build a per-station time-series split (TS mode).
+    def _build_pe_split(self, split_name: str) -> TimeSeriesSplit:
+        """Build a per-station time-series split (per_entity mode).
 
         Each station gets its own :class:`TimeSeriesDataset`, and the
         resulting samples are concatenated (equivalent to
@@ -463,13 +468,13 @@ class SwissRiverDataset(SpatialTempoDataset):
         merged = TimeSeriesSplit.merge(parts, name=split_name)
         return merged.with_max_samples(self.max_samples)
 
-    def _build_st_split(self, split_name: str) -> TimeSeriesSplit:
-        """Build a multi-station spatial-temporal split (ST mode).
+    def _build_mc_split(self, split_name: str) -> TimeSeriesSplit:
+        """Build a multi-station multivariate split (multi_channel mode).
 
         All stations are treated as separate feature / target channels in
         a single :class:`TimeSeriesDataset`, producing samples of shape
         ``(seq_len, N_stations * n_features)`` — the pattern used by
-        ``STGNNSequence*Dataset`` in the reference project.
+        the [``Time-Series-Library``](https://github.com/thuml/Time-Series-Library/tree/main).
         """
         df = self._split_frames[split_name].copy().reset_index(drop=True)
         feature_cols = [
@@ -483,7 +488,7 @@ class SwissRiverDataset(SpatialTempoDataset):
             if f'{station}_wt' in df.columns
         ]
 
-        st_ds = TimeSeriesDataset(
+        mc_ds = TimeSeriesDataset(
             splits={split_name: df[['epoch_day'] + feature_cols + target_cols]},
             time_col='epoch_day',
             feature_cols=feature_cols,
@@ -501,7 +506,7 @@ class SwissRiverDataset(SpatialTempoDataset):
             noise_type=self.noise_type,
             noise_kwargs=self.noise_kwargs,
         )
-        split = st_ds.get_split(split_name)
+        split = mc_ds.get_split(split_name)
         return split.with_max_samples(self.max_samples)
 
     def _build_ci_split(self, split_name: str) -> TimeSeriesSplit:
@@ -513,7 +518,7 @@ class SwissRiverDataset(SpatialTempoDataset):
         """
         from liulian.data.ts.channel_independent import ChannelIndependentDataset
 
-        base_split = self._build_ts_split(split_name)
+        base_split = self._build_pe_split(split_name)
         ci_ds = ChannelIndependentDataset(base_split)
         return ci_ds
 
@@ -525,16 +530,21 @@ class SwissRiverDataset(SpatialTempoDataset):
         if split_name not in ('train', 'val', 'test'):
             raise KeyError(f'Unknown split: {split_name!r}. Use train/val/test.')
         if split_name not in self._split_cache:
-            if self.split_mode == 'st':
-                self._split_cache[split_name] = self._build_st_split(split_name)
+            if self.split_mode == 'multi_channel':
+                self._split_cache[split_name] = self._build_mc_split(split_name)
             elif self.split_mode == 'channel_independent':
                 self._split_cache[split_name] = self._build_ci_split(split_name)
             else:
-                self._split_cache[split_name] = self._build_ts_split(split_name)
+                self._split_cache[split_name] = self._build_pe_split(split_name)
         return self._split_cache[split_name]
 
     def info(self) -> Dict[str, Any]:
         out = super().info()
+        # Derive target names based on split mode
+        if self.split_mode == 'multi_channel':
+            target_names = [f'{station}_wt' for station in self.station_ids]
+        else:
+            target_names = ['water_temperature']
         out.update(
             {
                 'domain': self.domain,
@@ -544,6 +554,7 @@ class SwissRiverDataset(SpatialTempoDataset):
                 'split_mode': self.split_mode,
                 'graph_name': self.graph_name,
                 'num_stations': len(self.station_ids),
+                'target_names': target_names,
             }
         )
         return out

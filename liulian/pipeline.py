@@ -79,7 +79,7 @@ def build_hpo_experiment_name(config: Dict[str, Any]) -> str:
         config.get('data', 'data'),
         config.get('model', 'model'),
         config.get('task', 'forecast'),
-        config.get('split_mode', 'ts'),
+        config.get('split_mode', 'per_entity'),
     ]
     extra = config.get('hpo_experiment_name')
     if extra:
@@ -111,39 +111,47 @@ def build_noise_kwargs(config: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 def build_dataset(config: Dict[str, Any]) -> Any:
     """Construct a dataset from the config.
 
-    Currently supports ``SwissRiverDataset``.  Other dataset types can
-    be added by extending the ``data`` key convention.
+    Supports ``SwissRiverDataset`` (for ``swiss-river-*`` data names).
+    Extend via the ``elif`` ladder for other dataset families.
 
     Returns:
         A dataset object with ``get_split()`` and ``get_data_loaders()``.
     """
-    from liulian.data.swiss_river import SwissRiverDataset
-
     noise_kwargs = build_noise_kwargs(config)
+    data_name = config['data']
 
-    dataset = SwissRiverDataset(
-        data_name=config['data'],
-        split_mode=config['split_mode'],
-        seq_len=config['seq_len'],
-        pred_len=config['pred_len'],
-        task=config['task'],
-        train_split=config['train_split'],
-        scaler_type=config.get('scaler', 'none'),
-        use_current_x=config['use_current_x'],
-        use_full_history=config['use_full_history'],
-        short_subsequence_method=config['short_subsequence_method'],
-        gap_mode=config['gap_mode'],
-        max_mask_consecutive=config['max_mask_consecutive'],
-        noise_type=config['noise_type'],
-        noise_kwargs=noise_kwargs,
-        include_historical_y=config['include_historical_y'],
-        include_historical_predicted_y=config['include_historical_predicted_y'],
-        identifier_mode=config['identifier_mode'],
-        id_integration=config['id_integration'],
-        graph_mode=config['graph_mode'],
-        graphlet_num_hops=config['graphlet_num_hops'],
-        max_samples=config.get('max_samples'),
-    )
+    if data_name.startswith('swiss-river'):
+        from liulian.data.swiss_river import SwissRiverDataset
+
+        dataset = SwissRiverDataset(
+            data_name=data_name,
+            split_mode=config['split_mode'],
+            seq_len=config['seq_len'],
+            pred_len=config['pred_len'],
+            task=config['task'],
+            train_split=config['train_split'],
+            scaler_type=config.get('scaler', 'none'),
+            use_current_x=config['use_current_x'],
+            use_full_history=config['use_full_history'],
+            short_subsequence_method=config['short_subsequence_method'],
+            gap_mode=config['gap_mode'],
+            max_mask_consecutive=config['max_mask_consecutive'],
+            noise_type=config['noise_type'],
+            noise_kwargs=noise_kwargs,
+            include_historical_y=config['include_historical_y'],
+            include_historical_predicted_y=config['include_historical_predicted_y'],
+            identifier_mode=config['identifier_mode'],
+            id_integration=config['id_integration'],
+            graph_mode=config['graph_mode'],
+            graphlet_num_hops=config['graphlet_num_hops'],
+            max_samples=config.get('max_samples'),
+        )
+    else:
+        raise ValueError(
+            f'Unknown dataset: {data_name!r}. '
+            f"Supported prefixes: 'swiss-river-*'. "
+            f'Add new datasets by extending build_dataset().'
+        )
     return dataset
 
 
@@ -190,12 +198,38 @@ def auto_detect_enc_in(dataset: Any) -> int:
 # ── Model ───────────────────────────────────────────────────────────────
 
 
+def _load_prompt_content(config: Dict[str, Any]) -> str:
+    """Load prompt text file for LLM-based models (e.g. TimeLLM).
+
+    Falls back to a generic description when no file is found.
+    """
+    prompt_map = {
+        'swiss-river-1990': 'wt-swiss-1990',
+        'swiss-river-2010': 'wt-swiss-2010',
+        'swiss-river-zurich': 'wt-zurich',
+    }
+    fname = prompt_map.get(config.get('data', ''), config.get('data', ''))
+    prompt_path = os.path.join(PROJECT_ROOT, 'dataset', 'prompt_bank', f'{fname}.txt')
+    if os.path.exists(prompt_path):
+        with open(prompt_path) as fh:
+            return fh.read()
+    return (
+        'Time series dataset for forecasting. '
+        'Data includes monitoring stations with periodic observations.'
+    )
+
+
 def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
     """Instantiate a forecasting model by name and wrap if needed.
 
+    All models are loaded via dynamic import from
+    ``liulian.models.torch.<model_name>``.  Special pre-processing
+    (e.g. prompt loading for TimeLLM) is handled transparently.
+
     Handles:
-    - Model instantiation (lstm, timellm, and any registered adapter)
+    - Model instantiation via ``liulian.models.torch.<name>.Model``
     - EntityWrapper wrapping when ``identifier_mode='embedding'``
+      (uses ChannelEntityWrapper for ``split_mode='multi_channel'``)
     - Auto enc_in detection from dataset
 
     Args:
@@ -205,6 +239,7 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
     Returns:
         A PyTorch ``nn.Module`` (potentially wrapped in EntityWrapper).
     """
+    import importlib
     from types import SimpleNamespace
 
     model_name = config['model']
@@ -216,70 +251,60 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
 
     ns = SimpleNamespace(**config)
 
-    # Instantiate model
-    if model_name == 'lstm':
-        from liulian.models.torch.lstm import Model
+    # Pre-processing for LLM-based models
+    if model_name == 'timellm':
+        ns.content = _load_prompt_content(config)
 
-        model = Model(ns).float()
+    # Dynamic import for all models
+    try:
+        mod = importlib.import_module(f'liulian.models.torch.{model_name}')
+        model = mod.Model(ns).float()
+    except (ImportError, ModuleNotFoundError, AttributeError) as exc:
+        raise ValueError(
+            f'Unknown model: {model_name!r}. Available: lstm, dlinear, timellm, '
+            f'or any module under liulian.models.torch.*.'
+        ) from exc
 
-    elif model_name == 'timellm':
-        from liulian.models.torch.timellm import Model
-
-        # Load prompt text for the dataset
-        prompt_map = {
-            'swiss-river-1990': 'wt-swiss-1990',
-            'swiss-river-2010': 'wt-swiss-2010',
-            'swiss-river-zurich': 'wt-zurich',
-        }
-        fname = prompt_map.get(config.get('data', ''), config.get('data', ''))
-        prompt_path = os.path.join(
-            PROJECT_ROOT, 'dataset', 'prompt_bank', f'{fname}.txt'
-        )
-        if os.path.exists(prompt_path):
-            with open(prompt_path) as fh:
-                ns.content = fh.read()
-        else:
-            ns.content = (
-                'Swiss River Network water temperature dataset. '
-                'Daily water and air temperature from monitoring stations.'
-            )
-        model = Model(ns).float()
-
-    else:
-        # Try dynamic import from liulian.models.torch.<name>
-        import importlib
-
-        try:
-            mod = importlib.import_module(f'liulian.models.torch.{model_name}')
-            model = mod.Model(ns).float()
-        except (ImportError, ModuleNotFoundError, AttributeError) as exc:
-            raise ValueError(
-                f'Unknown model: {model_name!r}. Available: lstm, timellm, '
-                f'or any module under liulian.models.torch.*.'
-            ) from exc
-
-    # Wrap with EntityWrapper for learnable embedding mode
+    # Wrap with entity embedding when configured
     if config.get('identifier_mode') == 'embedding':
-        from liulian.models.torch.entity_mixin import EntityWrapper
-
         num_emb = config.get('num_embeddings')
         if num_emb is None and dataset is not None:
             num_emb = len(dataset.station_ids)
         if num_emb is None:
-            num_emb = 100  # fallback
+            raise ValueError('num_embeddings must be specified when identifier_mode=embedding.')
         config['num_embeddings'] = num_emb
 
-        model = EntityWrapper(
-            inner_model=model,
-            enc_in=config['enc_in'],
-            num_embeddings=num_emb,
-            embedding_size=config.get('embedding_size', 10),
-        )
-        logger.info(
-            'EntityWrapper: num_embeddings=%d, embedding_size=%d',
-            num_emb,
-            config.get('embedding_size', 10),
-        )
+        emb_size = config.get('embedding_size', 10)
+
+        if config.get('split_mode') == 'multi_channel':
+            # Multi-channel mode: per-channel entity embedding
+            from liulian.models.torch.entity_mixin import ChannelEntityWrapper
+
+            model = ChannelEntityWrapper(
+                inner_model=model,
+                num_stations=num_emb,
+                embedding_size=emb_size,
+            )
+            logger.info(
+                'ChannelEntityWrapper: num_stations=%d, embedding_size=%d',
+                num_emb,
+                emb_size,
+            )
+        else:
+            # Per-entity mode: per-sample entity embedding
+            from liulian.models.torch.entity_mixin import EntityWrapper
+
+            model = EntityWrapper(
+                inner_model=model,
+                enc_in=config['enc_in'],
+                num_embeddings=num_emb,
+                embedding_size=emb_size,
+            )
+            logger.info(
+                'EntityWrapper: num_embeddings=%d, embedding_size=%d',
+                num_emb,
+                emb_size,
+            )
 
     n_params = sum(p.numel() for p in model.parameters())
     logger.info('Model: %s  (%.1fK params)', model_name, n_params / 1e3)
@@ -353,16 +378,21 @@ def build_optimizer(config: Dict[str, Any]) -> Optional[Any]:
         },
     )
 
-    # Default search space
+    # Default search space — resolved from search_spaces.py registry
     if 'search_space' not in config:
-        import ray.tune
+        from liulian.optim.search_spaces import resolve_search_space
 
-        config['search_space'] = {
-            'embedding_size': ray.tune.randint(1, 30 + 1),
-            'd_model': ray.tune.randint(16, 128 + 1),
-            'e_layers': ray.tune.randint(1, 3 + 1),
-            'learning_rate': ray.tune.uniform(0.00001, 0.01),
-        }
+        config['search_space'] = resolve_search_space(
+            model=config.get('model', ''),
+            data=config.get('data', ''),
+            identifier_mode=config.get('identifier_mode', 'none'),
+        )
+        logger.info(
+            'Resolved search space for model=%s, data=%s: %s',
+            config.get('model'),
+            config.get('data'),
+            list(config['search_space'].keys()),
+        )
 
     logger.info(
         'HPO enabled: %d samples, grace=%s, reduction=%s, storage=%s',
@@ -445,7 +475,7 @@ def build_experiment(
     model_name = config.get('model', 'model')
     spec = ExperimentSpec(
         name=f'{config.get("data", "data")}_{model_name}'
-        f'_{config.get("task", "forecast")}_{config.get("split_mode", "ts")}',
+        f'_{config.get("task", "forecast")}_{config.get("split_mode", "per_entity")}',
         task={
             'type': 'PredictionTask',
             'pred_len': config['pred_len'],
@@ -508,17 +538,16 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         Experiment summary dictionary.
     """
-    from liulian.config import apply_model_defaults, apply_quick_test
+    from liulian.config import apply_quick_test
 
     t0 = time.time()
 
     # ── Seed ────────────────────────────────────────────────────────
     seed_everything(config.get('seed', 2026))
 
-    # ── Quick-test & model-specific overrides ───────────────────────
+    # ── Quick-test overrides ────────────────────────────────────────
     if config.get('quick_test', False):
         apply_quick_test(config)
-    apply_model_defaults(config)
 
     # ── Build ───────────────────────────────────────────────────────
     dataset = build_dataset(config)
@@ -542,6 +571,16 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
             from liulian.viz.plots import save_prediction_plots
 
             viz_dir = os.path.join(artifacts_dir, 'figures')
+
+            # Derive target names from dataset when available
+            target_names = None
+            if dataset is not None:
+                try:
+                    info = dataset.info()
+                    target_names = info.get('target_names')
+                except Exception:
+                    pass
+
             plot_paths = save_prediction_plots(
                 preds=pred_result['preds'],
                 trues=pred_result['trues'],
@@ -549,7 +588,7 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
                 method=viz_method,
                 output_dir=viz_dir,
                 title_prefix=f'{config["data"]} / {config["model"]} — ',
-                target_names=['water_temperature'],
+                target_names=target_names,
             )
             logger.ok('Saved prediction plots:')
             for name, path in plot_paths.items():
@@ -595,7 +634,7 @@ def print_report(
     """Print a human-readable summary to stdout (matches run.py output)."""
     spec_name = (
         f'{config.get("data", "data")}_{config.get("model", "model")}'
-        f'_{config.get("task", "forecast")}_{config.get("split_mode", "ts")}'
+        f'_{config.get("task", "forecast")}_{config.get("split_mode", "per_entity")}'
     )
     print(f'\n{"=" * 60}')
     print(f'Experiment : {spec_name}')

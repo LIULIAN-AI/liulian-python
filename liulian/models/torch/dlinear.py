@@ -23,11 +23,15 @@ class Model(nn.Module):
     Paper link: https://arxiv.org/pdf/2205.13504.pdf
     """
 
-    def __init__(self, configs, individual=False):
+    def __init__(self, configs, individual=None):
         """
         individual: Bool, whether shared model among different variates.
+            If *None* (default), read from ``configs.individual``
+            (falling back to ``False``).
         """
         super(Model, self).__init__()
+        if individual is None:
+            individual = getattr(configs, 'individual', False)
         self.task_name = configs.task_name
         self.seq_len = configs.seq_len
         if (
