@@ -189,6 +189,21 @@ MODEL_DEFAULTS: Dict[str, Dict[str, Any]] = {
         'patch_len': 16,
         'stride': 8,
     },
+    'patchtst_entity': {
+        'd_model': 128,
+        'd_ff': 256,
+        'n_heads': 16,
+        'e_layers': 3,
+        'dropout': 0.2,
+        'batch_size': 32,
+        'learning_rate': 0.0001,
+        'lradj': 'type1',
+        'scaler': 'standard',
+        'split_mode': 'multi_channel',
+        'identifier_mode': 'none',
+        'patch_len': 16,
+        'stride': 8,
+    },
 }
 
 # ── Quick-test overrides ───────────────────────────────────────────────

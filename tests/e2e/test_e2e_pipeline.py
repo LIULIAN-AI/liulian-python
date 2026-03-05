@@ -32,7 +32,7 @@ import os
 import numpy as np
 import pytest
 
-from tests.e2e.baselines import DLINEAR_SWISS1990, LSTM_SWISS1990, PATCHTST_SWISS1990
+from tests.e2e.baselines import DLINEAR_SWISS1990, LSTM_SWISS1990, PATCHTST_SWISS1990, PATCHTST_ENTITY_SWISS1990
 
 pytestmark = pytest.mark.main_branch
 
@@ -441,3 +441,32 @@ class TestPatchTSTTuneEmb:
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, PATCHTST_SWISS1990['tune_emb'], 'patchtst_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# PatchTST with patch-level entity embedding + Swiss River 1990
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestPatchTSTEntitySingle:
+    """PatchTST patch-level entity embedding, single run."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='patchtst_entity', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, PATCHTST_ENTITY_SWISS1990['single'], 'patchtst_entity_single')
+
+
+class TestPatchTSTEntityTune:
+    """PatchTST patch-level entity embedding, Ray Tune HPO."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='patchtst_entity', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, PATCHTST_ENTITY_SWISS1990['tune'], 'patchtst_entity_tune')

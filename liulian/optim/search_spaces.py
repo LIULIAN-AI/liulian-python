@@ -520,6 +520,17 @@ def patchtst_embedding_space() -> Dict[str, Any]:
     return base
 
 
+def patchtst_entity_space() -> Dict[str, Any]:
+    """PatchTST with patch-level entity embedding search space.
+
+    Same architecture hyperparameters as :func:`patchtst_space`.  The
+    entity embedding is built into the model (``nn.Embedding(enc_in,
+    d_model)``), so there is no ``embedding_size`` to tune — it is
+    always ``d_model``.
+    """
+    return patchtst_space()
+
+
 def timesnet_space() -> Dict[str, Any]:
     """TimesNet search space — temporal 2D-variation modeling.
 
@@ -733,6 +744,7 @@ _SPACE_REGISTRY: Dict[str, Any] = {
     'itransformer': itransformer_space,
     'patchtst': patchtst_space,
     'patchtst_embedding': patchtst_embedding_space,
+    'patchtst_entity': patchtst_entity_space,
     'timesnet': timesnet_space,
     'timemixer': timemixer_space,
     'timexer': timexer_space,
@@ -807,6 +819,8 @@ _RESOLVE_ORDER: list[tuple[str | None, str, bool | None, str]] = [
     # PatchTST (dataset-agnostic)
     (None, 'patchtst', True, 'patchtst_embedding'),
     (None, 'patchtst', False, 'patchtst'),
+    # PatchTST with patch-level entity embedding (no identifier_mode needed)
+    (None, 'patchtst_entity', None, 'patchtst_entity'),
     # TimeLLM swiss-river
     ('swiss-river', 'timellm', None, 'timellm_swissriver'),
 ]

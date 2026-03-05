@@ -1,0 +1,119 @@
+# Swiss River experiment — PatchTST with patch-level entity embedding
+#
+# This config uses `patchtst_entity`, a PatchTST variant that adds
+# per-station entity embeddings at the PATCH level (in d_model space,
+# after patching and patch projection), rather than at the time-step
+# level (before normalisation, which gets the signal washed out).
+#
+# The entity embedding maps channel index → d_model vector and is
+# added to every patch token for that channel, analogous to positional
+# encoding.  `identifier_mode` is `none` because the entity embedding
+# is built into the model — no external wrapper needed.
+#
+# To compare approaches:
+#   model: patchtst,        identifier_mode: none      → no entity info
+#   model: patchtst,        identifier_mode: embedding  → time-step embedding (bad for PatchTST)
+#   model: patchtst_entity, identifier_mode: none      → patch-level embedding (this config)
+#
+# Usage:
+#   liulian run experiments/swiss_river/patchtst_entity_config.yaml
+#   liulian run experiments/swiss_river/patchtst_entity_config.yaml --quick_test
+#   liulian run experiments/swiss_river/patchtst_entity_config.yaml --pred_len 14
+
+# ── General ─────────────────────────────────────────────────────────────
+model: patchtst_entity
+seed: 2026
+quick_test: false
+eval_only: false
+
+# ── Data ────────────────────────────────────────────────────────────────
+data: swiss-river-1990            # swiss-river-1990 | swiss-river-2010 | swiss-river-zurich
+seq_len: 90                       # Look-back window
+pred_len: 7                       # Forecast horizon
+features: M
+label_len: 0
+train_split: 0.8
+max_samples: null
+
+# ── Task & mode ─────────────────────────────────────────────────────────
+task: forecast
+split_mode: multi_channel           # multi_channel mode: all stations as channels
+scaler: standard                     # per-feature zero-mean/unit-var (matches TSLib)
+use_current_x: true
+use_full_history: false
+
+# ── Gap handling ────────────────────────────────────────────────────────
+short_subsequence_method: drop
+gap_mode: split
+max_mask_consecutive: 10
+
+# ── Noise injection ─────────────────────────────────────────────────────
+noise_type: null
+noise_level: 0.01
+noise_probability: 0.01
+noise_scale_factor: 5.0
+
+# ── Historical target ──────────────────────────────────────────────────
+include_historical_y: none
+include_historical_predicted_y: false
+
+# ── Entity identifiers ─────────────────────────────────────────────────
+# Entity embedding is built into patchtst_entity at the patch level.
+# identifier_mode must be 'none' to prevent the pipeline from
+# double-wrapping with ChannelEntityWrapper.
+identifier_mode: none
+id_integration: concat_to_x
+embedding_size: 10
+num_embeddings: null
+
+# ── Graph / spatial ─────────────────────────────────────────────────────
+graph_mode: none
+graphlet_num_hops: 1
+
+# ── Model architecture ─────────────────────────────────────────────────
+enc_in: null                      # Auto-detected (= N_stations)
+dec_in: 1
+c_out: 1
+d_model: 128                     # PatchTST paper: 128 for small datasets
+d_ff: 256                        # Feed-forward dimension
+n_heads: 16                      # PatchTST paper: 16
+e_layers: 3                      # PatchTST paper: 3 encoder layers
+d_layers: 0
+dropout: 0.2                     # PatchTST paper: 0.2
+patch_len: 16                    # Patch length (default)
+stride: 8                        # Patch stride (50% overlap)
+
+# ── Training ────────────────────────────────────────────────────────────
+train_epochs: 50
+batch_size: 32
+learning_rate: 0.0001               # TSLib default for PatchTST
+loss: mse
+metrics: rmse,mae,nse
+eval_denorm: true
+show_progress: true
+patience: 10
+lradj: type1                        # TSLib default: halve LR every epoch
+num_workers: 0
+
+# ── Logging ─────────────────────────────────────────────────────────────
+wandb_project: null
+wandb_entity: null
+dev_run: false
+
+# ── HPO (Ray Tune) ─────────────────────────────────────────────────────
+hpo: True
+hpo_num_samples: 200
+hpo_scheduler: asha
+hpo_grace_period: 5
+hpo_reduction_factor: 1.5
+
+# ── Visualisation ───────────────────────────────────────────────────────
+auto_viz: true
+viz_method: mean
+
+# ── Misc (TSLib compat) ────────────────────────────────────────────────
+embed: timeF
+activation: gelu
+output_attention: false
+factor: 1
+task_name: long_term_forecast
