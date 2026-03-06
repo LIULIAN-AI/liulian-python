@@ -315,6 +315,18 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
         config['enc_in'] = auto_detect_enc_in(dataset)
         logger.info('Auto-detected enc_in=%d from training data', config['enc_in'])
 
+    # In multi-channel mode with features='M', c_out should match enc_in
+    # (predict all channels). Override c_out=1 default.
+    if (
+        config.get('split_mode') == 'multi_channel'
+        and config.get('features', 'M') in ('M', 'MS')
+        and config.get('c_out') in (None, 1)
+        and config.get('enc_in') is not None
+        and config['enc_in'] > 1
+    ):
+        config['c_out'] = config['enc_in']
+        config['dec_in'] = config['enc_in']
+
     ns = SimpleNamespace(**config)
 
     # Pre-processing for LLM-based models
