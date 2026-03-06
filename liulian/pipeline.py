@@ -107,12 +107,30 @@ def build_noise_kwargs(config: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 
 # ── Dataset ─────────────────────────────────────────────────────────────
 
+# File-path mappings for CSV-based and PEMS benchmark datasets.
+# Keys = dataset names used in config; values = (root_subdir, filename).
+_CSV_DATASET_MAP: Dict[str, tuple] = {
+    'traffic': ('dataset/traffic', 'traffic.csv'),
+    'electricity': ('dataset/electricity', 'electricity.csv'),
+    'exchange_rate': ('dataset/exchange_rate', 'exchange_rate.csv'),
+    'weather': ('dataset/weather', 'weather.csv'),
+    'illness': ('dataset/illness', 'national_illness.csv'),
+}
+
+_PEMS_DATASET_MAP: Dict[str, tuple] = {
+    'PEMS03': ('dataset/PEMS', 'PEMS03.npz'),
+    'PEMS04': ('dataset/PEMS', 'PEMS04.npz'),
+    'PEMS07': ('dataset/PEMS', 'PEMS07.npz'),
+    'PEMS08': ('dataset/PEMS', 'PEMS08.npz'),
+}
+
 
 def build_dataset(config: Dict[str, Any]) -> Any:
     """Construct a dataset from the config.
 
-    Supports ``SwissRiverDataset`` (for ``swiss-river-*`` data names).
-    Extend via the ``elif`` ladder for other dataset families.
+    Supports ``SwissRiverDataset`` (for ``swiss-river-*`` data names),
+    CSV-based benchmarks (traffic, electricity, exchange_rate, weather,
+    illness), and PEMS traffic sensor datasets (PEMS03/04/07/08).
 
     Returns:
         A dataset object with ``get_split()`` and ``get_data_loaders()``.
@@ -146,10 +164,53 @@ def build_dataset(config: Dict[str, Any]) -> Any:
             graphlet_num_hops=config['graphlet_num_hops'],
             max_samples=config.get('max_samples'),
         )
+
+    elif data_name in _CSV_DATASET_MAP:
+        from liulian.data.csv_dataset import CustomCSVDataset
+
+        root_subdir, csv_filename = _CSV_DATASET_MAP[data_name]
+        root_path = os.path.join(PROJECT_ROOT, root_subdir)
+
+        dataset = CustomCSVDataset(
+            root_path=root_path,
+            data_path=csv_filename,
+            size=(config['seq_len'], config.get('label_len', 0), config['pred_len']),
+            features=config.get('features', 'M'),
+            target=config.get('target', 'OT'),
+            scale=config.get('scaler', 'standard') != 'none',
+            scaler_type=config.get('scaler', 'standard'),
+            timeenc=config.get('timeenc', 0),
+            freq=config.get('freq', 'h'),
+            identifier_mode=config.get('identifier_mode', 'none'),
+            id_integration=config.get('id_integration', 'concat_to_x'),
+        )
+        # Propagate split_mode for info()
+        dataset.split_mode = config.get('split_mode', 'multi_channel')
+
+    elif data_name in _PEMS_DATASET_MAP:
+        from liulian.data.pems_dataset import PEMSDataset
+
+        root_subdir, npz_filename = _PEMS_DATASET_MAP[data_name]
+        root_path = os.path.join(PROJECT_ROOT, root_subdir)
+
+        dataset = PEMSDataset(
+            root_path=root_path,
+            data_path=npz_filename,
+            size=(config['seq_len'], config.get('label_len', 0), config['pred_len']),
+            features=config.get('features', 'M'),
+            scale=config.get('scaler', 'standard') != 'none',
+            scaler_type=config.get('scaler', 'standard'),
+            identifier_mode=config.get('identifier_mode', 'none'),
+            id_integration=config.get('id_integration', 'concat_to_x'),
+        )
+        # Propagate split_mode for info()
+        dataset.split_mode = config.get('split_mode', 'multi_channel')
+
     else:
         raise ValueError(
             f'Unknown dataset: {data_name!r}. '
-            f"Supported prefixes: 'swiss-river-*'. "
+            f"Supported: 'swiss-river-*', {sorted(_CSV_DATASET_MAP)}, "
+            f'{sorted(_PEMS_DATASET_MAP)}. '
             f'Add new datasets by extending build_dataset().'
         )
     return dataset
@@ -160,13 +221,13 @@ def print_dataset_summary(dataset: Any) -> None:
     info = dataset.info()
     logger.info(
         'Dataset: %s  (mode=%s, graph=%s)',
-        info.get('data_name'),
-        info.get('split_mode'),
+        info.get('data_name', info.get('domain', 'unknown')),
+        info.get('split_mode', 'multi_channel'),
         info.get('graph_name', 'none'),
     )
     logger.info(
         '  stations=%d, task=%s, seq_len=%d, pred_len=%d',
-        info.get('num_stations', 0),
+        info.get('num_stations', len(getattr(dataset, 'station_ids', []))),
         info.get('task', ''),
         info.get('seq_len', 0),
         info.get('pred_len', 0),
@@ -179,14 +240,17 @@ def print_dataset_summary(dataset: Any) -> None:
         info.get('gap_mode', 'split'),
     )
     for name in ('train', 'val', 'test'):
-        split = dataset.get_split(name)
-        logger.info(
-            '  split %-5s  samples=%d  feat=%d  targ=%d',
-            name,
-            len(split),
-            split.feat_dim,
-            split.targ_dim,
-        )
+        try:
+            split = dataset.get_split(name)
+            logger.info(
+                '  split %-5s  samples=%d  feat=%d  targ=%d',
+                name,
+                len(split),
+                split.feat_dim,
+                split.targ_dim,
+            )
+        except KeyError:
+            pass
 
 
 def auto_detect_enc_in(dataset: Any) -> int:

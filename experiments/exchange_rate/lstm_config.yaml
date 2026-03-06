@@ -1,0 +1,69 @@
+# Exchange Rate dataset — LSTM with entity embedding
+#
+# Exchange Rate dataset: 8 countries' daily exchange rates (1990–2016).
+# Entity identifiers help LSTM distinguish between different currencies.
+#
+# Usage:
+#   liulian run experiments/exchange_rate/lstm_config.yaml
+#   liulian run experiments/exchange_rate/lstm_config.yaml --quick_test
+
+# ── General ─────────────────────────────────────────────────────────────
+model: lstm
+seed: 2026
+quick_test: false
+eval_only: false
+
+# ── Data ────────────────────────────────────────────────────────────────
+data: exchange_rate
+seq_len: 96
+pred_len: 96
+features: M
+label_len: 0
+max_samples: null
+
+# ── Task & mode ─────────────────────────────────────────────────────────
+task: forecast
+split_mode: multi_channel
+scaler: standard
+use_current_x: true
+use_full_history: false
+
+# ── Gap handling ────────────────────────────────────────────────────────
+short_subsequence_method: drop
+gap_mode: split
+max_mask_consecutive: 10
+
+# ── Noise injection ─────────────────────────────────────────────────────
+noise_type: null
+
+# ── Historical target ──────────────────────────────────────────────────
+include_historical_y: none
+include_historical_predicted_y: false
+
+# ── Entity identifiers ─────────────────────────────────────────────────
+identifier_mode: embedding
+id_integration: concat_to_x
+embedding_size: 10
+num_embeddings: null              # Auto-detected (7 currencies + OT)
+
+# ── Graph / spatial ─────────────────────────────────────────────────────
+graph_mode: none
+graphlet_num_hops: 1
+
+# ── Model architecture ─────────────────────────────────────────────────
+enc_in: null
+dec_in: 1
+c_out: 1
+d_model: 64
+d_ff: 32
+dropout: 0.0
+
+# ── Training ────────────────────────────────────────────────────────────
+train_epochs: 30
+batch_size: 32
+learning_rate: 0.001
+loss: mse
+metrics: rmse,mae,mse
+patience: 10
+lradj: none
+num_workers: 0

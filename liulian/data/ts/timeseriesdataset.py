@@ -1112,6 +1112,66 @@ class TimeSeriesDataset(BaseDataset):
                 'noise_type': self.noise_type,
                 'identifier_mode': self.identifier_mode,
                 'id_integration': self.id_integration,
+                'num_stations': len(self.station_ids),
+                'split_mode': getattr(self, 'split_mode', 'multi_channel'),
             }
         )
         return out
+
+    def get_data_loaders(
+        self,
+        batch_size: int = 32,
+        num_workers: int = 0,
+    ) -> Dict[str, Any]:
+        """Create train/val/test torch DataLoaders.
+
+        Each batch yields
+        ``(batch_x, batch_y, batch_x_mark, batch_y_mark)`` — the
+        4-tuple format expected by :mod:`liulian.runtime.trainer`.
+
+        For **forecasting** (window = seq_len + pred_len):
+
+        * ``batch_x``  = features  ``[:, :seq_len, :]``   — encoder input
+        * ``batch_y``  = targets   ``[:, :, :]``           — decoder target
+        * ``batch_x_mark`` = time values for encoder steps
+        * ``batch_y_mark`` = time values for decoder steps
+        """
+        import torch
+        from torch.utils.data import DataLoader
+
+        seq_len = self.seq_len
+
+        def _collate(batch):
+            n_fields = len(batch[0])
+            fields = list(zip(*batch))
+
+            xs, ys, x_mark, y_mark = fields[0], fields[1], fields[2], fields[3]
+
+            x = torch.stack(xs)  # (B, seq_len, D_x)
+            y = torch.stack(ys)  # (B, pred_len, D_y)
+            xt = torch.stack(x_mark)  # (B, seq_len, ...)
+            yt = torch.stack(y_mark)  # (B, pred_len, ...)
+
+            batch_x = x[:, :seq_len, :]
+            batch_y = y
+            batch_x_mark = xt[:, :seq_len]
+            batch_y_mark = torch.cat([xt[:, :seq_len], yt], dim=1)
+
+            return batch_x, batch_y, batch_x_mark, batch_y_mark
+
+        def _make(split_name: str) -> DataLoader:
+            split = self.get_split(split_name)
+            return DataLoader(
+                split,
+                batch_size=batch_size,
+                shuffle=(split_name == 'train'),
+                num_workers=num_workers,
+                drop_last=False,
+                collate_fn=_collate,
+            )
+
+        return {
+            'train': _make('train'),
+            'val': _make('val'),
+            'test': _make('test'),
+        }

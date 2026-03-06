@@ -1,0 +1,71 @@
+# Electricity dataset — DLinear with entity embedding
+#
+# Electricity dataset: 320 clients' hourly electricity consumption.
+# DLinear uses multi_channel mode with ChannelEntityWrapper for
+# per-channel entity embedding.
+#
+# Usage:
+#   liulian run experiments/electricity/dlinear_config.yaml
+#   liulian run experiments/electricity/dlinear_config.yaml --quick_test
+
+# ── General ─────────────────────────────────────────────────────────────
+model: dlinear
+seed: 2026
+quick_test: false
+eval_only: false
+
+# ── Data ────────────────────────────────────────────────────────────────
+data: electricity
+seq_len: 96
+pred_len: 96
+features: M
+label_len: 0
+max_samples: null
+
+# ── Task & mode ─────────────────────────────────────────────────────────
+task: forecast
+split_mode: multi_channel
+scaler: standard
+use_current_x: true
+use_full_history: false
+
+# ── Gap handling ────────────────────────────────────────────────────────
+short_subsequence_method: drop
+gap_mode: split
+max_mask_consecutive: 10
+
+# ── Noise injection ─────────────────────────────────────────────────────
+noise_type: null
+
+# ── Historical target ──────────────────────────────────────────────────
+include_historical_y: none
+include_historical_predicted_y: false
+
+# ── Entity identifiers ─────────────────────────────────────────────────
+identifier_mode: embedding
+id_integration: concat_to_x
+embedding_size: 10
+num_embeddings: null              # Auto-detected (320 clients)
+
+# ── Graph / spatial ─────────────────────────────────────────────────────
+graph_mode: none
+graphlet_num_hops: 1
+
+# ── Model architecture ─────────────────────────────────────────────────
+enc_in: null
+dec_in: 1
+c_out: 1
+d_model: 64
+individual: false
+moving_avg: 25
+dropout: 0.0
+
+# ── Training ────────────────────────────────────────────────────────────
+train_epochs: 30
+batch_size: 32
+learning_rate: 0.0001
+loss: mse
+metrics: rmse,mae,mse
+patience: 10
+lradj: type1
+num_workers: 0

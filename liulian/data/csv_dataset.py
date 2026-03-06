@@ -175,6 +175,13 @@ class CSVTimeSeriesDataset(TimeSeriesDataset):
         # Load and split data
         splits, feature_cols, target_cols, time_col, tf_cols = self._load_and_split()
 
+        # Auto-detect station_ids from feature columns if not provided.
+        # For multi-entity CSV datasets (traffic, electricity, etc.),
+        # each non-date column (including target in M/MS mode) is a channel.
+        if 'station_ids' not in kwargs:
+            if len(feature_cols) > 1:
+                kwargs['station_ids'] = feature_cols
+
         # Initialize parent (handles scaler + split building)
         super().__init__(
             splits=splits,
@@ -238,9 +245,9 @@ class CSVTimeSeriesDataset(TimeSeriesDataset):
         border1s, border2s = self._compute_borders(n)
 
         # Build time features
-        dates = pd.to_datetime(df_raw['date'])
+        dates = pd.DatetimeIndex(pd.to_datetime(df_raw['date']))
         time_feats = _time_features_from_dates(
-            dates.dt,
+            dates,
             freq=self.freq,
             timeenc=self.timeenc,
         )

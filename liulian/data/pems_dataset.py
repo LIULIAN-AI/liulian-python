@@ -122,6 +122,11 @@ class PEMSDataset(TimeSeriesDataset):
             seq_len,
         )
 
+        # Auto-detect station_ids from sensor columns if not provided.
+        # Each sensor column (sensor_0, sensor_1, ...) is a separate entity.
+        if 'station_ids' not in kwargs:
+            kwargs['station_ids'] = feature_cols
+
         super().__init__(
             splits=splits,
             time_col='_time_idx',
