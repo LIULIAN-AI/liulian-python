@@ -1,12 +1,17 @@
-"""
-PatchTST: A Time Series is Worth 64 Words: Long-term Forecasting with Transformers
+"""PatchTST with optional entity integration modes.
 
 Paper: https://arxiv.org/pdf/2211.14730.pdf
 Original Implementation: Time-Series-Library
 https://github.com/thuml/Time-Series-Library/blob/main/models/PatchTST.py
 
-PatchTST applies transformers to patches of time series, achieving state-of-the-art
-performance with channel independence and efficient patching mechanism.
+Supported entity settings for ``model: patchtst``:
+
+* ``identifier_mode: none`` — plain PatchTST.
+* ``identifier_mode: embedding`` + ``id_integration: concat_to_x``
+    — legacy wrapper-based integration at the time-step level.
+* ``identifier_mode: embedding`` + ``id_integration: add_after_patch``
+    — add a learned per-channel embedding in ``d_model`` space after
+        patching and patch projection.
 """
 
 import torch
@@ -61,12 +66,26 @@ class Model(nn.Module):
         self.task_name = configs.task_name
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
+        self.identifier_mode = getattr(configs, 'identifier_mode', 'none')
+        self.id_integration = getattr(configs, 'id_integration', 'concat_to_x')
         padding = stride
+
+        self._use_add_after_patch = (
+            self.identifier_mode == 'embedding'
+            and self.id_integration == 'add_after_patch'
+        )
+        if self._use_add_after_patch and getattr(configs, 'split_mode', None) != 'multi_channel':
+            raise ValueError(
+                "PatchTST only supports id_integration='add_after_patch' in split_mode='multi_channel'."
+            )
 
         # patching and embedding
         self.patch_embedding = PatchEmbedding(
             configs.d_model, patch_len, stride, padding, configs.dropout
         )
+        if self._use_add_after_patch:
+            num_stations = getattr(configs, 'enc_in', 1)
+            self.entity_embedding = nn.Embedding(num_stations, configs.d_model)
 
         # Encoder
         self.encoder = Encoder(
@@ -120,6 +139,19 @@ class Model(nn.Module):
                 self.head_nf * configs.enc_in, configs.num_class
             )
 
+    def _inject_entity_after_patch(
+        self,
+        enc_out: torch.Tensor,
+        n_vars: int,
+    ) -> torch.Tensor:
+        """Add per-channel entity embeddings in patch-token space."""
+        if not self._use_add_after_patch:
+            return enc_out
+        batch_size = enc_out.shape[0] // n_vars
+        ids = torch.arange(n_vars, device=enc_out.device).repeat(batch_size)
+        emb = self.entity_embedding(ids)
+        return enc_out + emb.unsqueeze(1)
+
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         # Normalization from Non-stationary Transformer
         means = x_enc.mean(1, keepdim=True).detach()
@@ -131,6 +163,7 @@ class Model(nn.Module):
         x_enc = x_enc.permute(0, 2, 1)
         # u: [bs * nvars x patch_num x d_model]
         enc_out, n_vars = self.patch_embedding(x_enc)
+        enc_out = self._inject_entity_after_patch(enc_out, n_vars)
 
         # Encoder
         # z: [bs * nvars x patch_num x d_model]
@@ -167,6 +200,7 @@ class Model(nn.Module):
         x_enc = x_enc.permute(0, 2, 1)
         # u: [bs * nvars x patch_num x d_model]
         enc_out, n_vars = self.patch_embedding(x_enc)
+        enc_out = self._inject_entity_after_patch(enc_out, n_vars)
 
         # Encoder
         # z: [bs * nvars x patch_num x d_model]
@@ -198,6 +232,7 @@ class Model(nn.Module):
         x_enc = x_enc.permute(0, 2, 1)
         # u: [bs * nvars x patch_num x d_model]
         enc_out, n_vars = self.patch_embedding(x_enc)
+        enc_out = self._inject_entity_after_patch(enc_out, n_vars)
 
         # Encoder
         # z: [bs * nvars x patch_num x d_model]
@@ -223,12 +258,13 @@ class Model(nn.Module):
         means = x_enc.mean(1, keepdim=True).detach()
         x_enc = x_enc - means
         stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
-        x_enc /= stdev
+        x_enc = x_enc / stdev
 
         # do patching and embedding
         x_enc = x_enc.permute(0, 2, 1)
         # u: [bs * nvars x patch_num x d_model]
         enc_out, n_vars = self.patch_embedding(x_enc)
+        enc_out = self._inject_entity_after_patch(enc_out, n_vars)
 
         # Encoder
         # z: [bs * nvars x patch_num x d_model]

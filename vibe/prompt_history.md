@@ -78,8 +78,28 @@ Now perform the following tasks:
 
 ### prompt 2026.03.05 - 4:
 
-
 I am okay with all designs except: model name in config should always be patchtst. Revise the identifier mode and the related settings to choose from which embedding mode to use.
+
+### prompt 2026.03.06 - 1:
+
+Keep revising:
+- Please use embedding as the identifier mode for patchtst, and use id_integration to control how to integrate the embedding. For instance, "concat_to_x" is the current design, and "add_after_patch" is the new design. 
+- Model patchtst_entity should be agnostic to users and other parts of the code, meaning that it can be invoked by calling patchtst with the corresponding id_integration setting. You may need to reconsider whether this model is the correct design at all.
+- Use "add_after_patch" as the default setting for patchtst with embedding. Remove patchtst_patch_embedding_space in search_spaces.py; remove PATCHTST_PATCH_EMB_SWISS1990 from baselines.py; remove TestPatchTSTEntity tests from test_e2e_pipeline.py.
+
+
+### prompt 2026.03.06 - 2:
+
+Great! Now do the following:
+- Commit current changes.
+- In docs/entity_identifiers.md, "When to Use Entity Identifiers - Beneficial" section provides datasets from tsl lib which may benefit from entity identifiers. Please:
+  - Analyze in-depth datasets used by paper "Are Language Models Actually Useful for Time Series Forecasting?" Then make the same analysis for it as in docs/entity_identifiers.md, then update docs/entity_identifiers.md to include new info. Remember to add the references for each data (where they are from and used by which papers). (paper: https://arxiv.org/pdf/2406.16964, code: https://github.com/thuml/AutoTimes, openreview info: https://openreview.net/forum?id=DV15UbHCY1).
+  - Research heavily online for other datasets used by time series / spatial-temporal forecasting papers. Then analyze these datasets and update docs/entity_identifiers.md as well. You can also include some datasets that are not used by papers but have potential to be used by papers, e.g., some public datasets on kaggle, uci, etc. Remember to add the references for each data (where they are from and used by which papers).
+  - implement entity identifier integration for lstm, dlinear, and patchtst on datasets under ""When to Use Entity Identifiers - Beneficial" after the revision of this doc, following the same procedure as for swiss 1990. 
+
+
+
+
 
 
 ## Other issues:

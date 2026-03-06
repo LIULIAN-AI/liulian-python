@@ -226,13 +226,13 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
     ``liulian.models.torch.<model_name>``.  Special pre-processing
     (e.g. prompt loading for TimeLLM) is handled transparently.
 
-    Handles:
-    - Model instantiation via ``liulian.models.torch.<name>.Model``
-    - EntityWrapper wrapping when ``identifier_mode='embedding'``
-      (uses ChannelEntityWrapper for ``split_mode='multi_channel'``)
-    - Patch-level entity embedding when ``identifier_mode='patch_embedding'``
-      (imports ``patchtst_entity.Model`` instead of ``patchtst.Model``)
-    - Auto enc_in detection from dataset
+        Handles:
+        - Model instantiation via ``liulian.models.torch.<name>.Model``
+        - EntityWrapper wrapping when ``identifier_mode='embedding'``
+            (uses ChannelEntityWrapper for ``split_mode='multi_channel'``)
+        - PatchTST internal patch-level entity integration when
+            ``identifier_mode='embedding'`` and ``id_integration='add_after_patch'``
+        - Auto enc_in detection from dataset
 
     Args:
         config: Full experiment config dict.
@@ -257,12 +257,16 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
     if model_name == 'timellm':
         ns.content = _load_prompt_content(config)
 
+    if (
+        config.get('id_integration') == 'add_after_patch'
+        and not (model_name == 'patchtst' and config.get('identifier_mode') == 'embedding')
+    ):
+        raise ValueError(
+            "id_integration='add_after_patch' is only supported for model='patchtst' with identifier_mode='embedding'."
+        )
+
     # Dynamic import for all models
-    # For 'patch_embedding' mode on PatchTST, use the specialised module
-    # that adds entity embeddings after patching (in d_model space).
     _module_name = model_name
-    if model_name == 'patchtst' and config.get('identifier_mode') == 'patch_embedding':
-        _module_name = 'patchtst_entity'
 
     try:
         mod = importlib.import_module(f'liulian.models.torch.{_module_name}')
@@ -273,9 +277,12 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
             f'or any module under liulian.models.torch.*.'
         ) from exc
 
-    # Wrap with entity embedding when configured
-    # (skip for 'patch_embedding' — entity embedding is built into the model)
-    if config.get('identifier_mode') == 'embedding':
+    # Wrap with entity embedding when configured.
+    # PatchTST + add_after_patch is handled internally by the model.
+    if (
+        config.get('identifier_mode') == 'embedding'
+        and config.get('id_integration') != 'add_after_patch'
+    ):
         num_emb = config.get('num_embeddings')
         if num_emb is None and dataset is not None:
             num_emb = len(dataset.station_ids)
@@ -395,6 +402,7 @@ def build_optimizer(config: Dict[str, Any]) -> Optional[Any]:
             model=config.get('model', ''),
             data=config.get('data', ''),
             identifier_mode=config.get('identifier_mode', 'none'),
+            id_integration=config.get('id_integration', 'concat_to_x'),
         )
         logger.info(
             'Resolved search space for model=%s, data=%s: %s',

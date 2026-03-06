@@ -51,10 +51,10 @@ include_historical_y: none
 include_historical_predicted_y: false
 
 # ── Entity identifiers ─────────────────────────────────────────────────
-# PatchTST default: no entity embedding (channel-independent).
-# Set to 'embedding' to enable ChannelEntityWrapper.
+# PatchTST default: entity-aware mode with patch-token integration.
+# Use identifier_mode='none' to disable entity information.
 identifier_mode: embedding
-id_integration: concat_to_x
+id_integration: add_after_patch
 embedding_size: 10
 num_embeddings: null
 

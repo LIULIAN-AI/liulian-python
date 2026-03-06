@@ -510,27 +510,16 @@ def patchtst_space() -> Dict[str, Any]:
 
 
 def patchtst_embedding_space() -> Dict[str, Any]:
-    """PatchTST + ChannelEntityWrapper search space.
+    """PatchTST embedding search space.
 
     Extends :func:`patchtst_space` with ``embedding_size`` for the
-    per-channel entity embedding injected by ``ChannelEntityWrapper``.
+    legacy ``id_integration='concat_to_x'`` wrapper path. When
+    ``id_integration='add_after_patch'``, :func:`patchtst_space` is used
+    instead because the internal embedding size is fixed to ``d_model``.
     """
     base = patchtst_space()
     base['embedding_size'] = ray.tune.randint(1, 31)
     return base
-
-
-def patchtst_patch_embedding_space() -> Dict[str, Any]:
-    """PatchTST + patch-level entity embedding search space.
-
-    Same architecture hyperparameters as :func:`patchtst_space`.  The
-    entity embedding is built into the model (``nn.Embedding(enc_in,
-    d_model)``), so there is no ``embedding_size`` to tune — it is
-    always ``d_model``.
-
-    Selected via ``model: patchtst``, ``identifier_mode: patch_embedding``.
-    """
-    return patchtst_space()
 
 
 def timesnet_space() -> Dict[str, Any]:
@@ -746,7 +735,6 @@ _SPACE_REGISTRY: Dict[str, Any] = {
     'itransformer': itransformer_space,
     'patchtst': patchtst_space,
     'patchtst_embedding': patchtst_embedding_space,
-    'patchtst_patch_embedding': patchtst_patch_embedding_space,
     'timesnet': timesnet_space,
     'timemixer': timemixer_space,
     'timexer': timexer_space,
@@ -811,10 +799,9 @@ def get_asha_preset(name: str = 'default') -> Dict[str, Any]:
 # Checked in order; first match wins. ``None`` means "any".
 # ``emb_flag`` can be:
 #   - ``True``  — matches identifier_mode in ('embedding', 'embedding_idx')
-#   - ``False`` — matches identifier_mode NOT in ('embedding', 'embedding_idx', 'patch_embedding')
-#   - a string  — matches identifier_mode == that string exactly
+#   - ``False`` — matches identifier_mode NOT in ('embedding', 'embedding_idx')
 #   - ``None``  — matches any identifier_mode
-_RESOLVE_ORDER: list[tuple[str | None, str, bool | str | None, str]] = [
+_RESOLVE_ORDER: list[tuple[str | None, str, bool | None, str]] = [
     # Swiss-river specific
     ('swiss-river', 'lstm', True, 'swiss_lstm_embedding'),
     ('swiss-river', 'lstm', False, 'swiss_lstm'),
@@ -826,8 +813,6 @@ _RESOLVE_ORDER: list[tuple[str | None, str, bool | str | None, str]] = [
     # PatchTST (dataset-agnostic)
     (None, 'patchtst', True, 'patchtst_embedding'),
     (None, 'patchtst', False, 'patchtst'),
-    # PatchTST with patch-level entity embedding
-    (None, 'patchtst', 'patch_embedding', 'patchtst_patch_embedding'),
     # TimeLLM swiss-river
     ('swiss-river', 'timellm', None, 'timellm_swissriver'),
 ]
@@ -837,6 +822,7 @@ def resolve_search_space(
     model: str,
     data: str = '',
     identifier_mode: str = 'none',
+    id_integration: str = 'concat_to_x',
 ) -> Dict[str, Any]:
     """Pick the best pre-defined search space and return ``ray.tune`` objects.
 
@@ -855,13 +841,18 @@ def resolve_search_space(
         model: Model name (e.g. ``'lstm'``, ``'dlinear'``).
         data: Dataset name (e.g. ``'swiss-river-1990'``).
         identifier_mode: ``'embedding'`` / ``'embedding_idx'`` /
-            ``'patch_embedding'`` / ``'none'``.
+            ``'none'``.
+        id_integration: Embedding integration mode. For PatchTST,
+            ``'add_after_patch'`` uses the base PatchTST space because
+            no standalone ``embedding_size`` is tuned.
 
     Returns:
         Search space dictionary with ``ray.tune.*`` values.
     """
 
     has_emb = identifier_mode in ('embedding', 'embedding_idx')
+    if model == 'patchtst' and has_emb and id_integration == 'add_after_patch':
+        has_emb = False
 
     # ── LSTM: use legacy randint / uniform space for backward compat ──
     # The original pipeline used randint / uniform (not discrete choice).
@@ -886,13 +877,8 @@ def resolve_search_space(
         if data_prefix is not None and not data.startswith(data_prefix):
             continue
         # Match emb_flag against identifier_mode
-        if emb_flag is not None:
-            if isinstance(emb_flag, str):
-                # Exact string match (e.g. 'patch_embedding')
-                if identifier_mode != emb_flag:
-                    continue
-            elif emb_flag != has_emb:
-                continue
+        if emb_flag is not None and emb_flag != has_emb:
+            continue
         space = get_search_space(key)
         break
 

@@ -691,7 +691,7 @@ class TimeSeriesDataset(BaseDataset):
     identifier_mode : str
         Entity identifier strategy.
     id_integration : str
-        ``'concat_to_x'`` | ``'add_to_x'``.
+        ``'concat_to_x'`` | ``'add_to_x'`` | ``'add_after_patch'``.
     coordinates : dict
         Station coordinates.
     station_name : str or None
@@ -1085,6 +1085,9 @@ class TimeSeriesDataset(BaseDataset):
                     elif d_ent > d_feat:
                         ent = ent[:, :d_feat]
                     feat = feat + ent
+                elif self.id_integration == 'add_after_patch':
+                    # PatchTST handles entity injection internally after patching.
+                    pass
                 else:
                     raise ValueError(f'Unknown id_integration: {self.id_integration!r}')
 

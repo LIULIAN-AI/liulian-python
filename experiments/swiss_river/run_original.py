@@ -138,7 +138,7 @@ def _build_hpo_experiment_name(config: dict, model_name: str) -> str:
 
     ts = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
     parts = [
-        config.get('data', 'data'),
+        choices=['concat_to_x', 'add_to_x', 'add_after_patch'],
         model_name,
         config.get('task', 'forecast'),
         config.get('split_mode', 'ts'),

@@ -32,7 +32,7 @@ import os
 import numpy as np
 import pytest
 
-from tests.e2e.baselines import DLINEAR_SWISS1990, LSTM_SWISS1990, PATCHTST_SWISS1990, PATCHTST_PATCH_EMB_SWISS1990
+from tests.e2e.baselines import DLINEAR_SWISS1990, LSTM_SWISS1990, PATCHTST_SWISS1990
 
 pytestmark = pytest.mark.main_branch
 
@@ -49,6 +49,7 @@ def _base_config(
     split_mode: str = 'per_entity',
     identifier_mode: str = 'none',
     hpo: bool = False,
+    id_integration: str | None = None,
     **overrides: object,
 ) -> dict:
     """Generic e2e config builder for any model + Swiss River 1990.
@@ -66,6 +67,13 @@ def _base_config(
     - CPU-only — avoids GPU variance and setup overhead
     """
     from liulian.config import load_config
+
+    if id_integration is None:
+        id_integration = (
+            'add_after_patch'
+            if model == 'patchtst' and identifier_mode == 'embedding'
+            else 'concat_to_x'
+        )
 
     cfg = load_config()  # start from DEFAULT_CONFIG
     cfg.update(
@@ -90,7 +98,7 @@ def _base_config(
         include_historical_predicted_y=False,
         # Entity
         identifier_mode=identifier_mode,
-        id_integration='concat_to_x',
+        id_integration=id_integration,
         embedding_size=4,
         # Graph
         graph_mode='none',
@@ -408,7 +416,7 @@ class TestPatchTSTSingleNoEmb:
 
 
 class TestPatchTSTSingleEmb:
-    """PatchTST single run (multi_channel mode, with channel embedding)."""
+    """PatchTST single run (multi_channel mode, add-after-patch embedding)."""
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
@@ -432,7 +440,7 @@ class TestPatchTSTTuneNoEmb:
 
 
 class TestPatchTSTTuneEmb:
-    """PatchTST Ray Tune HPO (multi_channel mode, with channel embedding)."""
+    """PatchTST Ray Tune HPO (multi_channel mode, add-after-patch embedding)."""
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
@@ -442,31 +450,3 @@ class TestPatchTSTTuneEmb:
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, PATCHTST_SWISS1990['tune_emb'], 'patchtst_tune_emb')
 
-
-# ═══════════════════════════════════════════════════════════════════════
-# PatchTST with patch-level entity embedding + Swiss River 1990
-# ═══════════════════════════════════════════════════════════════════════
-
-
-class TestPatchTSTEntitySingle:
-    """PatchTST patch-level entity embedding, single run."""
-
-    def test_pipeline(self, tmp_path):
-        cfg = _base_config(
-            model='patchtst', split_mode='multi_channel',
-            identifier_mode='patch_embedding', hpo=False,
-        )
-        result = _run_and_collect(cfg, tmp_path)
-        _assert_baseline(result, PATCHTST_PATCH_EMB_SWISS1990['single'], 'patchtst_patch_emb_single')
-
-
-class TestPatchTSTEntityTune:
-    """PatchTST patch-level entity embedding, Ray Tune HPO."""
-
-    def test_pipeline(self, tmp_path):
-        cfg = _base_config(
-            model='patchtst', split_mode='multi_channel',
-            identifier_mode='patch_embedding', hpo=True,
-        )
-        result = _run_and_collect(cfg, tmp_path)
-        _assert_baseline(result, PATCHTST_PATCH_EMB_SWISS1990['tune'], 'patchtst_patch_emb_tune')

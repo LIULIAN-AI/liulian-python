@@ -17,7 +17,8 @@ Supported identifier modes
   ``x_enc`` and then projected back to the original ``enc_in`` dimensions
   via a learned linear layer before calling the inner model.
   **multi_channel mode**: a ``ChannelEntityWrapper`` injects per-channel
-  station embeddings.
+    station embeddings for ``id_integration='concat_to_x'``. PatchTST can
+    instead handle ``id_integration='add_after_patch'`` internally.
 
 Usage in an adapter
 -------------------
@@ -276,11 +277,11 @@ class EntityAwareMixin:
     Config keys
     -----------
     identifier_mode : str
-        One of ``'none'``, ``'embedding'``, ``'patch_embedding'``,
+        One of ``'none'``, ``'embedding'``,
         ``'onehot'``, ``'coordinates'``, ``'sinusoidal'``,
         ``'descriptors'``, ``'numeric_id'``.
-        ``'patch_embedding'`` is handled by the model internally
-        (e.g. ``patchtst_entity.Model``); no wrapper is applied.
+        ``'embedding'`` + ``id_integration='add_after_patch'`` is handled
+        by PatchTST internally; no wrapper is applied.
     entity_id_col : int
         Column index in ``x_mark_enc`` for integer station IDs
         (default ``0``).
@@ -322,7 +323,10 @@ class EntityAwareMixin:
         self._entity_mode = config.get('identifier_mode', 'none')
         self._entity_id_col = config.get('entity_id_col', 0)
 
-        if self._entity_mode == 'embedding':
+        if (
+            self._entity_mode == 'embedding'
+            and config.get('id_integration') != 'add_after_patch'
+        ):
             if config.get('split_mode') == 'multi_channel':
                 self._model = ChannelEntityWrapper(
                     self._model,

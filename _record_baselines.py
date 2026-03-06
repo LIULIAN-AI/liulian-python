@@ -9,8 +9,21 @@ import tempfile
 import numpy as np
 
 
-def _base_config(identifier_mode, hpo, model='lstm', split_mode='per_entity'):
+def _base_config(
+    identifier_mode,
+    hpo,
+    model='lstm',
+    split_mode='per_entity',
+    id_integration=None,
+):
     from liulian.config import load_config
+
+    if id_integration is None:
+        id_integration = (
+            'add_after_patch'
+            if model == 'patchtst' and identifier_mode == 'embedding'
+            else 'concat_to_x'
+        )
 
     cfg = load_config()
     cfg.update(
@@ -30,7 +43,7 @@ def _base_config(identifier_mode, hpo, model='lstm', split_mode='per_entity'):
         include_historical_y='none',
         include_historical_predicted_y=False,
         identifier_mode=identifier_mode,
-        id_integration='concat_to_x',
+        id_integration=id_integration,
         embedding_size=4,
         graph_mode='none',
         model=model,
@@ -108,9 +121,6 @@ SCENARIOS = {
     'patchtst_single_emb': lambda: _base_config('embedding', False, model='patchtst', split_mode='multi_channel'),
     'patchtst_tune_no_emb': lambda: _base_config('none', True, model='patchtst', split_mode='multi_channel'),
     'patchtst_tune_emb': lambda: _base_config('embedding', True, model='patchtst', split_mode='multi_channel'),
-    # PatchTST + patch-level entity embedding
-    'patchtst_patch_emb_single': lambda: _base_config('patch_embedding', False, model='patchtst', split_mode='multi_channel'),
-    'patchtst_patch_emb_tune': lambda: _base_config('patch_embedding', True, model='patchtst', split_mode='multi_channel'),
 }
 
 

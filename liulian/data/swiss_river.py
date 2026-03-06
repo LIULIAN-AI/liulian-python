@@ -74,7 +74,8 @@ class SwissRiverDataset(SpatialTempoDataset):
     identifier_mode : str
         Entity identifier strategy.
     id_integration : str
-        How entity feats are added (``'concat_to_x'`` | ``'add_to_x'``).
+        How entity feats are added (``'concat_to_x'`` | ``'add_to_x'`` |
+        ``'add_after_patch'``).
     graph_mode : str
         ``'none'`` | ``'edge_index'`` | ``'adj_matrix'`` |
         ``'graphlet_features'``.

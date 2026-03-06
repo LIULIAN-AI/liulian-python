@@ -186,6 +186,7 @@ MODEL_DEFAULTS: Dict[str, Dict[str, Any]] = {
         'scaler': 'standard',
         'split_mode': 'multi_channel',
         'identifier_mode': 'none',
+        'id_integration': 'add_after_patch',
         'patch_len': 16,
         'stride': 8,
     },
