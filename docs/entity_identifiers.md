@@ -8,6 +8,7 @@ Many real-world time-series datasets contain multiple independent entities measu
 - **Traffic**: 862 road occupancy sensors
 - **Electricity**: 321 household meters
 - **PEMS**: 170–883 traffic flow sensors
+- **Solar-Energy**: 137 PV plant power output sensors
 - **Swiss-river**: river monitoring stations with coordinates
 
 Entity identifiers inject per-entity information into the model, enabling it to learn entity-specific biases, spatial relationships, and distributional differences.
@@ -15,25 +16,87 @@ Entity identifiers inject per-entity information into the model, enabling it to 
 ## When to Use Entity Identifiers
 
 ### Beneficial (homogeneous entities)
-Entity identifiers help when features **are** entities — interchangeable channels measuring the same physical quantity:
 
-| Dataset | Entities? | Why |
-|---------|:---------:|-----|
-| Traffic | ✅ | 862 sensors measuring road occupancy % |
-| Electricity | ✅ | 321 clients measuring kWh consumption |
-| PEMS03/04/07/08 | ✅ | Traffic flow sensors with adjacency graph |
-| Swiss-river | ✅ | Stations with coordinates and river topology |
-| Exchange Rate | ⚠️ | 8 countries — borderline (few, semi-heterogeneous) |
+Entity identifiers help when features **are** entities — interchangeable channels measuring the same physical quantity.
+
+#### TSLib / Standard Forecasting Benchmarks
+
+These datasets are from the [Time-Series-Library](https://github.com/thuml/Time-Series-Library) (TSLib) and are used by most long-term forecasting papers including PatchTST, iTransformer, TimesNet, DLinear, Autoformer, FEDformer, Informer, etc.
+
+| Dataset | #Entities | Freq | Why beneficial | Source & References |
+|---------|----------:|------|----------------|---------------------|
+| **Traffic** | 862 | Hourly | Road occupancy % sensors on San Francisco Bay area freeways; all channels measure the same quantity | [Caltrans PEMS](http://pems.dot.ca.gov), introduced by [LSTNet (Lai et al., SIGIR 2018)](https://arxiv.org/abs/1703.07015). Used by Autoformer, FEDformer, PatchTST, iTransformer, TimesNet, DLinear, TimeMixer, etc. |
+| **Electricity** (ECL) | 321 | Hourly | Household electricity consumption in kWh; all channels are interchangeable clients | [UCI ML Repository](https://archive.ics.uci.edu/ml/datasets/ElectricityLoadDiagrams20112014), introduced by [LSTNet (Lai et al., SIGIR 2018)](https://arxiv.org/abs/1703.07015). Used by Autoformer, Informer, PatchTST, iTransformer, Time-LLM, OneFitsAll, CALF, etc. |
+| **Solar-Energy** | 137 | 10-min | Solar power output from 137 PV plants in Alabama; all channels measure the same quantity (kW) | [NREL Solar Data](http://www.nrel.gov/grid/solar-power-data.html), introduced by [LSTNet (Lai et al., SIGIR 2018)](https://arxiv.org/abs/1703.07015). Used by AutoTimes, iTransformer, Crossformer, etc. |
+| **Exchange Rate** | 8 | Daily | Daily exchange rates of 8 countries; borderline — few entities, semi-heterogeneous | [Lai et al., SIGIR 2018](https://arxiv.org/abs/1703.07015). Used by Autoformer, Informer, PatchTST, Time-LLM, OneFitsAll, CALF, etc. |
+
+#### PEMS Traffic Sensor Datasets
+
+From the California DOT Performance Measurement System.  Used extensively in spatial-temporal GNN papers.
+
+| Dataset | #Sensors | Features | Freq | Why beneficial | Source & References |
+|---------|----------|----------|------|----------------|---------------------|
+| **PEMS03** | 358 | Flow | 5-min | Traffic flow sensors with adjacency graph | [Song et al., STSGCN (AAAI 2020)](https://ojs.aaai.org/index.php/AAAI/article/view/5438) |
+| **PEMS04** | 307 | Flow, Occupy, Speed | 5-min | Traffic sensors with 3 features each; channels are interchangeable sensors | [Song et al., STSGCN (AAAI 2020)](https://ojs.aaai.org/index.php/AAAI/article/view/5438) |
+| **PEMS07** | 883 | Flow | 5-min | Large-scale traffic flow network | [Song et al., STSGCN (AAAI 2020)](https://ojs.aaai.org/index.php/AAAI/article/view/5438) |
+| **PEMS08** | 170 | Flow, Occupy, Speed | 5-min | Smaller traffic sensor network | [Song et al., STSGCN (AAAI 2020)](https://ojs.aaai.org/index.php/AAAI/article/view/5438) |
+
+#### Spatial-Temporal Graph Forecasting Datasets
+
+These are from the GNN / spatial-temporal forecasting literature (DCRNN, STGCN, Graph WaveNet, AGCRN, MTGNN, etc.):
+
+| Dataset | #Entities | Freq | Why beneficial | Source & References |
+|---------|----------:|------|----------------|---------------------|
+| **METR-LA** | 207 | 5-min | Loop detector speed sensors in Los Angeles highways; all channels measure traffic speed (mph) | [Li et al., DCRNN (ICLR 2018)](https://arxiv.org/abs/1707.01926). Used by STGCN, Graph WaveNet, AGCRN, MTGNN, StemGNN, etc. |
+| **PEMS-BAY** | 325 | 5-min | Traffic speed sensors in San Francisco Bay Area; same quantity across all sensors | [Li et al., DCRNN (ICLR 2018)](https://arxiv.org/abs/1707.01926). Used by STGCN, Graph WaveNet, AGCRN, MTGNN, etc. |
+| **NYC Taxi** | 75 zones | 30-min | Taxi trip demand per zone; homogeneous count data across pickup zones | [NYC TLC](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page). Used by [STResNet (Zhang et al., AAAI 2017)](https://arxiv.org/abs/1610.00081), AGCRN, etc. |
+| **NYC Bike** | 250+ stations | Hourly | Bike-sharing trip counts per station; homogeneous demand count | [Citi Bike](https://citibikenyc.com/system-data). Used by STGCN, STResNet, AGCRN, etc. |
+| **Beijing Air Quality** | 12 stations | Hourly | PM2.5 concentration across monitoring stations; same pollutant measurement | [UCI AQ Dataset](https://archive.ics.uci.edu/dataset/501/beijing+multi+site+air+quality+data+set). Used by [Yi et al. (KDD 2016)](https://dl.acm.org/doi/10.1145/2939672.2939679), MTGNN, etc. |
+
+#### Domain-Specific Datasets
+
+| Dataset | #Entities | Freq | Why beneficial | Source & References |
+|---------|----------:|------|----------------|---------------------|
+| **Swiss-river** | 10–50 stations | Daily | River monitoring stations with coordinates and graph topology; per-station water temperature | [Swiss FOEN](https://www.bafu.admin.ch/bafu/en/home.html). Used in this project. |
+| **NN5** | 111 ATMs | Daily | Cash withdrawal time series from 111 ATMs in England; homogeneous demand data | [NN5 Competition (Crone, 2008)](http://www.neural-forecasting-competition.com/NN5/). Used by [Tan et al. (NeurIPS 2024)](https://arxiv.org/abs/2406.16964). |
+| **London Smart Meters** | 5,567 meters | 30-min | Household energy consumption; all channels are interchangeable meters measuring kWh | [UK Power Networks / Kaggle](https://www.kaggle.com/datasets/jeanmidev/smart-meters-in-london). |
+| **Kaggle Store Sales** | 54 stores×33 families | Daily | Store-level product sales; same metric (units sold) across stores | [Kaggle](https://www.kaggle.com/competitions/store-sales-time-series-forecasting). |
+| **Kaggle Web Traffic** | 145K pages | Daily | Daily page views for Wikipedia articles; each channel is one page | [Kaggle](https://www.kaggle.com/competitions/web-traffic-time-series-forecasting). |
+| **FRED-MD** | ~130 series | Monthly | Macroeconomic indicators; each channel is one economic variable — borderline heterogeneous | [McCracken & Ng (2016)](https://doi.org/10.20955/r.2016.31-56). Used by [Tan et al. (NeurIPS 2024)](https://arxiv.org/abs/2406.16964). |
+
+> **Note on the "Are Language Models Actually Useful for Time Series Forecasting?" paper**
+> ([Tan et al., NeurIPS 2024 Spotlight](https://arxiv.org/abs/2406.16964),
+> [code](https://github.com/BennyTMT/LLMsForTimeSeries),
+> [OpenReview](https://openreview.net/forum?id=DV15UbHCY1)):
+>
+> This paper benchmarks on 8 core datasets: **ETTh1, ETTh2, ETTm1, ETTm2,
+> Weather, Electricity, Traffic, ILI**, plus 5 extended datasets from the
+> rebuttal: **Exchange Rate, Covid Deaths, NYC Taxi, NN5, FRED-MD**.
+> Of these, **Electricity** (321 clients), **Traffic** (862 sensors), and
+> **NN5** (111 ATMs) are homogeneous-entity datasets that benefit from entity
+> identifiers.  The rest (ETT, Weather, ILI, Covid Deaths) have heterogeneous
+> features and do not benefit.
+
+> **Note on AutoTimes** ([Liu et al., NeurIPS 2024](https://arxiv.org/abs/2402.02370),
+> [code](https://github.com/thuml/AutoTimes)):
+>
+> AutoTimes benchmarks on **ECL** (321 clients), **ETTh1** (7 features),
+> **Solar-Energy** (137 PV plants), **Traffic** (862 sensors), and
+> **Weather** (21 features).  Entity identifiers are beneficial for
+> **ECL**, **Solar-Energy**, and **Traffic** (homogeneous entities);
+> they are not beneficial for **ETTh1** and **Weather** (heterogeneous features).
 
 ### Not Beneficial (heterogeneous features)
+
 Entity identifiers **do not** help when features are heterogeneous — they measure different physical quantities and interact semantically:
 
-| Dataset | Entities? | Why |
-|---------|:---------:|-----|
-| ETT (h1/h2/m1/m2) | ❌ | Columns are load (MW), temperature (°C) — different units |
-| Weather | ❌ | Pressure (mbar), temperature (°C), humidity (%) |
-| ILI | ❌ | Weighted ILI %, age groups, totals |
-| M4 | ❌ | Univariate — no entity concept |
+| Dataset | Entities? | #Channels | Why not beneficial | Source & References |
+|---------|:---------:|----------:|--------------------|----|
+| **ETT** (h1/h2/m1/m2) | ❌ | 7 | Columns are load (MW) and temperature (°C) from one transformer — different physical units | [Zhou et al., Informer (AAAI 2021)](https://arxiv.org/abs/2012.07436). Used by virtually all TSF papers. |
+| **Weather** | ❌ | 21 | Pressure (mbar), temperature (°C), humidity (%) — semantically distinct meteorological variables | [Wetterstation (Max Planck Biogeochemistry)](https://www.bgc-jena.mpg.de/wetter/). Used by Autoformer, PatchTST, iTransformer, etc. |
+| **ILI** (Illness) | ❌ | 7 | Weighted ILI %, unweighted %, age group breakdowns — different statistical measures | [CDC ILINet](https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html). Used by Autoformer, TimesNet, Time-LLM, CALF, etc. |
+| **M4** | ❌ | 1 each | Univariate competition dataset — 100K individual series with no multi-entity structure | [M4 Competition (Makridakis et al., 2020)](https://doi.org/10.1016/j.ijforecast.2019.04.014). |
+| **Covid Deaths** | ⚠️ | varies | Regional death counts; could be treated as entities but series are short and policy-driven | Used by [Tan et al. (NeurIPS 2024)](https://arxiv.org/abs/2406.16964). |
 
 ## Supported Modes
 
