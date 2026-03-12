@@ -28,6 +28,10 @@ Models covered
 * TimeMixer + Swiss River 1990 (multi_channel)
 * TimeXer + Swiss River 1990 (multi_channel)
 * Mamba + Swiss River 1990 (multi_channel)
+* Nonstationary Transformer + Swiss River 1990 (multi_channel)
+* LightTS + Swiss River 1990 (multi_channel)
+* Reformer + Swiss River 1990 (multi_channel)
+* GPT4TS + Swiss River 1990 (multi_channel)
 """
 
 from __future__ import annotations
@@ -280,3 +284,23 @@ TIMEXER_SWISS1990: dict[str, dict] = _placeholder()
 # ── Mamba + Swiss River 1990 + multi_channel mode ─────────────────────────
 
 MAMBA_SWISS1990: dict[str, dict] = _placeholder()
+
+
+# ── Nonstationary Transformer + Swiss River 1990 + multi_channel mode ──────
+
+NONSTATIONARY_TRANSFORMER_SWISS1990: dict[str, dict] = _placeholder()
+
+
+# ── LightTS + Swiss River 1990 + multi_channel mode ───────────────────────
+
+LIGHTTS_SWISS1990: dict[str, dict] = _placeholder()
+
+
+# ── Reformer + Swiss River 1990 + multi_channel mode ──────────────────────
+
+REFORMER_SWISS1990: dict[str, dict] = _placeholder()
+
+
+# ── GPT4TS + Swiss River 1990 + multi_channel mode ────────────────────────
+
+GPT4TS_SWISS1990: dict[str, dict] = _placeholder()

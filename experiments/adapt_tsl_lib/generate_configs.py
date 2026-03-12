@@ -253,6 +253,61 @@ LSTM_OVERRIDES: dict[str, dict] = {
     "illness":     {"d_model": 64, "d_ff": 32, "e_layers": 2, "d_layers": 1, "dropout": 0.0},
 }
 
+# -- Nonstationary Transformer: uses p_hidden_dims/layers for de-stationary
+#    projectors. d_model=128 for ETT* (from scripts), 512 default otherwise.
+#    ECL uses d_model=2048. All use p_hidden_layers=2 except ETTm1/ETTm2 (4).
+NONSTATIONARY_TRANSFORMER_OVERRIDES: dict[str, dict] = {
+    "etth1":       {"d_model": 128, "e_layers": 2, "d_layers": 1, "factor": 3, "p_hidden_dims": [256, 256], "p_hidden_layers": 2},
+    "etth2":       {"d_model": 512, "e_layers": 2, "d_layers": 1, "factor": 3, "p_hidden_dims": [256, 256], "p_hidden_layers": 2},
+    "ettm1":       {"d_model": 512, "e_layers": 2, "d_layers": 1, "factor": 3, "p_hidden_dims": [16, 16, 16, 16], "p_hidden_layers": 4},
+    "ettm2":       {"d_model": 512, "e_layers": 2, "d_layers": 1, "factor": 3, "p_hidden_dims": [256, 256, 256, 256], "p_hidden_layers": 4},
+    "electricity": {"d_model": 2048, "e_layers": 2, "d_layers": 1, "factor": 3, "p_hidden_dims": [256, 256], "p_hidden_layers": 2},
+    "weather":     {"e_layers": 2, "d_layers": 1, "factor": 3, "train_epochs": 3, "p_hidden_dims": [256, 256], "p_hidden_layers": 2},
+    "traffic":     {"e_layers": 2, "d_layers": 1, "factor": 3, "train_epochs": 3, "p_hidden_dims": [128, 128], "p_hidden_layers": 2},
+    "exchange_rate": {"e_layers": 2, "d_layers": 1, "factor": 3, "p_hidden_dims": [256, 256], "p_hidden_layers": 2},
+    "illness":     {"e_layers": 2, "d_layers": 1, "factor": 3, "p_hidden_dims": [32, 32], "p_hidden_layers": 2},
+}
+
+# -- LightTS: pure MLP, uses TSL defaults mostly. Scripts only for ETTh1/ECL.
+LIGHTTS_OVERRIDES: dict[str, dict] = {
+    "etth1":       {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "etth2":       {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "ettm1":       {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "ettm2":       {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "electricity": {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "weather":     {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "traffic":     {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "exchange_rate": {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "illness":     {"e_layers": 2, "d_layers": 1, "factor": 3},
+}
+
+# -- Reformer: encoder-only with LSH attention. Scripts for ETTh1/ECL only.
+REFORMER_OVERRIDES: dict[str, dict] = {
+    "etth1":       {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "etth2":       {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "ettm1":       {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "ettm2":       {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "electricity": {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "weather":     {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "traffic":     {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "exchange_rate": {"e_layers": 2, "d_layers": 1, "factor": 3},
+    "illness":     {"e_layers": 2, "d_layers": 1, "factor": 3},
+}
+
+# -- GPT4TS: frozen GPT-2 with fine-tuned LayerNorm. No TSL counterpart.
+#    gpt_layers controls how many GPT-2 transformer layers to use (default 6).
+GPT4TS_OVERRIDES: dict[str, dict] = {
+    "etth1":       {"d_model": 768, "d_ff": 768, "e_layers": 6, "d_layers": 1, "gpt_layers": 6},
+    "etth2":       {"d_model": 768, "d_ff": 768, "e_layers": 6, "d_layers": 1, "gpt_layers": 6},
+    "ettm1":       {"d_model": 768, "d_ff": 768, "e_layers": 6, "d_layers": 1, "gpt_layers": 6},
+    "ettm2":       {"d_model": 768, "d_ff": 768, "e_layers": 6, "d_layers": 1, "gpt_layers": 6},
+    "electricity": {"d_model": 768, "d_ff": 768, "e_layers": 6, "d_layers": 1, "gpt_layers": 6},
+    "weather":     {"d_model": 768, "d_ff": 768, "e_layers": 6, "d_layers": 1, "gpt_layers": 6},
+    "traffic":     {"d_model": 768, "d_ff": 768, "e_layers": 6, "d_layers": 1, "gpt_layers": 6},
+    "exchange_rate": {"d_model": 768, "d_ff": 768, "e_layers": 6, "d_layers": 1, "gpt_layers": 6},
+    "illness":     {"d_model": 768, "d_ff": 768, "e_layers": 6, "d_layers": 1, "gpt_layers": 6},
+}
+
 # ═════════════════════════════════════════════════════════════════════
 # Consolidated model registry
 # ═════════════════════════════════════════════════════════════════════
@@ -314,6 +369,28 @@ MODEL_REGISTRY: dict[str, dict] = {
         "is_tsl": True, "tsl_model_name": "Mamba",
         "seed": 2021, "train_style": "tsl",
     },
+    "nonstationary_transformer": {
+        "overrides": NONSTATIONARY_TRANSFORMER_OVERRIDES,
+        "extra_arch_keys": ["p_hidden_dims", "p_hidden_layers"],
+        "is_tsl": True, "tsl_model_name": "Nonstationary_Transformer",
+        "seed": 2021, "train_style": "tsl",
+    },
+    "lightts": {
+        "overrides": LIGHTTS_OVERRIDES,
+        "is_tsl": True, "tsl_model_name": "LightTS",
+        "seed": 2021, "train_style": "tsl",
+    },
+    "reformer": {
+        "overrides": REFORMER_OVERRIDES,
+        "is_tsl": True, "tsl_model_name": "Reformer",
+        "seed": 2021, "train_style": "tsl",
+    },
+    "gpt4ts": {
+        "overrides": GPT4TS_OVERRIDES,
+        "extra_arch_keys": ["gpt_layers"],
+        "is_tsl": False, "tsl_model_name": None,
+        "seed": 2021, "train_style": "tsl",
+    },
     "lstm": {
         "overrides": LSTM_OVERRIDES,
         "is_tsl": False, "tsl_model_name": None,
@@ -332,6 +409,10 @@ TSL_SCRIPT_AVAILABLE: dict[str, dict[str, bool]] = {
     "timemixer":    {"etth1": True, "etth2": True, "ettm1": True, "ettm2": True, "electricity": True, "weather": True, "traffic": True, "exchange_rate": False, "illness": False},
     "timexer":      {"etth1": True, "etth2": True, "ettm1": True, "ettm2": True, "electricity": True, "weather": True, "traffic": True, "exchange_rate": False, "illness": False},
     "mamba":        {"etth1": True, "etth2": True, "ettm1": True, "ettm2": True, "electricity": True, "weather": True, "traffic": True, "exchange_rate": True, "illness": False},
+    "nonstationary_transformer": {"etth1": True, "etth2": True, "ettm1": True, "ettm2": True, "electricity": True, "weather": True, "traffic": True, "exchange_rate": True, "illness": True},
+    "lightts":      {"etth1": True, "etth2": False, "ettm1": False, "ettm2": False, "electricity": True, "weather": False, "traffic": False, "exchange_rate": False, "illness": False},
+    "reformer":     {"etth1": True, "etth2": False, "ettm1": False, "ettm2": False, "electricity": True, "weather": False, "traffic": False, "exchange_rate": False, "illness": False},
+    "gpt4ts":       {ds: False for ds in DATASETS},
     "lstm":         {ds: False for ds in DATASETS},
 }
 

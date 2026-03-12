@@ -2,11 +2,12 @@
 
 This document records the systematic comparison between the
 [Time-Series-Library (TSL)](https://github.com/thuml/Time-Series-Library)
-reference implementation and liulian for **11 model architectures** on
-standard long-term forecasting benchmarks (9 datasets, 94 experiments).
+reference implementation and liulian for **15 model architectures** on
+standard long-term forecasting benchmarks (9 datasets, 121 experiments).
 
 **Models**: PatchTST, DLinear, Informer, Autoformer, FEDformer, TimesNet,
-Transformer, iTransformer, TimeMixer, TimeXer, Mamba + LSTM (native).
+Transformer, iTransformer, TimeMixer, TimeXer, Mamba, Nonstationary Transformer,
+LightTS, Reformer, GPT4TS + LSTM (native).
 
 **Status**: PatchTST and DLinear fully compared (17/18 matched). All other
 models have configs generated and comparison script entries ready —
@@ -887,3 +888,129 @@ not**, likely due to pure random-state divergence on this small dataset
 | 16 | Traffic | DLinear | ❌ (defaults) | ✅ | ✅ MSE diff 0.19% | checked and matched | 2 | 2 | 55s | 97s |
 | 17 | Exchange | DLinear | ❌ (defaults) | ✅ | ✅ MSE diff 0.35% | checked and matched | 10 | 10 | 19s | 11s |
 | 18 | ILI | DLinear | ❌ (defaults) | ✅ | ✅ MSE diff 0.02% | checked and matched | 10 | 10 | 13s | 6s |
+
+---
+
+## New Models (Part 3)
+
+The following 4 models were identified as missing and implemented in Part 3.
+Comparison entries are ready; experiments pending execution.
+
+### Nonstationary Transformer
+
+**Paper**: [Non-stationary Transformers: Exploring the Stationarity in Time Series Forecasting](https://openreview.net/pdf?id=ucNDIDRNjjv) (NeurIPS 2022)
+
+**Architecture**: Encoder-decoder Transformer with De-Stationary Attention (DSAttention).
+Two Projector MLPs learn `tau` (scaling) and `delta` (shift) statistics from
+input sequences to restore non-stationary information lost by instance
+normalization. The projectors use Conv1d + stacked linear layers.
+
+**Key hyperparameters**: `p_hidden_dims` (list of hidden dimensions for
+projectors), `p_hidden_layers` (number of projector layers). Values vary
+significantly per dataset (e.g., `[256,256]` for ETTh1 vs `[16,16,16,16]` for
+ETTm1).
+
+**TSL scripts**: All 9 datasets have dedicated scripts.
+
+**Liulian adapter**: `liulian/models/torch/nonstationary_transformer.py`
+
+| # | Dataset | Model | Has TSL Script | Config Revised | Verified | Status |
+|---|---------|-------|---------------|----------------|----------|--------|
+| 19 | ETTh1 | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
+| 20 | ETTh2 | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
+| 21 | ETTm1 | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
+| 22 | ETTm2 | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
+| 23 | ECL | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
+| 24 | Weather | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
+| 25 | Traffic | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
+| 26 | Exchange | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
+| 27 | ILI | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
+
+### LightTS
+
+**Paper**: [Less Is More: Fast Multivariate Time Series Forecasting with Light Sampling-oriented MLP Structures](https://arxiv.org/abs/2207.01186) (arXiv 2022)
+
+**Architecture**: Pure MLP model using Iterative Enhancement Blocks (IEBlock).
+Two sampling strategies—continuous (first/last chunks) and interval
+(even/odd indices)—extract temporal features. Autoregressive skip connection
+preserves low-frequency information. No attention or embedding layers.
+
+**Key hyperparameters**: Standard `enc_in`, `seq_len`, `pred_len`. The model
+is self-contained and does not use `d_model` or `e_layers`.
+
+**TSL scripts**: ETTh1 and ECL only; other datasets use TSL defaults.
+
+**Liulian adapter**: `liulian/models/torch/lightts.py`
+
+| # | Dataset | Model | Has TSL Script | Config Revised | Verified | Status |
+|---|---------|-------|---------------|----------------|----------|--------|
+| 28 | ETTh1 | LightTS | ✅ | ✅ | ⏳ pending | — |
+| 29 | ETTh2 | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 30 | ETTm1 | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 31 | ETTm2 | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 32 | ECL | LightTS | ✅ | ✅ | ⏳ pending | — |
+| 33 | Weather | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 34 | Traffic | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 35 | Exchange | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 36 | ILI | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
+
+### Reformer
+
+**Paper**: [Reformer: The Efficient Transformer](https://openreview.net/forum?id=rkgNKkHtvB) (ICLR 2020)
+
+**Architecture**: Encoder-only Transformer with Locality-Sensitive Hashing
+(LSH) self-attention for $O(L \log L)$ complexity. Input is padded to
+multiples of `2 * bucket_size` for the hashing scheme. For forecasting,
+the encoder input is `[x_enc; x_dec_placeholder]` concatenated along the
+time axis, and the output is sliced to `[-pred_len:]`.
+
+**Key hyperparameters**: Standard transformer params (`d_model`, `e_layers`,
+`n_heads`). LSH-specific: `bucket_size` (default 4), `n_hashes` (default 4).
+
+**Dependencies**: `reformer-pytorch>=1.4.0`, `local-attention>=1.11.0`
+
+**TSL scripts**: ETTh1 and ECL only; other datasets use TSL defaults.
+
+**Liulian adapter**: `liulian/models/torch/reformer.py`,
+`liulian/models/torch/layers/attention.py` (ReformerLayer)
+
+| # | Dataset | Model | Has TSL Script | Config Revised | Verified | Status |
+|---|---------|-------|---------------|----------------|----------|--------|
+| 37 | ETTh1 | Reformer | ✅ | ✅ | ⏳ pending | — |
+| 38 | ETTh2 | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 39 | ETTm1 | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 40 | ETTm2 | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 41 | ECL | Reformer | ✅ | ✅ | ⏳ pending | — |
+| 42 | Weather | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 43 | Traffic | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 44 | Exchange | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 45 | ILI | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
+
+### GPT4TS (One Fits All)
+
+**Paper**: [One Fits All: Power General Time Series Analysis by Pretrained LM](https://arxiv.org/abs/2302.11939) (NeurIPS 2023)
+
+**Architecture**: Frozen pre-trained GPT-2 backbone with fine-tuned
+LayerNorm and positional embedding. Input is patch-based: the time series
+is normalized (instance norm), segmented into patches of length `patch_len`
+with stride `stride`, then projected to GPT-2's hidden dimension (768).
+Output projection maps back to `pred_len`.
+
+**Key hyperparameters**: `gpt_layers` (number of GPT-2 layers to use,
+default 6), `patch_len` (default 16), `stride` (default 8). The model's
+`d_model` is fixed at 768 (GPT-2 base).
+
+**Dependencies**: `transformers` (HuggingFace, for GPT-2 weights)
+
+**TSL scripts**: None — no TSL counterpart. Implemented from paper.
+No comparison experiments are included (liulian-only).
+
+**Liulian adapter**: `liulian/models/torch/gpt4ts.py`
+
+### Note on TS-LLM
+
+"TS-LLM" was identified as a potentially missing model name during the gap
+analysis, but it does not correspond to a single well-defined paper or TSL
+implementation. It may refer to a family of LLM-based time series methods.
+No adapter was created. The GPT4TS model above covers the primary
+"pretrained LLM for time series" approach from the TSL ecosystem.

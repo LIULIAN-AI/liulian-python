@@ -662,6 +662,93 @@ def transformer_enc_general_space() -> Dict[str, Any]:
     }
 
 
+def nonstationary_transformer_space() -> Dict[str, Any]:
+    """Non-stationary Transformer search space.
+
+    Paper: "Non-stationary Transformers: Exploring the Stationarity in
+           Time Series Forecasting" (Liu et al., NeurIPS 2022)
+    arXiv: https://openreview.net/pdf?id=ucNDIDRNjjv
+    TSLib: https://github.com/thuml/Time-Series-Library/blob/main/models/Nonstationary_Transformer.py
+
+    Key unique hyper: p_hidden_dims (Projector MLP widths) and
+    p_hidden_layers. TSL scripts use p_hidden_dims=[256,256] with 2 layers
+    for most datasets; ETTm uses 4 layers.
+    """
+    return {
+        'batch_size': ray.tune.choice([16, 32]),
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),
+        'd_model': ray.tune.choice([128, 256, 512]),
+        'd_ff': ray.tune.choice([256, 512, 2048]),
+        'n_heads': ray.tune.choice([4, 8]),
+        'e_layers': ray.tune.choice([2, 3]),
+        'd_layers': ray.tune.choice([1]),
+        'p_hidden_dims': ray.tune.choice([[128, 128], [256, 256]]),
+        'p_hidden_layers': ray.tune.choice([2]),
+        'dropout': ray.tune.choice([0.0, 0.1]),
+    }
+
+
+def lightts_space() -> Dict[str, Any]:
+    """LightTS search space — pure MLP with continuous/interval sampling.
+
+    Paper: "Less Is More: Fast Multivariate Time Series Forecasting with
+           Light Sampling-oriented MLP Structures" (Zhang et al., 2022)
+    arXiv: https://arxiv.org/abs/2207.01186
+    TSLib: https://github.com/thuml/Time-Series-Library/blob/main/models/LightTS.py
+
+    LightTS uses d_model internally for IEBlock hidden dims. The chunk_size
+    is hardcoded at 24; seq_len is padded if not divisible.
+    """
+    return {
+        'batch_size': ray.tune.choice([16, 32, 64]),
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),
+        'd_model': ray.tune.choice([256, 512, 1024]),
+        'dropout': ray.tune.choice([0.0, 0.1]),
+    }
+
+
+def reformer_space() -> Dict[str, Any]:
+    """Reformer search space — LSH attention for O(L log L) complexity.
+
+    Paper: "Reformer: The Efficient Transformer" (Kitaev et al., ICLR 2020)
+    arXiv: https://openreview.net/forum?id=rkgNKkHtvB
+    TSLib: https://github.com/thuml/Time-Series-Library/blob/main/models/Reformer.py
+
+    Encoder-only model using LSH self-attention with bucket_size=4,
+    n_hashes=4. TSL scripts use defaults for most hyperparameters.
+    """
+    return {
+        'batch_size': ray.tune.choice([16, 32]),
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),
+        'd_model': ray.tune.choice([256, 512]),
+        'd_ff': ray.tune.choice([512, 2048]),
+        'n_heads': ray.tune.choice([4, 8]),
+        'e_layers': ray.tune.choice([2, 3]),
+        'dropout': ray.tune.choice([0.0, 0.1]),
+    }
+
+
+def gpt4ts_space() -> Dict[str, Any]:
+    """GPT4TS (One Fits All) search space — frozen GPT-2 with fine-tuned LN.
+
+    Paper: "One Fits All: Power General Time Series Analysis by Pretrained
+           LM" (Zhou et al., NeurIPS 2023)
+    arXiv: https://arxiv.org/abs/2302.11939
+    Code:  https://github.com/DAMO-DI-ML/NeurIPS2023-One-Fits-All
+
+    d_model is fixed at 768 (GPT-2 hidden dim). gpt_layers controls how
+    many GPT-2 transformer blocks are used. Only LayerNorm and positional
+    embedding parameters are trainable.
+    """
+    return {
+        'batch_size': ray.tune.choice([16, 32]),
+        'learning_rate': ray.tune.loguniform(1e-5, 1e-3),
+        'gpt_layers': ray.tune.choice([3, 6]),
+        'patch_len': ray.tune.choice([8, 16, 24]),
+        'dropout': ray.tune.choice([0.0, 0.1]),
+    }
+
+
 # ======================================================================
 # ASHA presets for TSL models
 # Ref: https://docs.ray.io/en/latest/tune/api/schedulers.html#asha
@@ -739,6 +826,10 @@ _SPACE_REGISTRY: Dict[str, Any] = {
     'timemixer': timemixer_space,
     'timexer': timexer_space,
     'mamba': mamba_space,
+    'nonstationary_transformer': nonstationary_transformer_space,
+    'lightts': lightts_space,
+    'reformer': reformer_space,
+    'gpt4ts': gpt4ts_space,
     'lstm': lstm_general_space,
     'lstm_general': lstm_general_space,
     'transformer_encoder': transformer_enc_general_space,

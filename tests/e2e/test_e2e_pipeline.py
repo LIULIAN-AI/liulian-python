@@ -15,7 +15,8 @@ Placeholder (baselines not yet recorded)
 -----------------------------------------
 * **Informer** / **Autoformer** / **FEDformer** / **TimesNet** /
   **Transformer** / **iTransformer** / **TimeMixer** / **TimeXer** /
-  **Mamba** — each with 4 scenarios (single/tune × embedding/none)
+  **Mamba** / **Nonstationary Transformer** / **LightTS** /
+  **Reformer** / **GPT4TS** — each with 4 scenarios
   (single/tune × embedding/none)
 
 Baselines live in :pymod:`tests.e2e.baselines` so they can be imported
@@ -43,11 +44,15 @@ from tests.e2e.baselines import (
     AUTOFORMER_SWISS1990,
     DLINEAR_SWISS1990,
     FEDFORMER_SWISS1990,
+    GPT4TS_SWISS1990,
     INFORMER_SWISS1990,
     ITRANSFORMER_SWISS1990,
+    LIGHTTS_SWISS1990,
     LSTM_SWISS1990,
     MAMBA_SWISS1990,
+    NONSTATIONARY_TRANSFORMER_SWISS1990,
     PATCHTST_SWISS1990,
+    REFORMER_SWISS1990,
     TIMEMIXER_SWISS1990,
     TIMESNET_SWISS1990,
     TIMEXER_SWISS1990,
@@ -994,4 +999,224 @@ class TestMambaTuneEmb:
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, MAMBA_SWISS1990['tune_emb'], 'mamba_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Nonstationary Transformer + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestNonstationaryTransformerSingleNoEmb:
+    """Nonstationary Transformer single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='nonstationary_transformer', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+            p_hidden_dims=[128, 128], p_hidden_layers=2,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, NONSTATIONARY_TRANSFORMER_SWISS1990['single_no_emb'], 'nstransformer_single_no_emb')
+
+
+class TestNonstationaryTransformerSingleEmb:
+    """Nonstationary Transformer single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='nonstationary_transformer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+            p_hidden_dims=[128, 128], p_hidden_layers=2,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, NONSTATIONARY_TRANSFORMER_SWISS1990['single_emb'], 'nstransformer_single_emb')
+
+
+class TestNonstationaryTransformerTuneNoEmb:
+    """Nonstationary Transformer Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='nonstationary_transformer', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+            p_hidden_dims=[128, 128], p_hidden_layers=2,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, NONSTATIONARY_TRANSFORMER_SWISS1990['tune_no_emb'], 'nstransformer_tune_no_emb')
+
+
+class TestNonstationaryTransformerTuneEmb:
+    """Nonstationary Transformer Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='nonstationary_transformer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+            p_hidden_dims=[128, 128], p_hidden_layers=2,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, NONSTATIONARY_TRANSFORMER_SWISS1990['tune_emb'], 'nstransformer_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# LightTS + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestLightTSSingleNoEmb:
+    """LightTS single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='lightts', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, LIGHTTS_SWISS1990['single_no_emb'], 'lightts_single_no_emb')
+
+
+class TestLightTSSingleEmb:
+    """LightTS single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='lightts', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, LIGHTTS_SWISS1990['single_emb'], 'lightts_single_emb')
+
+
+class TestLightTSTuneNoEmb:
+    """LightTS Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='lightts', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, LIGHTTS_SWISS1990['tune_no_emb'], 'lightts_tune_no_emb')
+
+
+class TestLightTSTuneEmb:
+    """LightTS Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='lightts', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, LIGHTTS_SWISS1990['tune_emb'], 'lightts_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Reformer + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestReformerSingleNoEmb:
+    """Reformer single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='reformer', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, REFORMER_SWISS1990['single_no_emb'], 'reformer_single_no_emb')
+
+
+class TestReformerSingleEmb:
+    """Reformer single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='reformer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, REFORMER_SWISS1990['single_emb'], 'reformer_single_emb')
+
+
+class TestReformerTuneNoEmb:
+    """Reformer Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='reformer', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, REFORMER_SWISS1990['tune_no_emb'], 'reformer_tune_no_emb')
+
+
+class TestReformerTuneEmb:
+    """Reformer Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='reformer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, REFORMER_SWISS1990['tune_emb'], 'reformer_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# GPT4TS + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestGPT4TSSingleNoEmb:
+    """GPT4TS single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='gpt4ts', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+            gpt_layers=6,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, GPT4TS_SWISS1990['single_no_emb'], 'gpt4ts_single_no_emb')
+
+
+class TestGPT4TSSingleEmb:
+    """GPT4TS single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='gpt4ts', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+            gpt_layers=6,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, GPT4TS_SWISS1990['single_emb'], 'gpt4ts_single_emb')
+
+
+class TestGPT4TSTuneNoEmb:
+    """GPT4TS Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='gpt4ts', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+            gpt_layers=6,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, GPT4TS_SWISS1990['tune_no_emb'], 'gpt4ts_tune_no_emb')
+
+
+class TestGPT4TSTuneEmb:
+    """GPT4TS Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='gpt4ts', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+            gpt_layers=6,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, GPT4TS_SWISS1990['tune_emb'], 'gpt4ts_tune_emb')
 
