@@ -2,8 +2,15 @@
 
 This document records the systematic comparison between the
 [Time-Series-Library (TSL)](https://github.com/thuml/Time-Series-Library)
-reference implementation and liulian for **PatchTST** and **DLinear** on
-standard long-term forecasting benchmarks.
+reference implementation and liulian for **11 model architectures** on
+standard long-term forecasting benchmarks (9 datasets, 94 experiments).
+
+**Models**: PatchTST, DLinear, Informer, Autoformer, FEDformer, TimesNet,
+Transformer, iTransformer, TimeMixer, TimeXer, Mamba + LSTM (native).
+
+**Status**: PatchTST and DLinear fully compared (17/18 matched). All other
+models have configs generated and comparison script entries ready —
+experiments pending execution.
 
 **Goal**: Ensure liulian produces results matching TSL when configured with the
 same hyperparameters and data splits.
@@ -517,6 +524,217 @@ Training time: TSL 18.6s / Liulian 11.1s
 | Diff | 0.0010 (0.02%) | 0.0001 |
 
 Training time: TSL 13.1s / Liulian 5.6s
+
+---
+
+## Informer Comparisons
+
+**Paper**: "Informer: Beyond Efficient Transformer for Long Sequence Time-Series Forecasting" (AAAI 2021 Best Paper, Zhou et al.)
+
+TSL scripts use: d_model=512, d_ff=2048, n_heads=8, e_layers=2, d_layers=1,
+factor=3, distil=True. Learning rate: 0.0001. Seed: 2021.
+
+| # | Dataset | Status | Config |
+|---|---------|--------|--------|
+| 19 | ETTh1 — Informer | ⏳ pending | `experiments/etth1/informer_config.yaml` |
+| 20 | ETTh2 — Informer | ⏳ pending | `experiments/etth2/informer_config.yaml` |
+| 21 | ETTm1 — Informer | ⏳ pending | `experiments/ettm1/informer_config.yaml` |
+| 22 | ETTm2 — Informer | ⏳ pending | `experiments/ettm2/informer_config.yaml` |
+| 23 | Weather — Informer | ⏳ pending | `experiments/weather/informer_config.yaml` |
+| 24 | ECL — Informer | ⏳ pending | `experiments/electricity/informer_config.yaml` |
+| 25 | Traffic — Informer | ⏳ pending | `experiments/traffic/informer_config.yaml` |
+| 26 | Exchange — Informer | ⏳ pending | `experiments/exchange_rate/informer_config.yaml` |
+| 27 | ILI — Informer | ⏳ pending | `experiments/illness/informer_config.yaml` |
+
+---
+
+## Autoformer Comparisons
+
+**Paper**: "Autoformer: Decomposition Transformers with Auto-Correlation for Long-Term Series Forecasting" (NeurIPS 2021, Wu et al.)
+
+TSL scripts use: d_model=512, d_ff=2048, n_heads=8, e_layers=2, d_layers=1,
+factor=3, moving_avg=25. Learning rate: 0.0001. Seed: 2021.
+
+| # | Dataset | Status | Config |
+|---|---------|--------|--------|
+| 28 | ETTh1 — Autoformer | ⏳ pending | `experiments/etth1/autoformer_config.yaml` |
+| 29 | ETTh2 — Autoformer | ⏳ pending | `experiments/etth2/autoformer_config.yaml` |
+| 30 | ETTm1 — Autoformer | ⏳ pending | `experiments/ettm1/autoformer_config.yaml` |
+| 31 | ETTm2 — Autoformer | ⏳ pending | `experiments/ettm2/autoformer_config.yaml` |
+| 32 | Weather — Autoformer | ⏳ pending | `experiments/weather/autoformer_config.yaml` |
+| 33 | ECL — Autoformer | ⏳ pending | `experiments/electricity/autoformer_config.yaml` |
+| 34 | Traffic — Autoformer | ⏳ pending | `experiments/traffic/autoformer_config.yaml` |
+| 35 | Exchange — Autoformer | ⏳ pending | `experiments/exchange_rate/autoformer_config.yaml` |
+| 36 | ILI — Autoformer | ⏳ pending | `experiments/illness/autoformer_config.yaml` |
+
+---
+
+## FEDformer Comparisons
+
+**Paper**: "FEDformer: Frequency Enhanced Decomposed Transformer for Long-term Series Forecasting" (ICML 2022, Zhou et al.)
+
+TSL scripts use: d_model=512, d_ff=2048, n_heads=8, e_layers=2, d_layers=1,
+factor=3, moving_avg=25. Learning rate: 0.0001. Seed: 2021.
+
+| # | Dataset | Status | Config |
+|---|---------|--------|--------|
+| 37 | ETTh1 — FEDformer | ⏳ pending | `experiments/etth1/fedformer_config.yaml` |
+| 38 | ETTh2 — FEDformer | ⏳ pending | `experiments/etth2/fedformer_config.yaml` |
+| 39 | ETTm1 — FEDformer | ⏳ pending | `experiments/ettm1/fedformer_config.yaml` |
+| 40 | ETTm2 — FEDformer | ⏳ pending | `experiments/ettm2/fedformer_config.yaml` |
+| 41 | Weather — FEDformer | ⏳ pending | `experiments/weather/fedformer_config.yaml` |
+| 42 | ECL — FEDformer | ⏳ pending | `experiments/electricity/fedformer_config.yaml` |
+| 43 | Traffic — FEDformer | ⏳ pending | `experiments/traffic/fedformer_config.yaml` |
+| 44 | Exchange — FEDformer | ⏳ pending | `experiments/exchange_rate/fedformer_config.yaml` |
+| 45 | ILI — FEDformer | ⏳ pending | `experiments/illness/fedformer_config.yaml` |
+
+---
+
+## TimesNet Comparisons
+
+**Paper**: "TimesNet: Temporal 2D-Variation Modeling for General Time Series Analysis" (ICLR 2023, Wu et al.)
+
+TSL scripts use MUCH smaller d_model/d_ff than other models. Per-dataset
+overrides: d_model=16–64, d_ff=32–128, e_layers=2, top_k=5, num_kernels=6.
+
+| # | Dataset | Status | Config | d_model | d_ff |
+|---|---------|--------|--------|---------|------|
+| 46 | ETTh1 — TimesNet | ⏳ pending | `experiments/etth1/timesnet_config.yaml` | 16 | 32 |
+| 47 | ETTh2 — TimesNet | ⏳ pending | `experiments/etth2/timesnet_config.yaml` | 32 | 64 |
+| 48 | ETTm1 — TimesNet | ⏳ pending | `experiments/ettm1/timesnet_config.yaml` | 32 | 64 |
+| 49 | ETTm2 — TimesNet | ⏳ pending | `experiments/ettm2/timesnet_config.yaml` | 32 | 64 |
+| 50 | Weather — TimesNet | ⏳ pending | `experiments/weather/timesnet_config.yaml` | 16 | 32 |
+| 51 | ECL — TimesNet | ⏳ pending | `experiments/electricity/timesnet_config.yaml` | 32 | 32 |
+| 52 | Traffic — TimesNet | ⏳ pending | `experiments/traffic/timesnet_config.yaml` | 32 | 32 |
+| 53 | Exchange — TimesNet | ⏳ pending | `experiments/exchange_rate/timesnet_config.yaml` | 32 | 64 |
+| 54 | ILI — TimesNet | ⏳ pending | `experiments/illness/timesnet_config.yaml` | 64 | 128 |
+
+---
+
+## Transformer Comparisons
+
+**Paper**: "Attention Is All You Need" (NeurIPS 2017, Vaswani et al.)
+
+TSL Transformer uses argparse defaults throughout: d_model=512, d_ff=2048,
+n_heads=8, e_layers=2, d_layers=1. Learning rate: 0.0001.
+
+| # | Dataset | Status | Config |
+|---|---------|--------|--------|
+| 55 | ETTh1 — Transformer | ⏳ pending | `experiments/etth1/transformer_config.yaml` |
+| 56 | ETTh2 — Transformer | ⏳ pending | `experiments/etth2/transformer_config.yaml` |
+| 57 | ETTm1 — Transformer | ⏳ pending | `experiments/ettm1/transformer_config.yaml` |
+| 58 | ETTm2 — Transformer | ⏳ pending | `experiments/ettm2/transformer_config.yaml` |
+| 59 | Weather — Transformer | ⏳ pending | `experiments/weather/transformer_config.yaml` |
+| 60 | ECL — Transformer | ⏳ pending | `experiments/electricity/transformer_config.yaml` |
+| 61 | Traffic — Transformer | ⏳ pending | `experiments/traffic/transformer_config.yaml` |
+| 62 | Exchange — Transformer | ⏳ pending | `experiments/exchange_rate/transformer_config.yaml` |
+| 63 | ILI — Transformer | ⏳ pending | `experiments/illness/transformer_config.yaml` |
+
+**Note**: TSL ECL Transformer script uses `--features S` (univariate), but
+liulian config uses `features: M` (multivariate) for consistency across the
+benchmark. This may cause a legitimate MSE difference.
+
+---
+
+## iTransformer Comparisons
+
+**Paper**: "iTransformer: Inverted Transformers Are Effective for Time Series Forecasting" (ICLR 2024 Spotlight, Liu et al.)
+
+TSL scripts use: d_model=512, d_ff=512 (smaller than usual), e_layers=3–4.
+iTransformer is encoder-only (no d_layers/decoder). TSL scripts only cover
+ETTh2, ECL, Weather, Traffic; other datasets use argparse defaults.
+
+| # | Dataset | Status | Config | Notes |
+|---|---------|--------|--------|-------|
+| 64 | ETTh1 — iTransformer | ⏳ pending | `experiments/etth1/itransformer_config.yaml` | Defaults |
+| 65 | ETTh2 — iTransformer | ⏳ pending | `experiments/etth2/itransformer_config.yaml` | TSL script |
+| 66 | ETTm1 — iTransformer | ⏳ pending | `experiments/ettm1/itransformer_config.yaml` | Defaults |
+| 67 | ETTm2 — iTransformer | ⏳ pending | `experiments/ettm2/itransformer_config.yaml` | Defaults |
+| 68 | Weather — iTransformer | ⏳ pending | `experiments/weather/itransformer_config.yaml` | TSL script |
+| 69 | ECL — iTransformer | ⏳ pending | `experiments/electricity/itransformer_config.yaml` | TSL script |
+| 70 | Traffic — iTransformer | ⏳ pending | `experiments/traffic/itransformer_config.yaml` | TSL script |
+| 71 | Exchange — iTransformer | ⏳ pending | `experiments/exchange_rate/itransformer_config.yaml` | Defaults |
+| 72 | ILI — iTransformer | ⏳ pending | `experiments/illness/itransformer_config.yaml` | Defaults |
+
+---
+
+## TimeMixer Comparisons
+
+**Paper**: "TimeMixer: Decomposable Multiscale Mixing for Time Series Forecasting" (ICLR 2024, Wang et al.)
+
+TSL scripts use very small d_model/d_ff (like TimesNet). Unique params:
+label_len=0, down_sampling_layers=3, down_sampling_window=2,
+down_sampling_method=avg. Learning rate varies (Weather: 0.01).
+TSL scripts available for 7 datasets (no Exchange, no ILI).
+
+| # | Dataset | Status | Config | Notes |
+|---|---------|--------|--------|-------|
+| 73 | ETTh1 — TimeMixer | ⏳ pending | `experiments/etth1/timemixer_config.yaml` | d_model=16, lr=0.01 |
+| 74 | ETTh2 — TimeMixer | ⏳ pending | `experiments/etth2/timemixer_config.yaml` | d_model=16, lr=0.01 |
+| 75 | ETTm1 — TimeMixer | ⏳ pending | `experiments/ettm1/timemixer_config.yaml` | d_model=16, lr=0.01 |
+| 76 | ETTm2 — TimeMixer | ⏳ pending | `experiments/ettm2/timemixer_config.yaml` | d_model=16, lr=0.01 |
+| 77 | Weather — TimeMixer | ⏳ pending | `experiments/weather/timemixer_config.yaml` | d_model=16, lr=0.01 |
+| 78 | ECL — TimeMixer | ⏳ pending | `experiments/electricity/timemixer_config.yaml` | d_model=32, lr=0.001 |
+| 79 | Traffic — TimeMixer | ⏳ pending | `experiments/traffic/timemixer_config.yaml` | d_model=32, lr=0.001 |
+
+---
+
+## TimeXer Comparisons
+
+**Paper**: "TimeXer: Empowering Transformers for Time Series Forecasting with Exogenous Variables" (NeurIPS 2024, Wang et al.)
+
+TSL scripts vary d_model/d_ff/e_layers per dataset. patch_len=16 (argparse
+default). TSL scripts available for 7 datasets (no Exchange, no ILI).
+
+| # | Dataset | Status | Config | d_model | d_ff | e_layers |
+|---|---------|--------|--------|---------|------|----------|
+| 80 | ETTh1 — TimeXer | ⏳ pending | `experiments/etth1/timexer_config.yaml` | 256 | 512 | 2 |
+| 81 | ETTh2 — TimeXer | ⏳ pending | `experiments/etth2/timexer_config.yaml` | 128 | 256 | 2 |
+| 82 | ETTm1 — TimeXer | ⏳ pending | `experiments/ettm1/timexer_config.yaml` | 128 | 256 | 1 |
+| 83 | ETTm2 — TimeXer | ⏳ pending | `experiments/ettm2/timexer_config.yaml` | 128 | 256 | 1 |
+| 84 | Weather — TimeXer | ⏳ pending | `experiments/weather/timexer_config.yaml` | 256 | 512 | 3 |
+| 85 | ECL — TimeXer | ⏳ pending | `experiments/electricity/timexer_config.yaml` | 256 | 512 | 2 |
+| 86 | Traffic — TimeXer | ⏳ pending | `experiments/traffic/timexer_config.yaml` | 512 | 512 | 3 |
+
+---
+
+## Mamba Comparisons
+
+**Paper**: "Mamba: Linear-Time Sequence Modeling with Selective State Spaces" (Gu & Dao, 2024)
+
+TSL scripts use: d_model=128, d_ff=16 (!), e_layers=2, expand=2, d_conv=4.
+d_ff is much smaller than the argparse default because the SSM scan replaces
+the feed-forward role. TSL scripts available for 8 datasets (no ILI).
+
+| # | Dataset | Status | Config |
+|---|---------|--------|--------|
+| 87 | ETTh1 — Mamba | ⏳ pending | `experiments/etth1/mamba_config.yaml` |
+| 88 | ETTh2 — Mamba | ⏳ pending | `experiments/etth2/mamba_config.yaml` |
+| 89 | ETTm1 — Mamba | ⏳ pending | `experiments/ettm1/mamba_config.yaml` |
+| 90 | ETTm2 — Mamba | ⏳ pending | `experiments/ettm2/mamba_config.yaml` |
+| 91 | Weather — Mamba | ⏳ pending | `experiments/weather/mamba_config.yaml` |
+| 92 | ECL — Mamba | ⏳ pending | `experiments/electricity/mamba_config.yaml` |
+| 93 | Traffic — Mamba | ⏳ pending | `experiments/traffic/mamba_config.yaml` |
+| 94 | Exchange — Mamba | ⏳ pending | `experiments/exchange_rate/mamba_config.yaml` |
+
+---
+
+## LSTM Comparisons (liulian-native, no TSL reference)
+
+LSTM is a liulian-native model (not from TSL). No TSL reference scripts exist.
+Included for completeness — configs use seed=2026, patience=10, lradj=none.
+
+| # | Dataset | Status | Config |
+|---|---------|--------|--------|
+| 95 | ETTh1 — LSTM | ⏳ pending | `experiments/etth1/lstm_config.yaml` |
+| 96 | ETTh2 — LSTM | ⏳ pending | `experiments/etth2/lstm_config.yaml` |
+| 97 | ETTm1 — LSTM | ⏳ pending | `experiments/ettm1/lstm_config.yaml` |
+| 98 | ETTm2 — LSTM | ⏳ pending | `experiments/ettm2/lstm_config.yaml` |
+| 99 | Weather — LSTM | ⏳ pending | `experiments/weather/lstm_config.yaml` |
+| 100 | ECL — LSTM | — | `experiments/electricity/lstm_config.yaml` (existing) |
+| 101 | Traffic — LSTM | — | `experiments/traffic/lstm_config.yaml` (existing) |
+| 102 | Exchange — LSTM | — | `experiments/exchange_rate/lstm_config.yaml` (existing) |
+| 103 | ILI — LSTM | ⏳ pending | `experiments/illness/lstm_config.yaml` |
 
 ---
 

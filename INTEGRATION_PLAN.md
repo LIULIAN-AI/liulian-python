@@ -5,6 +5,29 @@
 
 ---
 
+## Progress Summary
+
+### Part 1 — TSL Comparison Infrastructure (COMPLETED, commit `04d4f28`)
+
+- 17/18 PatchTST + DLinear benchmarks matched (≤5% MSE gap)
+- Fixed: metric aggregation bias, dataset class routing, hyperparameter defaults
+- Created comparison script with automated TSL vs liulian execution
+
+### Part 2 — Multi-Model Expansion (IN PROGRESS)
+
+| Deliverable | Status | Details |
+|-------------|--------|---------|
+| Config generator | ✅ Done | `experiments/adapt_tsl_lib/generate_configs.py` |
+| Per-dataset configs | ✅ Done | 114 configs (12 models × 9 datasets, 87 new) |
+| Comparison script | ✅ Done | 94 experiments across 11 models |
+| HPO search spaces | ✅ Done | All 12 models have search spaces + TimeLLM resolution fix |
+| Mamba import shim | ✅ Done | `liulian/models/torch/mamba.py` re-exports from `mamba_model` |
+| E2E anchor tests | ✅ Done | 48 test classes (12 models × 4 scenarios), baselines pending |
+| Documentation | ✅ Done | 103 experiments documented in `docs/tsl_comparison.md` |
+| Missing models | ⏳ Future | Nonstationary_Transformer, LightTS, Reformer, GPT4TS, TS-LLM |
+
+---
+
 ## Part A — Feature Inventory
 
 ### A.1 Models (16 architectures)

@@ -813,8 +813,15 @@ _RESOLVE_ORDER: list[tuple[str | None, str, bool | None, str]] = [
     # PatchTST (dataset-agnostic)
     (None, 'patchtst', True, 'patchtst_embedding'),
     (None, 'patchtst', False, 'patchtst'),
-    # TimeLLM swiss-river
+    # TimeLLM — per-dataset routing (dataset-specific spaces exist in registry)
     ('swiss-river', 'timellm', None, 'timellm_swissriver'),
+    ('ETTh1', 'timellm', None, 'timellm_etth1'),
+    ('ETTh2', 'timellm', None, 'timellm_etth2'),
+    ('ETTm', 'timellm', None, 'timellm_ettm'),       # covers ETTm1 & ETTm2
+    ('weather', 'timellm', None, 'timellm_weather'),
+    ('electricity', 'timellm', None, 'timellm_electricity'),
+    # STGNN swiss-river
+    ('swiss-river', 'stgnn', None, 'swiss_stgnn'),
 ]
 
 

@@ -13,9 +13,44 @@ To re-record, run::
     .venv/bin/python _record_baselines.py <scenario_name>
 
 then paste the output here.
+
+Models covered
+--------------
+* LSTM + Swiss River 1990 (per_entity)
+* DLinear + Swiss River 1990 (multi_channel)
+* PatchTST + Swiss River 1990 (multi_channel)
+* Informer + Swiss River 1990 (multi_channel)
+* Autoformer + Swiss River 1990 (multi_channel)
+* FEDformer + Swiss River 1990 (multi_channel)
+* TimesNet + Swiss River 1990 (multi_channel)
+* Transformer + Swiss River 1990 (multi_channel)
+* iTransformer + Swiss River 1990 (multi_channel)
+* TimeMixer + Swiss River 1990 (multi_channel)
+* TimeXer + Swiss River 1990 (multi_channel)
+* Mamba + Swiss River 1990 (multi_channel)
 """
 
 from __future__ import annotations
+
+
+def _placeholder(n: int = 4) -> dict[str, dict]:
+    """Return *n* placeholder scenario dicts with ``test_mse=None``.
+
+    When ``test_mse is None``, ``_assert_baseline`` fails with an
+    informative message asking the user to record baselines.
+    """
+    keys = ['single_no_emb', 'single_emb', 'tune_no_emb', 'tune_emb']
+    return {
+        k: {
+            'pred_shape': None,
+            'test_mse': None,
+            'test_rmse': None,
+            'test_mae': None,
+            'test_nse': None,
+            'pred_first5': None,
+        }
+        for k in keys[:n]
+    }
 
 # ── LSTM + Swiss River 1990 + per_entity mode ──────────────────────────────
 
@@ -200,3 +235,48 @@ PATCHTST_SWISS1990: dict[str, dict] = {
         ],
     },
 }
+
+
+# ── Informer + Swiss River 1990 + multi_channel mode ──────────────────────
+
+INFORMER_SWISS1990: dict[str, dict] = _placeholder()
+
+
+# ── Autoformer + Swiss River 1990 + multi_channel mode ─────────────────────
+
+AUTOFORMER_SWISS1990: dict[str, dict] = _placeholder()
+
+
+# ── FEDformer + Swiss River 1990 + multi_channel mode ──────────────────────
+
+FEDFORMER_SWISS1990: dict[str, dict] = _placeholder()
+
+
+# ── TimesNet + Swiss River 1990 + multi_channel mode ───────────────────────
+
+TIMESNET_SWISS1990: dict[str, dict] = _placeholder()
+
+
+# ── Transformer + Swiss River 1990 + multi_channel mode ────────────────────
+
+TRANSFORMER_SWISS1990: dict[str, dict] = _placeholder()
+
+
+# ── iTransformer + Swiss River 1990 + multi_channel mode ───────────────────
+
+ITRANSFORMER_SWISS1990: dict[str, dict] = _placeholder()
+
+
+# ── TimeMixer + Swiss River 1990 + multi_channel mode ──────────────────────
+
+TIMEMIXER_SWISS1990: dict[str, dict] = _placeholder()
+
+
+# ── TimeXer + Swiss River 1990 + multi_channel mode ───────────────────────
+
+TIMEXER_SWISS1990: dict[str, dict] = _placeholder()
+
+
+# ── Mamba + Swiss River 1990 + multi_channel mode ─────────────────────────
+
+MAMBA_SWISS1990: dict[str, dict] = _placeholder()

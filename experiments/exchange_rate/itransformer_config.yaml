@@ -1,0 +1,129 @@
+# Exchange Rate dataset: daily rates of 8 countries (1990-2016).
+# iTransformer (no TSL script — using TSL defaults)
+#
+# Usage:
+#   liulian run experiments/exchange_rate/itransformer_config.yaml
+#   liulian run experiments/exchange_rate/itransformer_config.yaml --quick_test
+
+# ── General ─────────────────────────────────────────────────────────────
+model: itransformer
+seed: 2021
+quick_test: false
+eval_only: false
+
+# ── Data ────────────────────────────────────────────────────────────────
+data: exchange_rate
+seq_len: 96
+pred_len: 96
+features: M
+label_len: 48
+train_split: 0.7
+max_samples: null
+freq: d
+
+# ── Task & mode ─────────────────────────────────────────────────────────
+task: forecast
+split_mode: multi_channel
+scaler: standard
+use_current_x: true
+use_full_history: false
+
+# ── Gap handling ────────────────────────────────────────────────────────
+short_subsequence_method: drop
+gap_mode: split
+max_mask_consecutive: 10
+
+# ── Noise injection ─────────────────────────────────────────────────────
+noise_type: null
+noise_level: 0.01
+noise_probability: 0.01
+noise_scale_factor: 5.0
+
+# ── Historical target ──────────────────────────────────────────────────
+include_historical_y: none
+include_historical_predicted_y: false
+
+# ── Entity identifiers ─────────────────────────────────────────────────
+identifier_mode: none
+id_integration: concat_to_x
+embedding_size: 10
+num_embeddings: null
+
+# ── Graph / spatial ─────────────────────────────────────────────────────
+graph_mode: none
+graphlet_num_hops: 1
+
+# ── Model architecture ─────────────────────────────────────────────────
+enc_in: null
+dec_in: 1
+c_out: 1
+d_model: 128
+d_ff: 128
+n_heads: 8
+e_layers: 2
+d_layers: 1
+dropout: 0.1
+individual: false
+moving_avg: 25
+patch_len: 16
+stride: 8
+
+# ── Training ────────────────────────────────────────────────────────────
+train_epochs: 10
+batch_size: 32
+learning_rate: 0.0001
+loss: mse
+metrics: rmse,mae,mse
+eval_denorm: true
+show_progress: true
+patience: 3
+disable_early_stopping: false
+lradj: type1
+pct_start: 0.2
+cos_T_max: 20
+cos_eta_min: 1.0e-8
+cos_T_0: 10
+cos_T_mult: 2
+step_size: 10
+gamma: 0.5
+milestones: "30,60,90"
+sched_patience: 5
+sched_factor: 0.5
+num_workers: 0
+
+# ── HPO (Ray Tune) ─────────────────────────────────────────────────────
+hpo: false
+hpo_num_samples: 200
+hpo_scheduler: asha
+hpo_grace_period: 5
+hpo_reduction_factor: 1.5
+hpo_storage_path: null
+hpo_resources_cpu: 1
+hpo_resources_gpu: 0.25
+hpo_num_cpus: null
+hpo_max_concurrent: null
+hpo_resume: false
+hpo_save_checkpoints: true
+hpo_trim_checkpoints: true
+hpo_keep_best_n: 10
+hpo_trim_best_n: true
+hpo_trim_keep_best: true
+hpo_trim_keep_last: false
+hpo_experiment_name: null
+hpo_local_mode: false
+
+# ── Logging ─────────────────────────────────────────────────────────────
+wandb_project: null
+wandb_entity: null
+dev_run: false
+
+# ── Visualisation ───────────────────────────────────────────────────────
+auto_viz: true
+viz_method: mean
+
+# ── Misc model keys (compat) ───────────────────────────────────────────
+embed: timeF
+activation: gelu
+output_attention: false
+factor: 3
+task_name: long_term_forecast

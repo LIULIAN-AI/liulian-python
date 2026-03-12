@@ -9,6 +9,13 @@ Currently anchored
 * **LSTM + Swiss River 1990** (per_entity mode) — 4 scenarios
   (single/tune × embedding/none)
 * **DLinear + Swiss River 1990** (multi_channel mode) — 4 scenarios
+* **PatchTST + Swiss River 1990** (multi_channel mode) — 4 scenarios
+
+Placeholder (baselines not yet recorded)
+-----------------------------------------
+* **Informer** / **Autoformer** / **FEDformer** / **TimesNet** /
+  **Transformer** / **iTransformer** / **TimeMixer** / **TimeXer** /
+  **Mamba** — each with 4 scenarios (single/tune × embedding/none)
   (single/tune × embedding/none)
 
 Baselines live in :pymod:`tests.e2e.baselines` so they can be imported
@@ -32,7 +39,20 @@ import os
 import numpy as np
 import pytest
 
-from tests.e2e.baselines import DLINEAR_SWISS1990, LSTM_SWISS1990, PATCHTST_SWISS1990
+from tests.e2e.baselines import (
+    AUTOFORMER_SWISS1990,
+    DLINEAR_SWISS1990,
+    FEDFORMER_SWISS1990,
+    INFORMER_SWISS1990,
+    ITRANSFORMER_SWISS1990,
+    LSTM_SWISS1990,
+    MAMBA_SWISS1990,
+    PATCHTST_SWISS1990,
+    TIMEMIXER_SWISS1990,
+    TIMESNET_SWISS1990,
+    TIMEXER_SWISS1990,
+    TRANSFORMER_SWISS1990,
+)
 
 pytestmark = pytest.mark.main_branch
 
@@ -449,4 +469,529 @@ class TestPatchTSTTuneEmb:
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, PATCHTST_SWISS1990['tune_emb'], 'patchtst_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# TSL enc-dec models — helper for shared overrides
+# ═══════════════════════════════════════════════════════════════════════
+
+def _enc_dec_overrides(**extra: object) -> dict:
+    """Shared config overrides for TSL encoder-decoder architectures.
+
+    Sets ``d_layers=1`` and ``label_len=5`` (half of seq_len=10) which
+    are required by all TSL enc-dec models (Informer, Autoformer,
+    FEDformer, Transformer, TimesNet).
+    """
+    overrides = {'d_layers': 1, 'label_len': 5}
+    overrides.update(extra)
+    return overrides
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Informer + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestInformerSingleNoEmb:
+    """Informer single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='informer', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+            **_enc_dec_overrides(factor=3),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, INFORMER_SWISS1990['single_no_emb'], 'informer_single_no_emb')
+
+
+class TestInformerSingleEmb:
+    """Informer single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='informer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+            **_enc_dec_overrides(factor=3),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, INFORMER_SWISS1990['single_emb'], 'informer_single_emb')
+
+
+class TestInformerTuneNoEmb:
+    """Informer Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='informer', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+            **_enc_dec_overrides(factor=3),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, INFORMER_SWISS1990['tune_no_emb'], 'informer_tune_no_emb')
+
+
+class TestInformerTuneEmb:
+    """Informer Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='informer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+            **_enc_dec_overrides(factor=3),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, INFORMER_SWISS1990['tune_emb'], 'informer_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Autoformer + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestAutoformerSingleNoEmb:
+    """Autoformer single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='autoformer', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+            **_enc_dec_overrides(factor=3),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, AUTOFORMER_SWISS1990['single_no_emb'], 'autoformer_single_no_emb')
+
+
+class TestAutoformerSingleEmb:
+    """Autoformer single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='autoformer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+            **_enc_dec_overrides(factor=3),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, AUTOFORMER_SWISS1990['single_emb'], 'autoformer_single_emb')
+
+
+class TestAutoformerTuneNoEmb:
+    """Autoformer Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='autoformer', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+            **_enc_dec_overrides(factor=3),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, AUTOFORMER_SWISS1990['tune_no_emb'], 'autoformer_tune_no_emb')
+
+
+class TestAutoformerTuneEmb:
+    """Autoformer Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='autoformer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+            **_enc_dec_overrides(factor=3),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, AUTOFORMER_SWISS1990['tune_emb'], 'autoformer_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# FEDformer + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestFEDformerSingleNoEmb:
+    """FEDformer single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='fedformer', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+            **_enc_dec_overrides(),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, FEDFORMER_SWISS1990['single_no_emb'], 'fedformer_single_no_emb')
+
+
+class TestFEDformerSingleEmb:
+    """FEDformer single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='fedformer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+            **_enc_dec_overrides(),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, FEDFORMER_SWISS1990['single_emb'], 'fedformer_single_emb')
+
+
+class TestFEDformerTuneNoEmb:
+    """FEDformer Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='fedformer', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+            **_enc_dec_overrides(),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, FEDFORMER_SWISS1990['tune_no_emb'], 'fedformer_tune_no_emb')
+
+
+class TestFEDformerTuneEmb:
+    """FEDformer Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='fedformer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+            **_enc_dec_overrides(),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, FEDFORMER_SWISS1990['tune_emb'], 'fedformer_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# TimesNet + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestTimesNetSingleNoEmb:
+    """TimesNet single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='timesnet', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+            **_enc_dec_overrides(top_k=5, num_kernels=6),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TIMESNET_SWISS1990['single_no_emb'], 'timesnet_single_no_emb')
+
+
+class TestTimesNetSingleEmb:
+    """TimesNet single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='timesnet', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+            **_enc_dec_overrides(top_k=5, num_kernels=6),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TIMESNET_SWISS1990['single_emb'], 'timesnet_single_emb')
+
+
+class TestTimesNetTuneNoEmb:
+    """TimesNet Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='timesnet', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+            **_enc_dec_overrides(top_k=5, num_kernels=6),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TIMESNET_SWISS1990['tune_no_emb'], 'timesnet_tune_no_emb')
+
+
+class TestTimesNetTuneEmb:
+    """TimesNet Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='timesnet', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+            **_enc_dec_overrides(top_k=5, num_kernels=6),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TIMESNET_SWISS1990['tune_emb'], 'timesnet_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Transformer + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestTransformerSingleNoEmb:
+    """Transformer single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='transformer', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+            **_enc_dec_overrides(),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TRANSFORMER_SWISS1990['single_no_emb'], 'transformer_single_no_emb')
+
+
+class TestTransformerSingleEmb:
+    """Transformer single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='transformer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+            **_enc_dec_overrides(),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TRANSFORMER_SWISS1990['single_emb'], 'transformer_single_emb')
+
+
+class TestTransformerTuneNoEmb:
+    """Transformer Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='transformer', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+            **_enc_dec_overrides(),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TRANSFORMER_SWISS1990['tune_no_emb'], 'transformer_tune_no_emb')
+
+
+class TestTransformerTuneEmb:
+    """Transformer Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='transformer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+            **_enc_dec_overrides(),
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TRANSFORMER_SWISS1990['tune_emb'], 'transformer_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# iTransformer + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestiTransformerSingleNoEmb:
+    """iTransformer single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='itransformer', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, ITRANSFORMER_SWISS1990['single_no_emb'], 'itransformer_single_no_emb')
+
+
+class TestiTransformerSingleEmb:
+    """iTransformer single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='itransformer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, ITRANSFORMER_SWISS1990['single_emb'], 'itransformer_single_emb')
+
+
+class TestiTransformerTuneNoEmb:
+    """iTransformer Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='itransformer', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, ITRANSFORMER_SWISS1990['tune_no_emb'], 'itransformer_tune_no_emb')
+
+
+class TestiTransformerTuneEmb:
+    """iTransformer Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='itransformer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, ITRANSFORMER_SWISS1990['tune_emb'], 'itransformer_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# TimeMixer + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestTimeMixerSingleNoEmb:
+    """TimeMixer single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='timemixer', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+            label_len=0, down_sampling_layers=3, down_sampling_window=2,
+            down_sampling_method='avg',
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TIMEMIXER_SWISS1990['single_no_emb'], 'timemixer_single_no_emb')
+
+
+class TestTimeMixerSingleEmb:
+    """TimeMixer single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='timemixer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+            label_len=0, down_sampling_layers=3, down_sampling_window=2,
+            down_sampling_method='avg',
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TIMEMIXER_SWISS1990['single_emb'], 'timemixer_single_emb')
+
+
+class TestTimeMixerTuneNoEmb:
+    """TimeMixer Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='timemixer', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+            label_len=0, down_sampling_layers=3, down_sampling_window=2,
+            down_sampling_method='avg',
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TIMEMIXER_SWISS1990['tune_no_emb'], 'timemixer_tune_no_emb')
+
+
+class TestTimeMixerTuneEmb:
+    """TimeMixer Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='timemixer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+            label_len=0, down_sampling_layers=3, down_sampling_window=2,
+            down_sampling_method='avg',
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TIMEMIXER_SWISS1990['tune_emb'], 'timemixer_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# TimeXer + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestTimeXerSingleNoEmb:
+    """TimeXer single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='timexer', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TIMEXER_SWISS1990['single_no_emb'], 'timexer_single_no_emb')
+
+
+class TestTimeXerSingleEmb:
+    """TimeXer single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='timexer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TIMEXER_SWISS1990['single_emb'], 'timexer_single_emb')
+
+
+class TestTimeXerTuneNoEmb:
+    """TimeXer Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='timexer', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TIMEXER_SWISS1990['tune_no_emb'], 'timexer_tune_no_emb')
+
+
+class TestTimeXerTuneEmb:
+    """TimeXer Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='timexer', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, TIMEXER_SWISS1990['tune_emb'], 'timexer_tune_emb')
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# Mamba + Swiss River 1990 (multi_channel mode)
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class TestMambaSingleNoEmb:
+    """Mamba single run (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='mamba', split_mode='multi_channel',
+            identifier_mode='none', hpo=False,
+            d_ff=16, expand=2, d_conv=4,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, MAMBA_SWISS1990['single_no_emb'], 'mamba_single_no_emb')
+
+
+class TestMambaSingleEmb:
+    """Mamba single run (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='mamba', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=False,
+            d_ff=16, expand=2, d_conv=4,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, MAMBA_SWISS1990['single_emb'], 'mamba_single_emb')
+
+
+class TestMambaTuneNoEmb:
+    """Mamba Ray Tune HPO (multi_channel mode, no embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='mamba', split_mode='multi_channel',
+            identifier_mode='none', hpo=True,
+            d_ff=16, expand=2, d_conv=4,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, MAMBA_SWISS1990['tune_no_emb'], 'mamba_tune_no_emb')
+
+
+class TestMambaTuneEmb:
+    """Mamba Ray Tune HPO (multi_channel mode, with channel embedding)."""
+
+    def test_pipeline(self, tmp_path):
+        cfg = _base_config(
+            model='mamba', split_mode='multi_channel',
+            identifier_mode='embedding', hpo=True,
+            d_ff=16, expand=2, d_conv=4,
+        )
+        result = _run_and_collect(cfg, tmp_path)
+        _assert_baseline(result, MAMBA_SWISS1990['tune_emb'], 'mamba_tune_emb')
 
