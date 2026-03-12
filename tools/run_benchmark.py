@@ -127,7 +127,7 @@ def run_single_experiment(
                 for k, v in config.items()
                 if not isinstance(v, (type,)) and k != 'model_class'
             },
-            'final_test': summary.get('final_test', {}),
+            'metrics': summary.get('metrics', {}),
             'best_val_score': summary.get('best_val_score', float('inf')),
             'epochs_run': summary.get('epochs_run', 0),
             'elapsed_seconds': elapsed,
@@ -359,7 +359,8 @@ def main() -> None:
 
             if result['status'] == 'success':
                 completed += 1
-                test_metrics = result.get('final_test', {})
+                result_metrics = result.get('metrics', {})
+                test_metrics = result_metrics.get('test', result.get('final_test', {}))
                 metric_str = ', '.join(f'{k}={v:.6f}' for k, v in test_metrics.items())
                 log.info(
                     'DONE: %s — %s (%.1fs)',

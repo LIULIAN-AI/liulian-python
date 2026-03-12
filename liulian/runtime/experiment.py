@@ -559,16 +559,19 @@ class Experiment:
             if _loaded_checkpoint:
                 # Evaluate the loaded model to populate train_result
                 train_result = {
-                    'best_val_mse': hpo_result.best_value,
+                    'best_val_score': hpo_result.best_value,
                     'epochs_run': 0,
                     'history': [],
-                    'final_test': {},
+                    'metrics': {'training': {}, 'validation': {}, 'test': {}},
                 }
                 if test_loader is not None:
                     test_metrics = trainer.evaluate(torch_model, test_loader)
-                    train_result['final_test'] = test_metrics
+                    train_result['metrics']['test'] = test_metrics
             else:
                 # No checkpoint available — retrain with best config
+                raise RuntimeError(
+                    'Best checkpoint not found after HPO.  Checkpoint saving may have been disabled. Please retrain with best config.'
+                )
                 logger.warning(
                     'No checkpoint available from HPO (checkpoint saving '
                     'may have been disabled). Retraining with best config.'
@@ -579,21 +582,22 @@ class Experiment:
                     val_loader,
                     test_loader,
                 )
-            summary['metrics']['training'] = {
-                'best_val_mse': train_result['best_val_mse'],
-                'epochs_run': train_result['epochs_run'],
-            }
-            summary['metrics']['history'] = train_result['history']
+            train_metrics = train_result.get('metrics', {})
+            summary['metrics']['training'] = train_metrics.get('training', {})
+            summary['metrics']['validation'] = train_metrics.get('validation', {})
+            summary['metrics']['test'] = train_metrics.get('test', {})
+            summary['metrics']['history'] = train_result.get('history', [])
+            summary['metrics']['best_val_score'] = train_result.get('best_val_score')
+            summary['metrics']['best_epoch'] = train_result.get('best_epoch')
+            summary['metrics']['epochs_run'] = train_result.get('epochs_run', 0)
 
             self._sm.transition(LifecycleState.EVAL)
-            if train_result.get('final_test'):
-                summary['metrics']['final_test'] = train_result['final_test']
-            self._fire('on_eval_end', metrics=train_result.get('final_test', {}))
+            self._fire('on_eval_end', metrics=train_metrics.get('test', {}))
 
-            # Compute task metrics + predictions on the retrained model
-            self._compute_task_metrics(
-                summary, torch_model, trainer
-            )  # todo: is this necessary if trainer.evaluate is already done?
+            # # Compute task metrics + predictions on the retrained model
+            # self._compute_task_metrics(
+            #     summary, torch_model, trainer
+            # )  # todo: is this necessary if trainer.evaluate is already done?
             if test_loader is not None:
                 pred_result = trainer.predict(torch_model, test_loader)
                 summary['predictions'] = pred_result
@@ -613,11 +617,14 @@ class Experiment:
             train_result = trainer.fit(
                 torch_model, train_loader, val_loader, test_loader
             )
-            summary['metrics']['training'] = {
-                'best_val_mse': train_result['best_val_mse'],
-                'epochs_run': train_result['epochs_run'],
-            }
-            summary['metrics']['history'] = train_result['history']
+            train_metrics = train_result.get('metrics', {})
+            summary['metrics']['training'] = train_metrics.get('training', {})
+            summary['metrics']['validation'] = train_metrics.get('validation', {})
+            summary['metrics']['test'] = train_metrics.get('test', {})
+            summary['metrics']['history'] = train_result.get('history', [])
+            summary['metrics']['best_val_score'] = train_result.get('best_val_score')
+            summary['metrics']['best_epoch'] = train_result.get('best_epoch')
+            summary['metrics']['epochs_run'] = train_result.get('epochs_run', 0)
 
             self._fire(
                 'on_epoch_end',
@@ -627,9 +634,7 @@ class Experiment:
 
             # Transition to EVAL
             self._sm.transition(LifecycleState.EVAL)
-            if train_result.get('final_test'):
-                summary['metrics']['final_test'] = train_result['final_test']
-            self._fire('on_eval_end', metrics=train_result.get('final_test', {}))
+            self._fire('on_eval_end', metrics=train_metrics.get('test', {}))
 
         elif eval and not train:
             # Eval-only: load checkpoint and evaluate
@@ -653,11 +658,14 @@ class Experiment:
                 self._fire('on_eval_end', metrics=test_metrics)
                 logger.info('Test metrics: %s', test_metrics)
 
-        # Compute liulian task-level metrics on a sample
-        self._compute_task_metrics(summary, torch_model, trainer)
+        # # Compute liulian task-level metrics on a sample
+        # self._compute_task_metrics(summary, torch_model, trainer)
 
-        # Collect raw predictions for downstream visualization
-        if test_loader is not None:  # todo: is this redundant with trainer.train with test_loader?
+        # Collect raw predictions for downstream visualization & .npz export.
+        # This is NOT redundant with per-epoch evaluate()—evaluate() only
+        # returns aggregate metrics; predict() returns raw (preds, trues, times)
+        # tensors needed by the viz pipeline.
+        if test_loader is not None:
             pred_result = trainer.predict(torch_model, test_loader)
             summary['predictions'] = pred_result
             logger.info(
@@ -683,7 +691,7 @@ class Experiment:
             import torch as _torch
 
             test_split = self.dataset.get_split('test')
-            X_sample, y_sample = test_split.get_batch(batch_size=32)
+            X_sample, y_sample = test_split.get_batch(batch_size=32)  # todo: this is computed on a given sample batch. Maybe remove it.
 
             cfg = self.config
             pred_len = cfg.get('pred_len', 1)

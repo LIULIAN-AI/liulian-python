@@ -26,7 +26,7 @@ from liulian.data.spec import FieldSpec, TopologySpec
 from liulian.data.ts.timeseriesdataset import TimeSeriesDataset, TimeSeriesSplit
 from liulian.data.st.spatialtempodataset import SpatialTempoDataset
 
-# CSV / PEMS datasets (TimeSeriesDataset subclasses)
+# CSV / PEMS datasets (SpatialTempoDataset subclasses)
 from liulian.data.csv_dataset import (
     CSVTimeSeriesDataset,
     CustomCSVDataset,

@@ -63,6 +63,7 @@ n_heads: 8
 e_layers: 2
 d_layers: 1
 dropout: 0.1
+individual: false
 patch_len: 16
 stride: 8
 

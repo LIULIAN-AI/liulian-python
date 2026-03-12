@@ -409,10 +409,26 @@ class TimeSeriesSplit(Dataset):
         for correct per-entity inverse-transform.
 
         When ``seq_len`` is set (forecast mode), the window is split:
+
         * ``x_enc``  = features ``[:seq_len]``
         * ``y_dec``  = targets  ``[seq_len:]``  (pred_len rows)
         * ``x_mark`` = time     ``[:seq_len]``
         * ``y_mark`` = time     ``[seq_len:]``
+
+        When ``label_len > 0`` (Transformer decoder warm-up), the
+        decoder target includes an overlap with the encoder tail::
+
+            x_enc  = feat[:seq_len]                   # (seq_len, D)
+            y_dec  = targ[seq_len - label_len :]      # (label_len + pred_len, D)
+            y_mark = time[seq_len - label_len :]      # matching time marks
+
+        The first ``label_len`` rows of ``y_dec`` are ground-truth
+        values the decoder uses as warm-up context; the remaining
+        ``pred_len`` rows are the actual prediction targets.
+
+        For **encoder-only models** (DLinear, PatchTST, etc.),
+        ``label_len`` should be 0 — these models ignore ``y_dec``
+        entirely so the overlap is unnecessary.
 
         Otherwise the full window is returned for both encoder and
         decoder (nowcast / full-history mode).
@@ -459,18 +475,26 @@ class TimeSeriesSplit(Dataset):
         if t.ndim == 1:
             t = t.unsqueeze(-1)
 
-        # Split into encoder / decoder parts
+        # ── Split into encoder / decoder parts ──────────────────────
+        # Matches TSL data_loader.py __getitem__ convention:
+        #   seq_x = data[i : i + seq_len]                 # encoder
+        #   seq_y = data[i + seq_len - ll : i + seq_len + pred_len]  # decoder
         s = self.seq_len
         if s is not None and s < x.shape[0]:
-            x_enc = x[:s]
-            x_mark = t[:s]
-            # label_len: include decoder warmup overlap (TSLib compat)
+            x_enc = x[:s]                 # (seq_len, D_x)
+            x_mark = t[:s]                # (seq_len, T_feat)
+
+            # label_len: Transformer decoder warm-up overlap.
+            # When ll > 0 the decoder target starts ll rows *before*
+            # the prediction boundary, overlapping with the encoder
+            # tail.  See module docstring and class docstring for the
+            # full window diagram.
             ll = self.label_len
             if ll is not None and ll > 0:
-                y_dec = y[s - ll :]
+                y_dec = y[s - ll :]       # (label_len + pred_len, D_y)
                 y_mark = t[s - ll :]
             else:
-                y_dec = y[s:]
+                y_dec = y[s:]             # (pred_len, D_y)
                 y_mark = t[s:]
         else:
             # Nowcast / full-history: no split
@@ -835,12 +859,12 @@ class TimeSeriesDataset(BaseDataset):
             if cols_present:
                 vals = df[cols_present].values.copy()
                 # Handle NaN: only transform non-NaN rows
-                nan_mask = np.isnan(vals).any(axis=1)
+                nan_mask = np.isnan(vals).any(axis=1)  # todo: maybe raise an error if there are NaNs.
                 if not nan_mask.all():
                     vals[~nan_mask] = scaler.transform(vals[~nan_mask])
                     df[cols_present] = vals
 
-    def inverse_transform(self, data):
+    def inverse_transform(self, data, **kwargs):
         """Inverse-transform normalized predictions back to original scale.
 
         Delegates to the fitted scaler when ``scaler_type`` is not ``'none'``.
@@ -849,6 +873,10 @@ class TimeSeriesDataset(BaseDataset):
         ----------
         data : numpy.ndarray or torch.Tensor
             Model predictions (any shape, last dim = n_features).
+        **kwargs :
+            Extra keyword arguments (``entity_ids``, ``timestamps``, …)
+            are accepted for API compatibility with callers that pass
+            per-batch metadata but are currently unused.
 
         Returns
         -------
@@ -1126,37 +1154,62 @@ class TimeSeriesDataset(BaseDataset):
         """Create train/val/test torch DataLoaders.
 
         Each batch yields
-        ``(batch_x, batch_y, batch_x_mark, batch_y_mark)`` — the
-        4-tuple format expected by :mod:`liulian.runtime.trainer`.
+        ``(batch_x, batch_y, batch_x_mark, batch_y_mark)`` or, when
+        per-sample entity IDs are available (i.e. when
+        ``TimeSeriesSplit.seg_entity_ids`` is set),
+        ``(batch_x, batch_y, batch_x_mark, batch_y_mark, entity_id_strs, entity_idx)``
+        — the format expected by :mod:`liulian.runtime.trainer`.
 
         For **forecasting** (window = seq_len + pred_len):
 
-        * ``batch_x``  = features  ``[:, :seq_len, :]``   — encoder input
-        * ``batch_y``  = targets   ``[:, :, :]``           — decoder target
-        * ``batch_x_mark`` = time values for encoder steps
-        * ``batch_y_mark`` = time values for decoder steps
+        * ``batch_x``      — features  ``[:, :seq_len, :]``  (encoder input)  #  todo: make sure this is correct
+        * ``batch_y``      — targets   ``[:, :, :]``          (full decoder window)
+        * ``batch_x_mark`` — time values for encoder steps
+        * ``batch_y_mark`` — time values ``cat(encoder, decoder)``
+        * ``entity_id_strs`` (optional) — list of entity-ID strings (length B)
+        * ``entity_idx``     (optional) — integer station indices (B,)
         """
         import torch
         from torch.utils.data import DataLoader
 
         seq_len = self.seq_len
 
+        # Build station_id → integer index mapping for embedding mode.
+        # Used only when entity IDs are available in the split.
+        _station_to_idx = {sid: i for i, sid in enumerate(self.station_ids)}
+
         def _collate(batch):
+            # Each item is a 4-tuple or 5-tuple (with entity_id string)
             n_fields = len(batch[0])
             fields = list(zip(*batch))
 
             xs, ys, x_mark, y_mark = fields[0], fields[1], fields[2], fields[3]
+            entity_id_strs = list(fields[4]) if n_fields > 4 else None
 
-            x = torch.stack(xs)  # (B, seq_len, D_x)
-            y = torch.stack(ys)  # (B, pred_len, D_y)
-            xt = torch.stack(x_mark)  # (B, seq_len, ...)
-            yt = torch.stack(y_mark)  # (B, pred_len, ...)
+            x = torch.stack(xs)       # (B, seq_len, D_x)
+            y = torch.stack(ys)       # (B, pred_len, D_y)  or (B, label_len+pred_len, D_y)
+            xt = torch.stack(x_mark)  # (B, seq_len, T_feat)
+            yt = torch.stack(y_mark)  # (B, *, T_feat)
 
             batch_x = x[:, :seq_len, :]
             batch_y = y
             batch_x_mark = xt[:, :seq_len]
             batch_y_mark = torch.cat([xt[:, :seq_len], yt], dim=1)
 
+            if entity_id_strs is not None:
+                # Convert string station IDs → integer index tensor (B,)
+                entity_idx = torch.tensor(
+                    [_station_to_idx.get(s, 0) for s in entity_id_strs],
+                    dtype=torch.long,
+                )
+                return (
+                    batch_x,
+                    batch_y,
+                    batch_x_mark,
+                    batch_y_mark,
+                    entity_id_strs,
+                    entity_idx,
+                )
             return batch_x, batch_y, batch_x_mark, batch_y_mark
 
         def _make(split_name: str) -> DataLoader:

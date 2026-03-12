@@ -22,10 +22,12 @@ Individual building blocks are also exposed for fine-grained control::
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 import random
 import time
+from datetime import datetime
 from typing import Any, Dict, Optional
 
 import numpy as np
@@ -115,6 +117,10 @@ _CSV_DATASET_MAP: Dict[str, tuple] = {
     'exchange_rate': ('dataset/exchange_rate', 'exchange_rate.csv'),
     'weather': ('dataset/weather', 'weather.csv'),
     'illness': ('dataset/illness', 'national_illness.csv'),
+    'ETTh1': ('dataset/ETT-small', 'ETTh1.csv'),
+    'ETTh2': ('dataset/ETT-small', 'ETTh2.csv'),
+    'ETTm1': ('dataset/ETT-small', 'ETTm1.csv'),
+    'ETTm2': ('dataset/ETT-small', 'ETTm2.csv'),
 }
 
 _PEMS_DATASET_MAP: Dict[str, tuple] = {
@@ -132,11 +138,19 @@ def build_dataset(config: Dict[str, Any]) -> Any:
     CSV-based benchmarks (traffic, electricity, exchange_rate, weather,
     illness), and PEMS traffic sensor datasets (PEMS03/04/07/08).
 
+    If the dataset files are not found locally, an automatic download is
+    attempted (see :mod:`liulian.data.download`).
+
     Returns:
         A dataset object with ``get_split()`` and ``get_data_loaders()``.
     """
+    from liulian.data.download import ensure_dataset
+
     noise_kwargs = build_noise_kwargs(config)
     data_name = config['data']
+
+    # Auto-download if files are missing
+    ensure_dataset(data_name)
 
     if data_name.startswith('swiss-river'):
         from liulian.data.swiss_river import SwissRiverDataset
@@ -166,12 +180,12 @@ def build_dataset(config: Dict[str, Any]) -> Any:
         )
 
     elif data_name in _CSV_DATASET_MAP:
-        from liulian.data.csv_dataset import CustomCSVDataset
-
         root_subdir, csv_filename = _CSV_DATASET_MAP[data_name]
         root_path = os.path.join(PROJECT_ROOT, root_subdir)
 
-        dataset = CustomCSVDataset(
+        # ETT datasets need their specific classes with hardcoded
+        # 12/4/4-month borders to match TSL convention exactly.
+        _common_kwargs = dict(
             root_path=root_path,
             data_path=csv_filename,
             size=(config['seq_len'], config.get('label_len', 0), config['pred_len']),
@@ -183,7 +197,19 @@ def build_dataset(config: Dict[str, Any]) -> Any:
             freq=config.get('freq', 'h'),
             identifier_mode=config.get('identifier_mode', 'none'),
             id_integration=config.get('id_integration', 'concat_to_x'),
+            graph_mode=config.get('graph_mode', 'none'),
         )
+
+        if data_name in ('ETTh1', 'ETTh2'):
+            from liulian.data.csv_dataset import ETTHourDataset
+            dataset = ETTHourDataset(**_common_kwargs)
+        elif data_name in ('ETTm1', 'ETTm2'):
+            from liulian.data.csv_dataset import ETTMinuteDataset
+            dataset = ETTMinuteDataset(**_common_kwargs)
+        else:
+            from liulian.data.csv_dataset import CustomCSVDataset
+            dataset = CustomCSVDataset(**_common_kwargs)
+
         # Propagate split_mode for info()
         dataset.split_mode = config.get('split_mode', 'multi_channel')
 
@@ -202,6 +228,7 @@ def build_dataset(config: Dict[str, Any]) -> Any:
             scaler_type=config.get('scaler', 'standard'),
             identifier_mode=config.get('identifier_mode', 'none'),
             id_integration=config.get('id_integration', 'concat_to_x'),
+            graph_mode=config.get('graph_mode', 'none'),
         )
         # Propagate split_mode for info()
         dataset.split_mode = config.get('split_mode', 'multi_channel')
@@ -250,7 +277,7 @@ def print_dataset_summary(dataset: Any) -> None:
                 split.targ_dim,
             )
         except KeyError:
-            pass
+            raise ValueError(f'Dataset missing expected split: "{name}".') from None
 
 
 def auto_detect_enc_in(dataset: Any) -> int:
@@ -310,22 +337,49 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
 
     model_name = config['model']
 
-    # Auto-detect enc_in
+    # Auto-detect enc_in from the training split's feature dimension.
     if config.get('enc_in') is None and dataset is not None:
         config['enc_in'] = auto_detect_enc_in(dataset)
         logger.info('Auto-detected enc_in=%d from training data', config['enc_in'])
 
-    # In multi-channel mode with features='M', c_out should match enc_in
-    # (predict all channels). Override c_out=1 default.
+    # ── Auto-detect c_out / dec_in based on features mode ───────────────
+    #
+    # TSL convention (from Time-Series-Library run.py and experiment scripts):
+    #   enc_in = dec_in = c_out = number_of_data_channels  (always equal)
+    #
+    # Feature modes (--features flag):
+    #   'M'  (Multivariate→Multivariate): All non-date columns as input and
+    #        output.  enc_in = dec_in = c_out = num_channels.
+    #   'MS' (Multivariate→Single): All columns as input, but only the
+    #        target column is used for the loss.  enc_in = dec_in = c_out
+    #        = num_channels.  The f_dim=-1 slicing in the trainer selects
+    #        only the last column (target) for loss computation.
+    #   'S'  (Single→Single): Only the target column is used as input
+    #        and output.  enc_in = dec_in = c_out = 1.
+    #
+    # In multi_channel mode, the config YAML typically sets c_out=1 as a
+    # placeholder.  We override it here to match enc_in for both M and MS
+    # modes, since the model always outputs all channels — the MS target
+    # selection happens at loss time via f_dim, not via c_out.
+    #
+    # References:
+    #   - TSL data_loader.py Dataset_Custom.__read_data__: features handling
+    #   - TSL exp_long_term_forecasting.py: f_dim slicing in train/vali/test
+    #   - TSL scripts/long_term_forecast/: enc_in=dec_in=c_out=num_channels
+    features = config.get('features', 'M')
     if (
         config.get('split_mode') == 'multi_channel'
-        and config.get('features', 'M') in ('M', 'MS')
+        and features in ('M', 'MS')
         and config.get('c_out') in (None, 1)
         and config.get('enc_in') is not None
         and config['enc_in'] > 1
     ):
         config['c_out'] = config['enc_in']
         config['dec_in'] = config['enc_in']
+        logger.info(
+            'Auto-set c_out=%d, dec_in=%d for features=%r (multi_channel mode)',
+            config['c_out'], config['dec_in'], features,
+        )
 
     ns = SimpleNamespace(**config)
 
@@ -333,13 +387,13 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
     if model_name == 'timellm':
         ns.content = _load_prompt_content(config)
 
-    if (
-        config.get('id_integration') == 'add_after_patch'
-        and not (model_name == 'patchtst' and config.get('identifier_mode') == 'embedding')
-    ):
-        raise ValueError(
-            "id_integration='add_after_patch' is only supported for model='patchtst' with identifier_mode='embedding'."
-        )
+    if config.get('id_integration') == 'add_after_patch':
+        if not model_name == 'patchtst':
+            raise ValueError(
+                "id_integration='add_after_patch' is only supported for model='patchtst' with identifier_mode='embedding'."
+            )
+        if not config.get('identifier_mode') == 'embedding':
+            logger.warning('id_integration=add_after_patch has no effect when identifier_mode is not embedding.')
 
     # Dynamic import for all models
     _module_name = model_name
@@ -564,7 +618,7 @@ def build_experiment(
         metrics=parse_metric_names(config.get('metrics', 'rmse,mae,nse')),
     )
 
-    # Spec
+    # Spec — comprehensive snapshot of every experiment parameter
     model_name = config.get('model', 'model')
     spec = ExperimentSpec(
         name=f'{config.get("data", "data")}_{model_name}'
@@ -572,24 +626,67 @@ def build_experiment(
         task={
             'type': 'PredictionTask',
             'pred_len': config['pred_len'],
+            'seq_len': config['seq_len'],
             'task': config.get('task', 'forecast'),
             'loss': config.get('loss', 'mse'),
             'metrics': parse_metric_names(config.get('metrics', 'rmse,mae,nse')),
+            'features': config.get('features', 'M'),
         },
         dataset={
             'type': type(dataset).__name__,
             'data': config.get('data'),
+            'features': config.get('features', 'M'),
             'split_mode': config.get('split_mode'),
+            'scaler': config.get('scaler'),
+            'train_split': config.get('train_split'),
             'graph_mode': config.get('graph_mode'),
             'identifier_mode': config.get('identifier_mode'),
+            'id_integration': config.get('id_integration'),
+            'embedding_size': config.get('embedding_size'),
             'noise_type': config.get('noise_type'),
+            'noise_level': config.get('noise_level'),
+            'gap_mode': config.get('gap_mode'),
+            'short_subsequence_method': config.get('short_subsequence_method'),
+            'include_historical_y': config.get('include_historical_y'),
         },
         model={
             'type': model_name,
-            'd_model': config.get('d_model'),
             'enc_in': config.get('enc_in'),
+            'dec_in': config.get('dec_in'),
+            'c_out': config.get('c_out'),
+            'd_model': config.get('d_model'),
+            'd_ff': config.get('d_ff'),
+            'n_heads': config.get('n_heads'),
+            'e_layers': config.get('e_layers'),
+            'd_layers': config.get('d_layers'),
+            'dropout': config.get('dropout'),
+            'patch_len': config.get('patch_len'),
+            'stride': config.get('stride'),
+            'individual': config.get('individual'),
+            'moving_avg': config.get('moving_avg'),
+            'embed': config.get('embed'),
+            'activation': config.get('activation'),
         },
-        metadata={'seed': config.get('seed')},
+        optimizer={
+            'learning_rate': config.get('learning_rate'),
+            'lradj': config.get('lradj'),
+            'train_epochs': config.get('train_epochs'),
+            'batch_size': config.get('batch_size'),
+            'patience': config.get('patience'),
+            'eval_denorm': config.get('eval_denorm'),
+        },
+        logger={
+            'wandb_project': config.get('wandb_project'),
+            'wandb_entity': config.get('wandb_entity'),
+            'dev_run': config.get('dev_run'),
+        },
+        metadata={
+            'seed': config.get('seed'),
+            'hpo': config.get('hpo', False),
+            'hpo_num_samples': config.get('hpo_num_samples'),
+            'quick_test': config.get('quick_test', False),
+            'timestamp': datetime.now().isoformat(timespec='seconds'),
+        },
     )
 
     # Optimizer
@@ -641,6 +738,9 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
     # ── Quick-test overrides ────────────────────────────────────────
     if config.get('quick_test', False):
         apply_quick_test(config)
+
+    # ── Print experiment info ───────────────────────────────────────
+    print_experiment_info(config)
 
     # ── Build ───────────────────────────────────────────────────────
     dataset = build_dataset(config)
@@ -703,7 +803,12 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
         logger.ok('Raw predictions saved → %s', npz_path)
 
     # ── Console report ──────────────────────────────────────────────
-    print_report(config, summary, elapsed)
+    print_report(config, summary, elapsed, model)
+
+    # ── Results JSON ────────────────────────────────────────────────
+    results = build_results_dict(config, summary, elapsed, model)
+    results_path = os.path.join(artifacts_dir, 'results.json')
+    save_results_json(results, results_path)
 
     # ── Cleanup logger ──────────────────────────────────────────────
     exp_logger = getattr(exp, 'exp_logger', None)
@@ -716,42 +821,367 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
     return summary
 
 
-# ── Report ──────────────────────────────────────────────────────────────
+# ── Report & Results ────────────────────────────────────────────────────
+
+
+def _bold(text: str) -> str:
+    """Wrap *text* in ANSI bold escape codes."""
+    return f'\033[1m{text}\033[0m'
+
+
+def _kv_line(key: str, value: Any, key_width: int = 24) -> str:
+    """Format a single key-value pair with aligned columns."""
+    return f'  {key:<{key_width}} {value}'
+
+
+def _gpu_info() -> Dict[str, Any]:
+    """Collect GPU information (name, memory, CUDA version)."""
+    info: Dict[str, Any] = {'available': False}
+    try:
+        import torch
+
+        if torch.cuda.is_available():
+            info['available'] = True
+            info['device_count'] = torch.cuda.device_count()
+            info['current_device'] = torch.cuda.current_device()
+            info['device_name'] = torch.cuda.get_device_name(0)
+            mem = torch.cuda.get_device_properties(0).total_memory
+            info['total_memory_gb'] = round(mem / (1024**3), 1)
+            info['cuda_version'] = torch.version.cuda or 'N/A'
+        else:
+            info['device_name'] = 'CPU'
+    except ImportError:
+        info['device_name'] = 'CPU (torch not available)'
+    return info
+
+
+def _count_parameters(model: Any) -> Dict[str, int]:
+    """Count total and trainable parameters in a PyTorch model."""
+    try:
+        total = sum(p.numel() for p in model.parameters())
+        trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+        return {'total': total, 'trainable': trainable}
+    except Exception:
+        return {'total': 0, 'trainable': 0}
+
+
+def _format_param_count(n: int) -> str:
+    """Format a parameter count with K/M suffix."""
+    if n >= 1_000_000:
+        return f'{n / 1_000_000:.2f}M'
+    if n >= 1_000:
+        return f'{n / 1_000:.1f}K'
+    return str(n)
+
+
+def print_experiment_info(config: Dict[str, Any]) -> None:
+    """Print a comprehensive, formatted summary of experiment settings.
+
+    Called *before* training starts so the user can verify configuration.
+    Inspired by TSL's ``print_args()`` with bold category headers and
+    aligned key-value pairs.
+    """
+    W = 62
+    print(f'\n{"━" * W}')
+    print(_bold(f'  {"EXPERIMENT CONFIGURATION":^{W - 2}}'))
+    print(f'{"━" * W}')
+
+    # ── Basic Config ────────────────────────────────────────────────
+    print(_bold('  Basic Config'))
+    print(_kv_line('Model', config.get('model', 'N/A')))
+    print(_kv_line('Seed', config.get('seed', 2026)))
+    print(_kv_line('Quick test', config.get('quick_test', False)))
+    print(_kv_line('Eval only', config.get('eval_only', False)))
+
+    # ── Data ────────────────────────────────────────────────────────
+    print(_bold('\n  Data'))
+    print(_kv_line('Dataset', config.get('data', 'N/A')))
+    print(_kv_line('Features', config.get('features', 'M')))
+    print(_kv_line('Sequence length', config.get('seq_len', 'N/A')))
+    print(_kv_line('Prediction length', config.get('pred_len', 'N/A')))
+    print(_kv_line('Split mode', config.get('split_mode', 'N/A')))
+    print(_kv_line('Scaler', config.get('scaler', 'N/A')))
+    print(_kv_line('Train split', config.get('train_split', 'N/A')))
+
+    # ── Entity & Spatial ────────────────────────────────────────────
+    print(_bold('\n  Entity & Spatial'))
+    print(_kv_line('Identifier mode', config.get('identifier_mode', 'none')))
+    print(_kv_line('ID integration', config.get('id_integration', 'N/A')))
+    print(_kv_line('Graph mode', config.get('graph_mode', 'none')))
+
+    # ── Model Architecture ──────────────────────────────────────────
+    print(_bold('\n  Model Architecture'))
+    for k in (
+        'enc_in', 'dec_in', 'c_out', 'd_model', 'd_ff',
+        'n_heads', 'e_layers', 'd_layers', 'dropout',
+        'patch_len', 'stride', 'individual', 'moving_avg',
+    ):
+        v = config.get(k)
+        if v is not None:
+            print(_kv_line(k, v))
+
+    # ── Training ────────────────────────────────────────────────────
+    print(_bold('\n  Training'))
+    print(_kv_line('Epochs', config.get('train_epochs', 'N/A')))
+    print(_kv_line('Batch size', config.get('batch_size', 'N/A')))
+    print(_kv_line('Learning rate', config.get('learning_rate', 'N/A')))
+    print(_kv_line('LR scheduler', config.get('lradj', 'none')))
+    print(_kv_line('Loss', config.get('loss', 'mse')))
+    print(_kv_line('Metrics', config.get('metrics', 'N/A')))
+    print(_kv_line('Patience', config.get('patience', 'N/A')))
+    print(_kv_line('Eval denorm', config.get('eval_denorm', True)))
+
+    # ── Noise ───────────────────────────────────────────────────────
+    noise_type = config.get('noise_type')
+    if noise_type:
+        print(_bold('\n  Noise Injection'))
+        print(_kv_line('Type', noise_type))
+        print(_kv_line('Level', config.get('noise_level', 0.01)))
+        print(_kv_line('Probability', config.get('noise_probability', 0.01)))
+
+    # ── HPO ─────────────────────────────────────────────────────────
+    if config.get('hpo', False):
+        print(_bold('\n  HPO (Ray Tune)'))
+        print(_kv_line('Num samples', config.get('hpo_num_samples', 100)))
+        print(_kv_line('Scheduler', config.get('hpo_scheduler', 'asha')))
+        print(_kv_line('Grace period', config.get('hpo_grace_period', 5)))
+        print(_kv_line('Resume', config.get('hpo_resume', False)))
+
+    # ── GPU ─────────────────────────────────────────────────────────
+    gpu = _gpu_info()
+    print(_bold('\n  GPU'))
+    print(_kv_line('Device', gpu.get('device_name', 'CPU')))
+    if gpu.get('available'):
+        print(_kv_line('CUDA version', gpu.get('cuda_version', 'N/A')))
+        print(_kv_line('Total memory', f'{gpu.get("total_memory_gb", "?")} GB'))
+        print(_kv_line('Device count', gpu.get('device_count', 1)))
+
+    print(f'{"━" * W}\n')
 
 
 def print_report(
     config: Dict[str, Any],
     summary: Dict[str, Any],
     elapsed: float,
+    model: Any = None,
 ) -> None:
-    """Print a human-readable summary to stdout (matches run.py output)."""
+    """Print a comprehensive, formatted post-experiment report."""
+    W = 62
     spec_name = (
         f'{config.get("data", "data")}_{config.get("model", "model")}'
         f'_{config.get("task", "forecast")}_{config.get("split_mode", "per_entity")}'
     )
-    print(f'\n{"=" * 60}')
-    print(f'Experiment : {spec_name}')
-    print(f'Data       : {config["data"]}  (split_mode={config["split_mode"]})')
+
+    print(f'\n{"═" * W}')
+    print(_bold(f'  {"EXPERIMENT RESULTS":^{W - 2}}'))
+    print(f'{"═" * W}')
+
+    # ── Experiment ──────────────────────────────────────────────────
+    print(_bold('  Experiment'))
+    print(_kv_line('Name', spec_name))
+    print(_kv_line('Data', f'{config["data"]}  (split_mode={config["split_mode"]})'))
     print(
-        f'Task       : {config["task"]}  '
-        f'(seq={config["seq_len"]}, pred={config["pred_len"]}, '
-        f'full_hist={config["use_full_history"]})'
+        _kv_line(
+            'Task',
+            f'{config["task"]}  (seq={config["seq_len"]}, '
+            f'pred={config["pred_len"]})',
+        )
     )
-    print(f'Graph      : {config["graph_mode"]}')
-    print(f'Noise      : {config.get("noise_type") or "none"}')
-    print(f'Identifiers: {config["identifier_mode"]} [{config["id_integration"]}]')
-    print(
-        f'Gaps       : {config["gap_mode"]} '
-        f'(short_subseq={config["short_subsequence_method"]})'
-    )
-    print(f'Hist. y    : {config["include_historical_y"]}')
-    print(f'Elapsed    : {elapsed:.1f}s')
-    print(f'Artifacts  : {summary.get("artifacts_dir", "N/A")}')
-    for key, val in summary.get('metrics', {}).items():
-        if key == 'history':
-            continue
-        print(f'  {key}: {val}')
-    if 'hpo' in summary.get('metrics', {}):
-        hpo = summary['metrics']['hpo']
-        print(f'  HPO best: {hpo["best_value"]:.6f}  trials: {hpo["n_trials"]}')
-    print(f'{"=" * 60}')
+    print(_kv_line('Model', config.get('model', 'N/A')))
+
+    # ── Model size ──────────────────────────────────────────────────
+    if model is not None:
+        params = _count_parameters(model)
+        print(_bold('\n  Model Size'))
+        print(_kv_line('Total params', _format_param_count(params['total'])))
+        print(_kv_line('Trainable params', _format_param_count(params['trainable'])))
+
+    # ── Timing ──────────────────────────────────────────────────────
+    print(_bold('\n  Timing'))
+    print(_kv_line('Total elapsed', f'{elapsed:.1f}s'))
+
+    # ── Metrics ─────────────────────────────────────────────────────
+    metrics = summary.get('metrics', {})
+    if metrics:
+        print(_bold('\n  Metrics'))
+        for key, val in metrics.items():
+            if key == 'history':
+                continue
+            if isinstance(val, dict):
+                continue
+            if isinstance(val, float):
+                print(_kv_line(key, f'{val:.6f}'))
+            else:
+                print(_kv_line(key, val))
+
+    # ── HPO ─────────────────────────────────────────────────────────
+    if 'hpo' in metrics:
+        hpo = metrics['hpo']
+        print(_bold('\n  HPO Results'))
+        print(
+            _kv_line('Best value', f'{hpo.get("best_value", "N/A"):.6f}')
+            if isinstance(hpo.get('best_value'), (int, float))
+            else _kv_line('Best value', hpo.get('best_value', 'N/A'))
+        )
+        print(_kv_line('Trials', hpo.get('n_trials', 'N/A')))
+        if 'best_hparams' in hpo:
+            print(_kv_line('Best hparams', ''))
+            for k, v in hpo['best_hparams'].items():
+                print(f'    {k}: {v}')
+
+    # ── Artifacts ───────────────────────────────────────────────────
+    print(_bold('\n  Output'))
+    print(_kv_line('Artifacts', summary.get('artifacts_dir', 'N/A')))
+    print(f'{"═" * W}\n')
+
+
+# ── Results JSON ────────────────────────────────────────────────────────
+
+
+def build_results_dict(
+    config: Dict[str, Any],
+    summary: Dict[str, Any],
+    elapsed: float,
+    model: Any = None,
+) -> Dict[str, Any]:
+    """Build a comprehensive results dictionary for JSON serialisation.
+
+    The returned dict contains all information needed to reproduce,
+    compare, and analyse the experiment results.  See
+    ``docs/results_json.md`` for a detailed field reference.
+    """
+    gpu = _gpu_info()
+    params = _count_parameters(model) if model is not None else {'total': 0, 'trainable': 0}
+
+    # Extract metrics from summary (new structure: training/validation/test)
+    raw_metrics = summary.get('metrics', {})
+    structured_metrics: Dict[str, Any] = {
+        'training': raw_metrics.get('training', {}),
+        'validation': raw_metrics.get('validation', {}),
+        'test': raw_metrics.get('test', {}),
+    }
+    # Include scalar top-level metrics (best_val_score, best_epoch, epochs_run)
+    for k in ('best_val_score', 'best_epoch', 'epochs_run'):
+        v = raw_metrics.get(k)
+        if v is not None:
+            structured_metrics[k] = round(v, 8) if isinstance(v, float) else v
+
+    # HPO info
+    hpo_info: Optional[Dict[str, Any]] = None
+    if raw_metrics.get('hpo'):
+        hpo_raw = raw_metrics['hpo']
+        hpo_info = {
+            'best_value': hpo_raw.get('best_value'),
+            'n_trials': hpo_raw.get('n_trials'),
+            'best_hparams': hpo_raw.get('best_hparams', {}),
+        }
+        structured_metrics['hpo'] = hpo_info
+
+    # Training history summary (loss curves)
+    history = raw_metrics.get('history')
+    history_summary: Optional[Dict[str, Any]] = None
+    if history and isinstance(history, list) and len(history) > 0:
+        # History is a list of epoch records; summarise per-metric
+        history_summary = {
+            'n_epochs': len(history),
+            'final_train_loss': history[-1].get('train_loss'),
+        }
+
+    results: Dict[str, Any] = {
+        'experiment': {
+            'name': (
+                f'{config.get("data", "data")}_{config.get("model", "model")}'
+                f'_{config.get("task", "forecast")}_{config.get("split_mode", "per_entity")}'
+            ),
+            'timestamp': datetime.now().isoformat(timespec='seconds'),
+            'seed': config.get('seed', 2026),
+            'quick_test': config.get('quick_test', False),
+        },
+        'data': {
+            'dataset': config.get('data'),
+            'features': config.get('features', 'M'),
+            'seq_len': config.get('seq_len'),
+            'pred_len': config.get('pred_len'),
+            'split_mode': config.get('split_mode'),
+            'scaler': config.get('scaler'),
+            'train_split': config.get('train_split'),
+            'noise_type': config.get('noise_type'),
+            'noise_level': config.get('noise_level') if config.get('noise_type') else None,
+            'identifier_mode': config.get('identifier_mode'),
+            'graph_mode': config.get('graph_mode'),
+        },
+        'model': {
+            'type': config.get('model'),
+            'enc_in': config.get('enc_in'),
+            'd_model': config.get('d_model'),
+            'd_ff': config.get('d_ff'),
+            'n_heads': config.get('n_heads'),
+            'e_layers': config.get('e_layers'),
+            'd_layers': config.get('d_layers'),
+            'dropout': config.get('dropout'),
+            'patch_len': config.get('patch_len'),
+            'stride': config.get('stride'),
+            'individual': config.get('individual'),
+            'total_params': params['total'],
+            'trainable_params': params['trainable'],
+        },
+        'training': {
+            'epochs': config.get('train_epochs'),
+            'batch_size': config.get('batch_size'),
+            'learning_rate': config.get('learning_rate'),
+            'lr_scheduler': config.get('lradj'),
+            'loss': config.get('loss'),
+            'patience': config.get('patience'),
+            'eval_denorm': config.get('eval_denorm'),
+        },
+        'hpo': hpo_info,
+        'metrics': structured_metrics,
+        'history': history_summary,
+        'timing': {
+            'total_seconds': round(elapsed, 2),
+            'total_human': _format_time(elapsed),
+        },
+        'gpu': {
+            'device': gpu.get('device_name', 'CPU'),
+            'cuda_version': gpu.get('cuda_version'),
+            'memory_gb': gpu.get('total_memory_gb'),
+        },
+        'artifacts_dir': summary.get('artifacts_dir'),
+    }
+    return results
+
+
+def _format_time(seconds: float) -> str:
+    """Format seconds into a human-readable string."""
+    if seconds < 60:
+        return f'{seconds:.1f}s'
+    minutes = int(seconds // 60)
+    secs = seconds % 60
+    if minutes < 60:
+        return f'{minutes}m {secs:.0f}s'
+    hours = int(minutes // 60)
+    mins = minutes % 60
+    return f'{hours}h {mins}m {secs:.0f}s'
+
+
+def save_results_json(results: Dict[str, Any], path: str) -> None:
+    """Save results dictionary to a JSON file and print a summary.
+
+    Args:
+        results: Comprehensive results dict from :func:`build_results_dict`.
+        path: Target file path.
+    """
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, 'w', encoding='utf-8') as fh:
+        json.dump(results, fh, indent=2, default=str, ensure_ascii=False)
+    logger.ok('Results JSON saved → %s', path)
+
+    # Print only metrics and timing to stdout
+    summary_sections: Dict[str, Any] = {}
+    if 'metrics' in results:
+        summary_sections['metrics'] = results['metrics']
+    if 'timing' in results:
+        summary_sections['timing'] = results['timing']
+    if summary_sections:
+        print(f'\n{_bold("Results")} → {path}')
+        print(json.dumps(summary_sections, indent=2, default=str, ensure_ascii=False))

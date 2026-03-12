@@ -210,10 +210,10 @@ def run_single_model(
         elapsed = time.time() - t0
 
         metrics = summary.get('metrics', {})
-        final_test = metrics.get('final_test', {})
+        test_metrics = metrics.get('test', metrics.get('final_test', {}))
         task_metrics = metrics.get('task_metrics', {})
-        mse_val = final_test.get('mse', task_metrics.get('mse', float('nan')))
-        mae_val = final_test.get('mae', task_metrics.get('mae', float('nan')))
+        mse_val = test_metrics.get('mse', task_metrics.get('mse', float('nan')))
+        mae_val = test_metrics.get('mae', task_metrics.get('mae', float('nan')))
         return {
             'model': model_name,
             'params': param_count,

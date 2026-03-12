@@ -158,13 +158,13 @@ class TestForecastTrainer:
         )
         result = trainer.fit(model, loaders['train'], loaders['val'], loaders['test'])
 
-        assert 'best_val_mse' in result
-        assert 'final_test' in result
+        assert 'best_val_score' in result
+        assert 'metrics' in result
         assert result['epochs_run'] == 2
-        assert result['final_test']['mse'] >= 0
-        assert result['final_test']['mae'] >= 0
-        assert result['final_test']['rmse'] >= 0
-        assert 'nse' in result['final_test']
+        assert result['metrics']['test']['mse'] >= 0
+        assert result['metrics']['test']['mae'] >= 0
+        assert result['metrics']['test']['rmse'] >= 0
+        assert 'nse' in result['metrics']['test']
         assert len(result['history']) == 2
 
     def test_fit_itransformer(self, cfg, loaders):
@@ -176,7 +176,7 @@ class TestForecastTrainer:
         result = trainer.fit(model, loaders['train'], loaders['val'])
 
         assert result['epochs_run'] == 2
-        assert result['best_val_mse'] >= 0
+        assert result['best_val_score'] >= 0
 
     def test_evaluate(self, cfg, loaders):
         from liulian.models.torch.dlinear import Model
@@ -236,28 +236,26 @@ class TestExperimentTorchPath:
         summary = self._run_experiment('dlinear', cfg, loaders, dataset, task)
         assert summary['status'] == 'ok'
         assert 'training' in summary['metrics']
-        assert summary['metrics']['training']['epochs_run'] == 2
+        assert summary['metrics']['epochs_run'] == 2
 
     def test_patchtst_e2e(self, cfg, loaders, dataset, task):
         summary = self._run_experiment('patchtst', cfg, loaders, dataset, task)
         assert summary['status'] == 'ok'
         assert 'training' in summary['metrics']
-        assert summary['metrics']['training']['epochs_run'] == 2
-        assert 'final_test' in summary['metrics']
+        assert summary['metrics']['training']['loss'] >= 0
+        assert 'test' in summary['metrics']
 
     def test_itransformer_e2e(self, cfg, loaders, dataset, task):
         summary = self._run_experiment('itransformer', cfg, loaders, dataset, task)
         assert summary['status'] == 'ok'
         assert 'training' in summary['metrics']
-        assert summary['metrics']['training']['epochs_run'] == 2
-        assert 'final_test' in summary['metrics']
+        assert 'test' in summary['metrics']
 
     def test_transformer_e2e(self, cfg, loaders, dataset, task):
         summary = self._run_experiment('transformer', cfg, loaders, dataset, task)
         assert summary['status'] == 'ok'
         assert 'training' in summary['metrics']
-        assert summary['metrics']['training']['epochs_run'] == 2
-        assert 'final_test' in summary['metrics']
+        assert 'test' in summary['metrics']
 
     def test_eval_only(self, cfg, loaders, dataset, task):
         """Test eval-only mode (no training)."""

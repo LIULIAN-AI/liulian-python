@@ -4,6 +4,8 @@
 
 > *Where Space and Time Converge in Intelligence*
 
+[![Docs](https://img.shields.io/badge/docs-online-blue?logo=materialformkdocs)](https://jajupmochi.github.io/liulian-python)
+
 ---
 
 A research-oriented Python library for spatiotemporal model experimentation — training, evaluation, and inference over time-series, graph, and spatiotemporal data.

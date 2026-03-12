@@ -1,4 +1,4 @@
-"""CSV-based time-series datasets built on :class:`TimeSeriesDataset`.
+"""CSV-based spatiotemporal datasets built on :class:`SpatialTempoDataset`.
 
 Provides a unified hierarchy that replaces the duplicated TSLib-style
 dataset classes (``ETTHourDataset``, ``ETTMinuteDataset``,
@@ -6,15 +6,65 @@ dataset classes (``ETTHourDataset``, ``ETTMinuteDataset``,
 backward-compatible with the 4-tuple contract
 ``(seq_x, seq_y, seq_x_mark, seq_y_mark)`` expected by all models.
 
+Class hierarchy::
+
+    BaseDataset (ABC)
+    └── TimeSeriesDataset
+        └── SpatialTempoDataset  (adds graph_mode / edge_index / adj_matrix)
+            └── CSVTimeSeriesDataset  (adds CSV loading, borders, time features)
+                ├── ETTHourDataset   (12/4/4-month hourly borders)
+                ├── ETTMinuteDataset (12/4/4-month 15-min borders)
+                └── CustomCSVDataset (ratio-based borders — traffic, electricity, …)
+
 Key features:
 
 * Inherits all windowing / gap / noise / entity logic from
   :class:`TimeSeriesDataset`.
-* Adds ``scaler_type`` support for configurable normalisation.
+* Adds ``scaler_type`` support for configurable normalization.
 * ``label_len`` (decoder warmup) is forwarded to :class:`TimeSeriesSplit`
   for Transformer-style models.
 * Time features are generated and passed as the time column so that
   ``TimeSeriesSplit.__getitem__`` returns proper ``x_mark`` / ``y_mark``.
+
+seq_len / label_len / pred_len
+------------------------------
+These three parameters define the sliding-window geometry, following the
+Time-Series-Library (TSL) convention:
+
+* ``seq_len``   — encoder input length (look-back context).
+* ``pred_len``  — prediction horizon length.
+* ``label_len`` — decoder warm-up overlap (Transformer models only).
+
+Window layout in ``__getitem__``::
+
+    |--------------seq_len--------------|
+                        |---label_len---|---pred_len---|
+                                        ^
+                               prediction starts here
+
+    seq_x = data[i : i + seq_len]                   # encoder input
+    seq_y = data[i + seq_len - label_len :
+                 i + seq_len + pred_len]             # decoder target
+
+The last ``label_len`` rows of the encoder input overlap with the first
+``label_len`` rows of the decoder target.  At training time, the
+experiment code constructs:
+
+    dec_inp = cat([batch_y[:, :label_len, :], zeros(pred_len)])
+
+This gives the Transformer decoder ground-truth warm-up tokens followed
+by zero placeholders that it must learn to predict.
+
+**Encoder-only models** (DLinear, PatchTST, etc.) accept ``x_dec`` in
+their ``forward()`` signature for API compatibility, but **completely
+ignore it**.  Setting ``label_len=0`` for these models is recommended to
+avoid constructing unused decoder inputs.  There is no data-leakage risk
+either way — the overlap region is already seen by the encoder.
+
+features modes ('M' / 'MS' / 'S')
+----------------------------------
+See the inline comments in :meth:`CSVTimeSeriesDataset._load_and_split`
+and in :func:`liulian.pipeline.build_model` for detailed explanations.
 
 Migration guide::
 
@@ -40,7 +90,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from liulian.data.ts.timeseriesdataset import TimeSeriesDataset, TimeSeriesSplit
+from liulian.data.st.spatialtempodataset import SpatialTempoDataset
 
 try:
     from liulian.utils.timefeatures import time_features
@@ -58,7 +108,31 @@ def _time_features_from_dates(
     freq: str = 'h',
     timeenc: int = 0,
 ) -> np.ndarray:
-    """Extract time features from datetime index.
+    """Extract time features from a datetime index.
+
+    Two encoding modes are supported, matching the Time-Series-Library
+    (TSL) ``data_factory.py`` convention:
+
+    ``timeenc=1`` (*default in TSL* — used when ``embed='timeF'``)
+        Delegates to :func:`liulian.utils.timefeatures.time_features`,
+        which produces **continuous features normalized to [-0.5, 0.5]**
+        via GluonTS-style feature extractors.  For hourly data this
+        yields 4 dimensions: HourOfDay, DayOfWeek, DayOfMonth,
+        DayOfYear.  This is the **recommended** encoding and the one
+        used by all standard TSL benchmark scripts.
+
+    ``timeenc=0`` (categorical / manual encoding)
+        Produces hand-crafted normalized features in [-0.5, 0.5]:
+        ``month/12-0.5``, ``day/31-0.5``, ``weekday/6-0.5``,
+        ``hour/23-0.5`` (plus ``minute/59-0.5`` for minutely data).
+
+        .. note::
+
+           TSL's ``timeenc=0`` uses **raw integers** (month 1-12,
+           day 1-31 etc.) instead of normalized values. Our version
+           normalizes to [-0.5, 0.5] for better neural-network
+           compatibility.  This is an intentional deviation — see
+           ``docs/datasets.md`` for details.
 
     Parameters
     ----------
@@ -67,7 +141,7 @@ def _time_features_from_dates(
     freq : str
         Frequency hint (``'h'``, ``'t'``/``'min'``, etc.).
     timeenc : int
-        0 = categorical encoding, 1 = ``time_features()`` from utils.
+        0 = categorical (normalized), 1 = ``time_features()`` (default).
 
     Returns
     -------
@@ -80,7 +154,8 @@ def _time_features_from_dates(
             return tf.transpose(1, 0).numpy()
         return tf.transpose(1, 0)
 
-    # Categorical encoding (timeenc == 0 or fallback)
+    # Categorical encoding (timeenc == 0 or fallback).
+    # Normalized to [-0.5, 0.5] — see docstring for TSL deviation note.
     features = [
         dates.month / 12.0 - 0.5,
         dates.day / 31.0 - 0.5,
@@ -97,8 +172,12 @@ def _time_features_from_dates(
 # ---------------------------------------------------------------------------
 
 
-class CSVTimeSeriesDataset(TimeSeriesDataset):
-    """Base class for CSV-backed time-series datasets.
+class CSVTimeSeriesDataset(SpatialTempoDataset):
+    """Base class for CSV-backed spatiotemporal datasets.
+
+    Inherits from :class:`SpatialTempoDataset`, which adds graph /
+    spatial structure (``graph_mode``, ``edge_index``, ``adj_matrix``)
+    on top of :class:`TimeSeriesDataset`.
 
     Loads a CSV file, splits into train/val/test based on row borders,
     optionally applies scaling, and produces time-mark features.
@@ -127,9 +206,17 @@ class CSVTimeSeriesDataset(TimeSeriesDataset):
         Time encoding mode (0 or 1).
     freq : str
         Frequency string for time features.
+    graph_mode : str
+        Passed to :class:`SpatialTempoDataset`.
+        ``'none'`` | ``'edge_index'`` | ``'adj_matrix'``.
+    graph_metadata : dict | None
+        Passed to :class:`SpatialTempoDataset`.
+
+    Any additional keyword arguments are forwarded through the
+    ``SpatialTempoDataset → TimeSeriesDataset`` chain.
     """
 
-    domain: str = 'timeseries'
+    domain: str = 'spatiotemporal'
     version: str = '2.0'
 
     def __init__(
@@ -176,8 +263,22 @@ class CSVTimeSeriesDataset(TimeSeriesDataset):
         splits, feature_cols, target_cols, time_col, tf_cols = self._load_and_split()
 
         # Auto-detect station_ids from feature columns if not provided.
+        #
         # For multi-entity CSV datasets (traffic, electricity, etc.),
-        # each non-date column (including target in M/MS mode) is a channel.
+        # each data column represents a sensor / client / entity.  In
+        # features='M' or 'MS' mode, *all* non-date columns (including
+        # the target column 'OT') are treated as data channels.
+        #
+        # TSL convention: enc_in = dec_in = c_out = num_data_columns.
+        # For traffic: 861 sensor columns + 1 'OT' column = 862 channels.
+        # 'OT' is simply the last column (a road-occupancy sensor like
+        # the others) designated as the "target" for MS mode, but in M
+        # mode all 862 channels are predicted equally.
+        #
+        # The station_ids list is used for:
+        #   1. Entity embedding lookup (num_embeddings = len(station_ids))
+        #   2. Per-entity inverse transform
+        #   3. Per-channel reporting in visualization
         if 'station_ids' not in kwargs:
             if len(feature_cols) > 1:
                 kwargs['station_ids'] = feature_cols
@@ -220,19 +321,43 @@ class CSVTimeSeriesDataset(TimeSeriesDataset):
         # Ensure 'date' column exists
         if 'date' not in df_raw.columns:
             raise ValueError(
-                f"CSV must contain a 'date' column. "
+                f'CSV must contain a "date" column. '
                 f'Found columns: {list(df_raw.columns)}'
             )
 
         # Reorder columns: date, ...features, target
         cols = list(df_raw.columns)
         cols.remove('date')
-        if self.target in cols:
+        if self.target in cols:  # Ensure target is last for convenience (not strictly required)
             cols.remove(self.target)
             cols.append(self.target)
         df_raw = df_raw[['date'] + cols]
 
-        # Feature / target selection
+        # ── Feature / target column selection ──────────────────────────
+        #
+        # TSL features modes (from Time-Series-Library data_loader.py):
+        #
+        #   'M'  (Multivariate → Multivariate):
+        #        Input = ALL non-date columns.  Output = ALL columns.
+        #        enc_in = dec_in = c_out = len(data_cols).
+        #        Example: traffic (862 cols → predict all 862).
+        #
+        #   'MS' (Multivariate → Single):
+        #        Input = ALL non-date columns.  Output = only target col.
+        #        enc_in = dec_in = c_out = len(data_cols) — the model
+        #        still outputs all channels, but the trainer uses
+        #        f_dim=-1 to select only the last column (target) for
+        #        the loss.  This is the standard TSL convention.
+        #        Example: electricity (321 cols in → predict only 'OT').
+        #
+        #   'S'  (Single → Single):
+        #        Input = only target column.  Output = target column.
+        #        enc_in = dec_in = c_out = 1.
+        #        Example: univariate forecasting of 'OT' only.
+        #
+        # In all modes, the target column is reordered to be LAST in
+        # the DataFrame (see column reordering above), so f_dim=-1
+        # always selects it correctly in MS mode.
         if self.features in ('M', 'MS'):
             data_cols = [c for c in df_raw.columns if c != 'date']
         elif self.features == 'S':
@@ -278,7 +403,25 @@ class CSVTimeSeriesDataset(TimeSeriesDataset):
         self,
         n: int,
     ) -> Tuple[list[int], list[int]]:
-        """Return ``(border1s, border2s)`` for train/val/test.
+        """Return ``(border1s, border2s)`` for train/val/test splits.
+
+        Each split is defined by a half-open interval
+        ``[border1[i], border2[i])`` of row indices into the original
+        DataFrame.
+
+        **Border offset trick** (from TSL ``Dataset_Custom``):
+
+        Val and test splits start at ``X - seq_len`` instead of ``X``
+        so that the first sliding window in each split can look back
+        ``seq_len`` rows into the *preceding* split's data for context.
+        Without this offset the first few windows would lack sufficient
+        history::
+
+            |<------ train ------>|<------ val ------>|<--- test --->|
+            0             num_train                              n
+                          ↑
+                    val border1 = num_train - seq_len
+                    (allows first val window to see seq_len context)
 
         Must be overridden by subclasses with specific split logic.
         Default: 70/10/20 ratio split.
@@ -330,7 +473,11 @@ class ETTHourDataset(CSVTimeSeriesDataset):
         )
 
     def _compute_borders(self, n: int):
-        # 12 months train, 4 months val, 4 months test (hourly)
+        # ETT hourly: fixed 12/4/4-month calendar split.
+        # At 24 hours/day × 30 days/month:
+        #   train = rows [0, 8640)           — months 1–12
+        #   val   = rows [8640-seq_len, 12480) — months 13–16 (with context)
+        #   test  = rows [12480-seq_len, 17280) — months 17–20 (with context)
         b = [0, 12 * 30 * 24, 12 * 30 * 24 + 4 * 30 * 24, 12 * 30 * 24 + 8 * 30 * 24]
         # Cap at actual data length
         b = [min(v, n) for v in b]
@@ -379,7 +526,11 @@ class ETTMinuteDataset(CSVTimeSeriesDataset):
         )
 
     def _compute_borders(self, n: int):
-        # 12 months train, 4 months val, 4 months test (15-min)
+        # ETT 15-minute: fixed 12/4/4-month calendar split.
+        # At 4 samples/hour × 24 hours/day × 30 days/month = 2880/month:
+        #   train = rows [0, 34560)            — months 1–12
+        #   val   = rows [34560-seq_len, 46080) — months 13–16
+        #   test  = rows [46080-seq_len, 57600) — months 17–20
         m = 4  # 4x hourly
         b = [
             0,
@@ -438,6 +589,15 @@ class CustomCSVDataset(CSVTimeSeriesDataset):
         )
 
     def _compute_borders(self, n: int):
+        # Ratio-based split matching TSL Dataset_Custom:
+        #   num_vali = n - num_train - num_test  (the remainder)
+        #   train: [0, num_train)
+        #   val:   [num_train - seq_len, num_train + num_vali)
+        #   test:  [n - num_test - seq_len, n)
+        #
+        # The -seq_len offset on val/test border1 allows the first
+        # sliding window in each split to have seq_len context rows
+        # from the preceding split.  See base class docstring.
         num_train = int(n * self.train_ratio)
         num_test = int(n * self.test_ratio)
         border1s = [0, num_train - self.seq_len, n - num_test - self.seq_len]

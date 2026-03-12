@@ -670,6 +670,6 @@ class TestE2EDummy:
 
         assert summary['status'] == 'ok'
         assert 'training' in summary['metrics']
-        assert summary['metrics']['training']['epochs_run'] == 2
+        assert summary['metrics']['epochs_run'] == 2
         assert 'predictions' in summary
         assert summary['predictions']['preds'].shape[1] == pred_len

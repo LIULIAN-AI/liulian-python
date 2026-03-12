@@ -336,6 +336,7 @@ def save_prediction_plots(
     output_dir: str = 'artifacts',
     title_prefix: str = '',
     target_names: Sequence[str] | None = None,
+    max_channels: int = 20,
 ) -> Dict[str, str]:
     """High-level helper: aggregate → plot → save.
 
@@ -357,13 +358,35 @@ def save_prediction_plots(
         Prepended to plot titles.
     target_names : list of str or None
         Column labels.
+    max_channels : int
+        Maximum number of output channels to plot.  When the data has
+        more channels (e.g. 862, as in Traffic), only the first
+        ``max_channels`` are plotted to avoid excessive memory use and
+        matplotlib rendering failures.
 
     Returns
     -------
     dict
         Mapping of plot name → file path for each saved figure.
     """
+    import logging as _logging
+
+    _log = _logging.getLogger(__name__)
+
     from liulian.viz.prediction_aggregator import aggregate_predictions
+
+    # ── Guard: limit channels to avoid OOM / OOB on high-dim data ───
+    C = preds.shape[-1] if preds.ndim >= 3 else 1
+    if C > max_channels:
+        _log.warning(
+            'Prediction has %d channels — truncating to %d for viz.',
+            C,
+            max_channels,
+        )
+        preds = preds[..., :max_channels]
+        trues = trues[..., :max_channels]
+        if target_names is not None:
+            target_names = list(target_names)[:max_channels]
 
     result = aggregate_predictions(
         preds,

@@ -1,17 +1,12 @@
-# Swiss River experiment — PatchTST configuration
+# Swiss River — PatchTST (channel-independent patching)
 #
-# PatchTST operates in multi_channel mode where all stations are
-# treated as separate channels in a channel-independent transformer.
-# Input shape: (B, seq_len, N_stations)  →  Output: (B, pred_len, N_stations)
-#
-# PatchTST applies patching + linear embedding and uses a standard
-# Transformer encoder.  Channel independence means each variate is
-# processed independently, so enc_in does not need entity embedding.
+# Swiss river water temperature (1990+).
+# PatchTST uses multi_channel mode with entity embedding injected
+# after the patch embedding layer (add_after_patch).
 #
 # Usage:
 #   liulian run experiments/swiss_river/patchtst_config.yaml
 #   liulian run experiments/swiss_river/patchtst_config.yaml --quick_test
-#   liulian run experiments/swiss_river/patchtst_config.yaml --pred_len 14
 
 # ── General ─────────────────────────────────────────────────────────────
 model: patchtst
@@ -20,9 +15,9 @@ quick_test: false
 eval_only: false
 
 # ── Data ────────────────────────────────────────────────────────────────
-data: swiss-river-1990            # swiss-river-1990 | swiss-river-2010 | swiss-river-zurich
-seq_len: 90                       # Look-back window
-pred_len: 7                       # Forecast horizon
+data: swiss-river-1990
+seq_len: 90
+pred_len: 7
 features: M
 label_len: 0
 train_split: 0.8
@@ -30,8 +25,8 @@ max_samples: null
 
 # ── Task & mode ─────────────────────────────────────────────────────────
 task: forecast
-split_mode: multi_channel           # multi_channel mode: all stations as channels
-scaler: standard                     # per-feature zero-mean/unit-var (matches TSLib)
+split_mode: multi_channel
+scaler: standard
 use_current_x: true
 use_full_history: false
 
@@ -41,7 +36,7 @@ gap_mode: split
 max_mask_consecutive: 10
 
 # ── Noise injection ─────────────────────────────────────────────────────
-noise_type: null
+noise_type: null                  # null | gaussian | gaussian_a | impulse | impulse_a | quantization
 noise_level: 0.01
 noise_probability: 0.01
 noise_scale_factor: 5.0
@@ -51,8 +46,6 @@ include_historical_y: none
 include_historical_predicted_y: false
 
 # ── Entity identifiers ─────────────────────────────────────────────────
-# PatchTST default: entity-aware mode with patch-token integration.
-# Use identifier_mode='none' to disable entity information.
 identifier_mode: embedding
 id_integration: add_after_patch
 embedding_size: 10
@@ -63,47 +56,71 @@ graph_mode: none
 graphlet_num_hops: 1
 
 # ── Model architecture ─────────────────────────────────────────────────
-enc_in: null                      # Auto-detected (= N_stations)
+enc_in: null
 dec_in: 1
 c_out: 1
-d_model: 128                     # PatchTST paper: 128 for small datasets
-d_ff: 256                        # Feed-forward dimension
-n_heads: 16                      # PatchTST paper: 16
-e_layers: 3                      # PatchTST paper: 3 encoder layers
+d_model: 128
+d_ff: 256
+n_heads: 16
+e_layers: 3
 d_layers: 0
-dropout: 0.2                     # PatchTST paper: 0.2
-patch_len: 16                    # Patch length (default)
-stride: 8                        # Patch stride (50% overlap)
+dropout: 0.2
+patch_len: 16
+stride: 8
 
 # ── Training ────────────────────────────────────────────────────────────
 train_epochs: 50
 batch_size: 32
-learning_rate: 0.0001               # TSLib default for PatchTST
+learning_rate: 0.0001
 loss: mse
 metrics: rmse,mae,nse
 eval_denorm: true
 show_progress: true
 patience: 10
-lradj: type1                        # TSLib default: halve LR every epoch
+lradj: type1
+pct_start: 0.2
+cos_T_max: 20
+cos_eta_min: 1.0e-8
+cos_T_0: 10
+cos_T_mult: 2
+step_size: 10
+gamma: 0.5
+milestones: "30,60,90"
+sched_patience: 5
+sched_factor: 0.5
 num_workers: 0
-
-# ── Logging ─────────────────────────────────────────────────────────────
-wandb_project: null
-wandb_entity: null
-dev_run: false
 
 # ── HPO (Ray Tune) ─────────────────────────────────────────────────────
 hpo: false
 hpo_num_samples: 200
-hpo_scheduler: asha
+hpo_scheduler: asha               # asha | none
 hpo_grace_period: 5
 hpo_reduction_factor: 1.5
+hpo_storage_path: null            # Default: artifacts/ray_results
+hpo_resources_cpu: 1
+hpo_resources_gpu: 0.25
+hpo_num_cpus: null                # Auto
+hpo_max_concurrent: null
+hpo_resume: false
+hpo_save_checkpoints: true
+hpo_trim_checkpoints: true
+hpo_keep_best_n: 10
+hpo_trim_best_n: true
+hpo_trim_keep_best: true
+hpo_trim_keep_last: false
+hpo_experiment_name: null
+hpo_local_mode: false
+
+# ── Logging ─────────────────────────────────────────────────────────────
+wandb_project: null               # Set to enable wandb (e.g. "traffic-benchmark")
+wandb_entity: null
+dev_run: false
 
 # ── Visualisation ───────────────────────────────────────────────────────
 auto_viz: true
-viz_method: mean
+viz_method: mean                  # mean | median | last | longest_history | best | worst | single
 
-# ── Misc (TSLib compat) ────────────────────────────────────────────────
+# ── Misc model keys (compat) ───────────────────────────────────────────
 embed: timeF
 activation: gelu
 output_attention: false

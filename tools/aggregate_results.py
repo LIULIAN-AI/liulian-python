@@ -57,7 +57,8 @@ def aggregate_by_model_dataset(
             continue
         model = r.get('model', '?')
         dataset = r.get('dataset', '?')
-        test_metrics = r.get('final_test', {})
+        metrics = r.get('metrics', {})
+        test_metrics = metrics.get('test', r.get('final_test', {}))
         val = test_metrics.get(metric)
         if val is not None and np.isfinite(val):
             buckets[(model, dataset)].append(val)
@@ -85,7 +86,8 @@ def aggregate_entity_ablation(
         dataset = r.get('dataset', '?')
         cfg = r.get('config', {})
         mode = cfg.get('identifier_mode', 'none')
-        test_metrics = r.get('final_test', {})
+        metrics = r.get('metrics', {})
+        test_metrics = metrics.get('test', r.get('final_test', {}))
         val = test_metrics.get(metric)
         if val is not None and np.isfinite(val):
             buckets[(model, dataset, mode)].append(val)

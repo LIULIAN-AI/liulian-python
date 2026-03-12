@@ -1,8 +1,15 @@
-"""PEMS traffic sensor datasets built on :class:`TimeSeriesDataset`.
+"""PEMS traffic sensor datasets built on :class:`SpatialTempoDataset`.
 
 Loads PEMS03/04/07/08 from ``.npz`` files containing shape ``(T, N, F)``
 arrays (time steps x sensors x features).  Each ``.npz`` file has a
 single ``'data'`` key.
+
+Class hierarchy::
+
+    BaseDataset (ABC)
+    └── TimeSeriesDataset
+        └── SpatialTempoDataset  (adds graph_mode / edge_index / adj_matrix)
+            └── PEMSDataset      (PEMS .npz loading, 6:2:2 splits)
 
 | Dataset | Sensors | Features | Time steps |
 |---------|---------|----------|-----------|
@@ -27,7 +34,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from liulian.data.ts.timeseriesdataset import TimeSeriesDataset, TimeSeriesSplit
+from liulian.data.st.spatialtempodataset import SpatialTempoDataset
 
 
 class _StandardScaler:
@@ -50,8 +57,12 @@ class _StandardScaler:
         return data * self.scale_ + self.mean_
 
 
-class PEMSDataset(TimeSeriesDataset):
-    """PEMS traffic sensor dataset built on :class:`TimeSeriesDataset`.
+class PEMSDataset(SpatialTempoDataset):
+    """PEMS traffic sensor dataset built on :class:`SpatialTempoDataset`.
+
+    Inherits from :class:`SpatialTempoDataset`, which adds graph /
+    spatial structure (``graph_mode``, ``edge_index``, ``adj_matrix``)
+    on top of :class:`TimeSeriesDataset`.
 
     Parameters
     ----------
@@ -76,6 +87,10 @@ class PEMSDataset(TimeSeriesDataset):
     flag : str | None
         Accepted for backward compat with data_factory; ignored since
         all splits are created at once.
+    graph_mode : str
+        Passed to :class:`SpatialTempoDataset`.
+    graph_metadata : dict | None
+        Passed to :class:`SpatialTempoDataset`.
     """
 
     # 6:2:2 split

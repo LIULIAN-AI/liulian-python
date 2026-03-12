@@ -182,9 +182,11 @@ class TestResultsAggregation:
                         'dataset': dataset,
                         'seed': seed,
                         'config': {'seq_len': 96, 'pred_len': 96},
-                        'final_test': {
-                            'mse': 0.3 + seed * 0.01,
-                            'mae': 0.4 + seed * 0.01,
+                        'metrics': {
+                            'test': {
+                                'mse': 0.3 + seed * 0.01,
+                                'mae': 0.4 + seed * 0.01,
+                            },
                         },
                         'best_val_score': 0.35,
                         'epochs_run': 20,
@@ -207,7 +209,7 @@ class TestResultsAggregation:
                 'dataset': 'Traffic',
                 'seed': 42,
                 'config': {'identifier_mode': mode},
-                'final_test': {'mse': 0.5 if mode == 'none' else 0.45},
+                'metrics': {'test': {'mse': 0.5 if mode == 'none' else 0.45}},
                 'status': 'success',
             }
             with open(entity / f'dlinear_traffic_{mode}_seed42.json', 'w') as f:

@@ -161,7 +161,7 @@ class ForecastTrainer:
                 and save checkpoints, keeping the training loop shared.
 
         Returns:
-            Summary dict with ``"best_val_mse"``, ``"final_test"``, and
+            Summary dict with ``"best_val_score"``, ``"metrics"``, and
             ``"history"`` (list of per-epoch dicts).
         """
         cfg = self.config
@@ -175,7 +175,7 @@ class ForecastTrainer:
         trained_params = [p for p in model.parameters() if p.requires_grad]
         model_optim = optim.Adam(trained_params, lr=learning_rate)
 
-        # LR scheduler — built via the centralised registry
+        # LR scheduler — built via the centralized registry
         lradj = str(cfg.get('lradj', 'onecycle')).strip()
         sched, sched_step_mode = build_scheduler(
             optimizer=model_optim,
@@ -188,7 +188,7 @@ class ForecastTrainer:
 
         criterion = self._build_loss(self.loss_name)
         disable_es = bool(cfg.get('disable_early_stopping', False))
-        early_stopping = EarlyStopping(patience=patience, verbose=True)
+        early_stopping = EarlyStopping(patience=patience, verbose=False, save_mode=False)
 
         # Accelerator wrapping
         if self.accelerator is not None:
@@ -206,6 +206,10 @@ class ForecastTrainer:
         os.makedirs(self.checkpoint_dir, exist_ok=True)
 
         self.history = []
+
+        # Best-model tracking (independent of EarlyStopping)
+        best_val_score: float = float('inf')
+        best_epoch_idx: int = 0
 
         eval_metric_names = self._dedupe_metric_names(
             [self.loss_name] + list(self.metric_names)
@@ -312,6 +316,19 @@ class ForecastTrainer:
                 ' | '.join(extra_parts) if extra_parts else '',
             )
 
+            # Save best model explicitly (decoupled from EarlyStopping)
+            if monitor_value < best_val_score:
+                best_val_score = monitor_value
+                best_epoch_idx = epoch
+                ckpt_path = os.path.join(self.checkpoint_dir, 'checkpoint')
+                os.makedirs(self.checkpoint_dir, exist_ok=True)
+                torch.save(model.state_dict(), ckpt_path)
+                logger.ok(
+                    'Validation improved (%.6f). Best model saved → %s',
+                    monitor_value,
+                    ckpt_path,
+                )
+
             early_stopping(monitor_value, model, self.checkpoint_dir)
 
             # Per-epoch callback (used by Ray Tune trainable for reporting)
@@ -336,31 +353,45 @@ class ForecastTrainer:
             elif sched_step_mode == 'manual':
                 adjust_learning_rate(model_optim, epoch + 1, cfg)
 
-        # --- Load best & final test ---
+        # --- Load best model ---
         best_ckpt = os.path.join(self.checkpoint_dir, 'checkpoint')
         if os.path.exists(best_ckpt):
             model.load_state_dict(
                 torch.load(best_ckpt, map_location=self.device, weights_only=True)
             )
 
-        final_test = {}
-        if test_loader is not None:  # todo: is this redundant with per-epoch test evaluation?
-            final_test = self.evaluate(
-                model,
-                test_loader,
-                metric_names=eval_metric_names,
-                stage='Test',
-            )
+        # --- Extract best-epoch metrics from history ---
+        best_record = self.history[best_epoch_idx] if self.history else {}
+
+        val_metrics_best = {
+            k.removeprefix('val_'): v
+            for k, v in best_record.items()
+            if k.startswith('val_')
+        }
+        test_metrics_best = {
+            k.removeprefix('test_'): v
+            for k, v in best_record.items()
+            if k.startswith('test_')
+        }
+
+        if test_metrics_best:
             logger.ok(
-                'Final Test: %s',
-                ', '.join(f'{k.upper()}={v:.6f}' for k, v in final_test.items()),
+                'Best-epoch Test (%d): %s',
+                best_epoch_idx + 1,
+                ', '.join(f'{k.upper()}={v:.6f}' for k, v in test_metrics_best.items()),
             )
 
         return {
-            'best_val_mse': float(early_stopping.val_loss_min),
-            'best_val_score': float(early_stopping.val_loss_min),
+            'best_val_score': float(best_val_score),
             'monitored_metric': monitor_key,
-            'final_test': final_test,
+            'best_epoch': best_epoch_idx + 1,
+            'metrics': {
+                'training': {
+                    'loss': best_record.get('train_loss', float('nan')),
+                },
+                'validation': val_metrics_best,
+                'test': test_metrics_best,
+            },
             'history': self.history,
             'epochs_run': len(self.history),
         }
@@ -389,8 +420,13 @@ class ForecastTrainer:
         resolved_metric_names = self._dedupe_metric_names(
             [self.loss_name] + list(metric_names or self.metric_names)
         )
-        collected: Dict[str, List[float]] = {name: [] for name in resolved_metric_names}
-        denorm_collected: Dict[str, List[float]] = (
+        # Each entry is (metric_value, batch_size) to enable
+        # sample-weighted averaging (equivalent to global metric over all
+        # test samples, matching TSL's concat-then-compute approach).
+        collected: Dict[str, List[tuple[float, int]]] = {
+            name: [] for name in resolved_metric_names
+        }
+        denorm_collected: Dict[str, List[tuple[float, int]]] = (
             {name: [] for name in resolved_metric_names}
             if self.eval_denorm and self.inverse_transform_fn is not None
             else {}
@@ -449,9 +485,10 @@ class ForecastTrainer:
                 outputs = outputs[:, -pred_len:, f_dim:]
                 batch_y = batch_y[:, -pred_len:, f_dim:].to(self.device)
 
+                cur_batch_size = outputs.shape[0]
                 metrics = self._compute_metrics(outputs, batch_y, resolved_metric_names)
                 for name, value in metrics.items():
-                    collected[name].append(value)
+                    collected[name].append((value, cur_batch_size))
 
                 # De-normalized metrics
                 if denorm_collected:
@@ -478,7 +515,7 @@ class ForecastTrainer:
                             out_dn, tgt_dn, resolved_metric_names
                         )
                         for name, value in dn_metrics.items():
-                            denorm_collected[name].append(value)
+                            denorm_collected[name].append((value, cur_batch_size))
                     except Exception as exc:
                         logger.debug(
                             'inverse_transform failed (batch %d): %s', idx, exc
@@ -488,21 +525,36 @@ class ForecastTrainer:
                     iterator.set_postfix(
                         {
                             resolved_metric_names[0]: (
-                                collected[resolved_metric_names[0]][-1]
+                                collected[resolved_metric_names[0]][-1][0]
                             )
                         }
                     )
 
         model.train()
+
+        def _weighted_mean(pairs: list[tuple[float, int]]) -> float:
+            """Compute sample-weighted average of per-batch metrics.
+
+            This is equivalent to computing the metric globally over all
+            concatenated predictions (as done by TSL), rather than giving
+            equal weight to each batch regardless of its size.
+            """
+            if not pairs:
+                return float('nan')
+            vals, counts = zip(*pairs)
+            weights = np.array(counts, dtype=np.float64)
+            total = weights.sum()
+            if total == 0:
+                return float('nan')
+            return float(np.average(vals, weights=weights))
+
         result = {
-            name: float(np.nanmean(values)) if values else float('nan')
+            name: _weighted_mean(values)
             for name, values in collected.items()
         }
         if denorm_collected:
             for name, values in denorm_collected.items():
-                result[f'denorm_{name}'] = (
-                    float(np.nanmean(values)) if values else float('nan')
-                )
+                result[f'denorm_{name}'] = _weighted_mean(values)
         return result
 
     # ------------------------------------------------------------------
@@ -544,6 +596,7 @@ class ForecastTrainer:
         all_preds: List[torch.Tensor] = []
         all_trues: List[torch.Tensor] = []
         all_times: List[torch.Tensor] = []
+        all_entity_ids: List[Any] = []
 
         with torch.no_grad():
             for idx, batch in enumerate(loader):
@@ -556,6 +609,7 @@ class ForecastTrainer:
                     batch[2],
                     batch[3],
                 )
+                batch_entity_ids = batch[4] if len(batch) > 4 else None
                 batch_entity_idx = batch[5] if len(batch) > 5 else None
                 batch_x = batch_x.float().to(self.device)
                 batch_y = batch_y.float()
@@ -582,6 +636,10 @@ class ForecastTrainer:
                 all_preds.append(outputs)
                 all_trues.append(targets)
 
+                # Collect entity IDs for per-entity inverse transform
+                if batch_entity_ids is not None:
+                    all_entity_ids.append(batch_entity_ids)
+
                 # Time marks: squeeze trailing dim  (B, win, 1) → (B, win)
                 t = batch_y_mark.cpu()
                 if t.ndim == 3 and t.shape[-1] == 1:
@@ -594,12 +652,22 @@ class ForecastTrainer:
         trues_cat = torch.cat(all_trues, dim=0)
         times_cat = torch.cat(all_times, dim=0)
 
-        # Denormalise predictions and ground truth so that downstream
-        # visualisation and saved .npz files use real-world units.
+        # Denormalize predictions and targets so saved artifacts and plots use
+        # real-world units consistently across split modes.
         if self.inverse_transform_fn is not None:
             try:
-                preds_dn = self.inverse_transform_fn(preds_cat)
-                trues_dn = self.inverse_transform_fn(trues_cat)
+                inv_kwargs: Dict[str, Any] = {}
+                if all_entity_ids:
+                    # Concatenate collected entity_ids for per-entity scalers
+                    if isinstance(all_entity_ids[0], torch.Tensor):
+                        inv_kwargs['entity_ids'] = torch.cat(all_entity_ids, dim=0)
+                    elif isinstance(all_entity_ids[0], (list, tuple)):
+                        inv_kwargs['entity_ids'] = sum(all_entity_ids, [])
+                    else:
+                        # numpy or other — try to concatenate
+                        inv_kwargs['entity_ids'] = np.concatenate(all_entity_ids, axis=0)
+                preds_dn = self.inverse_transform_fn(preds_cat, **inv_kwargs)
+                trues_dn = self.inverse_transform_fn(trues_cat, **inv_kwargs)
                 if (
                     isinstance(preds_dn, torch.Tensor)
                     and isinstance(trues_dn, torch.Tensor)

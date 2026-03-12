@@ -156,8 +156,8 @@ class TestForecastTrainerDummy:
         model = _TinyModel(model_args)
         result = trainer.fit(model, loaders['train'], loaders['val'], loaders['test'])
 
-        assert 'best_val_mse' in result
-        assert result['best_val_mse'] < float('inf')
+        assert 'best_val_score' in result
+        assert result['best_val_score'] < float('inf')
         assert result['epochs_run'] == 2
         assert len(result['history']) == 2
 
@@ -269,7 +269,7 @@ class TestExperimentE2E:
 
         assert summary['status'] == 'ok'
         assert 'training' in summary['metrics']
-        assert summary['metrics']['training']['epochs_run'] == 2
+        assert summary['metrics']['epochs_run'] == 2
         assert 'predictions' in summary
         assert summary['predictions']['preds'].shape[1] == 4
 
@@ -325,7 +325,7 @@ class TestExperimentE2E:
             config=config,
         )
         summary = exp.run(train=True, eval=True)
-        final = summary['metrics'].get('final_test', {})
+        final = summary['metrics'].get('test', {})
         for k, v in final.items():
             if k != 'nse':  # NSE can be NaN for constant targets
                 assert np.isfinite(v), f'{k}={v} is not finite'

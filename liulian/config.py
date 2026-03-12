@@ -91,6 +91,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     'dropout': 0.1,
     'patch_len': 16,
     'stride': 8,
+    'individual': False,  # DLinear per-channel independence
     # ── LLM backbone (TimeLLM) ─────────────────────────────────────
     'llm_model': 'GPT2',
     'llm_dim': 768,
@@ -106,6 +107,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     'eval_denorm': True,
     'show_progress': True,
     'patience': 10,
+    'disable_early_stopping': False,
     'lradj': 'none',
     'pct_start': 0.2,
     'cos_T_max': 20,

@@ -184,21 +184,21 @@ def _run_and_collect(cfg: dict, tmp_path) -> dict:
     # ---- Metrics must be present ----
     assert 'metrics' in summary, 'Summary missing "metrics" key'
     metrics = summary['metrics']
-    assert 'final_test' in metrics, 'Metrics missing "final_test" key'
-    final_test = metrics['final_test']
+    assert 'test' in metrics, 'Metrics missing "test" key'
+    test_metrics = metrics['test']
 
     for required_key in ('mse', 'rmse', 'mae', 'nse'):
-        assert required_key in final_test, f'final_test missing "{required_key}" key'
-        assert np.isfinite(final_test[required_key]), (
-            f'final_test["{required_key}"] = {final_test[required_key]} is not finite'
+        assert required_key in test_metrics, f'test metrics missing "{required_key}" key'
+        assert np.isfinite(test_metrics[required_key]), (
+            f'test["{required_key}"] = {test_metrics[required_key]} is not finite'
         )
 
     result: dict = {
         'summary': summary,
-        'test_mse': final_test['mse'],
-        'test_rmse': final_test['rmse'],
-        'test_mae': final_test['mae'],
-        'test_nse': final_test['nse'],
+        'test_mse': test_metrics['mse'],
+        'test_rmse': test_metrics['rmse'],
+        'test_mae': test_metrics['mae'],
+        'test_nse': test_metrics['nse'],
     }
 
     # ---- Predictions must be present ----

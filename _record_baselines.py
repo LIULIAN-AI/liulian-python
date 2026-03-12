@@ -91,7 +91,7 @@ def run_scenario(name, cfg):
         finally:
             os.chdir(old_cwd)
 
-    ft = summary['metrics']['final_test']
+    ft = summary['metrics']['test']
     preds = summary['predictions']['preds']
     flat = preds.numpy().flatten()[:5].tolist()
     return {

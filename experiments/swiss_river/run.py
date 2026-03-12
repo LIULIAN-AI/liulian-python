@@ -1,29 +1,20 @@
 #!/usr/bin/env python
-"""Swiss River forecasting experiment — thin wrapper.
+"""Swiss River experiment — convenience wrapper.
 
-Delegates entirely to ``liulian.pipeline.run_experiment`` via the
-three-layer config system (DEFAULT_CONFIG < YAML < CLI overrides).
+This is a thin convenience wrapper that delegates to the unified
+``experiments/run.py`` entry point.  It defaults to the Swiss River
+LSTM config (``default_config.yaml``).
 
-Usage::
+Prefer using the unified entry point directly::
 
-    # DLinear quick test (default config)
+    python experiments/run.py --config experiments/swiss_river/default_config.yaml
+    python experiments/run.py --config experiments/swiss_river/patchtst_config.yaml --quick_test
+
+Legacy usage (still works)::
+
+    python experiments/swiss_river/run.py                   # defaults to default_config.yaml
     python experiments/swiss_river/run.py --quick_test
-
-    # DLinear with entity embedding
-    python experiments/swiss_river/run.py --quick_test --identifier_mode embedding
-
-    # LSTM (uses LSTM-specific config)
-    python experiments/swiss_river/run.py --config experiments/swiss_river/default_config.yaml
-
-    # Custom YAML + CLI overrides
-    python experiments/swiss_river/run.py --config my.yaml --model timellm --train_epochs 50
-
-    # Evaluate from checkpoint
-    python experiments/swiss_river/run.py --eval_only
-
-    # Previous run.py is preserved as run_original.py in this directory.
-
-See ``liulian run --help`` for the full CLI interface.
+    python experiments/swiss_river/run.py --config experiments/swiss_river/patchtst_config.yaml
 """
 
 from __future__ import annotations
@@ -33,7 +24,6 @@ import logging
 import os
 import sys
 
-# Path setup — ensure project root is importable
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 _PROJECT_ROOT = os.path.abspath(os.path.join(_SCRIPT_DIR, '..', '..'))
 if _PROJECT_ROOT not in sys.path:
@@ -53,10 +43,9 @@ def main() -> None:
     )
     p.add_argument(
         '--config',
-        default=os.path.join(_SCRIPT_DIR, 'patchtst_config.yaml'),
+        default=os.path.join(_SCRIPT_DIR, 'default_config.yaml'),
         help='Path to YAML config file.',
     )
-    # Generate --key args from DEFAULT_CONFIG for full backward compat
     for key, default in DEFAULT_CONFIG.items():
         flag = f'--{key}'
         if isinstance(default, bool):
@@ -71,7 +60,6 @@ def main() -> None:
 
     args = p.parse_args()
 
-    # Collect non-None CLI overrides
     skip = {'config'}
     cli_overrides = {
         k: v for k, v in vars(args).items() if k not in skip and v is not None

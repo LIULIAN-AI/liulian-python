@@ -1,0 +1,385 @@
+================================================================================
+TSL vs Liulian Comparison Results
+Generated: 2026-03-11 18:41:21
+================================================================================
+
+--- ETTh1_PatchTST ---
+  Dataset: ETTh1
+  Model: PatchTST
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 53.6
+  Liulian epochs run: 10
+  Liulian time (s): 52.6
+  TSL final MSE: 0.379186
+  TSL final MAE: 0.3996291756629944
+  Liulian final MSE: 0.379715
+  Liulian final MAE: 0.39764466881752014
+  Detail:
+  TSL  final: MSE=0.379186  MAE=0.399629
+  LL   final: MSE=0.379715  MAE=0.397645
+  Diff:       MSE=0.000529 (0.14%)  MAE=0.001985
+  Status: checked and matched
+
+--- ETTh2_PatchTST ---
+  Dataset: ETTh2
+  Model: PatchTST
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 4
+  TSL time (s): 54.0
+  Liulian epochs run: 7
+  Liulian time (s): 86.9
+  TSL final MSE: 0.291277
+  TSL final MAE: 0.34636303782463074
+  Liulian final MSE: 0.297114
+  Liulian final MAE: 0.34626123850995844
+  Detail:
+  TSL  final: MSE=0.291277  MAE=0.346363
+  LL   final: MSE=0.297114  MAE=0.346261
+  Diff:       MSE=0.005837 (2.00%)  MAE=0.000102
+  Status: checked and matched
+
+--- ETTm1_PatchTST ---
+  Dataset: ETTm1
+  Model: PatchTST
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 182.8
+  Liulian epochs run: 10
+  Liulian time (s): 186.1
+  TSL final MSE: 0.323108
+  TSL final MAE: 0.3646145462989807
+  Liulian final MSE: 0.323591
+  Liulian final MAE: 0.36465556474204835
+  Detail:
+  TSL  final: MSE=0.323108  MAE=0.364615
+  LL   final: MSE=0.323591  MAE=0.364656
+  Diff:       MSE=0.000483 (0.15%)  MAE=0.000041
+  Status: checked and matched
+
+--- ETTm2_PatchTST ---
+  Dataset: ETTm2
+  Model: PatchTST
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 4
+  TSL time (s): 227.7
+  Liulian epochs run: 5
+  Liulian time (s): 285.3
+  TSL final MSE: 0.183427
+  TSL final MAE: 0.2683773636817932
+  Liulian final MSE: 0.181140
+  Liulian final MAE: 0.2644782675086786
+  Detail:
+  TSL  final: MSE=0.183427  MAE=0.268377
+  LL   final: MSE=0.181140  MAE=0.264478
+  Diff:       MSE=0.002287 (1.25%)  MAE=0.003899
+  Status: checked and matched
+
+--- Weather_PatchTST ---
+  Dataset: Weather
+  Model: PatchTST
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 3
+  TSL time (s): 258.8
+  Liulian epochs run: 3
+  Liulian time (s): 262.3
+  TSL final MSE: 0.176093
+  TSL final MAE: 0.21972574293613434
+  Liulian final MSE: 0.176115
+  Liulian final MAE: 0.2170014490775012
+  Detail:
+  TSL  final: MSE=0.176093  MAE=0.219726
+  LL   final: MSE=0.176115  MAE=0.217001
+  Diff:       MSE=0.000022 (0.01%)  MAE=0.002724
+  Status: checked and matched
+
+--- ECL_PatchTST ---
+  Dataset: ECL
+  Model: PatchTST
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 1553.4
+  Liulian epochs run: 2
+  Liulian time (s): 1616.9
+  TSL final MSE: 0.190795
+  TSL final MAE: 0.28480613231658936
+  Liulian final MSE: 0.197280
+  Liulian final MAE: 0.29382267631244363
+  Detail:
+  Epoch 1: TSL test_loss=0.198360  liulian test_mse=0.198218  diff=0.000142 (0.07%) ✓
+  Epoch 2: TSL test_loss=0.190820  liulian test_mse=0.197280  diff=0.006461 (3.39%) ✓
+  Status: checked and matched
+
+--- Traffic_PatchTST ---
+  Dataset: Traffic
+  Model: PatchTST
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 1225.3
+  Liulian epochs run: 2
+  Liulian time (s): 1264.4
+  TSL final MSE: 0.494214
+  TSL final MAE: 0.3440028727054596
+  Liulian final MSE: 0.499992
+  Liulian final MAE: 0.337946213712039
+  Detail:
+  Epoch 1: TSL test_loss=0.527109  liulian test_mse=0.519990  diff=0.007119 (1.35%) ✓
+  Epoch 2: TSL test_loss=0.493976  liulian test_mse=0.499992  diff=0.006016 (1.22%) ✓
+  Status: checked and matched
+
+--- Exchange_PatchTST ---
+  Dataset: Exchange
+  Model: PatchTST
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 4
+  TSL time (s): 28.5
+  Liulian epochs run: 5
+  Liulian time (s): 32.1
+  TSL final MSE: 0.096066
+  TSL final MAE: 0.21466264128684998
+  Liulian final MSE: 0.087624
+  Liulian final MAE: 0.2055379894044664
+  Detail:
+  TSL  final: MSE=0.096066  MAE=0.214663
+  LL   final: MSE=0.087624  MAE=0.205538
+  Diff:       MSE=0.008442 (8.79%)  MAE=0.009125
+  Status: checked and matched
+
+--- ILI_PatchTST ---
+  Dataset: ILI
+  Model: PatchTST
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 9
+  TSL time (s): 20.1
+  Liulian epochs run: 10
+  Liulian time (s): 14.7
+  TSL final MSE: 2.242056
+  TSL final MAE: 0.8819721341133118
+  Liulian final MSE: 2.627550
+  Liulian final MAE: 0.9962247411410013
+  Detail:
+  TSL  final: MSE=2.242056  MAE=0.881972
+  LL   final: MSE=2.627550  MAE=0.996225
+  Diff:       MSE=0.385495 (17.19%)  MAE=0.114253
+  Status: checked but not matched
+
+--- ETTh1_DLinear ---
+  Dataset: ETTh1
+  Model: DLinear
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 9
+  TSL time (s): 19.6
+  Liulian epochs run: 10
+  Liulian time (s): 13.2
+  TSL final MSE: 0.396158
+  TSL final MAE: 0.4108411967754364
+  Liulian final MSE: 0.396112
+  Liulian final MAE: 0.41026642816987907
+  Detail:
+  TSL  final: MSE=0.396158  MAE=0.410841
+  LL   final: MSE=0.396112  MAE=0.410266
+  Diff:       MSE=0.000046 (0.01%)  MAE=0.000575
+  Status: checked and matched
+
+--- ETTh2_DLinear ---
+  Dataset: ETTh2
+  Model: DLinear
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 5
+  TSL time (s): 13.7
+  Liulian epochs run: 8
+  Liulian time (s): 15.0
+  TSL final MSE: 0.341448
+  TSL final MAE: 0.3952931761741638
+  Liulian final MSE: 0.346700
+  Liulian final MAE: 0.39999111606316134
+  Detail:
+  TSL  final: MSE=0.341448  MAE=0.395293
+  LL   final: MSE=0.346700  MAE=0.399991
+  Diff:       MSE=0.005253 (1.54%)  MAE=0.004698
+  Status: checked and matched
+
+--- ETTm1_DLinear ---
+  Dataset: ETTm1
+  Model: DLinear
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 6
+  TSL time (s): 33.7
+  Liulian epochs run: 7
+  Liulian time (s): 38.7
+  TSL final MSE: 0.345946
+  TSL final MAE: 0.37370893359184265
+  Liulian final MSE: 0.344534
+  Liulian final MAE: 0.37181097860109874
+  Detail:
+  TSL  final: MSE=0.345946  MAE=0.373709
+  LL   final: MSE=0.344534  MAE=0.371811
+  Diff:       MSE=0.001412 (0.41%)  MAE=0.001898
+  Status: checked and matched
+
+--- ETTm2_DLinear ---
+  Dataset: ETTm2
+  Model: DLinear
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 7
+  TSL time (s): 37.4
+  Liulian epochs run: 6
+  Liulian time (s): 30.5
+  TSL final MSE: 0.193428
+  TSL final MAE: 0.292817085981369
+  Liulian final MSE: 0.192144
+  Liulian final MAE: 0.29129193814773136
+  Detail:
+  TSL  final: MSE=0.193428  MAE=0.292817
+  LL   final: MSE=0.192144  MAE=0.291292
+  Diff:       MSE=0.001284 (0.66%)  MAE=0.001525
+  Status: checked and matched
+
+--- Weather_DLinear ---
+  Dataset: Weather
+  Model: DLinear
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 7
+  TSL time (s): 52.0
+  Liulian epochs run: 9
+  Liulian time (s): 43.9
+  TSL final MSE: 0.196220
+  TSL final MAE: 0.25610992312431335
+  Liulian final MSE: 0.195417
+  Liulian final MAE: 0.25507597383738295
+  Detail:
+  TSL  final: MSE=0.196220  MAE=0.256110
+  LL   final: MSE=0.195417  MAE=0.255076
+  Diff:       MSE=0.000804 (0.41%)  MAE=0.001034
+  Status: checked and matched
+
+--- ECL_DLinear ---
+  Dataset: ECL
+  Model: DLinear
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 39.1
+  Liulian epochs run: 2
+  Liulian time (s): 97.6
+  TSL final MSE: 0.222868
+  TSL final MAE: 0.31678539514541626
+  Liulian final MSE: 0.223120
+  Liulian final MAE: 0.31704053889822076
+  Detail:
+  Epoch 1: TSL test_loss=0.245241  liulian test_mse=0.245380  diff=0.000139 (0.06%) ✓
+  Epoch 2: TSL test_loss=0.223011  liulian test_mse=0.223120  diff=0.000109 (0.05%) ✓
+  Status: checked and matched
+
+--- Traffic_DLinear ---
+  Dataset: Traffic
+  Model: DLinear
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 54.6
+  Liulian epochs run: 2
+  Liulian time (s): 96.8
+  TSL final MSE: 0.728951
+  TSL final MAE: 0.447552889585495
+  Liulian final MSE: 0.727530
+  Liulian final MAE: 0.44718914165675083
+  Detail:
+  Epoch 1: TSL test_loss=0.789513  liulian test_mse=0.788858  diff=0.000655 (0.08%) ✓
+  Epoch 2: TSL test_loss=0.727645  liulian test_mse=0.727530  diff=0.000115 (0.02%) ✓
+  Status: checked and matched
+
+--- Exchange_DLinear ---
+  Dataset: Exchange
+  Model: DLinear
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 5
+  TSL time (s): 11.9
+  Liulian epochs run: 9
+  Liulian time (s): 9.8
+  TSL final MSE: 0.098343
+  TSL final MAE: 0.2326776683330536
+  Liulian final MSE: 0.094265
+  Liulian final MAE: 0.22689553830358716
+  Detail:
+  TSL  final: MSE=0.098343  MAE=0.232678
+  LL   final: MSE=0.094265  MAE=0.226896
+  Diff:       MSE=0.004078 (4.15%)  MAE=0.005782
+  Status: checked and matched
+
+--- ILI_DLinear ---
+  Dataset: ILI
+  Model: DLinear
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 4
+  TSL time (s): 7.2
+  Liulian epochs run: 10
+  Liulian time (s): 5.0
+  TSL final MSE: 5.060766
+  TSL final MAE: 1.7096543312072754
+  Liulian final MSE: 4.522494
+  Liulian final MAE: 1.636607031027476
+  Detail:
+  TSL  final: MSE=5.060766  MAE=1.709654
+  LL   final: MSE=4.522494  MAE=1.636607
+  Diff:       MSE=0.538273 (10.64%)  MAE=0.073047
+  Status: checked but not matched
+
+
+================================================================================
+SUMMARY
+================================================================================
+Name                      TSL ep LL ep  TSL time  LL time Status
+--------------------------------------------------------------------------------
+ETTh1_PatchTST                10    10     53.6s    52.6s checked and matched
+ETTh2_PatchTST                 4     7     54.0s    86.9s checked and matched
+ETTm1_PatchTST                10    10    182.8s   186.1s checked and matched
+ETTm2_PatchTST                 4     5    227.7s   285.3s checked and matched
+Weather_PatchTST               3     3    258.8s   262.3s checked and matched
+ECL_PatchTST                   2     2   1553.4s  1616.9s checked and matched
+Traffic_PatchTST               2     2   1225.3s  1264.4s checked and matched
+Exchange_PatchTST              4     5     28.5s    32.1s checked and matched
+ILI_PatchTST                   9    10     20.1s    14.7s checked but not matched
+ETTh1_DLinear                  9    10     19.6s    13.2s checked and matched
+ETTh2_DLinear                  5     8     13.7s    15.0s checked and matched
+ETTm1_DLinear                  6     7     33.7s    38.7s checked and matched
+ETTm2_DLinear                  7     6     37.4s    30.5s checked and matched
+Weather_DLinear                7     9     52.0s    43.9s checked and matched
+ECL_DLinear                    2     2     39.1s    97.6s checked and matched
+Traffic_DLinear                2     2     54.6s    96.8s checked and matched
+Exchange_DLinear               5     9     11.9s     9.8s checked and matched
+ILI_DLinear                    4    10      7.2s     5.0s checked but not matched

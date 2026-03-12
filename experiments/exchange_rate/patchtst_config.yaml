@@ -1,8 +1,6 @@
-# Exchange Rate dataset — PatchTST with entity embedding (add_after_patch)
+# Exchange Rate dataset — PatchTST (channel-independent patching)
 #
-# Exchange Rate dataset: 8 countries' daily exchange rates (1990–2016).
-# PatchTST uses channel-independent patching with entity embeddings
-# injected after the patch embedding layer (add_after_patch).
+# Exchange Rate dataset: daily exchange rates of 8 countries (1990-2016).
 #
 # Usage:
 #   liulian run experiments/exchange_rate/patchtst_config.yaml
@@ -10,7 +8,7 @@
 
 # ── General ─────────────────────────────────────────────────────────────
 model: patchtst
-seed: 2026
+seed: 2021
 quick_test: false
 eval_only: false
 
@@ -20,6 +18,7 @@ seq_len: 96
 pred_len: 96
 features: M
 label_len: 0
+train_split: 0.7
 max_samples: null
 
 # ── Task & mode ─────────────────────────────────────────────────────────
@@ -35,17 +34,20 @@ gap_mode: split
 max_mask_consecutive: 10
 
 # ── Noise injection ─────────────────────────────────────────────────────
-noise_type: null
+noise_type: null                  # null | gaussian | gaussian_a | impulse | impulse_a | quantization
+noise_level: 0.01
+noise_probability: 0.01
+noise_scale_factor: 5.0
 
 # ── Historical target ──────────────────────────────────────────────────
 include_historical_y: none
 include_historical_predicted_y: false
 
 # ── Entity identifiers ─────────────────────────────────────────────────
-identifier_mode: embedding
+identifier_mode: none
 id_integration: add_after_patch
 embedding_size: 10
-num_embeddings: null              # Auto-detected (7 currencies + OT)
+num_embeddings: null              # Auto-detected (8 countries)
 
 # ── Graph / spatial ─────────────────────────────────────────────────────
 graph_mode: none
@@ -55,20 +57,71 @@ graphlet_num_hops: 1
 enc_in: null
 dec_in: 1
 c_out: 1
-d_model: 128
-d_ff: 256
-n_heads: 16
-e_layers: 3
-dropout: 0.2
+d_model: 512
+d_ff: 2048
+n_heads: 8
+e_layers: 2
+d_layers: 1
+dropout: 0.1
 patch_len: 16
 stride: 8
 
 # ── Training ────────────────────────────────────────────────────────────
-train_epochs: 30
+train_epochs: 10
 batch_size: 32
 learning_rate: 0.0001
 loss: mse
 metrics: rmse,mae,mse
-patience: 10
+eval_denorm: true
+show_progress: true
+patience: 3
+disable_early_stopping: false
 lradj: type1
+pct_start: 0.2
+cos_T_max: 20
+cos_eta_min: 1.0e-8
+cos_T_0: 10
+cos_T_mult: 2
+step_size: 10
+gamma: 0.5
+milestones: "30,60,90"
+sched_patience: 5
+sched_factor: 0.5
 num_workers: 0
+
+# ── HPO (Ray Tune) ─────────────────────────────────────────────────────
+hpo: false
+hpo_num_samples: 200
+hpo_scheduler: asha               # asha | none
+hpo_grace_period: 5
+hpo_reduction_factor: 1.5
+hpo_storage_path: null            # Default: artifacts/ray_results
+hpo_resources_cpu: 1
+hpo_resources_gpu: 0.25
+hpo_num_cpus: null                # Auto
+hpo_max_concurrent: null
+hpo_resume: false
+hpo_save_checkpoints: true
+hpo_trim_checkpoints: true
+hpo_keep_best_n: 10
+hpo_trim_best_n: true
+hpo_trim_keep_best: true
+hpo_trim_keep_last: false
+hpo_experiment_name: null
+hpo_local_mode: false
+
+# ── Logging ─────────────────────────────────────────────────────────────
+wandb_project: null               # Set to enable wandb (e.g. "traffic-benchmark")
+wandb_entity: null
+dev_run: false
+
+# ── Visualisation ───────────────────────────────────────────────────────
+auto_viz: true
+viz_method: mean                  # mean | median | last | longest_history | best | worst | single
+
+# ── Misc model keys (compat) ───────────────────────────────────────────
+embed: timeF
+activation: gelu
+output_attention: false
+factor: 1
+task_name: long_term_forecast
