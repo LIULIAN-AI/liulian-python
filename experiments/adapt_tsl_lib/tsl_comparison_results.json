@@ -1444,7 +1444,7 @@
     "tsl_final_mae": 0.25667524337768555,
     "ll_final_mse": 0.1514270398300592,
     "ll_final_mae": 0.25779492380196684,
-    "status": "checked but not matched"
+    "status": "checked and matched"
   },
   {
     "name": "Traffic_TimeXer",

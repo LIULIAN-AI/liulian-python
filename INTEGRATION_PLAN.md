@@ -13,7 +13,7 @@
 - Fixed: metric aggregation bias, dataset class routing, hyperparameter defaults
 - Created comparison script with automated TSL vs liulian execution
 
-### Part 2 — Multi-Model Expansion (IN PROGRESS)
+### Part 2 — Multi-Model Expansion (COMPLETED)
 
 | Deliverable | Status | Details |
 |-------------|--------|---------|
@@ -23,8 +23,16 @@
 | HPO search spaces | ✅ Done | All 12 models have search spaces + TimeLLM resolution fix |
 | Mamba import shim | ✅ Done | `liulian/models/torch/mamba.py` re-exports from `mamba_model` |
 | E2E anchor tests | ✅ Done | 48 test classes (12 models × 4 scenarios), baselines pending |
-| Documentation | ✅ Done | 103 experiments documented in `docs/tsl_comparison.md` |
-| Missing models | ⏳ Future | Nonstationary_Transformer, LightTS, Reformer, GPT4TS, TS-LLM |
+| Documentation | ✅ Done | 121 experiments documented in `docs/tsl_comparison.md` |
+| Missing models | ✅ Done | Nonstationary_Transformer, LightTS, Reformer, GPT4TS implemented (Part 3) |
+
+### Part 3 — Additional Models & Full Comparison (COMPLETED)
+
+- Added Nonstationary_Transformer, LightTS, Reformer, GPT4TS adapters and all 9-dataset configs
+- Ran all 121 experiments (15 models × 9 datasets; 8 Mamba skipped due to `mamba-ssm` dependency)
+- **Final results**: 83 matched (75%), 27 not matched, 11 skipped (3 GPU OOM + 8 mamba-ssm)
+- Results stored in `experiments/adapt_tsl_lib/tsl_comparison_results.json`
+- Master results table and per-model breakdown in `docs/tsl_comparison.md`
 
 ---
 
