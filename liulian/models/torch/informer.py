@@ -37,6 +37,7 @@ class Model(nn.Module):
         self.task_name = configs.task_name
         self.pred_len = configs.pred_len
         self.label_len = configs.label_len
+        self.distil = getattr(configs, 'distil', True)
 
         # Embedding
         self.enc_embedding = DataEmbedding(
@@ -76,7 +77,7 @@ class Model(nn.Module):
                 for l in range(configs.e_layers)
             ],
             [ConvLayer(configs.d_model) for l in range(configs.e_layers - 1)]
-            if configs.distil and ('forecast' in configs.task_name)
+            if self.distil and ('forecast' in configs.task_name)
             else None,
             norm_layer=torch.nn.LayerNorm(configs.d_model),
         )
@@ -126,6 +127,10 @@ class Model(nn.Module):
             )
 
     def long_forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
+        # Align x_mark_dec length to x_dec (liulian passes full batch_y_mark which may
+        # span seq_len+label_len+pred_len, but decoder only needs label_len+pred_len)
+        if x_mark_dec is not None and x_mark_dec.shape[1] > x_dec.shape[1]:
+            x_mark_dec = x_mark_dec[:, :x_dec.shape[1], :]
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         dec_out = self.dec_embedding(x_dec, x_mark_dec)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
@@ -143,6 +148,9 @@ class Model(nn.Module):
         ).detach()  # B x 1 x E
         x_enc = x_enc / std_enc
 
+        # Align x_mark_dec length to x_dec (same reason as long_forecast)
+        if x_mark_dec is not None and x_mark_dec.shape[1] > x_dec.shape[1]:
+            x_mark_dec = x_mark_dec[:, :x_dec.shape[1], :]
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         dec_out = self.dec_embedding(x_dec, x_mark_dec)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)

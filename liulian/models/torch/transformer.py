@@ -127,6 +127,9 @@ class Model(nn.Module):
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
 
+        # align x_mark_dec to x_dec length (label_len+pred_len)
+        if x_mark_dec is not None and x_mark_dec.shape[1] > x_dec.shape[1]:
+            x_mark_dec = x_mark_dec[:, :x_dec.shape[1], :]
         dec_out = self.dec_embedding(x_dec, x_mark_dec)
         dec_out = self.decoder(dec_out, enc_out, x_mask=None, cross_mask=None)
         return dec_out

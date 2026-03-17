@@ -11,6 +11,8 @@ Usage (from project root, with .venv activated):
 Options:
     --pairs PAIR [PAIR ...]   Run only selected pairs by name, e.g.
                               --pairs ETTh1_PatchTST ETTh2_DLinear
+    --remaining-only          Skip pairs that already have non-dry-run
+                              results in an existing JSON results file.
     --dry-run                 Print commands without executing them.
 
 The script automatically:
@@ -41,6 +43,15 @@ TSL_ROOT = PROJECT_ROOT / "refer_projects" / "Time-Series-Library"
 PYTHON = str(PROJECT_ROOT / ".venv" / "bin" / "python")
 RESULTS_DIR = PROJECT_ROOT / "artifacts"
 RESULTS_FILE = RESULTS_DIR / "tsl_comparison_results.txt"
+RESULTS_JSON_FILES = [
+    PROJECT_ROOT / 'experiments' / 'adapt_tsl_lib' / 'tsl_comparison_results.json',
+    RESULTS_DIR / 'tsl_comparison_results.json',
+]
+
+COMPLETED_STATUSES = {
+    'checked and matched',
+    'checked but not matched',
+}
 
 # Tolerance for "matched" verdict
 MSE_ABS_TOL = 0.010   # absolute MSE difference
@@ -1980,8 +1991,8 @@ def parse_liulian_output(output: str) -> dict:
 # Runner
 # ---------------------------------------------------------------------------
 
-def run_cmd(cmd: list[str], cwd: str, label: str) -> tuple[str, float]:
-    """Run a command, return (combined_output, elapsed_seconds)."""
+def run_cmd(cmd: list[str], cwd: str, label: str) -> tuple[str, float, int]:
+    """Run a command, return (combined_output, elapsed_seconds, returncode)."""
     print(f"\n{'='*60}")
     print(f"  Running: {label}")
     print(f"  CWD: {cwd}")
@@ -1996,7 +2007,21 @@ def run_cmd(cmd: list[str], cwd: str, label: str) -> tuple[str, float]:
     )
     elapsed = time.time() - t0
     print(f"  Finished in {elapsed:.1f}s (exit code {proc.returncode})")
-    return proc.stdout, elapsed
+    return proc.stdout, elapsed, proc.returncode
+
+
+def _tail_lines(text: str, n: int = 40) -> str:
+    """Return the last *n* lines of text for compact error reporting."""
+    lines = text.strip().splitlines()
+    if not lines:
+        return ''
+    return '\n'.join(lines[-n:])
+
+
+def is_completed_result(entry: dict) -> bool:
+    """Return True if a stored result counts as a completed comparison."""
+    status = entry.get('status', '')
+    return status in COMPLETED_STATUSES or (isinstance(status, str) and status.startswith('skipped'))
 
 
 def compare_metrics(
@@ -2069,6 +2094,13 @@ def main() -> None:
         help="Print commands without executing",
     )
     parser.add_argument(
+        '--remaining-only', action='store_true',
+        help=(
+            'Skip pairs that already have non-dry-run results in an existing '
+            'JSON results file, and run only the remaining selected pairs.'
+        ),
+    )
+    parser.add_argument(
         "--disable-es", action="store_true",
         help=(
             "Disable early stopping for both sides. "
@@ -2089,6 +2121,53 @@ def main() -> None:
             print(f"No matching experiments for: {args.pairs}")
             print(f"Available: {[e.name for e in EXPERIMENTS]}")
             sys.exit(1)
+
+    selected_experiments = experiments
+    selected_names = {e.name for e in selected_experiments}
+
+    existing_results_by_name: dict[str, dict] = {}
+    if args.remaining_only:
+        for json_path in RESULTS_JSON_FILES:
+            if not json_path.exists():
+                continue
+            try:
+                with open(json_path) as f:
+                    loaded = json.load(f)
+            except (OSError, json.JSONDecodeError) as exc:
+                print(f'Warning: failed to read existing results from {json_path}: {exc}')
+                continue
+
+            if not isinstance(loaded, list):
+                print(f'Warning: ignoring non-list results file: {json_path}')
+                continue
+
+            loaded_count = 0
+            for entry in loaded:
+                if not isinstance(entry, dict):
+                    continue
+                name = entry.get('name')
+                if not name or not is_completed_result(entry):
+                    continue
+                if name not in selected_names:
+                    continue
+                if name not in existing_results_by_name:
+                    loaded_count += 1
+                existing_results_by_name[name] = entry
+
+            if loaded_count:
+                print(f'Loaded {loaded_count} unique completed result(s) from {json_path}')
+
+        remaining = [e for e in experiments if e.name not in existing_results_by_name]
+        skipped = len(experiments) - len(remaining)
+        print(
+            f'Remaining-only mode: {skipped} already completed, '
+            f'{len(remaining)} remaining.'
+        )
+        experiments = remaining
+
+        if not experiments:
+            print('No remaining experiments to run.')
+            return
 
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
     results: list[dict] = []
@@ -2115,29 +2194,42 @@ def main() -> None:
 
         # --- Run TSL ---
         try:
-            tsl_out, tsl_time = run_cmd(
+            tsl_out, tsl_time, tsl_rc = run_cmd(
                 tsl_cmd, cwd=str(TSL_ROOT), label=f"TSL {exp.name}",
             )
         except subprocess.TimeoutExpired:
-            tsl_out, tsl_time = "", -1
+            tsl_out, tsl_time, tsl_rc = '', -1, -1
             print("  TSL TIMEOUT")
 
         tsl_metrics = parse_tsl_output(tsl_out)
 
         # --- Run liulian ---
         try:
-            ll_out, ll_time = run_cmd(
+            ll_out, ll_time, ll_rc = run_cmd(
                 ll_cmd, cwd=str(PROJECT_ROOT), label=f"liulian {exp.name}",
             )
         except subprocess.TimeoutExpired:
-            ll_out, ll_time = "", -1
+            ll_out, ll_time, ll_rc = '', -1, -1
             print("  liulian TIMEOUT")
 
         ll_metrics = parse_liulian_output(ll_out)
 
         # --- Compare ---
-        matched, detail = compare_metrics(tsl_metrics, ll_metrics, exp.large)
-        status = "checked and matched" if matched else "checked but not matched"
+        if tsl_rc != 0:
+            status = 'run failed'
+            detail = (
+                f'TSL command failed with exit code {tsl_rc}.\n'
+                f'Last output lines:\n{_tail_lines(tsl_out)}'
+            )
+        elif ll_rc != 0:
+            status = 'run failed'
+            detail = (
+                f'liulian command failed with exit code {ll_rc}.\n'
+                f'Last output lines:\n{_tail_lines(ll_out)}'
+            )
+        else:
+            matched, detail = compare_metrics(tsl_metrics, ll_metrics, exp.large)
+            status = 'checked and matched' if matched else 'checked but not matched'
 
         tsl_epochs_run = len(tsl_metrics["epochs"])
         ll_epochs_run = ll_metrics.get("epochs_run") or len(ll_metrics["epochs"])
@@ -2167,6 +2259,41 @@ def main() -> None:
         print(f"  TSL: {tsl_epochs_run} epochs in {tsl_time:.1f}s")
         print(f"  LL:  {ll_epochs_run} epochs in {ll_time:.1f}s")
 
+    results_to_write = results
+    if args.remaining_only:
+        merged_by_name = {
+            name: dict(existing_results_by_name[name])
+            for name in selected_names
+            if name in existing_results_by_name
+        }
+        for r in results:
+            merged_by_name[r['name']] = r
+        results_to_write = [
+            merged_by_name[e.name]
+            for e in selected_experiments
+            if e.name in merged_by_name
+        ]
+    else:
+        # When running specific --pairs, merge new results with all prior completed
+        # results so we never overwrite already-recorded data.
+        all_existing: dict = {}
+        for jf_path in RESULTS_JSON_FILES:
+            p = Path(jf_path)
+            if p.exists():
+                try:
+                    existing = json.loads(p.read_text())
+                    if isinstance(existing, list):
+                        for entry in existing:
+                            name = entry.get('name')
+                            if name and is_completed_result(entry) and name not in all_existing:
+                                all_existing[name] = entry
+                except Exception:
+                    pass
+        # New results override existing entries of the same name
+        for r in results:
+            all_existing[r['name']] = r
+        results_to_write = list(all_existing.values())
+
     # --- Write results file ---
     with open(RESULTS_FILE, "w") as f:
         f.write("=" * 80 + "\n")
@@ -2174,7 +2301,7 @@ def main() -> None:
         f.write(f"Generated: {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
         f.write("=" * 80 + "\n\n")
 
-        for r in results:
+        for r in results_to_write:
             f.write(f"--- {r['name']} ---\n")
             if r.get("status") == "dry-run":
                 f.write(f"  Status: dry-run\n")
@@ -2207,7 +2334,7 @@ def main() -> None:
         f.write(f"{'Name':<25} {'TSL ep':>6} {'LL ep':>5} "
                 f"{'TSL time':>9} {'LL time':>8} {'Status'}\n")
         f.write("-" * 80 + "\n")
-        for r in results:
+        for r in results_to_write:
             if r.get("status") == "dry-run":
                 f.write(f"{r['name']:<25} {'---':>6} {'---':>5} "
                         f"{'---':>9} {'---':>8} dry-run\n")
@@ -2225,7 +2352,7 @@ def main() -> None:
     json_file = RESULTS_DIR / "tsl_comparison_results.json"
     # Remove non-serialisable bits
     json_results = []
-    for r in results:
+    for r in results_to_write:
         jr = dict(r)
         jr.pop("detail", None)
         json_results.append(jr)

@@ -154,7 +154,10 @@ class Model(nn.Module):
         # enc
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
-        # dec
+        # dec — align x_mark_dec to seasonal_init length (label_len+pred_len)
+        dec_len = seasonal_init.shape[1]
+        if x_mark_dec is not None and x_mark_dec.shape[1] > dec_len:
+            x_mark_dec = x_mark_dec[:, :dec_len, :]
         dec_out = self.dec_embedding(seasonal_init, x_mark_dec)
         seasonal_part, trend_part = self.decoder(
             dec_out, enc_out, x_mask=None, cross_mask=None, trend=trend_init

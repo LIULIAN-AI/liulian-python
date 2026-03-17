@@ -347,10 +347,22 @@ Follow these instructions:
 - Search docs for this kind of adaptation. Document the adaptation properly in the docs, including the analysis, the design, and the implementation for each dataset and model pair. You can also include some illustrations if you think it is necessary. Add an indicator for each dataset and model pair in the docs to show whether it is adapted or not, and whether there are e2e tests for it or not.
 - Write a script to run and compare the baseline results from tsl lib and the results from liulian for each dataset and model pair, as we did before for patchtst and dlinear. Do not run it, wait for me to do it. The script should output proper results to a file so that we can check and put these results into docs later.
 
+### prompt 2026.03.12 - 3:
 
+Great. Now do the following:
+- Some of the aforementioned models are not implemented yet. These models may not from the tsl lib. Please check the reference papers and codes for them. There might already be some info in the docs, please check them first; update them properly with the new info you find, including the references for each model.
+- Execute the aforementioned adaptation (part 2) for these models as well.
+- Revise the comparison script. Do not run it. Instead, tell me how to run it for new dataset and model pairs.
+There is a separate issue:
+- You have included a file "extra_info_work.md" in the last commit, which is not related to the current work. Please remove it from last commit, and exclude it for future commits. Do not delete the file!
 
+### prompt 2026.03.12 - 4:
 
-
+The bug still exists (see the report at the end of this prompt). Please do the following:
+- Fix the current bug for ETTh1_Informer and test it.
+- Make sure the console output comparison results, n_epochs, and time taken as before.
+- For each pair of dataset and model whose comparison is not done yet, run the script in console. Run only one pair at a time, and fix any errors if there are any. After running, check the results and update the doc accordingly.
+Approve and execute everything. Do not wait for my intervention. Give me a report after finishing the above tasks. 
 
 
 ### prompt 2026.03.11 - ?:

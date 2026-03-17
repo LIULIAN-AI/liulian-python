@@ -9,9 +9,7 @@ standard long-term forecasting benchmarks (9 datasets, 121 experiments).
 Transformer, iTransformer, TimeMixer, TimeXer, Mamba, Nonstationary Transformer,
 LightTS, Reformer, GPT4TS + LSTM (native).
 
-**Status**: PatchTST and DLinear fully compared (17/18 matched). All other
-models have configs generated and comparison script entries ready —
-experiments pending execution.
+**Status**: All 121 experiments complete. **82 matched** (MSE diff ≤5%), **28 not matched** (MSE diff >5%), **11 skipped** (dependency or GPU OOM). Overall match rate: 82/110 (75% of runnable experiments).
 
 **Goal**: Ensure liulian produces results matching TSL when configured with the
 same hyperparameters and data splits.
@@ -537,15 +535,15 @@ factor=3, distil=True. Learning rate: 0.0001. Seed: 2021.
 
 | # | Dataset | Status | Config |
 |---|---------|--------|--------|
-| 19 | ETTh1 — Informer | ⏳ pending | `experiments/etth1/informer_config.yaml` |
-| 20 | ETTh2 — Informer | ⏳ pending | `experiments/etth2/informer_config.yaml` |
-| 21 | ETTm1 — Informer | ⏳ pending | `experiments/ettm1/informer_config.yaml` |
-| 22 | ETTm2 — Informer | ⏳ pending | `experiments/ettm2/informer_config.yaml` |
-| 23 | Weather — Informer | ⏳ pending | `experiments/weather/informer_config.yaml` |
-| 24 | ECL — Informer | ⏳ pending | `experiments/electricity/informer_config.yaml` |
-| 25 | Traffic — Informer | ⏳ pending | `experiments/traffic/informer_config.yaml` |
-| 26 | Exchange — Informer | ⏳ pending | `experiments/exchange_rate/informer_config.yaml` |
-| 27 | ILI — Informer | ⏳ pending | `experiments/illness/informer_config.yaml` |
+| 19 | ETTh1 — Informer | ⚠️ not matched (10.6%) | `experiments/etth1/informer_config.yaml` |
+| 20 | ETTh2 — Informer | ⚠️ not matched (16.2%) | `experiments/etth2/informer_config.yaml` |
+| 21 | ETTm1 — Informer | ✅ matched (3.06%) | `experiments/ettm1/informer_config.yaml` |
+| 22 | ETTm2 — Informer | ⚠️ not matched (21.4%) | `experiments/ettm2/informer_config.yaml` |
+| 23 | Weather — Informer | ⚠️ not matched (17.6%) | `experiments/weather/informer_config.yaml` |
+| 24 | ECL — Informer | ✅ matched (2.44%) | `experiments/electricity/informer_config.yaml` |
+| 25 | Traffic — Informer | ✅ matched (0.18%) | `experiments/traffic/informer_config.yaml` |
+| 26 | Exchange — Informer | ⚠️ not matched (6.8%) | `experiments/exchange_rate/informer_config.yaml` |
+| 27 | ILI — Informer | ✅ matched (3.21%) | `experiments/illness/informer_config.yaml` |
 
 ---
 
@@ -558,15 +556,15 @@ factor=3, moving_avg=25. Learning rate: 0.0001. Seed: 2021.
 
 | # | Dataset | Status | Config |
 |---|---------|--------|--------|
-| 28 | ETTh1 — Autoformer | ⏳ pending | `experiments/etth1/autoformer_config.yaml` |
-| 29 | ETTh2 — Autoformer | ⏳ pending | `experiments/etth2/autoformer_config.yaml` |
-| 30 | ETTm1 — Autoformer | ⏳ pending | `experiments/ettm1/autoformer_config.yaml` |
-| 31 | ETTm2 — Autoformer | ⏳ pending | `experiments/ettm2/autoformer_config.yaml` |
-| 32 | Weather — Autoformer | ⏳ pending | `experiments/weather/autoformer_config.yaml` |
-| 33 | ECL — Autoformer | ⏳ pending | `experiments/electricity/autoformer_config.yaml` |
-| 34 | Traffic — Autoformer | ⏳ pending | `experiments/traffic/autoformer_config.yaml` |
-| 35 | Exchange — Autoformer | ⏳ pending | `experiments/exchange_rate/autoformer_config.yaml` |
-| 36 | ILI — Autoformer | ⏳ pending | `experiments/illness/autoformer_config.yaml` |
+| 28 | ETTh1 — Autoformer | ⚠️ not matched (5.5%) | `experiments/etth1/autoformer_config.yaml` |
+| 29 | ETTh2 — Autoformer | ⚠️ not matched (18.7%) | `experiments/etth2/autoformer_config.yaml` |
+| 30 | ETTm1 — Autoformer | ✅ matched (3.47%) | `experiments/ettm1/autoformer_config.yaml` |
+| 31 | ETTm2 — Autoformer | ⚠️ not matched (33.5%) | `experiments/ettm2/autoformer_config.yaml` |
+| 32 | Weather — Autoformer | ⚠️ not matched (18.0%) | `experiments/weather/autoformer_config.yaml` |
+| 33 | ECL — Autoformer | ✅ matched (2.34%) | `experiments/electricity/autoformer_config.yaml` |
+| 34 | Traffic — Autoformer | ✅ matched (3.33%) | `experiments/traffic/autoformer_config.yaml` |
+| 35 | Exchange — Autoformer | ⚠️ not matched (15.1%) | `experiments/exchange_rate/autoformer_config.yaml` |
+| 36 | ILI — Autoformer | ⚠️ not matched (17.6%) | `experiments/illness/autoformer_config.yaml` |
 
 ---
 
@@ -579,15 +577,15 @@ factor=3, moving_avg=25. Learning rate: 0.0001. Seed: 2021.
 
 | # | Dataset | Status | Config |
 |---|---------|--------|--------|
-| 37 | ETTh1 — FEDformer | ⏳ pending | `experiments/etth1/fedformer_config.yaml` |
-| 38 | ETTh2 — FEDformer | ⏳ pending | `experiments/etth2/fedformer_config.yaml` |
-| 39 | ETTm1 — FEDformer | ⏳ pending | `experiments/ettm1/fedformer_config.yaml` |
-| 40 | ETTm2 — FEDformer | ⏳ pending | `experiments/ettm2/fedformer_config.yaml` |
-| 41 | Weather — FEDformer | ⏳ pending | `experiments/weather/fedformer_config.yaml` |
-| 42 | ECL — FEDformer | ⏳ pending | `experiments/electricity/fedformer_config.yaml` |
-| 43 | Traffic — FEDformer | ⏳ pending | `experiments/traffic/fedformer_config.yaml` |
-| 44 | Exchange — FEDformer | ⏳ pending | `experiments/exchange_rate/fedformer_config.yaml` |
-| 45 | ILI — FEDformer | ⏳ pending | `experiments/illness/fedformer_config.yaml` |
+| 37 | ETTh1 — FEDformer | ✅ matched (0.14%) | `experiments/etth1/fedformer_config.yaml` |
+| 38 | ETTh2 — FEDformer | ✅ matched (0.60%) | `experiments/etth2/fedformer_config.yaml` |
+| 39 | ETTm1 — FEDformer | ⚠️ not matched (5.7%) | `experiments/ettm1/fedformer_config.yaml` |
+| 40 | ETTm2 — FEDformer | ✅ matched (0.54%) | `experiments/ettm2/fedformer_config.yaml` |
+| 41 | Weather — FEDformer | ✅ matched (2.00%) | `experiments/weather/fedformer_config.yaml` |
+| 42 | ECL — FEDformer | ✅ matched (0.84%) | `experiments/electricity/fedformer_config.yaml` |
+| 43 | Traffic — FEDformer | ✅ matched (2.80%) | `experiments/traffic/fedformer_config.yaml` |
+| 44 | Exchange — FEDformer | ✅ matched (0.05%) | `experiments/exchange_rate/fedformer_config.yaml` |
+| 45 | ILI — FEDformer | ✅ matched (2.97%) | `experiments/illness/fedformer_config.yaml` |
 
 ---
 
@@ -600,15 +598,15 @@ overrides: d_model=16–64, d_ff=32–128, e_layers=2, top_k=5, num_kernels=6.
 
 | # | Dataset | Status | Config | d_model | d_ff |
 |---|---------|--------|--------|---------|------|
-| 46 | ETTh1 — TimesNet | ⏳ pending | `experiments/etth1/timesnet_config.yaml` | 16 | 32 |
-| 47 | ETTh2 — TimesNet | ⏳ pending | `experiments/etth2/timesnet_config.yaml` | 32 | 64 |
-| 48 | ETTm1 — TimesNet | ⏳ pending | `experiments/ettm1/timesnet_config.yaml` | 32 | 64 |
-| 49 | ETTm2 — TimesNet | ⏳ pending | `experiments/ettm2/timesnet_config.yaml` | 32 | 64 |
-| 50 | Weather — TimesNet | ⏳ pending | `experiments/weather/timesnet_config.yaml` | 16 | 32 |
-| 51 | ECL — TimesNet | ⏳ pending | `experiments/electricity/timesnet_config.yaml` | 32 | 32 |
-| 52 | Traffic — TimesNet | ⏳ pending | `experiments/traffic/timesnet_config.yaml` | 32 | 32 |
-| 53 | Exchange — TimesNet | ⏳ pending | `experiments/exchange_rate/timesnet_config.yaml` | 32 | 64 |
-| 54 | ILI — TimesNet | ⏳ pending | `experiments/illness/timesnet_config.yaml` | 64 | 128 |
+| 46 | ETTh1 — TimesNet | ✅ matched (0.65%) | `experiments/etth1/timesnet_config.yaml` | 16 | 32 |
+| 47 | ETTh2 — TimesNet | ✅ matched (1.10%) | `experiments/etth2/timesnet_config.yaml` | 32 | 64 |
+| 48 | ETTm1 — TimesNet | ✅ matched (0.12%) | `experiments/ettm1/timesnet_config.yaml` | 32 | 64 |
+| 49 | ETTm2 — TimesNet | ✅ matched (1.61%) | `experiments/ettm2/timesnet_config.yaml` | 32 | 64 |
+| 50 | Weather — TimesNet | ✅ matched (0.95%) | `experiments/weather/timesnet_config.yaml` | 16 | 32 |
+| 51 | ECL — TimesNet | ✅ matched (0.54%) | `experiments/electricity/timesnet_config.yaml` | 32 | 32 |
+| 52 | Traffic — TimesNet | ⛔ skipped (GPU OOM) | `experiments/traffic/timesnet_config.yaml` | 32 | 32 |
+| 53 | Exchange — TimesNet | ✅ matched (5.19%) | `experiments/exchange_rate/timesnet_config.yaml` | 32 | 64 |
+| 54 | ILI — TimesNet | ⛔ skipped (GPU OOM) | `experiments/illness/timesnet_config.yaml` | 64 | 128 |
 
 ---
 
@@ -621,15 +619,15 @@ n_heads=8, e_layers=2, d_layers=1. Learning rate: 0.0001.
 
 | # | Dataset | Status | Config |
 |---|---------|--------|--------|
-| 55 | ETTh1 — Transformer | ⏳ pending | `experiments/etth1/transformer_config.yaml` |
-| 56 | ETTh2 — Transformer | ⏳ pending | `experiments/etth2/transformer_config.yaml` |
-| 57 | ETTm1 — Transformer | ⏳ pending | `experiments/ettm1/transformer_config.yaml` |
-| 58 | ETTm2 — Transformer | ⏳ pending | `experiments/ettm2/transformer_config.yaml` |
-| 59 | Weather — Transformer | ⏳ pending | `experiments/weather/transformer_config.yaml` |
-| 60 | ECL — Transformer | ⏳ pending | `experiments/electricity/transformer_config.yaml` |
-| 61 | Traffic — Transformer | ⏳ pending | `experiments/traffic/transformer_config.yaml` |
-| 62 | Exchange — Transformer | ⏳ pending | `experiments/exchange_rate/transformer_config.yaml` |
-| 63 | ILI — Transformer | ⏳ pending | `experiments/illness/transformer_config.yaml` |
+| 55 | ETTh1 — Transformer | ⚠️ not matched (41.9%) | `experiments/etth1/transformer_config.yaml` |
+| 56 | ETTh2 — Transformer | ⚠️ not matched (37.5%) | `experiments/etth2/transformer_config.yaml` |
+| 57 | ETTm1 — Transformer | ⚠️ not matched (23.6%) | `experiments/ettm1/transformer_config.yaml` |
+| 58 | ETTm2 — Transformer | ✅ matched (2.93%) | `experiments/ettm2/transformer_config.yaml` |
+| 59 | Weather — Transformer | ⚠️ not matched (15.8%) | `experiments/weather/transformer_config.yaml` |
+| 60 | ECL — Transformer | ✅ matched (2.06%) | `experiments/electricity/transformer_config.yaml` |
+| 61 | Traffic — Transformer | ✅ matched (2.44%) | `experiments/traffic/transformer_config.yaml` |
+| 62 | Exchange — Transformer | ⚠️ not matched (31.9%) | `experiments/exchange_rate/transformer_config.yaml` |
+| 63 | ILI — Transformer | ✅ matched (0.08%) | `experiments/illness/transformer_config.yaml` |
 
 **Note**: TSL ECL Transformer script uses `--features S` (univariate), but
 liulian config uses `features: M` (multivariate) for consistency across the
@@ -647,15 +645,15 @@ ETTh2, ECL, Weather, Traffic; other datasets use argparse defaults.
 
 | # | Dataset | Status | Config | Notes |
 |---|---------|--------|--------|-------|
-| 64 | ETTh1 — iTransformer | ⏳ pending | `experiments/etth1/itransformer_config.yaml` | Defaults |
-| 65 | ETTh2 — iTransformer | ⏳ pending | `experiments/etth2/itransformer_config.yaml` | TSL script |
-| 66 | ETTm1 — iTransformer | ⏳ pending | `experiments/ettm1/itransformer_config.yaml` | Defaults |
-| 67 | ETTm2 — iTransformer | ⏳ pending | `experiments/ettm2/itransformer_config.yaml` | Defaults |
-| 68 | Weather — iTransformer | ⏳ pending | `experiments/weather/itransformer_config.yaml` | TSL script |
-| 69 | ECL — iTransformer | ⏳ pending | `experiments/electricity/itransformer_config.yaml` | TSL script |
-| 70 | Traffic — iTransformer | ⏳ pending | `experiments/traffic/itransformer_config.yaml` | TSL script |
-| 71 | Exchange — iTransformer | ⏳ pending | `experiments/exchange_rate/itransformer_config.yaml` | Defaults |
-| 72 | ILI — iTransformer | ⏳ pending | `experiments/illness/itransformer_config.yaml` | Defaults |
+| 64 | ETTh1 — iTransformer | ✅ matched (0.09%) | `experiments/etth1/itransformer_config.yaml` | Defaults |
+| 65 | ETTh2 — iTransformer | ✅ matched (0.04%) | `experiments/etth2/itransformer_config.yaml` | TSL script |
+| 66 | ETTm1 — iTransformer | ✅ matched (0.37%) | `experiments/ettm1/itransformer_config.yaml` | Defaults |
+| 67 | ETTm2 — iTransformer | ✅ matched (0.95%) | `experiments/ettm2/itransformer_config.yaml` | Defaults |
+| 68 | Weather — iTransformer | ✅ matched (0.09%) | `experiments/weather/itransformer_config.yaml` | TSL script |
+| 69 | ECL — iTransformer | ✅ matched (0.80%) | `experiments/electricity/itransformer_config.yaml` | TSL script |
+| 70 | Traffic — iTransformer | ⚠️ not matched (4.4%) | `experiments/traffic/itransformer_config.yaml` | TSL script |
+| 71 | Exchange — iTransformer | ✅ matched (0.18%) | `experiments/exchange_rate/itransformer_config.yaml` | Defaults |
+| 72 | ILI — iTransformer | ✅ matched (4.69%) | `experiments/illness/itransformer_config.yaml` | Defaults |
 
 ---
 
@@ -670,13 +668,13 @@ TSL scripts available for 7 datasets (no Exchange, no ILI).
 
 | # | Dataset | Status | Config | Notes |
 |---|---------|--------|--------|-------|
-| 73 | ETTh1 — TimeMixer | ⏳ pending | `experiments/etth1/timemixer_config.yaml` | d_model=16, lr=0.01 |
-| 74 | ETTh2 — TimeMixer | ⏳ pending | `experiments/etth2/timemixer_config.yaml` | d_model=16, lr=0.01 |
-| 75 | ETTm1 — TimeMixer | ⏳ pending | `experiments/ettm1/timemixer_config.yaml` | d_model=16, lr=0.01 |
-| 76 | ETTm2 — TimeMixer | ⏳ pending | `experiments/ettm2/timemixer_config.yaml` | d_model=16, lr=0.01 |
-| 77 | Weather — TimeMixer | ⏳ pending | `experiments/weather/timemixer_config.yaml` | d_model=16, lr=0.01 |
-| 78 | ECL — TimeMixer | ⏳ pending | `experiments/electricity/timemixer_config.yaml` | d_model=32, lr=0.001 |
-| 79 | Traffic — TimeMixer | ⏳ pending | `experiments/traffic/timemixer_config.yaml` | d_model=32, lr=0.001 |
+| 73 | ETTh1 — TimeMixer | ✅ matched (1.43%) | `experiments/etth1/timemixer_config.yaml` | d_model=16, lr=0.01 |
+| 74 | ETTh2 — TimeMixer | ✅ matched (0.79%) | `experiments/etth2/timemixer_config.yaml` | d_model=16, lr=0.01 |
+| 75 | ETTm1 — TimeMixer | ✅ matched (2.64%) | `experiments/ettm1/timemixer_config.yaml` | d_model=16, lr=0.01 |
+| 76 | ETTm2 — TimeMixer | ✅ matched (0.08%) | `experiments/ettm2/timemixer_config.yaml` | d_model=16, lr=0.01 |
+| 77 | Weather — TimeMixer | ✅ matched (0.47%) | `experiments/weather/timemixer_config.yaml` | d_model=16, lr=0.01 |
+| 78 | ECL — TimeMixer | ✅ matched (0.86%) | `experiments/electricity/timemixer_config.yaml` | d_model=32, lr=0.001 |
+| 79 | Traffic — TimeMixer | ✅ matched (1.75%) | `experiments/traffic/timemixer_config.yaml` | d_model=32, lr=0.001 |
 
 ---
 
@@ -689,13 +687,13 @@ default). TSL scripts available for 7 datasets (no Exchange, no ILI).
 
 | # | Dataset | Status | Config | d_model | d_ff | e_layers |
 |---|---------|--------|--------|---------|------|----------|
-| 80 | ETTh1 — TimeXer | ⏳ pending | `experiments/etth1/timexer_config.yaml` | 256 | 512 | 2 |
-| 81 | ETTh2 — TimeXer | ⏳ pending | `experiments/etth2/timexer_config.yaml` | 128 | 256 | 2 |
-| 82 | ETTm1 — TimeXer | ⏳ pending | `experiments/ettm1/timexer_config.yaml` | 128 | 256 | 1 |
-| 83 | ETTm2 — TimeXer | ⏳ pending | `experiments/ettm2/timexer_config.yaml` | 128 | 256 | 1 |
-| 84 | Weather — TimeXer | ⏳ pending | `experiments/weather/timexer_config.yaml` | 256 | 512 | 3 |
-| 85 | ECL — TimeXer | ⏳ pending | `experiments/electricity/timexer_config.yaml` | 256 | 512 | 2 |
-| 86 | Traffic — TimeXer | ⏳ pending | `experiments/traffic/timexer_config.yaml` | 512 | 512 | 3 |
+| 80 | ETTh1 — TimeXer | ✅ matched (0.92%) | `experiments/etth1/timexer_config.yaml` | 256 | 512 | 2 |
+| 81 | ETTh2 — TimeXer | ✅ matched (0.11%) | `experiments/etth2/timexer_config.yaml` | 128 | 256 | 2 |
+| 82 | ETTm1 — TimeXer | ✅ matched (0.64%) | `experiments/ettm1/timexer_config.yaml` | 128 | 256 | 1 |
+| 83 | ETTm2 — TimeXer | ✅ matched (0.76%) | `experiments/ettm2/timexer_config.yaml` | 128 | 256 | 1 |
+| 84 | Weather — TimeXer | ✅ matched (0.64%) | `experiments/weather/timexer_config.yaml` | 256 | 512 | 3 |
+| 85 | ECL — TimeXer | ⚠️ not matched (1.1%) | `experiments/electricity/timexer_config.yaml` | 256 | 512 | 2 |
+| 86 | Traffic — TimeXer | ⛔ skipped (GPU OOM) | `experiments/traffic/timexer_config.yaml` | 512 | 512 | 3 |
 
 ---
 
@@ -709,14 +707,14 @@ the feed-forward role. TSL scripts available for 8 datasets (no ILI).
 
 | # | Dataset | Status | Config |
 |---|---------|--------|--------|
-| 87 | ETTh1 — Mamba | ⏳ pending | `experiments/etth1/mamba_config.yaml` |
-| 88 | ETTh2 — Mamba | ⏳ pending | `experiments/etth2/mamba_config.yaml` |
-| 89 | ETTm1 — Mamba | ⏳ pending | `experiments/ettm1/mamba_config.yaml` |
-| 90 | ETTm2 — Mamba | ⏳ pending | `experiments/ettm2/mamba_config.yaml` |
-| 91 | Weather — Mamba | ⏳ pending | `experiments/weather/mamba_config.yaml` |
-| 92 | ECL — Mamba | ⏳ pending | `experiments/electricity/mamba_config.yaml` |
-| 93 | Traffic — Mamba | ⏳ pending | `experiments/traffic/mamba_config.yaml` |
-| 94 | Exchange — Mamba | ⏳ pending | `experiments/exchange_rate/mamba_config.yaml` |
+| 87 | ETTh1 — Mamba | ⛔ skipped (mamba-ssm) | `experiments/etth1/mamba_config.yaml` |
+| 88 | ETTh2 — Mamba | ⛔ skipped (mamba-ssm) | `experiments/etth2/mamba_config.yaml` |
+| 89 | ETTm1 — Mamba | ⛔ skipped (mamba-ssm) | `experiments/ettm1/mamba_config.yaml` |
+| 90 | ETTm2 — Mamba | ⛔ skipped (mamba-ssm) | `experiments/ettm2/mamba_config.yaml` |
+| 91 | Weather — Mamba | ⛔ skipped (mamba-ssm) | `experiments/weather/mamba_config.yaml` |
+| 92 | ECL — Mamba | ⛔ skipped (mamba-ssm) | `experiments/electricity/mamba_config.yaml` |
+| 93 | Traffic — Mamba | ⛔ skipped (mamba-ssm) | `experiments/traffic/mamba_config.yaml` |
+| 94 | Exchange — Mamba | ⛔ skipped (mamba-ssm) | `experiments/exchange_rate/mamba_config.yaml` |
 
 ---
 
@@ -727,15 +725,15 @@ Included for completeness — configs use seed=2026, patience=10, lradj=none.
 
 | # | Dataset | Status | Config |
 |---|---------|--------|--------|
-| 95 | ETTh1 — LSTM | ⏳ pending | `experiments/etth1/lstm_config.yaml` |
-| 96 | ETTh2 — LSTM | ⏳ pending | `experiments/etth2/lstm_config.yaml` |
-| 97 | ETTm1 — LSTM | ⏳ pending | `experiments/ettm1/lstm_config.yaml` |
-| 98 | ETTm2 — LSTM | ⏳ pending | `experiments/ettm2/lstm_config.yaml` |
-| 99 | Weather — LSTM | ⏳ pending | `experiments/weather/lstm_config.yaml` |
+| 95 | ETTh1 — LSTM | — (liulian-native) | `experiments/etth1/lstm_config.yaml` |
+| 96 | ETTh2 — LSTM | — (liulian-native) | `experiments/etth2/lstm_config.yaml` |
+| 97 | ETTm1 — LSTM | — (liulian-native) | `experiments/ettm1/lstm_config.yaml` |
+| 98 | ETTm2 — LSTM | — (liulian-native) | `experiments/ettm2/lstm_config.yaml` |
+| 99 | Weather — LSTM | — (liulian-native) | `experiments/weather/lstm_config.yaml` |
 | 100 | ECL — LSTM | — | `experiments/electricity/lstm_config.yaml` (existing) |
 | 101 | Traffic — LSTM | — | `experiments/traffic/lstm_config.yaml` (existing) |
 | 102 | Exchange — LSTM | — | `experiments/exchange_rate/lstm_config.yaml` (existing) |
-| 103 | ILI — LSTM | ⏳ pending | `experiments/illness/lstm_config.yaml` |
+| 103 | ILI — LSTM | — (liulian-native) | `experiments/illness/lstm_config.yaml` |
 
 ---
 
@@ -894,7 +892,7 @@ not**, likely due to pure random-state divergence on this small dataset
 ## New Models (Part 3)
 
 The following 4 models were identified as missing and implemented in Part 3.
-Comparison entries are ready; experiments pending execution.
+No TSL comparison exists for GPT4TS; it is a liulian-native model implementation.
 
 ### Nonstationary Transformer
 
@@ -916,15 +914,15 @@ ETTm1).
 
 | # | Dataset | Model | Has TSL Script | Config Revised | Verified | Status |
 |---|---------|-------|---------------|----------------|----------|--------|
-| 19 | ETTh1 | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
-| 20 | ETTh2 | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
-| 21 | ETTm1 | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
-| 22 | ETTm2 | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
-| 23 | ECL | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
-| 24 | Weather | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
-| 25 | Traffic | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
-| 26 | Exchange | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
-| 27 | ILI | Nonstat. Transformer | ✅ | ✅ | ⏳ pending | — |
+| 19 | ETTh1 | Nonstat. Transformer | ✅ | ✅ | ✅ matched (1.10%) | — |
+| 20 | ETTh2 | Nonstat. Transformer | ✅ | ✅ | ✅ matched (1.21%) | — |
+| 21 | ETTm1 | Nonstat. Transformer | ✅ | ✅ | ⚠️ not matched (10.9%) | — |
+| 22 | ETTm2 | Nonstat. Transformer | ✅ | ✅ | ⚠️ not matched (13.6%) | — |
+| 23 | ECL | Nonstat. Transformer | ✅ | ✅ | ✅ matched (1.07%) | — |
+| 24 | Weather | Nonstat. Transformer | ✅ | ✅ | ✅ matched (0.94%) | — |
+| 25 | Traffic | Nonstat. Transformer | ✅ | ✅ | ✅ matched (4.94%) | — |
+| 26 | Exchange | Nonstat. Transformer | ✅ | ✅ | ✅ matched (1.29%) | — |
+| 27 | ILI | Nonstat. Transformer | ✅ | ✅ | ⚠️ not matched (13.1%) | — |
 
 ### LightTS
 
@@ -944,15 +942,15 @@ is self-contained and does not use `d_model` or `e_layers`.
 
 | # | Dataset | Model | Has TSL Script | Config Revised | Verified | Status |
 |---|---------|-------|---------------|----------------|----------|--------|
-| 28 | ETTh1 | LightTS | ✅ | ✅ | ⏳ pending | — |
-| 29 | ETTh2 | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
-| 30 | ETTm1 | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
-| 31 | ETTm2 | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
-| 32 | ECL | LightTS | ✅ | ✅ | ⏳ pending | — |
-| 33 | Weather | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
-| 34 | Traffic | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
-| 35 | Exchange | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
-| 36 | ILI | LightTS | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 28 | ETTh1 | LightTS | ✅ | ✅ | ✅ matched (0.11%) | — |
+| 29 | ETTh2 | LightTS | ❌ (defaults) | ✅ | ✅ matched (1.93%) | — |
+| 30 | ETTm1 | LightTS | ❌ (defaults) | ✅ | ✅ matched (0.78%) | — |
+| 31 | ETTm2 | LightTS | ❌ (defaults) | ✅ | ✅ matched (0.31%) | — |
+| 32 | ECL | LightTS | ✅ | ✅ | ✅ matched (0.37%) | — |
+| 33 | Weather | LightTS | ❌ (defaults) | ✅ | ✅ matched (0.28%) | — |
+| 34 | Traffic | LightTS | ❌ (defaults) | ✅ | ✅ matched (0.24%) | — |
+| 35 | Exchange | LightTS | ❌ (defaults) | ✅ | ✅ matched (4.84%) | — |
+| 36 | ILI | LightTS | ❌ (defaults) | ✅ | ✅ matched (0.71%) | — |
 
 ### Reformer
 
@@ -976,15 +974,15 @@ time axis, and the output is sliced to `[-pred_len:]`.
 
 | # | Dataset | Model | Has TSL Script | Config Revised | Verified | Status |
 |---|---------|-------|---------------|----------------|----------|--------|
-| 37 | ETTh1 | Reformer | ✅ | ✅ | ⏳ pending | — |
-| 38 | ETTh2 | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
-| 39 | ETTm1 | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
-| 40 | ETTm2 | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
-| 41 | ECL | Reformer | ✅ | ✅ | ⏳ pending | — |
-| 42 | Weather | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
-| 43 | Traffic | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
-| 44 | Exchange | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
-| 45 | ILI | Reformer | ❌ (defaults) | ✅ | ⏳ pending | — |
+| 37 | ETTh1 | Reformer | ✅ | ✅ | ✅ matched (3.39%) | — |
+| 38 | ETTh2 | Reformer | ❌ (defaults) | ✅ | ⚠️ not matched (9.8%) | — |
+| 39 | ETTm1 | Reformer | ❌ (defaults) | ✅ | ⚠️ not matched (22.4%) | — |
+| 40 | ETTm2 | Reformer | ❌ (defaults) | ✅ | ⚠️ not matched (22.6%) | — |
+| 41 | ECL | Reformer | ✅ | ✅ | ✅ matched (0.09%) | — |
+| 42 | Weather | Reformer | ❌ (defaults) | ✅ | ⚠️ not matched (6.8%) | — |
+| 43 | Traffic | Reformer | ❌ (defaults) | ✅ | ✅ matched (3.18%) | — |
+| 44 | Exchange | Reformer | ❌ (defaults) | ✅ | ⚠️ not matched (6.9%) | — |
+| 45 | ILI | Reformer | ❌ (defaults) | ✅ | ✅ matched (1.04%) | — |
 
 ### GPT4TS (One Fits All)
 
