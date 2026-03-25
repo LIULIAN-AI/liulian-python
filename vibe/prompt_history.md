@@ -364,6 +364,241 @@ The bug still exists (see the report at the end of this prompt). Please do the f
 - For each pair of dataset and model whose comparison is not done yet, run the script in console. Run only one pair at a time, and fix any errors if there are any. After running, check the results and update the doc accordingly.
 Approve and execute everything. Do not wait for my intervention. Give me a report after finishing the above tasks. 
 
+**Claude Opus 4.6 model is no longer accessible via GitHub Copilot Student Subscription. Switch to "Auto" (e.g., GPT-5.3-Codex, Gemini 3.1 Pro).**
+
+### prompt 2026.03.17 - 1:
+
+Great! Now check carefully in the relevant codes and INTEGRATION_PLAN.md doc file, and docs/tsl_comparison.md doc file, to find out which dataset and model pairs have or have not been compared, which are matched and which are not. Give a complete list of these pairs, detail the reference docs and codes, and update the docs accordingly.
+
+### prompt 2026.03.17 - 2:
+
+Great! Now do the following:
+- In tsl_comparison.md, it claims that there are many dataset and model pairs that do not have tsl lib scripts. In these cases, which arguments were used for the check with tsl lib? Please detail the arguments used for each dataset and model pair in the doc, and give the references for these arguments (e.g., which scripts or papers they are from). If there are some pairs that do not have any reference for the arguments, please mark them in the doc as well.
+- In tsl_comparison.md, master results table show that many dataset and model pairs have large gap in results. For each of these pairs (except PatchTST and DLinear, which we have already analyzed), please analyze the possible reasons for the gap, and try to fix it. Record the details of the analysis and fix in the doc.
+- Some models are missing from the comparison, including TimeLLM, GPT4TS, TimeMoE, TimesNet, Stationary, ETSformer. For each of these models, run the aforementioned comparison procedure for all datasets that are already compared for other models, and update the docs accordingly. Some models are not from tsl lib, so you may need to do some research (from current code, docs, online) to figure out the best settings for these models for each dataset, and then run the comparison. Remember to record the details of the comparison in the doc as well. Do not skip any dataset or any model.
+
+### prompt 2026.03.17 - 3:
+
+Great. Now do the following:
+- Add all aforementioned missing dataset and model pairs to the comparison, following the same procedure as before. Update the docs accordingly.
+- For all dataset and model pairs that have been compared and marked as "checked but not matched" (except PatchTST and DLinear), analyze the possible reasons for the gap, and try to fix it. Please analyze from codes, docs, deep research (online if necessary), and logical analysis. Do not run the "compare_tsl_liulian.py" script for this part. Record the details of the analysis and fix in the doc.
+- Update "compare_tsl_liulian.py" script to include all dataset and model pairs. Add give me a cli script to run the comparison for each pair that have not been compared yet or have been compared but not matched yet (except PatchTST and DLinear). Do not run it. I will run it myself.
+Notice, this is a very complicated and time-consuming process, so please make sure to do it carefully and thoroughly. Think before you act, make sure to check all relevant codes, docs, and online resources beforehand, and make thorough and detailed plans first.
+
+### prompt 2026.03.17 - 4:
+
+Okay, this is not good enough. Please do the following task: 
+add all aforementioned missing dataset and model pairs to the comparison. 
+Please following the steps below:
+- Check all codes, docs, related history to find out all missing dataset and model pairs. List them in a complete list, and give the references for each pair (e.g., which scripts or papers they are from). Show these info in a table to me.
+- For each of these pairs, analyze the best settings for it, based on the reference scripts, papers, docs, and online resources. If there are some pairs that do not have any reference for the settings, please mark them.
+- For each of these pairs, check if there are already comparison codes in the "compare_tsl_liulian.py" script. If not, add the comparison code for it in the script. Report in detail which pairs have been added to the script, and which already have the comparison code in the script. Show these info in a table to me.
+- Update the relevant docs to include these pairs, the settings for these pairs, and the references for these pairs. Show these info in a table to me, including which docs have been updated and what info have been updated.
+- Report in detail the changes you have made.
+- Make a detailed cli script to run the comparison for each of these pairs using "--pairs" argument, which includes all the pairs that have been added to the comparison. Show this script to me, and explain how to run it.
+Please follow strictly the rules below while doing the above tasks:
+- Notice, this is a very complicated and time-consuming process, so please make sure to do it carefully and thoroughly. 
+- Each of the above bullet points counts as one task.
+- Before executing any tasks, make a thorough and detailed overall agent plan to include all tasks, in the format of:
+  - Task 1 - description of task 1
+  - Task 2 - description of task 2
+  ... and so on for all tasks.
+- After making the overall agent plan, make a deep analysis for the whole process, find out potential issues and problems, and optimize the overall agent plan with full details. This should be done before executing any tasks. Report in detail the analysis and optimization for the overall agent plan.
+- Execute each task one by one. While executing each task, strictly follow the rules and steps below:
+  - Think before you act, make sure to check all relevant codes, docs, and online resources beforehand, and make thorough and detailed plans first.
+  - The plan should include all steps you will take to execute the task, and the expected outcomes for each step. Show the plan before you execute the task.
+  - Update the overall agent plan based on the plan for each task, replacing task x with the detailed plan for task x, in the format of:
+    - Task x.1 - description of task x step 1
+    - Task x.2 - description of task x step 2
+    ... and so on for all steps.
+  - Execute the task following the plan.
+  - If there are any issues or problems during the execution, please analyze the issues, find out the causes, and fix them. Report in detail the issues, the causes, and the fixes. This should be done for each step in the plan until the task is successfully executed or at least three rounds of analysis and fix have been done for each issue.
+  - After successfully executing the task, run a check to make sure the task is done correctly, and report the check results. If there are any issues during the check, please analyze the issues, find out the causes, and fix them. Report in detail the issues, the causes, and the fixes. This should be done for each issue until the check is passed or at least three rounds of analysis and fix have been done for each issue.
+  - Update the relevant docs to include all the details of the task, and possible results and analysis derived from the task. 
+  - After finishing the task, report in detail, including what you have done, what you have found, and what changes you have made, and what have been requested to be reported in the task. Show the report after you finish the task.
+- After finishing all tasks, give me a final report for the whole process, including what you have done, what you have found, what changes you have made, what have been requested to be reported in each task, what suggestions you have for the next steps, and any other info you think is necessary to report. Make the report clear and well-structured, with proper sections and formatting to make it easy to read and understand. Show the final report after you finish all tasks.
+
+### prompt 2026.03.18 - 1:
+
+Good. Now we have a new problem: I ran "python experiments/adapt_tsl_lib/compare_tsl_liulian.py --pairs ETTh1_ETSformer --disable-es", and the generated "tsl_comparison_results.txt" and "tsl_comparison_results.json" files are under artifacts/ dir, instead of "experiments/adapt_tsl_lib/". Please fix the code to save these files in the correct dir, and merge the info in these files to the existing json and txt files under "experiments/adapt_tsl_lib/" dir.
+
+### prompt 2026.03.18 - 2:
+
+Good. Now, check for ETSformer with all other datasets, if there are some possible reasons that may cause the gap in results between tsl lib and liulian, and try to fix it. 
+
+### prompt 2026.03.18 - 3:
+
+Interesting. I wonder want are the settings for other models for a same dataset, especially those are highly related to the dataset, e.g., freq. For instance, for Weather dataset, should all models remain the same freq setting as "h" (hourly)? 
+Please check all yaml settings under experiments/ dir. For each dataset, list all dataset related settings, and all these settings for each model in a table. Highlight the settings that are different across models for the same dataset, and analyze whether these differences are reasonable or not. If there are some unreasonable differences, please fix them by making them consistent across models for the same dataset. Update the yaml files accordingly, and update the docs to include the analysis and the changes you have made.
+
+### prompt 2026.03.18 - 4:
+
+Where is the reference of this freq: 10min? Find it, doc it properly in the comments, and show it here. You should check for refer_projects tsl only for the reference.
+
+### prompt 2026.03.18 - 5:
+
+How about other datasets? Which ones have you checked and which ones have you not checked? Make a table of this info.
+
+### prompt 2026.03.18 - 6:
+
+This is not good enough. You should check the codes in tsl, make a detailed explaination for where this setting is defined, and how it is passed as code goes until the model / dataset uses it. Notice the code is run by .sh scripts from the tsl lib.
+
+### prompt 2026.03.18 - 7:
+
+Did not you realize that in this case the actual freq should be "h"? Please check and confirm if this is correct or not. If it is correct, please fix the setting to "h".
+
+### prompt 2026.03.18 - 8:
+
+What is the actually time stamp interval for the weather dataset if "h" is used? Is this consistent with the text in the .txt file? Then revise all yaml files and corresponding files and codes if necessary accordingly in liulian, for all models using weather dataset.
+
+### prompt 2026.03.19 - 1:
+
+Read results file experiments/adapt_tsl_lib/tsl_comparison_results.txt, and find out all issues, errors, and problems shown in the file, and report it in detail here.
+
+(Agent: GitHub Copilot VSCode Plugin; Model: GPT-5.3-Codex)
+
+### prompt 2026.03.19 - 2:
+
+First lets handle P0: Fix frequency-token crashes first (21 failed runs). Do not add robust frequency normalization/aliasing for 10min, 15min. Instead, make a plan for the following:
+- List all datasets and the related models that have freq setting errors in a Markdown table here.
+- For each of these datasets, check in the tsl reference project to find out: if there is a freq setting such as 10min, 15min, etc; if there is, what is the value of this setting; if not, what is the default setting for this dataset? List the reference codes / files in a Markdown table here.
+- Give plans on how to fix the freq setting for each of these dataset and model pairs, based on the reference you find. Make a detailed plan for each pair, and list the expected fixes in a Markdown table here.
+
+(Agent: GitHub Copilot VSCode Plugin; Model: GPT-5.3-Codex)
+
+### prompt 2026.03.20 - 1:
+
+Good. I have already run the script for the 21 pairs. Read results file experiments/adapt_tsl_lib/tsl_comparison_results.txt, and continue your plan.
+
+(Agent: GitHub Copilot VSCode Plugin; Model: GPT-5.3-Codex)
+
+### prompt 2026.03.20 - 2:
+
+- P1: Add missing model config defaults in-model (21 failed runs) — Guard missing config fields with getattr(..., default) in timesnet.py, timemixer.py, and timexer.py for num_kernels, channel_independence, use_norm.
+- fix The 3 remaining failures (non-freq)
+ETTm1_NonstationaryTransformer
+ETTm2_NonstationaryTransformer
+Weather_NonstationaryTransformer
+
+(Generated meta-prompt for planning using prompt in "meta_plan_prompt.md" via model: Claude Sonnet 4.6 Extended.)
+(Agent: GitHub Copilot VSCode Plugin; Model: GPT-5.3-Codex)
+
+
+### prompt 2026.03.20 - 3:
+
+- Check if the previous plan have been finished, if not, continue to execute the plan until all the steps have been completed.
+- P3: Address OOM cases (2 failed runs) — Add smaller fallback runtime profile (lower batch size / d_model / mixed precision) for heavy pairs in run_pending_or_unmatched.py, so comparison can complete instead of aborting.
+
+(Generated meta-prompt for planning using prompt in "meta_plan_prompt.md" via model: Claude Sonnet 4.6 Extended.)
+(Agent: GitHub Copilot VSCode Plugin; Model: GPT-5.3-Codex)
+
+### prompt 2026.03.23 - 1:
+
+I reran python experiments/adapt
+_tsl_lib/compare_tsl_liulian.py --pairs Traffic_TimesNet ILI_TimesNet Traffic_TimeXer --disable-es --oom-fallback, and get the "TSL TIMEOUT". Now figure out the reason of this problem, and give me a list of cause and solutions in the order of priority and in the Markdown table format. Remember, the tsl and liulian results must be comparable (better with the same settings) when designing the solutions.
+
+(Agent: GitHub Copilot VSCode Plugin; Model: GPT-5.3-Codex)
+
+### prompt 2026.03.23 - 2:
+
+Good. Please revise as the following:
+- For these pairs which use special settings (e.g., OOM fallback), please mark them automatically in the results txt / json files, and also mark them in the doc file. If there is a script to revise docs based on the results txt / json files, please revise the script to include this info as well.
+- When running experiments/adapt_tsl_lib/compare_tsl_liulian.py, sometimes it takes a long time to run. Please add a proper timer or progress bar for each running instance.
+After implementing the above changes, make a detailed Markdown table to highlight what you have changed with the referred codes and lines. Then give the cli script to run the comparison with the new changes.
+
+(Agent: GitHub Copilot VSCode Plugin; Model: GPT-5.3-Codex)
+
+
+### prompt 2026.03.23 - 3:
+
+Keep revising:
+- Fo the progress bar, are there progress bars from tsl and liulian pipeline (the global ones not the local ones such as the ones for each epoch)? If so, invoke these progress bars. If not, fall back to the progress bar you have implemented. Please make sure to check the reference codes in tsl lib for this part.
+- What is the difference between codes update_doc_full.py and update_doc.py? List in Markdown table all the references that use these two scripts and how they are used. Then check if there are some overlaps or inconsistencies between these two scripts, and if so, optimize them. If major parts are overlapped, please merge them into one script. After the optimization, make a detailed Markdown table to highlight what you have changed with the referred codes and lines.
+- "Special Settings" should also be added to the "Master Results Table" in docs/tsl_comparison.md doc file.
+After implementing the above changes, make a detailed Markdown table to highlight what you have changed with the referred codes and lines. 
+
+(Agent: GitHub Copilot VSCode Plugin; Model: GPT-5.3-Codex)
+
+### prompt 2026.03.24 - 1:
+
+Keep revising:
+- I reran python experiments/adapt
+_tsl_lib/compare_tsl_liulian.py --pairs Traffic_TimesNet ILI_TimesNet Traffic_TimeXer --disable-es --oom-fallback, all experiments passed. Please update the doc file for these pairs.
+- Check if the previous plan have been finished, especially P3: Address OOM cases. If not, continue to execute the plan until all the steps have been completed.
+- P4: Then tackle all metric mismatches (except PatchTST and DLinear, which we have already analyzed). Analyze the possible reasons for the gap first and list them in a Markdown table, then try to fix it. Please analyze from codes, docs, deep research (online if necessary), and logical analysis. Do not run the "compare_tsl_liulian.py" script for this part. Record the details of the analysis and fix in a Markdown table. Use targeted config parity checks from audit_dataset_configs.py and dataset/model configs under experiments if necessary.
+
+(Agent: GitHub Copilot VSCode Plugin; Model: GPT-5.3-Codex)
+
+### prompt 2026.03.24 - 2:
+
+Keep revising:
+- in tsl_comparison.md, master Results Table must have a "special settings" (e.g., OOM fallback, limited epochs, etc) column.
+- in tsl_comparison.md, in the table "Summary by Model", why TimeMixer and TimeXer have only 7 datasets instead of 9?
+- OOM fallback was fixed before, and use_amp was set to false to avoid bug. Please keep this setting. 
+- List all unmatch pairs (except PatchTST and DLinear) in a Markdown table, and list the reasons for the mismatch and the fixes you have tried.
+- For each pair that has been fixed, write me the cli script to run the comparison for it using compare_tsl_liulian.py and "--pairs" argument. Do not run it, wait for me to do it.
+
+(Agent: GitHub Copilot VSCode Plugin; Model: GPT-5.3-Codex)
+
+### prompt 2026.03.24 - 3:
+
+- There are other pairs ran with "disable_es", and they were documented somewhere. Please find these pairs, and update the Master Results Table in docs/tsl_comparison.md doc file to reflect this info.
+- Why `Exchange` and `ILI` are not included as active comparison pairs for `TimeMixer` and `TimeXer`? If there are some reasons for this, please document the reasons in the doc file. If there is no reason, please add these pairs to the comparison, and update the doc accordingly.
+- Make a new "all unmatched pairs" including the links to lines of code and doc files of the fixes you have done for each pair. Meanwhile, explain what are the meanings of "Static parity audit; retained remediation path" and "Config parity + static audit; no safe static-only fix yet".
+- For TimesNet, "Applied --disable-es --oom-fallback" was already done before and there are still mismatches. Please analyze the possible reasons for the mismatch, and try to fix it.
+
+(Agent: GitHub Copilot VSCode Plugin; Model: GPT-5.3-Codex)
+
+### prompt 2026.03.24 - 4:
+
+Do the following:
+- Tell me which LLM model you are using right now.
+- Explain the purpose of copilot-instructions.md file, and how it is used for the GitHub Copilot agent.
+- I have some GitHub Copilot agent (VSCode Plugin) and Codex agent (VSCode Plugin) sessions already ran. Can you find and locate these sessions, and tell me if it is possible to use the information from them?
+- If I run GitHub Copilot agent from cli command now (as I am doing now), is it still possible to reflect the file changes symultaneously in the VSCode?
+- It seems that I can set a lot of stuffs for the GitHub Copilot agent from VSCode, e.g., hooks (e.g., session start, pre-tool usage, post-tool usage, etc), agent.md, etc. Can you check all these settings, and tell me, based on the current codes, docs, skills, especially my queries during the previous sessions from VSCode, what settings are there, and what settings I should set for the GitHub Copilot agent to make it more efficient and better for the current work, and is it possible to set and use these settings from cli command?
+- In cli command, can I still use VSCode plugin features for the GitHub Copilot agent? What are the differences between using GitHub Copilot agent from cli command and from VSCode plugin? Make a detailed Markdown table to show the differences, and give suggestions on which way to use for the current work.
+
+(Agent: GitHub Copilot via CLI; Model: claude-sonnet-4.5)
+
+### prompt 2026.03.24 - 5:
+
+Do the following:
+- Tell me how to auto prove all cli command when using GitHub Copilot agent from cli command.
+- Tell me how to see all the thinking process when using GitHub Copilot agent from cli command as if in VSCode plugin.
+- Tell me how to create new sessions and switch sessions in cli command.
+- Is it possible to share a session between GitHub Copilot agent from cli command and from VSCode plugin? If so, how to do it?
+- How to export the full session info, including the thinking process, the file changes, the prompts, etc to agent and human readable files? Can VSCode chat debug plugin do this? If so, how to do it? If not, is there any other way to do it?
+- Can cli command support the Hooks System, and Auto-Approval Patterns? If so, how to set and use them from cli command?
+- Is it possible to develop a tool myself (such as similar to openclaw), so that I can use all the features of GitHub Copilot agent and VSCode from cli command? If so, how to do it? If not, is there any alternative way to achieve this goal?
+
+(Agent: GitHub Copilot via CLI; Model: claude-sonnet-4.5)
+
+### prompt 2026.03.24 - 6:
+
+Great! Now analyze all model-dataset pairs that do not match (except PatchTST and DLinear, which we have already analyzed), find out the possible reasons for the gap, and fix them. Please analyze from codes, docs, deep research (online if necessary), and logical analysis. Use "compare_tsl_liulian.py" script to check the results after each fix. Record in detail the issues, the causes, and the fixes for each pair in a Markdown table. Fix any problem you find during the analysis and fix process, and report in detail. Use any possible tools you can find on the computer, via cli command, or online to help you with the analysis and fix. After finishing all the analysis and fixes, give me a report for this part. Remember to make a super detailed plan before you start the analysis and fix. Update the plan while you are doing the analysis and fix.
+Try to follow rules in skills and meta_plan_prompt.md. You can set up some hooks or relevant settings as you pointed out before.
+Keep running until everything is done, even if it takes a long time and the request is broken out by the system. Just continue with a new request. Do not wait for my intervention.
+The current comparison results are in the file "experiments/adapt_tsl_lib/tsl_comparison_results.txt" and "experiments/adapt_tsl_lib/tsl_comparison.md" doc file.
+
+(Agent: GitHub Copilot via CLI; Model: claude-sonnet-4.5)
+
+### prompt 2026.03.25 - 1:
+
+Check carefully if there is already an instruction (e.g., in the docs) to use the pipelines in liulian for forecasting. Revise it if there is any or make a new one if there is no such demo following these instructions:
+- The instruction should be put in a proper place in the mkdocs, which can be accessed by users easily.
+- The instruction should give a clear guide for users to understand how to use the main pipeline in liulian for forecasting. Including how to prepare the data, how to set the configs, how to set up each component or layer in the pipeline, how to run the pipeline, and how to check the results. You can also include some tips and best practices for users to use the pipeline better.
+- The instruction should include proper references to the relevant codes, docs, and online resources for users to check for more details. You can also include some illustrations or visualizations if you think it is necessary to make the instruction more clear and user-friendly.
+- A demo must be included in the doc at a proper demo gallery section, which is linked to the instruction. The demo should be clear and easy to understand, with minimal but complete code to show how to use the pipeline for forecasting. Use PatchTST and swiss 1990 dataset for the demo. Codes must be runnable and tested to make sure they are correct, and proper comments should be included to explain the code. You can also include some visualizations for the results if you think it is necessary.
+- Before doing the above tasks, research online for some good docs and demos for forecasting pipelines and deep learning libs to see how they design their docs and demos for this part, and optimize the design of our docs and demos based on the research.
+After finishing the above tasks, give me a report for this part in the Markdown table format. Then give me a cli script to commit the changes you have made so far, and wait for my approval to commit and push the changes.
+
+(Agent: GitHub Copilot VSCode Plugin; Model: GPT-5.3-Codex)
+
+
+- Please use tqdm for the fallback runner progress bar.
+
+- Some datasets are missing from the comparison, including Solar-Energy, Exchange Rate, 4 PEMS datasets, Covid Deaths, NYC Taxi, NN5, FRED-MD,
 
 ### prompt 2026.03.11 - ?:
 

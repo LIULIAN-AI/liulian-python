@@ -149,6 +149,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     'viz_method': 'mean',
     # ── Misc model keys (Time-LLM compat) ──────────────────────────
     'embed': 'timeF',
+    'freq': 'h',  # Time encoding frequency: h=hourly, d=daily, etc.
     'activation': 'gelu',
     'output_attention': False,
     'moving_avg': 25,

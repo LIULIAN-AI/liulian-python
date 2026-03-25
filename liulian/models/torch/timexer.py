@@ -164,7 +164,7 @@ class Model(nn.Module):
         self.features = configs.features
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
-        self.use_norm = configs.use_norm
+        self.use_norm = getattr(configs, 'use_norm', 1)
         self.patch_len = configs.patch_len
         self.patch_num = int(configs.seq_len // configs.patch_len)
         self.n_vars = 1 if configs.features == 'MS' else configs.enc_in

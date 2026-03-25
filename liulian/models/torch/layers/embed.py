@@ -209,8 +209,38 @@ class TimeFeatureEmbedding(nn.Module):
         super(TimeFeatureEmbedding, self).__init__()
 
         freq_map = {'h': 4, 't': 5, 's': 6, 'm': 1, 'a': 1, 'w': 2, 'd': 3, 'b': 3}
-        d_inp = freq_map[freq]
+        freq_key = self._normalize_freq(freq)
+        d_inp = freq_map[freq_key]
         self.embed = nn.Linear(d_inp, d_model, bias=False)
+
+    @staticmethod
+    def _normalize_freq(freq: str) -> str:
+        """Normalize common textual frequency aliases to TSL-style short tokens."""
+        f = (freq or '').strip().lower()
+        if f in {'t', 'min', 'mins', 'minute', 'minutes'}:
+            return 't'
+        if f.endswith('min') and f[:-3].isdigit():
+            return 't'
+        alias_map = {
+            'hour': 'h',
+            'hourly': 'h',
+            '1h': 'h',
+            'day': 'd',
+            'daily': 'd',
+            '1d': 'd',
+            'week': 'w',
+            'weekly': 'w',
+            'month': 'm',
+            'monthly': 'm',
+            'year': 'a',
+            'yearly': 'a',
+            'annual': 'a',
+            'business': 'b',
+            'businessday': 'b',
+            'second': 's',
+            'secondly': 's',
+        }
+        return alias_map.get(f, f)
 
     def forward(self, x):
         """Forward pass
@@ -243,7 +273,7 @@ class DataEmbedding(nn.Module):
         Args:
             c_in: Number of input channels
             d_model: Dimension of the model
-            embed_type: Type of temporal embedding ('fixed' or 'timeF')
+            embed_type: Type of temporal embedding ('fixed', 'timeF', or 'none')
             freq: Frequency of time features
             dropout: Dropout rate
         """
@@ -251,11 +281,16 @@ class DataEmbedding(nn.Module):
 
         self.value_embedding = TokenEmbedding(c_in=c_in, d_model=d_model)
         self.position_embedding = PositionalEmbedding(d_model=d_model)
-        self.temporal_embedding = (
-            TemporalEmbedding(d_model=d_model, embed_type=embed_type, freq=freq)
-            if embed_type != 'timeF'
-            else TimeFeatureEmbedding(d_model=d_model, embed_type=embed_type, freq=freq)
-        )
+        if embed_type == 'none':
+            self.temporal_embedding = None
+        elif embed_type == 'timeF':
+            self.temporal_embedding = TimeFeatureEmbedding(
+                d_model=d_model, embed_type=embed_type, freq=freq
+            )
+        else:
+            self.temporal_embedding = TemporalEmbedding(
+                d_model=d_model, embed_type=embed_type, freq=freq
+            )
         self.dropout = nn.Dropout(p=dropout)
 
     def forward(self, x, x_mark):
@@ -268,7 +303,7 @@ class DataEmbedding(nn.Module):
         Returns:
             Embedded data [batch_size, seq_len, d_model]
         """
-        if x_mark is None:
+        if x_mark is None or self.temporal_embedding is None:
             x = self.value_embedding(x) + self.position_embedding(x)
         else:
             x = (

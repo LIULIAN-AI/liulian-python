@@ -20,7 +20,7 @@ label_len: 48
 train_split: 0.7
 max_samples: null
 target: OT
-freq: t
+freq: h
 
 # ── Task & mode ─────────────────────────────────────────────────────────
 task: forecast
@@ -128,4 +128,3 @@ activation: gelu
 output_attention: false
 factor: 3
 task_name: long_term_forecast
-use_norm: 1

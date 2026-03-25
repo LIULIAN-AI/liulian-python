@@ -19,7 +19,7 @@ features: M
 label_len: 48
 train_split: 0.7
 max_samples: null
-freq: h
+freq: d
 
 # ── Task & mode ─────────────────────────────────────────────────────────
 task: forecast

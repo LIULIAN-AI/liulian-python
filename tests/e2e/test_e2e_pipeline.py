@@ -134,6 +134,7 @@ def _base_config(
         enc_in=None,  # auto-detect
         individual=False,
         moving_avg=25,
+        embed='none',  # Skip temporal embedding (swiss-river has single time feature)
         # Training — tiny slices, still exercises every stage
         batch_size=16,
         max_train_iters=5,  # 5 × 16 = 80 train samples

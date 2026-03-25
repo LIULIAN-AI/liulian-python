@@ -1,4 +1,4 @@
-# Weather dataset: 21 meteorological indicators.
+# Weather dataset: 21 meteorological indicators sampled every 10 minutes.
 # TimesNet (has TSL benchmark script)
 #
 # Usage:
@@ -19,7 +19,7 @@ features: M
 label_len: 48
 train_split: 0.7
 max_samples: null
-freq: t
+freq: h
 
 # ── Task & mode ─────────────────────────────────────────────────────────
 task: forecast
@@ -64,7 +64,6 @@ e_layers: 2
 d_layers: 1
 dropout: 0.1
 top_k: 5
-num_kernels: 6
 individual: false
 moving_avg: 25
 patch_len: 16

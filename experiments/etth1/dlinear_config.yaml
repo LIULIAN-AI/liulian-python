@@ -1,7 +1,9 @@
-# ETTh1 dataset — DLinear
+# ETT hour-level benchmark (ETTh1). 7 transformer features.
+# DLinear (has TSL benchmark script)
 #
-# ETT hour-level benchmark (ETTh1). Heterogeneous transformer signals; entity
-# identifiers are intentionally disabled.
+# Usage:
+#   liulian run experiments/etth1/dlinear_config.yaml
+#   liulian run experiments/etth1/dlinear_config.yaml --quick_test
 
 # ── General ─────────────────────────────────────────────────────────────
 model: dlinear
@@ -48,7 +50,7 @@ id_integration: concat_to_x
 embedding_size: 10
 num_embeddings: null
 
-# ── Graph / spatial ────────────────────────────────────────────────────
+# ── Graph / spatial ─────────────────────────────────────────────────────
 graph_mode: none
 graphlet_num_hops: 1
 
@@ -124,5 +126,5 @@ viz_method: mean
 embed: timeF
 activation: gelu
 output_attention: false
-factor: 1
+factor: 3
 task_name: long_term_forecast

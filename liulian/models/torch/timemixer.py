@@ -129,7 +129,7 @@ class PastDecomposableMixing(nn.Module):
 
         self.layer_norm = nn.LayerNorm(configs.d_model)
         self.dropout = nn.Dropout(configs.dropout)
-        self.channel_independence = configs.channel_independence
+        self.channel_independence = getattr(configs, 'channel_independence', 1)
 
         if configs.decomp_method == 'moving_avg':
             self.decompsition = series_decomp(configs.moving_avg)
@@ -138,7 +138,7 @@ class PastDecomposableMixing(nn.Module):
         else:
             raise ValueError('decomposition method error')
 
-        if not configs.channel_independence:
+        if not self.channel_independence:
             self.cross_layer = nn.Sequential(
                 nn.Linear(in_features=configs.d_model, out_features=configs.d_ff),
                 nn.GELU(),
@@ -198,7 +198,7 @@ class Model(nn.Module):
         self.label_len = configs.label_len
         self.pred_len = configs.pred_len
         self.down_sampling_window = configs.down_sampling_window
-        self.channel_independence = configs.channel_independence
+        self.channel_independence = getattr(configs, 'channel_independence', 1)
         self.pdm_blocks = nn.ModuleList(
             [PastDecomposableMixing(configs) for _ in range(configs.e_layers)]
         )

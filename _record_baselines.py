@@ -15,6 +15,7 @@ def _base_config(
     model='lstm',
     split_mode='per_entity',
     id_integration=None,
+    **extra,
 ):
     from liulian.config import load_config
 
@@ -49,7 +50,12 @@ def _base_config(
         model=model,
         d_model=16,
         e_layers=1,
+        d_layers=1,
+        label_len=5,
         enc_in=None,
+        individual=False,
+        moving_avg=25,
+        embed='none',  # Skip temporal embedding (swiss-river has single time feature)
         batch_size=16,
         max_train_iters=5,
         max_eval_iters=5,
@@ -77,6 +83,7 @@ def _base_config(
         seed=2026,
         quick_test=False,
     )
+    cfg.update(extra)
     return cfg
 
 
@@ -121,6 +128,11 @@ SCENARIOS = {
     'patchtst_single_emb': lambda: _base_config('embedding', False, model='patchtst', split_mode='multi_channel'),
     'patchtst_tune_no_emb': lambda: _base_config('none', True, model='patchtst', split_mode='multi_channel'),
     'patchtst_tune_emb': lambda: _base_config('embedding', True, model='patchtst', split_mode='multi_channel'),
+    # Informer scenarios (multi_channel mode)
+    'informer_single_no_emb': lambda: _base_config('none', False, model='informer', split_mode='multi_channel', factor=3),
+    'informer_single_emb': lambda: _base_config('embedding', False, model='informer', split_mode='multi_channel', factor=3),
+    'informer_tune_no_emb': lambda: _base_config('none', True, model='informer', split_mode='multi_channel', factor=3),
+    'informer_tune_emb': lambda: _base_config('embedding', True, model='informer', split_mode='multi_channel', factor=3),
 }
 
 

@@ -54,17 +54,18 @@ class TimesBlock(nn.Module):
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
         self.k = configs.top_k
+        num_kernels = getattr(configs, 'num_kernels', 6)
         self.conv = nn.Sequential(
             Inception_Block_V1(
                 configs.d_model,
                 configs.d_ff,
-                num_kernels=configs.num_kernels,
+                num_kernels=num_kernels,
             ),
             nn.GELU(),
             Inception_Block_V1(
                 configs.d_ff,
                 configs.d_model,
-                num_kernels=configs.num_kernels,
+                num_kernels=num_kernels,
             ),
         )
 

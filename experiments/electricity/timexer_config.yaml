@@ -127,4 +127,3 @@ activation: gelu
 output_attention: false
 factor: 3
 task_name: long_term_forecast
-use_norm: 1

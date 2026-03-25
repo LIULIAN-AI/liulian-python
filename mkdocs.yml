@@ -29,8 +29,12 @@ nav:
   - Architecture: architecture.md
   - Guides:
       - CLI Usage: cli.md
+      - Forecasting Pipeline: forecasting_pipeline.md
       - Adapter Guide: adapter_guide.md
       - Manifest Specification: manifest_spec.md
+  - Demo Gallery:
+      - Overview: demo_gallery.md
+      - PatchTST Swiss River 1990: demo_patchtst_swiss1990.md
   - Models:
       - PyTorch Models: models/torch_models.md
       - Entity Identifiers: entity_identifiers.md

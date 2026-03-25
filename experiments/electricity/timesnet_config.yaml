@@ -64,7 +64,6 @@ e_layers: 2
 d_layers: 1
 dropout: 0.1
 top_k: 5
-num_kernels: 6
 individual: false
 moving_avg: 25
 patch_len: 16

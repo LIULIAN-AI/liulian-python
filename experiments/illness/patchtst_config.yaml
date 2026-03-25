@@ -1,10 +1,17 @@
-# Illness (ILI) dataset — PatchTST
+# ILI (national illness) dataset. Weekly influenza-like illness data.
+# PatchTST (has TSL benchmark script)
+#
+# Usage:
+#   liulian run experiments/illness/patchtst_config.yaml
+#   liulian run experiments/illness/patchtst_config.yaml --quick_test
 
+# ── General ─────────────────────────────────────────────────────────────
 model: patchtst
 seed: 2021
 quick_test: false
 eval_only: false
 
+# ── Data ────────────────────────────────────────────────────────────────
 data: illness
 seq_len: 36
 pred_len: 24
@@ -12,35 +19,41 @@ features: M
 label_len: 18
 train_split: 0.7
 max_samples: null
-target: OT
-freq: h
+freq: w
 
+# ── Task & mode ─────────────────────────────────────────────────────────
 task: forecast
 split_mode: multi_channel
 scaler: standard
 use_current_x: true
 use_full_history: false
 
+# ── Gap handling ────────────────────────────────────────────────────────
 short_subsequence_method: drop
 gap_mode: split
 max_mask_consecutive: 10
 
+# ── Noise injection ─────────────────────────────────────────────────────
 noise_type: null
 noise_level: 0.01
 noise_probability: 0.01
 noise_scale_factor: 5.0
 
+# ── Historical target ──────────────────────────────────────────────────
 include_historical_y: none
 include_historical_predicted_y: false
 
+# ── Entity identifiers ─────────────────────────────────────────────────
 identifier_mode: none
-id_integration: add_after_patch
+id_integration: concat_to_x
 embedding_size: 10
 num_embeddings: null
 
+# ── Graph / spatial ─────────────────────────────────────────────────────
 graph_mode: none
 graphlet_num_hops: 1
 
+# ── Model architecture ─────────────────────────────────────────────────
 enc_in: null
 dec_in: 1
 c_out: 1
@@ -50,11 +63,12 @@ n_heads: 4
 e_layers: 4
 d_layers: 0
 dropout: 0.1
-patch_len: 16
-stride: 8
 individual: false
 moving_avg: 25
+patch_len: 16
+stride: 8
 
+# ── Training ────────────────────────────────────────────────────────────
 train_epochs: 10
 batch_size: 32
 learning_rate: 0.0001
@@ -77,6 +91,7 @@ sched_patience: 5
 sched_factor: 0.5
 num_workers: 0
 
+# ── HPO (Ray Tune) ─────────────────────────────────────────────────────
 hpo: false
 hpo_num_samples: 200
 hpo_scheduler: asha
@@ -97,15 +112,18 @@ hpo_trim_keep_last: false
 hpo_experiment_name: null
 hpo_local_mode: false
 
+# ── Logging ─────────────────────────────────────────────────────────────
 wandb_project: null
 wandb_entity: null
 dev_run: false
 
+# ── Visualisation ───────────────────────────────────────────────────────
 auto_viz: true
 viz_method: mean
 
+# ── Misc model keys (compat) ───────────────────────────────────────────
 embed: timeF
 activation: gelu
 output_attention: false
-factor: 1
+factor: 3
 task_name: long_term_forecast

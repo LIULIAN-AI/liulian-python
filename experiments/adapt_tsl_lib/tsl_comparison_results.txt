@@ -1,385 +1,3456 @@
 ================================================================================
 TSL vs Liulian Comparison Results
-Generated: 2026-03-11 18:41:21
+Generated: 2026-03-25 14:51:31
 ================================================================================
 
 --- ETTh1_PatchTST ---
   Dataset: ETTh1
   Model: PatchTST
+  Special settings applied: False
   Has TSL script: True
   Large dataset: False
   Epoch limit: None
   TSL epochs run: 10
-  TSL time (s): 53.6
+  TSL time (s): 45.5
   Liulian epochs run: 10
-  Liulian time (s): 52.6
+  Liulian time (s): 49.1
   TSL final MSE: 0.379186
   TSL final MAE: 0.3996291756629944
-  Liulian final MSE: 0.379715
-  Liulian final MAE: 0.39764466881752014
+  Liulian final MSE: 0.378819
+  Liulian final MAE: 0.39797361037247486
   Detail:
-  TSL  final: MSE=0.379186  MAE=0.399629
-  LL   final: MSE=0.379715  MAE=0.397645
-  Diff:       MSE=0.000529 (0.14%)  MAE=0.001985
+
   Status: checked and matched
 
 --- ETTh2_PatchTST ---
   Dataset: ETTh2
   Model: PatchTST
+  Special settings applied: False
   Has TSL script: True
   Large dataset: False
   Epoch limit: None
-  TSL epochs run: 4
-  TSL time (s): 54.0
-  Liulian epochs run: 7
-  Liulian time (s): 86.9
+  TSL epochs run: 10
+  TSL time (s): 114.2
+  Liulian epochs run: 10
+  Liulian time (s): 118.6
   TSL final MSE: 0.291277
   TSL final MAE: 0.34636303782463074
-  Liulian final MSE: 0.297114
-  Liulian final MAE: 0.34626123850995844
+  Liulian final MSE: 0.299107
+  Liulian final MAE: 0.34732373780579284
   Detail:
-  TSL  final: MSE=0.291277  MAE=0.346363
-  LL   final: MSE=0.297114  MAE=0.346261
-  Diff:       MSE=0.005837 (2.00%)  MAE=0.000102
+
   Status: checked and matched
 
 --- ETTm1_PatchTST ---
   Dataset: ETTm1
   Model: PatchTST
+  Special settings applied: False
   Has TSL script: True
   Large dataset: False
   Epoch limit: None
   TSL epochs run: 10
-  TSL time (s): 182.8
+  TSL time (s): 167.4
   Liulian epochs run: 10
-  Liulian time (s): 186.1
+  Liulian time (s): 183.2
   TSL final MSE: 0.323108
   TSL final MAE: 0.3646145462989807
-  Liulian final MSE: 0.323591
-  Liulian final MAE: 0.36465556474204835
+  Liulian final MSE: 0.324308
+  Liulian final MAE: 0.36513894062203966
   Detail:
-  TSL  final: MSE=0.323108  MAE=0.364615
-  LL   final: MSE=0.323591  MAE=0.364656
-  Diff:       MSE=0.000483 (0.15%)  MAE=0.000041
+
   Status: checked and matched
 
 --- ETTm2_PatchTST ---
   Dataset: ETTm2
   Model: PatchTST
+  Special settings applied: False
   Has TSL script: True
   Large dataset: False
   Epoch limit: None
-  TSL epochs run: 4
-  TSL time (s): 227.7
-  Liulian epochs run: 5
-  Liulian time (s): 285.3
+  TSL epochs run: 10
+  TSL time (s): 467.3
+  Liulian epochs run: 10
+  Liulian time (s): 491.5
   TSL final MSE: 0.183427
   TSL final MAE: 0.2683773636817932
-  Liulian final MSE: 0.181140
-  Liulian final MAE: 0.2644782675086786
+  Liulian final MSE: 0.181428
+  Liulian final MAE: 0.2646542430915248
   Detail:
-  TSL  final: MSE=0.183427  MAE=0.268377
-  LL   final: MSE=0.181140  MAE=0.264478
-  Diff:       MSE=0.002287 (1.25%)  MAE=0.003899
+
   Status: checked and matched
 
 --- Weather_PatchTST ---
   Dataset: Weather
   Model: PatchTST
+  Special settings applied: False
   Has TSL script: True
   Large dataset: False
   Epoch limit: None
   TSL epochs run: 3
-  TSL time (s): 258.8
+  TSL time (s): 252.6
   Liulian epochs run: 3
-  Liulian time (s): 262.3
+  Liulian time (s): 259.7
   TSL final MSE: 0.176093
   TSL final MAE: 0.21972574293613434
-  Liulian final MSE: 0.176115
-  Liulian final MAE: 0.2170014490775012
+  Liulian final MSE: 0.176368
+  Liulian final MAE: 0.2171663024538735
   Detail:
-  TSL  final: MSE=0.176093  MAE=0.219726
-  LL   final: MSE=0.176115  MAE=0.217001
-  Diff:       MSE=0.000022 (0.01%)  MAE=0.002724
+
   Status: checked and matched
 
 --- ECL_PatchTST ---
   Dataset: ECL
   Model: PatchTST
+  Special settings applied: False
   Has TSL script: True
   Large dataset: True
   Epoch limit: 2
   TSL epochs run: 2
-  TSL time (s): 1553.4
+  TSL time (s): 1434.2
   Liulian epochs run: 2
-  Liulian time (s): 1616.9
+  Liulian time (s): 1498.5
   TSL final MSE: 0.190795
   TSL final MAE: 0.28480613231658936
-  Liulian final MSE: 0.197280
-  Liulian final MAE: 0.29382267631244363
+  Liulian final MSE: 0.197256
+  Liulian final MAE: 0.29380098017579936
   Detail:
-  Epoch 1: TSL test_loss=0.198360  liulian test_mse=0.198218  diff=0.000142 (0.07%) ✓
-  Epoch 2: TSL test_loss=0.190820  liulian test_mse=0.197280  diff=0.006461 (3.39%) ✓
+
   Status: checked and matched
 
 --- Traffic_PatchTST ---
   Dataset: Traffic
   Model: PatchTST
+  Special settings applied: False
   Has TSL script: True
   Large dataset: True
   Epoch limit: 2
   TSL epochs run: 2
-  TSL time (s): 1225.3
+  TSL time (s): 1228.1
   Liulian epochs run: 2
-  Liulian time (s): 1264.4
+  Liulian time (s): 1272.3
   TSL final MSE: 0.494214
   TSL final MAE: 0.3440028727054596
-  Liulian final MSE: 0.499992
-  Liulian final MAE: 0.337946213712039
+  Liulian final MSE: 0.500220
+  Liulian final MAE: 0.33802876925140124
   Detail:
-  Epoch 1: TSL test_loss=0.527109  liulian test_mse=0.519990  diff=0.007119 (1.35%) ✓
-  Epoch 2: TSL test_loss=0.493976  liulian test_mse=0.499992  diff=0.006016 (1.22%) ✓
+
   Status: checked and matched
 
 --- Exchange_PatchTST ---
   Dataset: Exchange
   Model: PatchTST
+  Special settings applied: False
   Has TSL script: True
   Large dataset: False
   Epoch limit: None
-  TSL epochs run: 4
-  TSL time (s): 28.5
-  Liulian epochs run: 5
-  Liulian time (s): 32.1
+  TSL epochs run: 10
+  TSL time (s): 52.5
+  Liulian epochs run: 10
+  Liulian time (s): 57.4
   TSL final MSE: 0.096066
   TSL final MAE: 0.21466264128684998
-  Liulian final MSE: 0.087624
-  Liulian final MAE: 0.2055379894044664
+  Liulian final MSE: 0.086828
+  Liulian final MAE: 0.20462185563585092
   Detail:
-  TSL  final: MSE=0.096066  MAE=0.214663
-  LL   final: MSE=0.087624  MAE=0.205538
-  Diff:       MSE=0.008442 (8.79%)  MAE=0.009125
+
   Status: checked and matched
 
 --- ILI_PatchTST ---
   Dataset: ILI
   Model: PatchTST
+  Special settings applied: False
   Has TSL script: True
   Large dataset: False
   Epoch limit: None
-  TSL epochs run: 9
-  TSL time (s): 20.1
+  TSL epochs run: 10
+  TSL time (s): 13.7
   Liulian epochs run: 10
-  Liulian time (s): 14.7
-  TSL final MSE: 2.242056
-  TSL final MAE: 0.8819721341133118
-  Liulian final MSE: 2.627550
-  Liulian final MAE: 0.9962247411410013
+  Liulian time (s): 15.1
+  TSL final MSE: 2.217642
+  TSL final MAE: 0.8805752992630005
+  Liulian final MSE: 2.170815
+  Liulian final MAE: 0.8883974776548498
   Detail:
-  TSL  final: MSE=2.242056  MAE=0.881972
-  LL   final: MSE=2.627550  MAE=0.996225
-  Diff:       MSE=0.385495 (17.19%)  MAE=0.114253
-  Status: checked but not matched
+
+  Status: checked and matched
 
 --- ETTh1_DLinear ---
   Dataset: ETTh1
   Model: DLinear
+  Special settings applied: False
   Has TSL script: True
   Large dataset: False
   Epoch limit: None
-  TSL epochs run: 9
-  TSL time (s): 19.6
+  TSL epochs run: 10
+  TSL time (s): 10.5
   Liulian epochs run: 10
-  Liulian time (s): 13.2
+  Liulian time (s): 12.6
   TSL final MSE: 0.396158
   TSL final MAE: 0.4108411967754364
-  Liulian final MSE: 0.396112
-  Liulian final MAE: 0.41026642816987907
+  Liulian final MSE: 0.396024
+  Liulian final MAE: 0.41064705247296895
   Detail:
-  TSL  final: MSE=0.396158  MAE=0.410841
-  LL   final: MSE=0.396112  MAE=0.410266
-  Diff:       MSE=0.000046 (0.01%)  MAE=0.000575
+
   Status: checked and matched
 
 --- ETTh2_DLinear ---
   Dataset: ETTh2
   Model: DLinear
+  Special settings applied: False
   Has TSL script: False
   Large dataset: False
   Epoch limit: None
-  TSL epochs run: 5
-  TSL time (s): 13.7
-  Liulian epochs run: 8
-  Liulian time (s): 15.0
+  TSL epochs run: 10
+  TSL time (s): 11.3
+  Liulian epochs run: 10
+  Liulian time (s): 12.3
   TSL final MSE: 0.341448
   TSL final MAE: 0.3952931761741638
-  Liulian final MSE: 0.346700
-  Liulian final MAE: 0.39999111606316134
+  Liulian final MSE: 0.349346
+  Liulian final MAE: 0.4016497936133208
   Detail:
-  TSL  final: MSE=0.341448  MAE=0.395293
-  LL   final: MSE=0.346700  MAE=0.399991
-  Diff:       MSE=0.005253 (1.54%)  MAE=0.004698
+
   Status: checked and matched
 
 --- ETTm1_DLinear ---
   Dataset: ETTm1
   Model: DLinear
+  Special settings applied: False
   Has TSL script: False
   Large dataset: False
   Epoch limit: None
-  TSL epochs run: 6
-  TSL time (s): 33.7
-  Liulian epochs run: 7
-  Liulian time (s): 38.7
-  TSL final MSE: 0.345946
-  TSL final MAE: 0.37370893359184265
-  Liulian final MSE: 0.344534
-  Liulian final MAE: 0.37181097860109874
+  TSL epochs run: 10
+  TSL time (s): 30.9
+  Liulian epochs run: 10
+  Liulian time (s): 37.8
+  TSL final MSE: 0.345494
+  TSL final MAE: 0.37204140424728394
+  Liulian final MSE: 0.345247
+  Liulian final MAE: 0.372251921654791
   Detail:
-  TSL  final: MSE=0.345946  MAE=0.373709
-  LL   final: MSE=0.344534  MAE=0.371811
-  Diff:       MSE=0.001412 (0.41%)  MAE=0.001898
+
   Status: checked and matched
 
 --- ETTm2_DLinear ---
   Dataset: ETTm2
   Model: DLinear
+  Special settings applied: False
   Has TSL script: False
   Large dataset: False
   Epoch limit: None
-  TSL epochs run: 7
-  TSL time (s): 37.4
-  Liulian epochs run: 6
-  Liulian time (s): 30.5
+  TSL epochs run: 10
+  TSL time (s): 28.8
+  Liulian epochs run: 10
+  Liulian time (s): 38.5
   TSL final MSE: 0.193428
   TSL final MAE: 0.292817085981369
-  Liulian final MSE: 0.192144
-  Liulian final MAE: 0.29129193814773136
+  Liulian final MSE: 0.192492
+  Liulian final MAE: 0.29156864876950594
   Detail:
-  TSL  final: MSE=0.193428  MAE=0.292817
-  LL   final: MSE=0.192144  MAE=0.291292
-  Diff:       MSE=0.001284 (0.66%)  MAE=0.001525
+
   Status: checked and matched
 
 --- Weather_DLinear ---
   Dataset: Weather
   Model: DLinear
+  Special settings applied: False
   Has TSL script: False
   Large dataset: False
   Epoch limit: None
-  TSL epochs run: 7
-  TSL time (s): 52.0
-  Liulian epochs run: 9
-  Liulian time (s): 43.9
-  TSL final MSE: 0.196220
-  TSL final MAE: 0.25610992312431335
-  Liulian final MSE: 0.195417
-  Liulian final MAE: 0.25507597383738295
+  TSL epochs run: 10
+  TSL time (s): 36.7
+  Liulian epochs run: 10
+  Liulian time (s): 44.3
+  TSL final MSE: 0.195467
+  TSL final MAE: 0.2546525001525879
+  Liulian final MSE: 0.195689
+  Liulian final MAE: 0.25523068483923184
   Detail:
-  TSL  final: MSE=0.196220  MAE=0.256110
-  LL   final: MSE=0.195417  MAE=0.255076
-  Diff:       MSE=0.000804 (0.41%)  MAE=0.001034
+
   Status: checked and matched
 
 --- ECL_DLinear ---
   Dataset: ECL
   Model: DLinear
+  Special settings applied: False
   Has TSL script: True
   Large dataset: True
   Epoch limit: 2
   TSL epochs run: 2
-  TSL time (s): 39.1
+  TSL time (s): 32.7
   Liulian epochs run: 2
-  Liulian time (s): 97.6
+  Liulian time (s): 90.9
   TSL final MSE: 0.222868
   TSL final MAE: 0.31678539514541626
-  Liulian final MSE: 0.223120
-  Liulian final MAE: 0.31704053889822076
+  Liulian final MSE: 0.222978
+  Liulian final MAE: 0.31685799891697125
   Detail:
-  Epoch 1: TSL test_loss=0.245241  liulian test_mse=0.245380  diff=0.000139 (0.06%) ✓
-  Epoch 2: TSL test_loss=0.223011  liulian test_mse=0.223120  diff=0.000109 (0.05%) ✓
+
   Status: checked and matched
 
 --- Traffic_DLinear ---
   Dataset: Traffic
   Model: DLinear
+  Special settings applied: False
   Has TSL script: False
   Large dataset: True
   Epoch limit: 2
   TSL epochs run: 2
-  TSL time (s): 54.6
+  TSL time (s): 45.9
   Liulian epochs run: 2
-  Liulian time (s): 96.8
+  Liulian time (s): 89.7
   TSL final MSE: 0.728951
   TSL final MAE: 0.447552889585495
-  Liulian final MSE: 0.727530
-  Liulian final MAE: 0.44718914165675083
+  Liulian final MSE: 0.728832
+  Liulian final MAE: 0.4474678391537777
   Detail:
-  Epoch 1: TSL test_loss=0.789513  liulian test_mse=0.788858  diff=0.000655 (0.08%) ✓
-  Epoch 2: TSL test_loss=0.727645  liulian test_mse=0.727530  diff=0.000115 (0.02%) ✓
+
   Status: checked and matched
 
 --- Exchange_DLinear ---
   Dataset: Exchange
   Model: DLinear
+  Special settings applied: False
   Has TSL script: False
   Large dataset: False
   Epoch limit: None
-  TSL epochs run: 5
-  TSL time (s): 11.9
-  Liulian epochs run: 9
-  Liulian time (s): 9.8
-  TSL final MSE: 0.098343
-  TSL final MAE: 0.2326776683330536
-  Liulian final MSE: 0.094265
-  Liulian final MAE: 0.22689553830358716
+  TSL epochs run: 10
+  TSL time (s): 9.1
+  Liulian epochs run: 10
+  Liulian time (s): 8.7
+  TSL final MSE: 0.094370
+  TSL final MAE: 0.2274428755044937
+  Liulian final MSE: 0.094040
+  Liulian final MAE: 0.22687089589913015
   Detail:
-  TSL  final: MSE=0.098343  MAE=0.232678
-  LL   final: MSE=0.094265  MAE=0.226896
-  Diff:       MSE=0.004078 (4.15%)  MAE=0.005782
+
   Status: checked and matched
 
 --- ILI_DLinear ---
   Dataset: ILI
   Model: DLinear
+  Special settings applied: False
   Has TSL script: False
   Large dataset: False
   Epoch limit: None
-  TSL epochs run: 4
-  TSL time (s): 7.2
+  TSL epochs run: 10
+  TSL time (s): 5.9
   Liulian epochs run: 10
-  Liulian time (s): 5.0
-  TSL final MSE: 5.060766
-  TSL final MAE: 1.7096543312072754
-  Liulian final MSE: 4.522494
-  Liulian final MAE: 1.636607031027476
+  Liulian time (s): 4.8
+  TSL final MSE: 4.781504
+  TSL final MAE: 1.6558369398117065
+  Liulian final MSE: 4.780502
+  Liulian final MAE: 1.6559105382246129
   Detail:
-  TSL  final: MSE=5.060766  MAE=1.709654
-  LL   final: MSE=4.522494  MAE=1.636607
-  Diff:       MSE=0.538273 (10.64%)  MAE=0.073047
+
+  Status: checked and matched
+
+--- ETTh1_Informer ---
+  Dataset: ETTh1
+  Model: Informer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 4
+  TSL time (s): 62.9
+  Liulian epochs run: 4
+  Liulian time (s): 65.9
+  TSL final MSE: 0.965742
+  TSL final MAE: 0.7807000279426575
+  Liulian final MSE: 0.861667
+  Liulian final MAE: 0.7150885880528489
+  Detail:
+
   Status: checked but not matched
+
+--- ETTh2_Informer ---
+  Dataset: ETTh2
+  Model: Informer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 137.5
+  Liulian epochs run: 10
+  Liulian time (s): 144.7
+  TSL final MSE: 2.807787
+  TSL final MAE: 1.320982575416565
+  Liulian final MSE: 3.411386
+  Liulian final MAE: 1.471076978644092
+  Detail:
+
+  Status: checked but not matched
+
+--- ETTm1_Informer ---
+  Dataset: ETTm1
+  Model: Informer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 3037.6
+  Liulian epochs run: 10
+  Liulian time (s): 3392.7
+  TSL final MSE: 0.627005
+  TSL final MAE: 0.5623064041137695
+  Liulian final MSE: 0.629283
+  Liulian final MAE: 0.5685489137845696
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm2_Informer ---
+  Dataset: ETTm2
+  Model: Informer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 3428.6
+  Liulian epochs run: 10
+  Liulian time (s): 3495.5
+  TSL final MSE: 0.365542
+  TSL final MAE: 0.45538151264190674
+  Liulian final MSE: 0.368479
+  Liulian final MAE: 0.44813325432771145
+  Detail:
+
+  Status: checked and matched
+
+--- Weather_Informer ---
+  Dataset: Weather
+  Model: Informer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 829.3
+  Liulian epochs run: 10
+  Liulian time (s): 576.8
+  TSL final MSE: 0.373800
+  TSL final MAE: 0.4302234649658203
+  Liulian final MSE: 0.361929
+  Liulian final MAE: 0.41974406124120106
+  Detail:
+
+  Status: checked and matched
+
+--- ECL_Informer ---
+  Dataset: ECL
+  Model: Informer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 81.9
+  Liulian epochs run: 2
+  Liulian time (s): 145.8
+  TSL final MSE: 0.336632
+  TSL final MAE: 0.42092880606651306
+  Liulian final MSE: 0.349372
+  Liulian final MAE: 0.42987181959170684
+  Detail:
+
+  Status: checked and matched
+
+--- Traffic_Informer ---
+  Dataset: Traffic
+  Model: Informer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 78.7
+  Liulian epochs run: 2
+  Liulian time (s): 128.2
+  TSL final MSE: 0.746593
+  TSL final MAE: 0.4256553649902344
+  Liulian final MSE: 0.749306
+  Liulian final MAE: 0.43232141582280564
+  Detail:
+
+  Status: checked and matched
+
+--- Exchange_Informer ---
+  Dataset: Exchange
+  Model: Informer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 7
+  TSL time (s): 60.8
+  Liulian epochs run: 5
+  Liulian time (s): 47.8
+  TSL final MSE: 0.982898
+  TSL final MAE: 0.795436441898346
+  Liulian final MSE: 0.968104
+  Liulian final MAE: 0.7700773464141181
+  Detail:
+
+  Status: checked and matched
+
+--- ILI_Informer ---
+  Dataset: ILI
+  Model: Informer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 10.0
+  Liulian epochs run: 10
+  Liulian time (s): 10.5
+  TSL final MSE: 5.017463
+  TSL final MAE: 1.5314648151397705
+  Liulian final MSE: 5.188732
+  Liulian final MAE: 1.554384202115676
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh1_Autoformer ---
+  Dataset: ETTh1
+  Model: Autoformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 281.9
+  Liulian epochs run: 10
+  Liulian time (s): 293.7
+  TSL final MSE: 0.483234
+  TSL final MAE: 0.4787684977054596
+  Liulian final MSE: 0.477840
+  Liulian final MAE: 0.47057069212572794
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh2_Autoformer ---
+  Dataset: ETTh2
+  Model: Autoformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 282.2
+  Liulian epochs run: 10
+  Liulian time (s): 294.1
+  TSL final MSE: 0.375422
+  TSL final MAE: 0.40943843126296997
+  Liulian final MSE: 0.358442
+  Liulian final MAE: 0.3988275855137587
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm1_Autoformer ---
+  Dataset: ETTm1
+  Model: Autoformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 1176.0
+  Liulian epochs run: 10
+  Liulian time (s): 1191.5
+  TSL final MSE: 0.460168
+  TSL final MAE: 0.45951899886131287
+  Liulian final MSE: 0.455981
+  Liulian final MAE: 0.46118034425136556
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm2_Autoformer ---
+  Dataset: ETTm2
+  Model: Autoformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 826.4
+  Liulian epochs run: 10
+  Liulian time (s): 879.2
+  TSL final MSE: 0.233187
+  TSL final MAE: 0.31903836131095886
+  Liulian final MSE: 0.248880
+  Liulian final MAE: 0.3338481841097775
+  Detail:
+
+  Status: checked but not matched
+
+--- Weather_Autoformer ---
+  Dataset: Weather
+  Model: Autoformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 2
+  TSL time (s): 243.3
+  Liulian epochs run: 2
+  Liulian time (s): 274.9
+  TSL final MSE: 0.285689
+  TSL final MAE: 0.3517765700817108
+  Liulian final MSE: 0.257816
+  Liulian final MAE: 0.3227919571155883
+  Detail:
+
+  Status: checked but not matched
+
+--- ECL_Autoformer ---
+  Dataset: ECL
+  Model: Autoformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 138.2
+  Liulian epochs run: 2
+  Liulian time (s): 207.2
+  TSL final MSE: 0.212566
+  TSL final MAE: 0.3287758529186249
+  Liulian final MSE: 0.219708
+  Liulian final MAE: 0.33583923782522196
+  Detail:
+
+  Status: checked but not matched
+
+--- Traffic_Autoformer ---
+  Dataset: Traffic
+  Model: Autoformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 115.6
+  Liulian epochs run: 2
+  Liulian time (s): 172.0
+  TSL final MSE: 0.654922
+  TSL final MAE: 0.3997613787651062
+  Liulian final MSE: 0.708558
+  Liulian final MAE: 0.42554304092781936
+  Detail:
+
+  Status: checked but not matched
+
+--- Exchange_Autoformer ---
+  Dataset: Exchange
+  Model: Autoformer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 4
+  TSL time (s): 71.4
+  Liulian epochs run: 4
+  Liulian time (s): 73.4
+  TSL final MSE: 0.166662
+  TSL final MAE: 0.29700732231140137
+  Liulian final MSE: 0.163775
+  Liulian final MAE: 0.28814764373245455
+  Detail:
+
+  Status: checked and matched
+
+--- ILI_Autoformer ---
+  Dataset: ILI
+  Model: Autoformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 12.4
+  Liulian epochs run: 10
+  Liulian time (s): 13.5
+  TSL final MSE: 3.370216
+  TSL final MAE: 1.2851526737213135
+  Liulian final MSE: 3.411037
+  Liulian final MAE: 1.335472303278306
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh1_FEDformer ---
+  Dataset: ETTh1
+  Model: FEDformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 481.6
+  Liulian epochs run: 10
+  Liulian time (s): 468.2
+  TSL final MSE: 0.377129
+  TSL final MAE: 0.4184778034687042
+  Liulian final MSE: 0.378094
+  Liulian final MAE: 0.4169554175123492
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh2_FEDformer ---
+  Dataset: ETTh2
+  Model: FEDformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 464.3
+  Liulian epochs run: 10
+  Liulian time (s): 488.9
+  TSL final MSE: 0.350986
+  TSL final MAE: 0.3916681706905365
+  Liulian final MSE: 0.353084
+  Liulian final MAE: 0.3948403427534514
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm1_FEDformer ---
+  Dataset: ETTm1
+  Model: FEDformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 2147.7
+  Liulian epochs run: 10
+  Liulian time (s): 1880.9
+  TSL final MSE: 0.364328
+  TSL final MAE: 0.4108876883983612
+  Liulian final MSE: 0.372703
+  Liulian final MAE: 0.4178081836037876
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm2_FEDformer ---
+  Dataset: ETTm2
+  Model: FEDformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 1926.0
+  Liulian epochs run: 10
+  Liulian time (s): 1942.8
+  TSL final MSE: 0.191766
+  TSL final MAE: 0.281178742647171
+  Liulian final MSE: 0.191557
+  Liulian final MAE: 0.281373577556151
+  Detail:
+
+  Status: checked and matched
+
+--- Weather_FEDformer ---
+  Dataset: Weather
+  Model: FEDformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 1892.3
+  Liulian epochs run: 10
+  Liulian time (s): 1880.7
+  TSL final MSE: 0.226382
+  TSL final MAE: 0.30459699034690857
+  Liulian final MSE: 0.225253
+  Liulian final MAE: 0.3085229998687728
+  Detail:
+
+  Status: checked and matched
+
+--- ECL_FEDformer ---
+  Dataset: ECL
+  Model: FEDformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 222.4
+  Liulian epochs run: 2
+  Liulian time (s): 287.2
+  TSL final MSE: 0.204520
+  TSL final MAE: 0.3176666498184204
+  Liulian final MSE: 0.202654
+  Liulian final MAE: 0.3162776394885138
+  Detail:
+
+  Status: checked and matched
+
+--- Traffic_FEDformer ---
+  Dataset: Traffic
+  Model: FEDformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 171.3
+  Liulian epochs run: 2
+  Liulian time (s): 219.3
+  TSL final MSE: 0.596949
+  TSL final MAE: 0.3818839490413666
+  Liulian final MSE: 0.615747
+  Liulian final MAE: 0.3915909134657055
+  Detail:
+
+  Status: checked and matched
+
+--- Exchange_FEDformer ---
+  Dataset: Exchange
+  Model: FEDformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 267.5
+  Liulian epochs run: 10
+  Liulian time (s): 271.5
+  TSL final MSE: 0.166271
+  TSL final MAE: 0.29401373863220215
+  Liulian final MSE: 0.167320
+  Liulian final MAE: 0.296037419980756
+  Detail:
+
+  Status: checked and matched
+
+--- ILI_FEDformer ---
+  Dataset: ILI
+  Model: FEDformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 25.6
+  Liulian epochs run: 10
+  Liulian time (s): 28.5
+  TSL final MSE: 3.161979
+  TSL final MAE: 1.2473371028900146
+  Liulian final MSE: 3.204659
+  Liulian final MAE: 1.2514807630987728
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh1_TimesNet ---
+  Dataset: ETTh1
+  Model: TimesNet
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 162.2
+  Liulian epochs run: 10
+  Liulian time (s): 165.4
+  TSL final MSE: 0.389076
+  TSL final MAE: 0.4120110869407654
+  Liulian final MSE: 0.388576
+  Liulian final MAE: 0.41137571406535656
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh2_TimesNet ---
+  Dataset: ETTh2
+  Model: TimesNet
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 5
+  TSL time (s): 112.5
+  Liulian epochs run: 7
+  Liulian time (s): 159.7
+  TSL final MSE: 0.337004
+  TSL final MAE: 0.37088826298713684
+  Liulian final MSE: 0.335927
+  Liulian final MAE: 0.37056999230085197
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm1_TimesNet ---
+  Dataset: ETTm1
+  Model: TimesNet
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 4
+  TSL time (s): 667.7
+  Liulian epochs run: 4
+  Liulian time (s): 691.1
+  TSL final MSE: 0.336482
+  TSL final MAE: 0.37510064244270325
+  Liulian final MSE: 0.332900
+  Liulian final MAE: 0.37330564316435505
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm2_TimesNet ---
+  Dataset: ETTm2
+  Model: TimesNet
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 7
+  TSL time (s): 504.7
+  Liulian epochs run: 6
+  Liulian time (s): 455.3
+  TSL final MSE: 0.190928
+  TSL final MAE: 0.26761558651924133
+  Liulian final MSE: 0.189705
+  Liulian final MAE: 0.2681773759512724
+  Detail:
+
+  Status: checked and matched
+
+--- Weather_TimesNet ---
+  Dataset: Weather
+  Model: TimesNet
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 9
+  TSL time (s): 776.6
+  Liulian epochs run: 7
+  Liulian time (s): 572.6
+  TSL final MSE: 0.169014
+  TSL final MAE: 0.21946772933006287
+  Liulian final MSE: 0.167419
+  Liulian final MAE: 0.219079777230275
+  Detail:
+
+  Status: checked and matched
+
+--- ECL_TimesNet ---
+  Dataset: ECL
+  Model: TimesNet
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 2461.3
+  Liulian epochs run: 0
+  Liulian time (s): 3.4
+  TSL final MSE: 0.174026
+  TSL final MAE: 0.27913472056388855
+  Detail:
+
+  Status: run failed
+
+--- Traffic_TimesNet ---
+  Dataset: Traffic
+  Model: TimesNet
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 3212.0
+  Liulian epochs run: 2
+  Liulian time (s): 3125.2
+  TSL final MSE: 0.614855
+  TSL final MAE: 0.3298930823802948
+  Liulian final MSE: 0.580915
+  Liulian final MAE: 0.3195525915775347
+  Detail:
+
+  Status: checked but not matched
+
+--- Exchange_TimesNet ---
+  Dataset: Exchange
+  Model: TimesNet
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 4
+  TSL time (s): 187.9
+  Liulian epochs run: 4
+  Liulian time (s): 192.0
+  TSL final MSE: 0.114014
+  TSL final MAE: 0.2420734465122223
+  Liulian final MSE: 0.111882
+  Liulian final MAE: 0.2388031134374031
+  Detail:
+
+  Status: checked and matched
+
+--- ILI_TimesNet ---
+  Dataset: ILI
+  Model: TimesNet
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 2
+  TSL time (s): 103.9
+  Liulian epochs run: 2
+  Liulian time (s): 100.3
+  TSL final MSE: 2.975315
+  TSL final MAE: 1.0116045475006104
+  Liulian final MSE: 3.167918
+  Liulian final MAE: 1.0928075020804124
+  Detail:
+
+  Status: checked but not matched
+
+--- ETTh1_Transformer ---
+  Dataset: ETTh1
+  Model: Transformer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 4
+  TSL time (s): 57.2
+  Liulian epochs run: 6
+  Liulian time (s): 88.6
+  TSL final MSE: 0.835445
+  TSL final MAE: 0.7167075872421265
+  Liulian final MSE: 1.115380
+  Liulian final MAE: 0.8331774660886083
+  Detail:
+  TSL  final: MSE=0.835445  MAE=0.716708
+  LL   final: MSE=1.115380  MAE=0.833177
+  Diff:       MSE=0.279935 (33.51%)  MAE=0.116470
+  Status: checked but not matched
+
+--- ETTh2_Transformer ---
+  Dataset: ETTh2
+  Model: Transformer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 4
+  TSL time (s): 57.6
+  Liulian epochs run: 4
+  Liulian time (s): 61.5
+  TSL final MSE: 2.743933
+  TSL final MAE: 1.3132082223892212
+  Liulian final MSE: 1.946473
+  Liulian final MAE: 1.1453088637100302
+  Detail:
+  TSL  final: MSE=2.743933  MAE=1.313208
+  LL   final: MSE=1.946473  MAE=1.145309
+  Diff:       MSE=0.797460 (29.06%)  MAE=0.167899
+  Status: checked but not matched
+
+--- ETTm1_Transformer ---
+  Dataset: ETTm1
+  Model: Transformer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 4
+  TSL time (s): 217.9
+  Liulian epochs run: 4
+  Liulian time (s): 231.9
+  TSL final MSE: 0.693046
+  TSL final MAE: 0.6053159236907959
+  Liulian final MSE: 0.626503
+  Liulian final MAE: 0.5822254851819129
+  Detail:
+  TSL  final: MSE=0.693046  MAE=0.605316
+  LL   final: MSE=0.626503  MAE=0.582225
+  Diff:       MSE=0.066543 (9.60%)  MAE=0.023090
+  Status: checked but not matched
+
+--- ETTm2_Transformer ---
+  Dataset: ETTm2
+  Model: Transformer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 4
+  TSL time (s): 217.5
+  Liulian epochs run: 4
+  Liulian time (s): 231.9
+  TSL final MSE: 0.522904
+  TSL final MAE: 0.5280907154083252
+  Liulian final MSE: 0.412039
+  Liulian final MAE: 0.46366356000858533
+  Detail:
+  TSL  final: MSE=0.522904  MAE=0.528091
+  LL   final: MSE=0.412039  MAE=0.463664
+  Diff:       MSE=0.110865 (21.20%)  MAE=0.064427
+  Status: checked but not matched
+
+--- Weather_Transformer ---
+  Dataset: Weather
+  Model: Transformer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 3
+  TSL time (s): 168.2
+  Liulian epochs run: 3
+  Liulian time (s): 180.4
+  TSL final MSE: 0.372275
+  TSL final MAE: 0.41316118836402893
+  Liulian final MSE: 0.270225
+  Liulian final MAE: 0.3475976485783275
+  Detail:
+  TSL  final: MSE=0.372275  MAE=0.413161
+  LL   final: MSE=0.270225  MAE=0.347598
+  Diff:       MSE=0.102050 (27.41%)  MAE=0.065564
+  Status: checked but not matched
+
+--- ECL_Transformer ---
+  Dataset: ECL
+  Model: Transformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 75.5
+  Liulian epochs run: 2
+  Liulian time (s): 145.8
+  TSL final MSE: 0.269544
+  TSL final MAE: 0.36662501096725464
+  Liulian final MSE: 0.271435
+  Liulian final MAE: 0.36930717585855394
+  Detail:
+
+  Status: checked and matched
+
+--- Traffic_Transformer ---
+  Dataset: Traffic
+  Model: Transformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 73.8
+  Liulian epochs run: 2
+  Liulian time (s): 126.3
+  TSL final MSE: 0.661357
+  TSL final MAE: 0.36797037720680237
+  Liulian final MSE: 0.676831
+  Liulian final MAE: 0.3783527218174313
+  Detail:
+
+  Status: checked and matched
+
+--- Exchange_Transformer ---
+  Dataset: Exchange
+  Model: Transformer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 5
+  TSL time (s): 42.0
+  Liulian epochs run: 5
+  Liulian time (s): 44.9
+  TSL final MSE: 0.797585
+  TSL final MAE: 0.6702165603637695
+  Liulian final MSE: 0.828351
+  Liulian final MAE: 0.6857200491277478
+  Detail:
+
+  Status: checked and matched
+
+--- ILI_Transformer ---
+  Dataset: ILI
+  Model: Transformer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 9.1
+  Liulian epochs run: 8
+  Liulian time (s): 9.1
+  TSL final MSE: 4.519824
+  TSL final MAE: 1.3940125703811646
+  Liulian final MSE: 5.145920
+  Liulian final MAE: 1.5651002729640286
+  Detail:
+  TSL  final: MSE=4.519824  MAE=1.394013
+  LL   final: MSE=5.145920  MAE=1.565100
+  Diff:       MSE=0.626096 (13.85%)  MAE=0.171088
+  Status: checked but not matched
+
+--- ETTh1_iTransformer ---
+  Dataset: ETTh1
+  Model: iTransformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 21.9
+  Liulian epochs run: 10
+  Liulian time (s): 26.4
+  TSL final MSE: 0.394530
+  TSL final MAE: 0.40945249795913696
+  Liulian final MSE: 0.394521
+  Liulian final MAE: 0.40937310853167114
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh2_iTransformer ---
+  Dataset: ETTh2
+  Model: iTransformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 21.3
+  Liulian epochs run: 10
+  Liulian time (s): 26.7
+  TSL final MSE: 0.300403
+  TSL final MAE: 0.3496180474758148
+  Liulian final MSE: 0.300786
+  Liulian final MAE: 0.34988773456595745
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm1_iTransformer ---
+  Dataset: ETTm1
+  Model: iTransformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 70.8
+  Liulian epochs run: 10
+  Liulian time (s): 85.0
+  TSL final MSE: 0.341283
+  TSL final MAE: 0.376443475484848
+  Liulian final MSE: 0.342181
+  Liulian final MAE: 0.37752174785283255
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm2_iTransformer ---
+  Dataset: ETTm2
+  Model: iTransformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 71.6
+  Liulian epochs run: 10
+  Liulian time (s): 84.3
+  TSL final MSE: 0.183787
+  TSL final MAE: 0.2668642997741699
+  Liulian final MSE: 0.182769
+  Liulian final MAE: 0.26710420565479953
+  Detail:
+
+  Status: checked and matched
+
+--- Weather_iTransformer ---
+  Dataset: Weather
+  Model: iTransformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 122.5
+  Liulian epochs run: 10
+  Liulian time (s): 143.6
+  TSL final MSE: 0.174920
+  TSL final MAE: 0.21613314747810364
+  Liulian final MSE: 0.176738
+  Liulian final MAE: 0.21549896742650623
+  Detail:
+
+  Status: checked and matched
+
+--- ECL_iTransformer ---
+  Dataset: ECL
+  Model: iTransformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 120.5
+  Liulian epochs run: 2
+  Liulian time (s): 189.0
+  TSL final MSE: 0.157431
+  TSL final MAE: 0.2497926950454712
+  Liulian final MSE: 0.159049
+  Liulian final MAE: 0.2517068766151255
+  Detail:
+
+  Status: checked and matched
+
+--- Traffic_iTransformer ---
+  Dataset: Traffic
+  Model: iTransformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 351.7
+  Liulian epochs run: 2
+  Liulian time (s): 400.3
+  TSL final MSE: 0.441411
+  TSL final MAE: 0.3120712637901306
+  Liulian final MSE: 0.459084
+  Liulian final MAE: 0.32369939616147003
+  Detail:
+
+  Status: checked and matched
+
+--- Exchange_iTransformer ---
+  Dataset: Exchange
+  Model: iTransformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 15.5
+  Liulian epochs run: 10
+  Liulian time (s): 16.8
+  TSL final MSE: 0.086995
+  TSL final MAE: 0.2071472704410553
+  Liulian final MSE: 0.087021
+  Liulian final MAE: 0.20720388567397363
+  Detail:
+
+  Status: checked and matched
+
+--- ILI_iTransformer ---
+  Dataset: ILI
+  Model: iTransformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 5.7
+  Liulian epochs run: 10
+  Liulian time (s): 5.9
+  TSL final MSE: 3.152707
+  TSL final MAE: 1.2100822925567627
+  Liulian final MSE: 3.008049
+  Liulian final MAE: 1.165643585429472
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh1_TimeMixer ---
+  Dataset: ETTh1
+  Model: TimeMixer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 6
+  TSL time (s): 16.8
+  Liulian epochs run: 7
+  Liulian time (s): 21.2
+  TSL final MSE: 0.383007
+  TSL final MAE: 0.398675799369812
+  Liulian final MSE: 0.377270
+  Liulian final MAE: 0.3988068712998977
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh2_TimeMixer ---
+  Dataset: ETTh2
+  Model: TimeMixer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 6
+  TSL time (s): 57.1
+  Liulian epochs run: 6
+  Liulian time (s): 54.5
+  TSL final MSE: 0.291671
+  TSL final MAE: 0.34400466084480286
+  Liulian final MSE: 0.288928
+  Liulian final MAE: 0.3397226873805322
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm1_TimeMixer ---
+  Dataset: ETTm1
+  Model: TimeMixer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 6
+  TSL time (s): 500.7
+  Liulian epochs run: 7
+  Liulian time (s): 610.7
+  TSL final MSE: 0.320179
+  TSL final MAE: 0.3598528802394867
+  Liulian final MSE: 0.322157
+  Liulian final MAE: 0.3600117970008558
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm2_TimeMixer ---
+  Dataset: ETTm2
+  Model: TimeMixer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 5
+  TSL time (s): 93.1
+  Liulian epochs run: 4
+  Liulian time (s): 83.2
+  TSL final MSE: 0.175693
+  TSL final MAE: 0.2584095895290375
+  Liulian final MSE: 0.174514
+  Liulian final MAE: 0.2560884115093386
+  Detail:
+
+  Status: checked and matched
+
+--- Weather_TimeMixer ---
+  Dataset: Weather
+  Model: TimeMixer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 7
+  TSL time (s): 259.4
+  Liulian epochs run: 9
+  Liulian time (s): 346.6
+  TSL final MSE: 0.162534
+  TSL final MAE: 0.20917636156082153
+  Liulian final MSE: 0.161616
+  Liulian final MAE: 0.20920494079236004
+  Detail:
+
+  Status: checked and matched
+
+--- ECL_TimeMixer ---
+  Dataset: ECL
+  Model: TimeMixer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 7.2
+  Liulian epochs run: 0
+  Liulian time (s): 6.1
+  Detail:
+
+  Status: run failed
+
+--- Traffic_TimeMixer ---
+  Dataset: Traffic
+  Model: TimeMixer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 8.5
+  Liulian epochs run: 0
+  Liulian time (s): 6.7
+  Detail:
+
+  Status: run failed
+
+--- ETTh1_TimeXer ---
+  Dataset: ETTh1
+  Model: TimeXer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 6
+  TSL time (s): 108.0
+  Liulian epochs run: 7
+  Liulian time (s): 126.5
+  TSL final MSE: 0.387146
+  TSL final MAE: 0.40468236804008484
+  Liulian final MSE: 0.387400
+  Liulian final MAE: 0.4060330773170375
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh2_TimeXer ---
+  Dataset: ETTh2
+  Model: TimeXer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 43.4
+  Liulian epochs run: 0
+  Liulian time (s): 2.4
+  TSL final MSE: 0.286300
+  TSL final MAE: 0.33847707509994507
+  Detail:
+
+  Status: run failed
+
+--- ETTm1_TimeXer ---
+  Dataset: ETTm1
+  Model: TimeXer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 496.6
+  Liulian epochs run: 0
+  Liulian time (s): 2.5
+  TSL final MSE: 0.319036
+  TSL final MAE: 0.3578522503376007
+  Detail:
+
+  Status: run failed
+
+--- ETTm2_TimeXer ---
+  Dataset: ETTm2
+  Model: TimeXer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 130.6
+  Liulian epochs run: 0
+  Liulian time (s): 2.5
+  TSL final MSE: 0.170459
+  TSL final MAE: 0.2553682029247284
+  Detail:
+
+  Status: run failed
+
+--- Weather_TimeXer ---
+  Dataset: Weather
+  Model: TimeXer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 524.0
+  Liulian epochs run: 0
+  Liulian time (s): 2.5
+  TSL final MSE: 0.158080
+  TSL final MAE: 0.20580673217773438
+  Detail:
+
+  Status: run failed
+
+--- ECL_TimeXer ---
+  Dataset: ECL
+  Model: TimeXer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 966.4
+  Liulian epochs run: 0
+  Liulian time (s): 3.4
+  TSL final MSE: 0.153081
+  TSL final MAE: 0.25667524337768555
+  Detail:
+
+  Status: run failed
+
+--- Traffic_TimeXer ---
+  Dataset: Traffic
+  Model: TimeXer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 10.1
+  Liulian epochs run: 0
+  Liulian time (s): 7.7
+  Detail:
+
+  Status: run failed
+
+--- ETTh1_Mamba ---
+  Dataset: ETTh1
+  Model: Mamba
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 2.9
+  Liulian epochs run: 0
+  Liulian time (s): 2.3
+  Detail:
+
+  Status: run failed
+
+--- ETTh2_Mamba ---
+  Dataset: ETTh2
+  Model: Mamba
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 3.0
+  Liulian epochs run: 0
+  Liulian time (s): 2.4
+  Detail:
+
+  Status: run failed
+
+--- ETTm1_Mamba ---
+  Dataset: ETTm1
+  Model: Mamba
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 3.0
+  Liulian epochs run: 0
+  Liulian time (s): 2.5
+  Detail:
+
+  Status: run failed
+
+--- ETTm2_Mamba ---
+  Dataset: ETTm2
+  Model: Mamba
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 3.0
+  Liulian epochs run: 0
+  Liulian time (s): 2.5
+  Detail:
+
+  Status: run failed
+
+--- Weather_Mamba ---
+  Dataset: Weather
+  Model: Mamba
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 3.0
+  Liulian epochs run: 0
+  Liulian time (s): 2.5
+  Detail:
+
+  Status: run failed
+
+--- ECL_Mamba ---
+  Dataset: ECL
+  Model: Mamba
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 3.0
+  Liulian epochs run: 0
+  Liulian time (s): 3.4
+  Detail:
+
+  Status: run failed
+
+--- Traffic_Mamba ---
+  Dataset: Traffic
+  Model: Mamba
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 3.0
+  Liulian epochs run: 0
+  Liulian time (s): 4.1
+  Detail:
+
+  Status: run failed
+
+--- Exchange_Mamba ---
+  Dataset: Exchange
+  Model: Mamba
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 3.0
+  Liulian epochs run: 0
+  Liulian time (s): 2.4
+  Detail:
+
+  Status: run failed
+
+--- ETTh1_NonstationaryTransformer ---
+  Dataset: ETTh1
+  Model: Nonstationary_Transformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 73.5
+  Liulian epochs run: 10
+  Liulian time (s): 77.9
+  TSL final MSE: 0.560027
+  TSL final MAE: 0.5136276483535767
+  Liulian final MSE: 0.528181
+  Liulian final MAE: 0.49133785124099016
+  Detail:
+
+  Status: checked but not matched
+
+--- ETTh2_NonstationaryTransformer ---
+  Dataset: ETTh2
+  Model: Nonstationary_Transformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 139.3
+  Liulian epochs run: 10
+  Liulian time (s): 149.8
+  TSL final MSE: 0.411921
+  TSL final MAE: 0.42678189277648926
+  Liulian final MSE: 0.414520
+  Liulian final MAE: 0.43317652513779686
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm1_NonstationaryTransformer ---
+  Dataset: ETTm1
+  Model: Nonstationary_Transformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 625.0
+  Liulian epochs run: 10
+  Liulian time (s): 592.7
+  TSL final MSE: 0.416589
+  TSL final MAE: 0.416329026222229
+  Liulian final MSE: 0.407646
+  Liulian final MAE: 0.4085643927821445
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm2_NonstationaryTransformer ---
+  Dataset: ETTm2
+  Model: Nonstationary_Transformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 567.2
+  Liulian epochs run: 10
+  Liulian time (s): 594.4
+  TSL final MSE: 0.246355
+  TSL final MAE: 0.30913275480270386
+  Liulian final MSE: 0.261519
+  Liulian final MAE: 0.31852413073540775
+  Detail:
+
+  Status: checked but not matched
+
+--- ECL_NonstationaryTransformer ---
+  Dataset: ECL
+  Model: Nonstationary_Transformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 334.3
+  Liulian epochs run: 2
+  Liulian time (s): 399.7
+  TSL final MSE: 0.166717
+  TSL final MAE: 0.2710619270801544
+  Liulian final MSE: 0.169587
+  Liulian final MAE: 0.27146261056302706
+  Detail:
+
+  Status: checked and matched
+
+--- Weather_NonstationaryTransformer ---
+  Dataset: Weather
+  Model: Nonstationary_Transformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 3
+  TSL time (s): 177.3
+  Liulian epochs run: 3
+  Liulian time (s): 188.4
+  TSL final MSE: 0.182262
+  TSL final MAE: 0.2304101139307022
+  Liulian final MSE: 0.194824
+  Liulian final MAE: 0.23975295975250743
+  Detail:
+
+  Status: checked but not matched
+
+--- Traffic_NonstationaryTransformer ---
+  Dataset: Traffic
+  Model: Nonstationary_Transformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 79.6
+  Liulian epochs run: 2
+  Liulian time (s): 128.3
+  TSL final MSE: 0.662609
+  TSL final MAE: 0.37092310190200806
+  Liulian final MSE: 0.631883
+  Liulian final MAE: 0.3573992501124587
+  Detail:
+
+  Status: checked and matched
+
+--- Exchange_NonstationaryTransformer ---
+  Dataset: Exchange
+  Model: Nonstationary_Transformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 80.0
+  Liulian epochs run: 10
+  Liulian time (s): 86.8
+  TSL final MSE: 0.128832
+  TSL final MAE: 0.25266242027282715
+  Liulian final MSE: 0.180865
+  Liulian final MAE: 0.27730005786724066
+  Detail:
+
+  Status: checked but not matched
+
+--- ILI_NonstationaryTransformer ---
+  Dataset: ILI
+  Model: Nonstationary_Transformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 9.0
+  Liulian epochs run: 10
+  Liulian time (s): 10.0
+  TSL final MSE: 2.507935
+  TSL final MAE: 0.9650539755821228
+  Liulian final MSE: 2.427920
+  Liulian final MAE: 1.0434376492219812
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh1_LightTS ---
+  Dataset: ETTh1
+  Model: LightTS
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 16.9
+  Liulian epochs run: 10
+  Liulian time (s): 21.1
+  TSL final MSE: 0.435177
+  TSL final MAE: 0.4435972571372986
+  Liulian final MSE: 0.435650
+  Liulian final MAE: 0.44385327250567974
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh2_LightTS ---
+  Dataset: ETTh2
+  Model: LightTS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 17.2
+  Liulian epochs run: 10
+  Liulian time (s): 20.7
+  TSL final MSE: 0.442252
+  TSL final MAE: 0.4665568768978119
+  Liulian final MSE: 0.450777
+  Liulian final MAE: 0.4725016471406502
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm1_LightTS ---
+  Dataset: ETTm1
+  Model: LightTS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 52.3
+  Liulian epochs run: 10
+  Liulian time (s): 64.1
+  TSL final MSE: 0.393123
+  TSL final MAE: 0.4131525754928589
+  Liulian final MSE: 0.396205
+  Liulian final MAE: 0.41748988563435346
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm2_LightTS ---
+  Dataset: ETTm2
+  Model: LightTS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 51.8
+  Liulian epochs run: 10
+  Liulian time (s): 64.6
+  TSL final MSE: 0.225521
+  TSL final MAE: 0.3252256512641907
+  Liulian final MSE: 0.224830
+  Liulian final MAE: 0.3226401504359047
+  Detail:
+
+  Status: checked and matched
+
+--- ECL_LightTS ---
+  Dataset: ECL
+  Model: LightTS
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 38.7
+  Liulian epochs run: 2
+  Liulian time (s): 98.6
+  TSL final MSE: 0.222730
+  TSL final MAE: 0.32447898387908936
+  Liulian final MSE: 0.223555
+  Liulian final MAE: 0.32451142829131524
+  Detail:
+
+  Status: checked and matched
+
+--- Weather_LightTS ---
+  Dataset: Weather
+  Model: LightTS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 64.6
+  Liulian epochs run: 10
+  Liulian time (s): 70.9
+  TSL final MSE: 0.172976
+  TSL final MAE: 0.2333727777004242
+  Liulian final MSE: 0.172483
+  Liulian final MAE: 0.23283685255854214
+  Detail:
+
+  Status: checked and matched
+
+--- Traffic_LightTS ---
+  Dataset: Traffic
+  Model: LightTS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 55.3
+  Liulian epochs run: 2
+  Liulian time (s): 103.0
+  TSL final MSE: 0.743584
+  TSL final MAE: 0.4585288465023041
+  Liulian final MSE: 0.745382
+  Liulian final MAE: 0.45921419032186556
+  Detail:
+
+  Status: checked and matched
+
+--- Exchange_LightTS ---
+  Dataset: Exchange
+  Model: LightTS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 12.3
+  Liulian epochs run: 10
+  Liulian time (s): 13.0
+  TSL final MSE: 0.135832
+  TSL final MAE: 0.2771548330783844
+  Liulian final MSE: 0.129254
+  Liulian final MAE: 0.2702436782891237
+  Detail:
+
+  Status: checked and matched
+
+--- ILI_LightTS ---
+  Dataset: ILI
+  Model: LightTS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 5.7
+  Liulian epochs run: 10
+  Liulian time (s): 5.5
+  TSL final MSE: 5.884622
+  TSL final MAE: 1.7794240713119507
+  Liulian final MSE: 5.842778
+  Liulian final MAE: 1.7723556013668285
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh1_Reformer ---
+  Dataset: ETTh1
+  Model: Reformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 221.1
+  Liulian epochs run: 10
+  Liulian time (s): 228.7
+  TSL final MSE: 0.851638
+  TSL final MAE: 0.6909100413322449
+  Liulian final MSE: 0.802842
+  Liulian final MAE: 0.649092736321249
+  Detail:
+
+  Status: checked but not matched
+
+--- ETTh2_Reformer ---
+  Dataset: ETTh2
+  Model: Reformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 221.7
+  Liulian epochs run: 10
+  Liulian time (s): 228.5
+  TSL final MSE: 2.029880
+  TSL final MAE: 1.1054871082305908
+  Liulian final MSE: 1.944546
+  Liulian final MAE: 1.0953705114564947
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm1_Reformer ---
+  Dataset: ETTm1
+  Model: Reformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 877.7
+  Liulian epochs run: 10
+  Liulian time (s): 898.1
+  TSL final MSE: 0.868566
+  TSL final MAE: 0.65863436460495
+  Liulian final MSE: 0.709292
+  Liulian final MAE: 0.6048068488557177
+  Detail:
+
+  Status: checked but not matched
+
+--- ETTm2_Reformer ---
+  Dataset: ETTm2
+  Model: Reformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 876.0
+  Liulian epochs run: 10
+  Liulian time (s): 897.3
+  TSL final MSE: 0.929850
+  TSL final MAE: 0.7496973276138306
+  Liulian final MSE: 0.891578
+  Liulian final MAE: 0.7198136513107976
+  Detail:
+
+  Status: checked and matched
+
+--- ECL_Reformer ---
+  Dataset: ECL
+  Model: Reformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 112.5
+  Liulian epochs run: 2
+  Liulian time (s): 182.7
+  TSL final MSE: 0.328275
+  TSL final MAE: 0.41325533390045166
+  Liulian final MSE: 0.335716
+  Liulian final MAE: 0.4189313945038621
+  Detail:
+
+  Status: checked and matched
+
+--- Weather_Reformer ---
+  Dataset: Weather
+  Model: Reformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 885.9
+  Liulian epochs run: 10
+  Liulian time (s): 905.9
+  TSL final MSE: 0.365435
+  TSL final MAE: 0.4053132236003876
+  Liulian final MSE: 0.354313
+  Liulian final MAE: 0.3874496392526192
+  Detail:
+
+  Status: checked and matched
+
+--- Traffic_Reformer ---
+  Dataset: Traffic
+  Model: Reformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 99.2
+  Liulian epochs run: 2
+  Liulian time (s): 151.2
+  TSL final MSE: 0.714238
+  TSL final MAE: 0.4002355635166168
+  Liulian final MSE: 0.713497
+  Liulian final MAE: 0.4035847417741726
+  Detail:
+
+  Status: checked and matched
+
+--- Exchange_Reformer ---
+  Dataset: Exchange
+  Model: Reformer
+  Special settings applied: True
+  Special settings tags: custom_timeout
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 5
+  TSL time (s): 67.7
+  Liulian epochs run: 9
+  Liulian time (s): 119.6
+  TSL final MSE: 0.985423
+  TSL final MAE: 0.8186545372009277
+  Liulian final MSE: 1.074215
+  Liulian final MAE: 0.8357626365709908
+  Detail:
+
+  Status: checked but not matched
+
+--- ILI_Reformer ---
+  Dataset: ILI
+  Model: Reformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 10.7
+  Liulian epochs run: 10
+  Liulian time (s): 11.2
+  TSL final MSE: 3.947287
+  TSL final MAE: 1.3040478229522705
+  Liulian final MSE: 3.785817
+  Liulian final MAE: 1.2791243440964644
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh1_GPT4TS ---
+  Dataset: ETTh1
+  Model: GPT4TS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no tsl counterpart
+
+--- ETTh1_TimeLLM ---
+  Dataset: ETTh1
+  Model: TimeLLM
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+
+--- ETTh1_TimeMoE ---
+  Dataset: ETTh1
+  Model: TimeMoE
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+
+--- ETTh1_Stationary ---
+  Dataset: ETTh1
+  Model: Stationary
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical Stationary model in current TSL/liulian setup
+
+--- ETTh2_TimeLLM ---
+  Dataset: ETTh2
+  Model: TimeLLM
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+
+--- ETTm1_TimeLLM ---
+  Dataset: ETTm1
+  Model: TimeLLM
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+
+--- ETTm2_TimeLLM ---
+  Dataset: ETTm2
+  Model: TimeLLM
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+
+--- Weather_TimeLLM ---
+  Dataset: Weather
+  Model: TimeLLM
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+
+--- ECL_TimeLLM ---
+  Dataset: ECL
+  Model: TimeLLM
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+
+--- Traffic_TimeLLM ---
+  Dataset: Traffic
+  Model: TimeLLM
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+
+--- Exchange_TimeLLM ---
+  Dataset: Exchange
+  Model: TimeLLM
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+
+--- ILI_TimeLLM ---
+  Dataset: ILI
+  Model: TimeLLM
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+
+--- ETTh2_TimeMoE ---
+  Dataset: ETTh2
+  Model: TimeMoE
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+
+--- ETTm1_TimeMoE ---
+  Dataset: ETTm1
+  Model: TimeMoE
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+
+--- ETTm2_TimeMoE ---
+  Dataset: ETTm2
+  Model: TimeMoE
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+
+--- Weather_TimeMoE ---
+  Dataset: Weather
+  Model: TimeMoE
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+
+--- ECL_TimeMoE ---
+  Dataset: ECL
+  Model: TimeMoE
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+
+--- Traffic_TimeMoE ---
+  Dataset: Traffic
+  Model: TimeMoE
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+
+--- Exchange_TimeMoE ---
+  Dataset: Exchange
+  Model: TimeMoE
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+
+--- ILI_TimeMoE ---
+  Dataset: ILI
+  Model: TimeMoE
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+
+--- ETTh2_ETSformer ---
+  Dataset: ETTh2
+  Model: ETSformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 128.1
+  Liulian epochs run: 10
+  Liulian time (s): 134.6
+  TSL final MSE: 0.384135
+  TSL final MAE: 0.4279192090034485
+  Liulian final MSE: 0.369607
+  Liulian final MAE: 0.4206293011803173
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm1_ETSformer ---
+  Dataset: ETTm1
+  Model: ETSformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 502.2
+  Liulian epochs run: 10
+  Liulian time (s): 517.8
+  TSL final MSE: 0.543073
+  TSL final MAE: 0.5084189772605896
+  Liulian final MSE: 0.541605
+  Liulian final MAE: 0.5123827580237024
+  Detail:
+
+  Status: checked and matched
+
+--- ECL_ETSformer ---
+  Dataset: ECL
+  Model: ETSformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 83.7
+  Liulian epochs run: 2
+  Liulian time (s): 150.6
+  TSL final MSE: 0.274831
+  TSL final MAE: 0.3748418390750885
+  Liulian final MSE: 0.275440
+  Liulian final MAE: 0.375311283566714
+  Detail:
+
+  Status: checked and matched
+
+--- Traffic_ETSformer ---
+  Dataset: Traffic
+  Model: ETSformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 2
+  TSL time (s): 89.2
+  Liulian epochs run: 2
+  Liulian time (s): 142.9
+  TSL final MSE: 1.042174
+  TSL final MAE: 0.6171517968177795
+  Liulian final MSE: 1.049203
+  Liulian final MAE: 0.6259156634931232
+  Detail:
+
+  Status: checked and matched
+
+--- Exchange_ETSformer ---
+  Dataset: Exchange
+  Model: ETSformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 74.5
+  Liulian epochs run: 10
+  Liulian time (s): 77.1
+  TSL final MSE: 0.100916
+  TSL final MAE: 0.22566622495651245
+  Liulian final MSE: 0.095933
+  Liulian final MAE: 0.22164982586638
+  Detail:
+
+  Status: checked and matched
+
+--- ILI_ETSformer ---
+  Dataset: ILI
+  Model: ETSformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 9.7
+  Liulian epochs run: 10
+  Liulian time (s): 9.9
+  TSL final MSE: 4.051630
+  TSL final MAE: 1.4449883699417114
+  Liulian final MSE: 4.634145
+  Liulian final MAE: 1.5465871039558858
+  Detail:
+
+  Status: checked but not matched
+
+--- ETTh2_Stationary ---
+  Dataset: ETTh2
+  Model: Stationary
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical Stationary model in current TSL/liulian setup
+
+--- ETTm1_Stationary ---
+  Dataset: ETTm1
+  Model: Stationary
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical Stationary model in current TSL/liulian setup
+
+--- ETTm2_Stationary ---
+  Dataset: ETTm2
+  Model: Stationary
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical Stationary model in current TSL/liulian setup
+
+--- Weather_Stationary ---
+  Dataset: Weather
+  Model: Stationary
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical Stationary model in current TSL/liulian setup
+
+--- ECL_Stationary ---
+  Dataset: ECL
+  Model: Stationary
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical Stationary model in current TSL/liulian setup
+
+--- Traffic_Stationary ---
+  Dataset: Traffic
+  Model: Stationary
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical Stationary model in current TSL/liulian setup
+
+--- Exchange_Stationary ---
+  Dataset: Exchange
+  Model: Stationary
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical Stationary model in current TSL/liulian setup
+
+--- ILI_Stationary ---
+  Dataset: ILI
+  Model: Stationary
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical Stationary model in current TSL/liulian setup
+
+--- Solar_PatchTST ---
+  Dataset: Solar-Energy
+  Model: PatchTST
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: dataset/config not integrated in liulian long_term comparison
+
+--- Solar_DLinear ---
+  Dataset: Solar-Energy
+  Model: DLinear
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: dataset/config not integrated in liulian long_term comparison
+
+--- PEMS03_PatchTST ---
+  Dataset: PEMS03
+  Model: PatchTST
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+
+--- PEMS03_DLinear ---
+  Dataset: PEMS03
+  Model: DLinear
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+
+--- PEMS04_PatchTST ---
+  Dataset: PEMS04
+  Model: PatchTST
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+
+--- PEMS04_DLinear ---
+  Dataset: PEMS04
+  Model: DLinear
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+
+--- PEMS07_PatchTST ---
+  Dataset: PEMS07
+  Model: PatchTST
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+
+--- PEMS07_DLinear ---
+  Dataset: PEMS07
+  Model: DLinear
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+
+--- PEMS08_PatchTST ---
+  Dataset: PEMS08
+  Model: PatchTST
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+
+--- PEMS08_DLinear ---
+  Dataset: PEMS08
+  Model: DLinear
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+
+--- CovidDeaths_PatchTST ---
+  Dataset: Covid Deaths
+  Model: PatchTST
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical TSL script/config mapping in current repository
+
+--- CovidDeaths_DLinear ---
+  Dataset: Covid Deaths
+  Model: DLinear
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical TSL script/config mapping in current repository
+
+--- NYCTaxi_PatchTST ---
+  Dataset: NYC Taxi
+  Model: PatchTST
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical TSL script/config mapping in current repository
+
+--- NYCTaxi_DLinear ---
+  Dataset: NYC Taxi
+  Model: DLinear
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical TSL script/config mapping in current repository
+
+--- NN5_PatchTST ---
+  Dataset: NN5
+  Model: PatchTST
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical TSL script/config mapping in current repository
+
+--- NN5_DLinear ---
+  Dataset: NN5
+  Model: DLinear
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical TSL script/config mapping in current repository
+
+--- FREDMD_PatchTST ---
+  Dataset: FRED-MD
+  Model: PatchTST
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical TSL script/config mapping in current repository
+
+--- FREDMD_DLinear ---
+  Dataset: FRED-MD
+  Model: DLinear
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no canonical TSL script/config mapping in current repository
+
+--- ETTh1_ETSformer ---
+  Dataset: ETTh1
+  Model: ETSformer
+  Special settings applied: False
+  Has TSL script: True
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 129.1
+  Liulian epochs run: 10
+  Liulian time (s): 134.2
+  TSL final MSE: 0.573259
+  TSL final MAE: 0.5516856908798218
+  Liulian final MSE: 0.551603
+  Liulian final MAE: 0.5296952473196992
+  Detail:
+
+  Status: checked and matched
+
+--- ETTm2_ETSformer ---
+  Dataset: ETTm2
+  Model: ETSformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 499.4
+  Liulian epochs run: 10
+  Liulian time (s): 518.2
+  TSL final MSE: 0.332186
+  TSL final MAE: 0.3890339434146881
+  Liulian final MSE: 0.336501
+  Liulian final MAE: 0.41536986962841166
+  Detail:
+
+  Status: checked and matched
+
+--- Weather_ETSformer ---
+  Dataset: Weather
+  Model: ETSformer
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 10
+  TSL time (s): 500.8
+  Liulian epochs run: 10
+  Liulian time (s): 519.6
+  TSL final MSE: 0.217918
+  TSL final MAE: 0.3019653856754303
+  Liulian final MSE: 0.225514
+  Liulian final MAE: 0.30827044360896083
+  Detail:
+
+  Status: checked and matched
+
+--- ETTh2_GPT4TS ---
+  Dataset: ETTh2
+  Model: GPT4TS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no tsl counterpart
+
+--- ETTm1_GPT4TS ---
+  Dataset: ETTm1
+  Model: GPT4TS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no tsl counterpart
+
+--- ETTm2_GPT4TS ---
+  Dataset: ETTm2
+  Model: GPT4TS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no tsl counterpart
+
+--- Weather_GPT4TS ---
+  Dataset: Weather
+  Model: GPT4TS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no tsl counterpart
+
+--- ECL_GPT4TS ---
+  Dataset: ECL
+  Model: GPT4TS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no tsl counterpart
+
+--- Traffic_GPT4TS ---
+  Dataset: Traffic
+  Model: GPT4TS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: True
+  Epoch limit: 2
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no tsl counterpart
+
+--- Exchange_GPT4TS ---
+  Dataset: Exchange
+  Model: GPT4TS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no tsl counterpart
+
+--- ILI_GPT4TS ---
+  Dataset: ILI
+  Model: GPT4TS
+  Special settings applied: False
+  Has TSL script: False
+  Large dataset: False
+  Epoch limit: None
+  TSL epochs run: 0
+  TSL time (s): 0.0
+  Liulian epochs run: 0
+  Liulian time (s): 0.0
+  Detail:
+
+  Status: skipped: no tsl counterpart
 
 
 ================================================================================
 SUMMARY
 ================================================================================
-Name                      TSL ep LL ep  TSL time  LL time Status
+Name                      TSL ep LL ep  TSL time  LL time  Special Status
 --------------------------------------------------------------------------------
-ETTh1_PatchTST                10    10     53.6s    52.6s checked and matched
-ETTh2_PatchTST                 4     7     54.0s    86.9s checked and matched
-ETTm1_PatchTST                10    10    182.8s   186.1s checked and matched
-ETTm2_PatchTST                 4     5    227.7s   285.3s checked and matched
-Weather_PatchTST               3     3    258.8s   262.3s checked and matched
-ECL_PatchTST                   2     2   1553.4s  1616.9s checked and matched
-Traffic_PatchTST               2     2   1225.3s  1264.4s checked and matched
-Exchange_PatchTST              4     5     28.5s    32.1s checked and matched
-ILI_PatchTST                   9    10     20.1s    14.7s checked but not matched
-ETTh1_DLinear                  9    10     19.6s    13.2s checked and matched
-ETTh2_DLinear                  5     8     13.7s    15.0s checked and matched
-ETTm1_DLinear                  6     7     33.7s    38.7s checked and matched
-ETTm2_DLinear                  7     6     37.4s    30.5s checked and matched
-Weather_DLinear                7     9     52.0s    43.9s checked and matched
-ECL_DLinear                    2     2     39.1s    97.6s checked and matched
-Traffic_DLinear                2     2     54.6s    96.8s checked and matched
-Exchange_DLinear               5     9     11.9s     9.8s checked and matched
-ILI_DLinear                    4    10      7.2s     5.0s checked but not matched
+ETTh1_PatchTST                10    10     45.5s    49.1s       no checked and matched
+ETTh2_PatchTST                10    10    114.2s   118.6s       no checked and matched
+ETTm1_PatchTST                10    10    167.4s   183.2s       no checked and matched
+ETTm2_PatchTST                10    10    467.3s   491.5s       no checked and matched
+Weather_PatchTST               3     3    252.6s   259.7s       no checked and matched
+ECL_PatchTST                   2     2   1434.2s  1498.5s       no checked and matched
+Traffic_PatchTST               2     2   1228.1s  1272.3s       no checked and matched
+Exchange_PatchTST             10    10     52.5s    57.4s       no checked and matched
+ILI_PatchTST                  10    10     13.7s    15.1s       no checked and matched
+ETTh1_DLinear                 10    10     10.5s    12.6s       no checked and matched
+ETTh2_DLinear                 10    10     11.3s    12.3s       no checked and matched
+ETTm1_DLinear                 10    10     30.9s    37.8s       no checked and matched
+ETTm2_DLinear                 10    10     28.8s    38.5s       no checked and matched
+Weather_DLinear               10    10     36.7s    44.3s       no checked and matched
+ECL_DLinear                    2     2     32.7s    90.9s       no checked and matched
+Traffic_DLinear                2     2     45.9s    89.7s       no checked and matched
+Exchange_DLinear              10    10      9.1s     8.7s       no checked and matched
+ILI_DLinear                   10    10      5.9s     4.8s       no checked and matched
+ETTh1_Informer                 4     4     62.9s    65.9s      yes checked but not matched
+ETTh2_Informer                10    10    137.5s   144.7s       no checked but not matched
+ETTm1_Informer                10    10   3037.6s  3392.7s       no checked and matched
+ETTm2_Informer                10    10   3428.6s  3495.5s       no checked and matched
+Weather_Informer              10    10    829.3s   576.8s       no checked and matched
+ECL_Informer                   2     2     81.9s   145.8s       no checked and matched
+Traffic_Informer               2     2     78.7s   128.2s       no checked and matched
+Exchange_Informer              7     5     60.8s    47.8s      yes checked and matched
+ILI_Informer                  10    10     10.0s    10.5s       no checked and matched
+ETTh1_Autoformer              10    10    281.9s   293.7s       no checked and matched
+ETTh2_Autoformer              10    10    282.2s   294.1s       no checked and matched
+ETTm1_Autoformer              10    10   1176.0s  1191.5s       no checked and matched
+ETTm2_Autoformer              10    10    826.4s   879.2s       no checked but not matched
+Weather_Autoformer             2     2    243.3s   274.9s       no checked but not matched
+ECL_Autoformer                 2     2    138.2s   207.2s       no checked but not matched
+Traffic_Autoformer             2     2    115.6s   172.0s       no checked but not matched
+Exchange_Autoformer            4     4     71.4s    73.4s      yes checked and matched
+ILI_Autoformer                10    10     12.4s    13.5s       no checked and matched
+ETTh1_FEDformer               10    10    481.6s   468.2s       no checked and matched
+ETTh2_FEDformer               10    10    464.3s   488.9s       no checked and matched
+ETTm1_FEDformer               10    10   2147.7s  1880.9s       no checked and matched
+ETTm2_FEDformer               10    10   1926.0s  1942.8s       no checked and matched
+Weather_FEDformer             10    10   1892.3s  1880.7s       no checked and matched
+ECL_FEDformer                  2     2    222.4s   287.2s       no checked and matched
+Traffic_FEDformer              2     2    171.3s   219.3s       no checked and matched
+Exchange_FEDformer            10    10    267.5s   271.5s       no checked and matched
+ILI_FEDformer                 10    10     25.6s    28.5s       no checked and matched
+ETTh1_TimesNet                10    10    162.2s   165.4s       no checked and matched
+ETTh2_TimesNet                 5     7    112.5s   159.7s      yes checked and matched
+ETTm1_TimesNet                 4     4    667.7s   691.1s      yes checked and matched
+ETTm2_TimesNet                 7     6    504.7s   455.3s      yes checked and matched
+Weather_TimesNet               9     7    776.6s   572.6s      yes checked and matched
+ECL_TimesNet                   2     0   2461.3s     3.4s       no run failed
+Traffic_TimesNet               2     2   3212.0s  3125.2s       no checked but not matched
+Exchange_TimesNet              4     4    187.9s   192.0s       no checked and matched
+ILI_TimesNet                   2     2    103.9s   100.3s       no checked but not matched
+ETTh1_Transformer              4     6     57.2s    88.6s      yes checked but not matched
+ETTh2_Transformer              4     4     57.6s    61.5s      yes checked but not matched
+ETTm1_Transformer              4     4    217.9s   231.9s      yes checked but not matched
+ETTm2_Transformer              4     4    217.5s   231.9s      yes checked but not matched
+Weather_Transformer            3     3    168.2s   180.4s      yes checked but not matched
+ECL_Transformer                2     2     75.5s   145.8s       no checked and matched
+Traffic_Transformer            2     2     73.8s   126.3s       no checked and matched
+Exchange_Transformer           5     5     42.0s    44.9s      yes checked and matched
+ILI_Transformer               10     8      9.1s     9.1s      yes checked but not matched
+ETTh1_iTransformer            10    10     21.9s    26.4s       no checked and matched
+ETTh2_iTransformer            10    10     21.3s    26.7s       no checked and matched
+ETTm1_iTransformer            10    10     70.8s    85.0s       no checked and matched
+ETTm2_iTransformer            10    10     71.6s    84.3s       no checked and matched
+Weather_iTransformer          10    10    122.5s   143.6s       no checked and matched
+ECL_iTransformer               2     2    120.5s   189.0s       no checked and matched
+Traffic_iTransformer           2     2    351.7s   400.3s       no checked and matched
+Exchange_iTransformer         10    10     15.5s    16.8s       no checked and matched
+ILI_iTransformer              10    10      5.7s     5.9s       no checked and matched
+ETTh1_TimeMixer                6     7     16.8s    21.2s      yes checked and matched
+ETTh2_TimeMixer                6     6     57.1s    54.5s      yes checked and matched
+ETTm1_TimeMixer                6     7    500.7s   610.7s      yes checked and matched
+ETTm2_TimeMixer                5     4     93.1s    83.2s      yes checked and matched
+Weather_TimeMixer              7     9    259.4s   346.6s      yes checked and matched
+ECL_TimeMixer                  0     0      7.2s     6.1s      yes run failed
+Traffic_TimeMixer              0     0      8.5s     6.7s      yes run failed
+ETTh1_TimeXer                  6     7    108.0s   126.5s      yes checked and matched
+ETTh2_TimeXer                 10     0     43.4s     2.4s       no run failed
+ETTm1_TimeXer                 10     0    496.6s     2.5s       no run failed
+ETTm2_TimeXer                 10     0    130.6s     2.5s       no run failed
+Weather_TimeXer               10     0    524.0s     2.5s       no run failed
+ECL_TimeXer                    2     0    966.4s     3.4s       no run failed
+Traffic_TimeXer                0     0     10.1s     7.7s      yes run failed
+ETTh1_Mamba                    0     0      2.9s     2.3s      yes run failed
+ETTh2_Mamba                    0     0      3.0s     2.4s       no run failed
+ETTm1_Mamba                    0     0      3.0s     2.5s       no run failed
+ETTm2_Mamba                    0     0      3.0s     2.5s       no run failed
+Weather_Mamba                  0     0      3.0s     2.5s       no run failed
+ECL_Mamba                      0     0      3.0s     3.4s       no run failed
+Traffic_Mamba                  0     0      3.0s     4.1s       no run failed
+Exchange_Mamba                 0     0      3.0s     2.4s       no run failed
+ETTh1_NonstationaryTransformer     10    10     73.5s    77.9s       no checked but not matched
+ETTh2_NonstationaryTransformer     10    10    139.3s   149.8s       no checked and matched
+ETTm1_NonstationaryTransformer     10    10    625.0s   592.7s       no checked and matched
+ETTm2_NonstationaryTransformer     10    10    567.2s   594.4s       no checked but not matched
+ECL_NonstationaryTransformer      2     2    334.3s   399.7s       no checked and matched
+Weather_NonstationaryTransformer      3     3    177.3s   188.4s       no checked but not matched
+Traffic_NonstationaryTransformer      2     2     79.6s   128.3s       no checked and matched
+Exchange_NonstationaryTransformer     10    10     80.0s    86.8s       no checked but not matched
+ILI_NonstationaryTransformer     10    10      9.0s    10.0s       no checked and matched
+ETTh1_LightTS                 10    10     16.9s    21.1s       no checked and matched
+ETTh2_LightTS                 10    10     17.2s    20.7s       no checked and matched
+ETTm1_LightTS                 10    10     52.3s    64.1s       no checked and matched
+ETTm2_LightTS                 10    10     51.8s    64.6s       no checked and matched
+ECL_LightTS                    2     2     38.7s    98.6s       no checked and matched
+Weather_LightTS               10    10     64.6s    70.9s       no checked and matched
+Traffic_LightTS                2     2     55.3s   103.0s       no checked and matched
+Exchange_LightTS              10    10     12.3s    13.0s       no checked and matched
+ILI_LightTS                   10    10      5.7s     5.5s       no checked and matched
+ETTh1_Reformer                10    10    221.1s   228.7s       no checked but not matched
+ETTh2_Reformer                10    10    221.7s   228.5s       no checked and matched
+ETTm1_Reformer                10    10    877.7s   898.1s       no checked but not matched
+ETTm2_Reformer                10    10    876.0s   897.3s       no checked and matched
+ECL_Reformer                   2     2    112.5s   182.7s       no checked and matched
+Weather_Reformer              10    10    885.9s   905.9s       no checked and matched
+Traffic_Reformer               2     2     99.2s   151.2s       no checked and matched
+Exchange_Reformer              5     9     67.7s   119.6s      yes checked but not matched
+ILI_Reformer                  10    10     10.7s    11.2s       no checked and matched
+ETTh1_GPT4TS                   0     0      0.0s     0.0s       no skipped: no tsl counterpart
+ETTh1_TimeLLM                  0     0      0.0s     0.0s       no skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+ETTh1_TimeMoE                  0     0      0.0s     0.0s       no skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+ETTh1_Stationary               0     0      0.0s     0.0s       no skipped: no canonical Stationary model in current TSL/liulian setup
+ETTh2_TimeLLM                  0     0      0.0s     0.0s       no skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+ETTm1_TimeLLM                  0     0      0.0s     0.0s       no skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+ETTm2_TimeLLM                  0     0      0.0s     0.0s       no skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+Weather_TimeLLM                0     0      0.0s     0.0s       no skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+ECL_TimeLLM                    0     0      0.0s     0.0s       no skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+Traffic_TimeLLM                0     0      0.0s     0.0s       no skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+Exchange_TimeLLM               0     0      0.0s     0.0s       no skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+ILI_TimeLLM                    0     0      0.0s     0.0s       no skipped: no bundled TSL long-term counterpart (external Time-LLM repo)
+ETTh2_TimeMoE                  0     0      0.0s     0.0s       no skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+ETTm1_TimeMoE                  0     0      0.0s     0.0s       no skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+ETTm2_TimeMoE                  0     0      0.0s     0.0s       no skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+Weather_TimeMoE                0     0      0.0s     0.0s       no skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+ECL_TimeMoE                    0     0      0.0s     0.0s       no skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+Traffic_TimeMoE                0     0      0.0s     0.0s       no skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+Exchange_TimeMoE               0     0      0.0s     0.0s       no skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+ILI_TimeMoE                    0     0      0.0s     0.0s       no skipped: TimeMoE is zero-shot task in current code, not long_term_forecast
+ETTh2_ETSformer               10    10    128.1s   134.6s       no checked and matched
+ETTm1_ETSformer               10    10    502.2s   517.8s       no checked and matched
+ECL_ETSformer                  2     2     83.7s   150.6s       no checked and matched
+Traffic_ETSformer              2     2     89.2s   142.9s       no checked and matched
+Exchange_ETSformer            10    10     74.5s    77.1s       no checked and matched
+ILI_ETSformer                 10    10      9.7s     9.9s       no checked but not matched
+ETTh2_Stationary               0     0      0.0s     0.0s       no skipped: no canonical Stationary model in current TSL/liulian setup
+ETTm1_Stationary               0     0      0.0s     0.0s       no skipped: no canonical Stationary model in current TSL/liulian setup
+ETTm2_Stationary               0     0      0.0s     0.0s       no skipped: no canonical Stationary model in current TSL/liulian setup
+Weather_Stationary             0     0      0.0s     0.0s       no skipped: no canonical Stationary model in current TSL/liulian setup
+ECL_Stationary                 0     0      0.0s     0.0s       no skipped: no canonical Stationary model in current TSL/liulian setup
+Traffic_Stationary             0     0      0.0s     0.0s       no skipped: no canonical Stationary model in current TSL/liulian setup
+Exchange_Stationary            0     0      0.0s     0.0s       no skipped: no canonical Stationary model in current TSL/liulian setup
+ILI_Stationary                 0     0      0.0s     0.0s       no skipped: no canonical Stationary model in current TSL/liulian setup
+Solar_PatchTST                 0     0      0.0s     0.0s       no skipped: dataset/config not integrated in liulian long_term comparison
+Solar_DLinear                  0     0      0.0s     0.0s       no skipped: dataset/config not integrated in liulian long_term comparison
+PEMS03_PatchTST                0     0      0.0s     0.0s       no skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+PEMS03_DLinear                 0     0      0.0s     0.0s       no skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+PEMS04_PatchTST                0     0      0.0s     0.0s       no skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+PEMS04_DLinear                 0     0      0.0s     0.0s       no skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+PEMS07_PatchTST                0     0      0.0s     0.0s       no skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+PEMS07_DLinear                 0     0      0.0s     0.0s       no skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+PEMS08_PatchTST                0     0      0.0s     0.0s       no skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+PEMS08_DLinear                 0     0      0.0s     0.0s       no skipped: TSL PEMS scripts are short-term; long-term compare path not aligned
+CovidDeaths_PatchTST           0     0      0.0s     0.0s       no skipped: no canonical TSL script/config mapping in current repository
+CovidDeaths_DLinear            0     0      0.0s     0.0s       no skipped: no canonical TSL script/config mapping in current repository
+NYCTaxi_PatchTST               0     0      0.0s     0.0s       no skipped: no canonical TSL script/config mapping in current repository
+NYCTaxi_DLinear                0     0      0.0s     0.0s       no skipped: no canonical TSL script/config mapping in current repository
+NN5_PatchTST                   0     0      0.0s     0.0s       no skipped: no canonical TSL script/config mapping in current repository
+NN5_DLinear                    0     0      0.0s     0.0s       no skipped: no canonical TSL script/config mapping in current repository
+FREDMD_PatchTST                0     0      0.0s     0.0s       no skipped: no canonical TSL script/config mapping in current repository
+FREDMD_DLinear                 0     0      0.0s     0.0s       no skipped: no canonical TSL script/config mapping in current repository
+ETTh1_ETSformer               10    10    129.1s   134.2s       no checked and matched
+ETTm2_ETSformer               10    10    499.4s   518.2s       no checked and matched
+Weather_ETSformer             10    10    500.8s   519.6s       no checked and matched
+ETTh2_GPT4TS                   0     0      0.0s     0.0s       no skipped: no tsl counterpart
+ETTm1_GPT4TS                   0     0      0.0s     0.0s       no skipped: no tsl counterpart
+ETTm2_GPT4TS                   0     0      0.0s     0.0s       no skipped: no tsl counterpart
+Weather_GPT4TS                 0     0      0.0s     0.0s       no skipped: no tsl counterpart
+ECL_GPT4TS                     0     0      0.0s     0.0s       no skipped: no tsl counterpart
+Traffic_GPT4TS                 0     0      0.0s     0.0s       no skipped: no tsl counterpart
+Exchange_GPT4TS                0     0      0.0s     0.0s       no skipped: no tsl counterpart
+ILI_GPT4TS                     0     0      0.0s     0.0s       no skipped: no tsl counterpart

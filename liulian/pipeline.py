@@ -185,6 +185,13 @@ def build_dataset(config: Dict[str, Any]) -> Any:
 
         # ETT datasets need their specific classes with hardcoded
         # 12/4/4-month borders to match TSL convention exactly.
+        # Match Time-Series-Library behavior:
+        #   timeenc = 0 if embed != 'timeF' else 1
+        # If config does not provide timeenc explicitly, derive it from embed.
+        inferred_timeenc = (
+            0 if str(config.get('embed', 'timeF')) != 'timeF' else 1
+        )
+
         _common_kwargs = dict(
             root_path=root_path,
             data_path=csv_filename,
@@ -193,7 +200,7 @@ def build_dataset(config: Dict[str, Any]) -> Any:
             target=config.get('target', 'OT'),
             scale=config.get('scaler', 'standard') != 'none',
             scaler_type=config.get('scaler', 'standard'),
-            timeenc=config.get('timeenc', 0),
+            timeenc=config.get('timeenc', inferred_timeenc),
             freq=config.get('freq', 'h'),
             identifier_mode=config.get('identifier_mode', 'none'),
             id_integration=config.get('id_integration', 'concat_to_x'),
@@ -745,6 +752,10 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
     # ── Build ───────────────────────────────────────────────────────
     dataset = build_dataset(config)
     print_dataset_summary(dataset)
+    # TSL seeds once and instantiates the model before building loaders.
+    # Re-seed here so dataset construction does not perturb the model/init RNG
+    # stream relative to the TSL reference pipeline.
+    seed_everything(config.get('seed', 2026))
     model = build_model(config, dataset)
     loaders = build_loaders(dataset, config)
     exp = build_experiment(config, dataset, model, loaders)

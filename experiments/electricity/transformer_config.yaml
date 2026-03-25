@@ -15,7 +15,7 @@ eval_only: false
 data: electricity
 seq_len: 96
 pred_len: 96
-features: M
+features: S
 label_len: 48
 train_split: 0.7
 max_samples: null

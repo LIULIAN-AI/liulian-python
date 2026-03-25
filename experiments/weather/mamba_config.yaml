@@ -1,4 +1,4 @@
-# Weather dataset: 21 meteorological indicators.
+# Weather dataset: 21 meteorological indicators sampled every 10 minutes.
 # Mamba (has TSL benchmark script)
 #
 # Usage:
@@ -19,7 +19,7 @@ features: M
 label_len: 48
 train_split: 0.7
 max_samples: null
-freq: t
+freq: h
 
 # ── Task & mode ─────────────────────────────────────────────────────────
 task: forecast

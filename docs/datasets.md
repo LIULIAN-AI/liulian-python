@@ -90,13 +90,19 @@ dec_inp = cat([batch_y[:, :label_len, :], zeros(pred_len)])
 # Ground-truth warm-up + zero placeholders for prediction
 ```
 
-### Encoder-only models (DLinear, PatchTST)
+### Encoder-only and decoder-light models
 
-These models accept `(x_enc, x_mark_enc, x_dec, x_mark_dec)` for API
-compatibility but **completely ignore** `x_dec` and `x_mark_dec`.
-**Set `label_len=0`** for these models to avoid constructing unused
-decoder inputs. There is no data-leakage risk either way — the overlap
-region `[seq_len-label_len : seq_len]` is already visible to the encoder.
+Several models accept `(x_enc, x_mark_enc, x_dec, x_mark_dec)` for API
+compatibility but ignore part or all of the decoder path during the
+forecast forward pass. That means `label_len` often has no behavioral
+effect even when the benchmark config still carries a non-zero value.
+
+For strict TSL benchmark parity, many published `PatchTST` and `DLinear`
+scripts still keep the dataset default decoder overlap (`48` for the
+96-step benchmarks, `18` for ILI) even though the model does not use the
+decoder warm-up. By contrast, the TSL `TimeMixer` scripts intentionally
+set `label_len=0` across datasets, and we preserve that as a model-
+specific convention.
 
 ### Encoder-decoder models (Informer, Autoformer, etc.)
 
@@ -159,7 +165,9 @@ Produces **continuous features normalised to `[-0.5, 0.5]`**:
 | Monthly (`m`) | MonthOfYear | 1 |
 
 This is the encoding used by **all standard TSL benchmark scripts**
-(via `--embed timeF`).
+(via `--embed timeF`). Detailed minute offsets such as `10min` and
+`15min` are supported through pandas offset parsing and are preferable
+to ambiguous shorthand when the dataset cadence is known precisely.
 
 ### `timeenc=0` (categorical — manual)
 

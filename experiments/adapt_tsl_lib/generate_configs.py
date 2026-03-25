@@ -47,7 +47,7 @@ DATASETS: dict[str, dict] = {
         "data": "ETTm1",
         "channels": 7,
         "target": "OT",
-        "freq": "t",
+        "freq": "h",
         "seq_len": 96, "pred_len": 96, "label_len": 48,
         "description": "ETT 15-minute benchmark (ETTm1). 7 transformer features.",
     },
@@ -55,7 +55,7 @@ DATASETS: dict[str, dict] = {
         "data": "ETTm2",
         "channels": 7,
         "target": "OT",
-        "freq": "t",
+        "freq": "h",
         "seq_len": 96, "pred_len": 96, "label_len": 48,
         "description": "ETT 15-minute benchmark (ETTm2). 7 transformer features.",
     },
@@ -71,9 +71,9 @@ DATASETS: dict[str, dict] = {
         "data": "weather",
         "channels": 21,
         "target": None,
-        "freq": "t",
+        "freq": "h",
         "seq_len": 96, "pred_len": 96, "label_len": 48,
-        "description": "Weather dataset: 21 meteorological indicators.",
+        "description": "Weather dataset: 21 meteorological indicators sampled every 10 minutes.",
     },
     "traffic": {
         "data": "traffic",
@@ -136,6 +136,33 @@ INFORMER_OVERRIDES: dict[str, dict] = {
     "illness":     {"e_layers": 2, "d_layers": 1, "factor": 3},
 }
 
+# -- PatchTST: benchmark-specific encoder settings from TSL scripts -------
+PATCHTST_OVERRIDES: dict[str, dict] = {
+    "etth1":       {"d_model": 512, "d_ff": 2048, "n_heads": 2, "e_layers": 1, "d_layers": 0},
+    "etth2":       {"d_model": 512, "d_ff": 2048, "n_heads": 4, "e_layers": 3, "d_layers": 0},
+    "ettm1":       {"d_model": 512, "d_ff": 2048, "n_heads": 2, "e_layers": 1, "d_layers": 0},
+    "ettm2":       {"d_model": 512, "d_ff": 2048, "n_heads": 16, "e_layers": 3, "d_layers": 0},
+    "electricity": {"d_model": 512, "d_ff": 2048, "n_heads": 8, "e_layers": 2, "d_layers": 1, "batch_size": 16},
+    "weather":     {"d_model": 512, "d_ff": 2048, "n_heads": 4, "e_layers": 2, "d_layers": 0, "train_epochs": 3},
+    "traffic":     {"d_model": 512, "d_ff": 512, "n_heads": 8, "e_layers": 2, "d_layers": 1, "batch_size": 4},
+    "exchange_rate": {"d_model": 512, "d_ff": 2048, "n_heads": 8, "e_layers": 2, "d_layers": 1},
+    "illness":     {"d_model": 1024, "d_ff": 2048, "n_heads": 4, "e_layers": 4, "d_layers": 0},
+}
+
+# -- DLinear: preserve current benchmark hyperparameters while fixing
+#    dataset-facing values such as freq / label_len through shared metadata.
+DLINEAR_OVERRIDES: dict[str, dict] = {
+    "etth1":       {"d_model": 128, "d_ff": 256, "n_heads": 1, "e_layers": 1, "d_layers": 0, "dropout": 0.1},
+    "etth2":       {"d_model": 128, "d_ff": 256, "n_heads": 1, "e_layers": 1, "d_layers": 0, "dropout": 0.0},
+    "ettm1":       {"d_model": 128, "d_ff": 256, "n_heads": 1, "e_layers": 1, "d_layers": 0, "dropout": 0.0},
+    "ettm2":       {"d_model": 128, "d_ff": 256, "n_heads": 1, "e_layers": 1, "d_layers": 0, "dropout": 0.0},
+    "electricity": {"d_model": 64, "d_ff": 32, "n_heads": 8, "e_layers": 2, "d_layers": 1, "dropout": 0.1},
+    "weather":     {"d_model": 128, "d_ff": 256, "n_heads": 1, "e_layers": 1, "d_layers": 0, "dropout": 0.0},
+    "traffic":     {"d_model": 64, "d_ff": 32, "n_heads": 8, "e_layers": 2, "d_layers": 1, "dropout": 0.0},
+    "exchange_rate": {"d_model": 64, "d_ff": 32, "n_heads": 8, "e_layers": 2, "d_layers": 1, "dropout": 0.0},
+    "illness":     {"d_model": 128, "d_ff": 256, "n_heads": 1, "e_layers": 1, "d_layers": 0, "dropout": 0.0},
+}
+
 # -- FEDformer: same pattern as Informer ---------------------------------
 FEDFORMER_OVERRIDES: dict[str, dict] = {
     "etth1":       {"e_layers": 2, "d_layers": 1, "factor": 3},
@@ -147,6 +174,20 @@ FEDFORMER_OVERRIDES: dict[str, dict] = {
     "traffic":     {"e_layers": 2, "d_layers": 1, "factor": 3},
     "exchange_rate": {"e_layers": 2, "d_layers": 1, "factor": 3},
     "illness":     {"e_layers": 2, "d_layers": 1, "factor": 3},
+}
+
+# -- ETSformer: preserve current benchmark hyperparameters while inheriting
+#    dataset-facing values such as freq / label_len from shared metadata.
+ETSFORMER_OVERRIDES: dict[str, dict] = {
+    "etth1":       {"d_model": 512, "d_ff": 2048, "n_heads": 8, "e_layers": 2, "d_layers": 2, "factor": 3},
+    "etth2":       {"d_model": 512, "d_ff": 2048, "n_heads": 8, "e_layers": 2, "d_layers": 2, "factor": 3},
+    "ettm1":       {"d_model": 512, "d_ff": 2048, "n_heads": 8, "e_layers": 2, "d_layers": 2, "factor": 3},
+    "ettm2":       {"d_model": 512, "d_ff": 2048, "n_heads": 8, "e_layers": 2, "d_layers": 2, "factor": 3},
+    "electricity": {"d_model": 512, "d_ff": 2048, "n_heads": 8, "e_layers": 2, "d_layers": 2, "factor": 3},
+    "weather":     {"d_model": 512, "d_ff": 2048, "n_heads": 8, "e_layers": 2, "d_layers": 2, "factor": 3},
+    "traffic":     {"d_model": 512, "d_ff": 2048, "n_heads": 8, "e_layers": 2, "d_layers": 2, "factor": 3},
+    "exchange_rate": {"d_model": 512, "d_ff": 2048, "n_heads": 8, "e_layers": 2, "d_layers": 2, "factor": 3},
+    "illness":     {"d_model": 512, "d_ff": 2048, "n_heads": 8, "e_layers": 2, "d_layers": 2, "factor": 3},
 }
 
 # -- Autoformer: full coverage -------------------------------------------
@@ -203,15 +244,15 @@ ITRANSFORMER_OVERRIDES: dict[str, dict] = {
 
 # -- TimeMixer: label_len=0, unique down_sampling args -------------------
 TIMEMIXER_OVERRIDES: dict[str, dict] = {
-    "etth1":       {"d_model": 16, "d_ff": 32, "e_layers": 2, "batch_size": 128, "learning_rate": 0.01, "train_epochs": 10, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2},
-    "etth2":       {"d_model": 16, "d_ff": 32, "e_layers": 2, "learning_rate": 0.01, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2},
-    "ettm1":       {"d_model": 16, "d_ff": 32, "e_layers": 2, "batch_size": 16, "learning_rate": 0.01, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2},
-    "ettm2":       {"d_model": 32, "d_ff": 32, "e_layers": 2, "batch_size": 128, "learning_rate": 0.01, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2},
-    "electricity": {"d_model": 16, "d_ff": 32, "e_layers": 3, "d_layers": 1, "factor": 3, "batch_size": 32, "learning_rate": 0.01, "train_epochs": 20, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2},
-    "weather":     {"d_model": 16, "d_ff": 32, "e_layers": 3, "d_layers": 1, "factor": 3, "batch_size": 128, "learning_rate": 0.01, "train_epochs": 20, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2},
-    "traffic":     {"d_model": 32, "d_ff": 64, "e_layers": 3, "d_layers": 1, "factor": 3, "batch_size": 8, "learning_rate": 0.01, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2},
-    "exchange_rate": {"d_model": 16, "d_ff": 32, "e_layers": 2, "learning_rate": 0.01, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2},
-    "illness":     {"d_model": 16, "d_ff": 32, "e_layers": 2, "learning_rate": 0.01, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2},
+    "etth1":       {"d_model": 16, "d_ff": 32, "e_layers": 2, "batch_size": 128, "learning_rate": 0.01, "train_epochs": 10, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2, "channel_independence": 1, "decomp_method": "moving_avg", "use_norm": 1},
+    "etth2":       {"d_model": 16, "d_ff": 32, "e_layers": 2, "learning_rate": 0.01, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2, "channel_independence": 1, "decomp_method": "moving_avg", "use_norm": 1},
+    "ettm1":       {"d_model": 16, "d_ff": 32, "e_layers": 2, "batch_size": 16, "learning_rate": 0.01, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2, "channel_independence": 1, "decomp_method": "moving_avg", "use_norm": 1},
+    "ettm2":       {"d_model": 32, "d_ff": 32, "e_layers": 2, "batch_size": 128, "learning_rate": 0.01, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2, "channel_independence": 1, "decomp_method": "moving_avg", "use_norm": 1},
+    "electricity": {"d_model": 16, "d_ff": 32, "e_layers": 3, "d_layers": 1, "factor": 3, "batch_size": 32, "learning_rate": 0.01, "train_epochs": 20, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2, "channel_independence": 1, "decomp_method": "moving_avg", "use_norm": 1},
+    "weather":     {"d_model": 16, "d_ff": 32, "e_layers": 3, "d_layers": 1, "factor": 3, "batch_size": 128, "learning_rate": 0.01, "train_epochs": 20, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2, "channel_independence": 1, "decomp_method": "moving_avg", "use_norm": 1},
+    "traffic":     {"d_model": 32, "d_ff": 64, "e_layers": 3, "d_layers": 1, "factor": 3, "batch_size": 8, "learning_rate": 0.01, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2, "channel_independence": 1, "decomp_method": "moving_avg", "use_norm": 1},
+    "exchange_rate": {"d_model": 16, "d_ff": 32, "e_layers": 2, "learning_rate": 0.01, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2, "channel_independence": 1, "decomp_method": "moving_avg", "use_norm": 1},
+    "illness":     {"d_model": 16, "d_ff": 32, "e_layers": 2, "learning_rate": 0.01, "down_sampling_layers": 3, "down_sampling_method": "avg", "down_sampling_window": 2, "channel_independence": 1, "decomp_method": "moving_avg", "use_norm": 1},
 }
 
 # -- TimeXer: varies e_layers/d_model/d_ff per dataset -------------------
@@ -327,6 +368,21 @@ MODEL_REGISTRY: dict[str, dict] = {
         "is_tsl": True, "tsl_model_name": "Informer",
         "seed": 2021, "train_style": "tsl",
     },
+    "patchtst": {
+        "overrides": PATCHTST_OVERRIDES,
+        "is_tsl": True, "tsl_model_name": "PatchTST",
+        "seed": 2021, "train_style": "tsl",
+    },
+    "dlinear": {
+        "overrides": DLINEAR_OVERRIDES,
+        "is_tsl": True, "tsl_model_name": "DLinear",
+        "seed": 2021, "train_style": "tsl",
+    },
+    "etsformer": {
+        "overrides": ETSFORMER_OVERRIDES,
+        "is_tsl": True, "tsl_model_name": "ETSformer",
+        "seed": 2021, "train_style": "tsl",
+    },
     "autoformer": {
         "overrides": AUTOFORMER_OVERRIDES,
         "is_tsl": True, "tsl_model_name": "Autoformer",
@@ -354,6 +410,7 @@ MODEL_REGISTRY: dict[str, dict] = {
     },
     "timemixer": {
         "overrides": TIMEMIXER_OVERRIDES,
+        "extra_arch_keys": ["channel_independence", "decomp_method", "use_norm"],
         "label_len_override": 0,
         "is_tsl": True, "tsl_model_name": "TimeMixer",
         "seed": 2021, "train_style": "tsl",
@@ -400,6 +457,9 @@ MODEL_REGISTRY: dict[str, dict] = {
 
 # TSL script availability matrix (True = .sh exists in TSL benchmark scripts)
 TSL_SCRIPT_AVAILABLE: dict[str, dict[str, bool]] = {
+    "patchtst":     {ds: True for ds in DATASETS},
+    "dlinear":      {"etth1": True, "etth2": False, "ettm1": False, "ettm2": False, "electricity": True, "weather": False, "traffic": False, "exchange_rate": False, "illness": False},
+    "etsformer":    {"etth1": True, "etth2": False, "ettm1": False, "ettm2": False, "electricity": True, "weather": False, "traffic": False, "exchange_rate": False, "illness": False},
     "informer":     {"etth1": True, "etth2": False, "ettm1": False, "ettm2": False, "electricity": True, "weather": False, "traffic": False, "exchange_rate": False, "illness": False},
     "fedformer":    {"etth1": True, "etth2": False, "ettm1": False, "ettm2": False, "electricity": True, "weather": False, "traffic": False, "exchange_rate": False, "illness": False},
     "autoformer":   {ds: True for ds in DATASETS},
@@ -470,7 +530,9 @@ def _render_config(
     if "top_k" in params:
         top_k_line = f"top_k: {params['top_k']}\n"
 
-    # Target/freq lines (only for ETT datasets which need them)
+    # Emit explicit freq for every TSL-backed CSV benchmark so the config does
+    # not silently inherit TSL run.py's hourly default when a script omits
+    # --freq. Keep target optional because it is non-functional for features=M.
     target_line = f"target: {ds['target']}" if ds["target"] else ""
     freq_line = f"freq: {ds['freq']}" if ds["freq"] else ""
     target_freq_block = ""

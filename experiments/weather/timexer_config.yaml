@@ -1,4 +1,4 @@
-# Weather dataset: 21 meteorological indicators.
+# Weather dataset: 21 meteorological indicators sampled every 10 minutes.
 # TimeXer (has TSL benchmark script)
 #
 # Usage:
@@ -19,7 +19,7 @@ features: M
 label_len: 48
 train_split: 0.7
 max_samples: null
-freq: t
+freq: h
 
 # ── Task & mode ─────────────────────────────────────────────────────────
 task: forecast
@@ -127,4 +127,3 @@ activation: gelu
 output_attention: false
 factor: 3
 task_name: long_term_forecast
-use_norm: 1

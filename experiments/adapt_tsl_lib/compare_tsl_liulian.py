@@ -2,7 +2,8 @@
 """Compare TSL (Time-Series-Library) vs liulian benchmark results.
 
 Runs both TSL and liulian for each dataset × model pair, compares metrics,
-and writes structured results to ``artifacts/tsl_comparison_results.txt``.
+and writes structured results to
+``experiments/adapt_tsl_lib/tsl_comparison_results.txt``.
 
 Usage (from project root, with .venv activated):
 
@@ -32,8 +33,11 @@ import subprocess
 import sys
 import time
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional
+
+import yaml
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -41,12 +45,44 @@ from typing import Optional
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 TSL_ROOT = PROJECT_ROOT / "refer_projects" / "Time-Series-Library"
 PYTHON = str(PROJECT_ROOT / ".venv" / "bin" / "python")
-RESULTS_DIR = PROJECT_ROOT / "artifacts"
+RESULTS_DIR = PROJECT_ROOT / "experiments" / "adapt_tsl_lib"
+LEGACY_RESULTS_DIR = PROJECT_ROOT / "artifacts"
 RESULTS_FILE = RESULTS_DIR / "tsl_comparison_results.txt"
 RESULTS_JSON_FILES = [
-    PROJECT_ROOT / 'experiments' / 'adapt_tsl_lib' / 'tsl_comparison_results.json',
     RESULTS_DIR / 'tsl_comparison_results.json',
+    LEGACY_RESULTS_DIR / 'tsl_comparison_results.json',
 ]
+RUNTIME_OVERRIDES_ENV_VAR = 'LIULIAN_COMPARE_RUNTIME_OVERRIDES'
+
+OOM_FALLBACK_PROFILES: dict[str, dict[str, dict]] = {
+    "Traffic_TimesNet": {
+        "tsl_overrides": {
+            "batch_size": 2,
+            "use_amp": False,
+        },
+        "liulian_cli_overrides": {
+            "batch_size": 2,
+        },
+    },
+    "ILI_TimesNet": {
+        "tsl_overrides": {
+            "batch_size": 2,
+            "use_amp": False,
+        },
+        "liulian_cli_overrides": {
+            "batch_size": 2,
+        },
+    },
+    "Traffic_TimeXer": {
+        "tsl_overrides": {
+            "batch_size": 2,
+            "use_amp": False,
+        },
+        "liulian_cli_overrides": {
+            "batch_size": 2,
+        },
+    },
+}
 
 COMPLETED_STATUSES = {
     'checked and matched',
@@ -69,6 +105,8 @@ class Experiment:
     model: str                    # "PatchTST" or "DLinear"
     liulian_config: str           # path relative to PROJECT_ROOT
     has_tsl_script: bool          # True if a script exists in TSL
+    tsl_comparable: bool = True   # False if model has no TSL counterpart
+    skip_reason: Optional[str] = None  # If set, pair is tracked but skipped.
     large: bool = False           # limit to 2 epochs and compare per-epoch
     # Non-default TSL args (override defaults from run.py)
     tsl_overrides: dict = field(default_factory=dict)
@@ -76,6 +114,7 @@ class Experiment:
 
 # TSL default args (applied to every TSL run); scripts override some of these.
 TSL_BASE_ARGS = {
+    "num_workers": 0,
     "task_name": "long_term_forecast",
     "is_training": 1,
     "features": "M",
@@ -928,6 +967,7 @@ EXPERIMENTS: list[Experiment] = [
             "data_path": "electricity.csv",
             "data": "custom",
             "model_id": "ECL_96_96",
+            "features": "S",
             "enc_in": 321, "dec_in": 321, "c_out": 321,
             "e_layers": 2, "d_layers": 1, "factor": 3,
         },
@@ -1237,6 +1277,46 @@ EXPERIMENTS: list[Experiment] = [
             "down_sampling_window": 2,
         },
     ),
+    Experiment(
+        name="Exchange_TimeMixer",
+        dataset="Exchange", model="TimeMixer",
+        liulian_config="experiments/exchange_rate/timemixer_config.yaml",
+        has_tsl_script=False,
+        tsl_overrides={
+            "root_path": "./dataset/exchange_rate/",
+            "data_path": "exchange_rate.csv",
+            "data": "custom",
+            "model_id": "Exchange_96_96",
+            "enc_in": 8, "dec_in": 8, "c_out": 8,
+            "label_len": 0,
+            "d_model": 16, "d_ff": 32, "e_layers": 2,
+            "learning_rate": 0.01,
+            "down_sampling_layers": 3, "down_sampling_method": "avg",
+            "down_sampling_window": 2,
+            "channel_independence": 1, "decomp_method": "moving_avg",
+            "use_norm": 1,
+        },
+    ),
+    Experiment(
+        name="ILI_TimeMixer",
+        dataset="ILI", model="TimeMixer",
+        liulian_config="experiments/illness/timemixer_config.yaml",
+        has_tsl_script=False,
+        tsl_overrides={
+            "root_path": "./dataset/illness/",
+            "data_path": "national_illness.csv",
+            "data": "custom",
+            "model_id": "ili_36_24",
+            "seq_len": 36, "label_len": 0, "pred_len": 24,
+            "enc_in": 7, "dec_in": 7, "c_out": 7,
+            "d_model": 16, "d_ff": 32, "e_layers": 2,
+            "learning_rate": 0.01,
+            "down_sampling_layers": 3, "down_sampling_method": "avg",
+            "down_sampling_window": 2,
+            "channel_independence": 1, "decomp_method": "moving_avg",
+            "use_norm": 1,
+        },
+    ),
     # ── TimeXer ─────────────────────────────────────────────────────────
     Experiment(
         name="ETTh1_TimeXer",
@@ -1341,6 +1421,35 @@ EXPERIMENTS: list[Experiment] = [
             "d_model": 512, "d_ff": 512,
             "e_layers": 3, "factor": 3,
             "batch_size": 16, "learning_rate": 0.001,
+        },
+    ),
+    Experiment(
+        name="Exchange_TimeXer",
+        dataset="Exchange", model="TimeXer",
+        liulian_config="experiments/exchange_rate/timexer_config.yaml",
+        has_tsl_script=False,
+        tsl_overrides={
+            "root_path": "./dataset/exchange_rate/",
+            "data_path": "exchange_rate.csv",
+            "data": "custom",
+            "model_id": "Exchange_96_96",
+            "enc_in": 8, "dec_in": 8, "c_out": 8,
+            "d_model": 256, "e_layers": 1, "factor": 3,
+        },
+    ),
+    Experiment(
+        name="ILI_TimeXer",
+        dataset="ILI", model="TimeXer",
+        liulian_config="experiments/illness/timexer_config.yaml",
+        has_tsl_script=False,
+        tsl_overrides={
+            "root_path": "./dataset/illness/",
+            "data_path": "national_illness.csv",
+            "data": "custom",
+            "model_id": "ili_36_24",
+            "seq_len": 36, "label_len": 18, "pred_len": 24,
+            "enc_in": 7, "dec_in": 7, "c_out": 7,
+            "d_model": 256, "e_layers": 1, "factor": 3,
         },
     ),
     # ── Mamba ───────────────────────────────────────────────────────────
@@ -1864,21 +1973,899 @@ EXPERIMENTS: list[Experiment] = [
             "e_layers": 2, "d_layers": 1, "factor": 3,
         },
     ),
+
+    # ── GPT4TS (liulian-native, no TSL counterpart) ────────────────────
+    Experiment(
+        name="ETTh1_GPT4TS",
+        dataset="ETTh1", model="GPT4TS",
+        liulian_config="experiments/etth1/gpt4ts_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTh1.csv",
+            "data": "ETTh1",
+            "model_id": "ETTh1_96_96",
+            "d_model": 768, "d_ff": 768,
+            "e_layers": 6, "d_layers": 1,
+        },
+    ),
+    Experiment(
+        name="ETTh2_GPT4TS",
+        dataset="ETTh2", model="GPT4TS",
+        liulian_config="experiments/etth2/gpt4ts_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTh2.csv",
+            "data": "ETTh2",
+            "model_id": "ETTh2_96_96",
+            "d_model": 768, "d_ff": 768,
+            "e_layers": 6, "d_layers": 1,
+        },
+    ),
+    Experiment(
+        name="ETTm1_GPT4TS",
+        dataset="ETTm1", model="GPT4TS",
+        liulian_config="experiments/ettm1/gpt4ts_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTm1.csv",
+            "data": "ETTm1",
+            "model_id": "ETTm1_96_96",
+            "d_model": 768, "d_ff": 768,
+            "e_layers": 6, "d_layers": 1,
+        },
+    ),
+    Experiment(
+        name="ETTm2_GPT4TS",
+        dataset="ETTm2", model="GPT4TS",
+        liulian_config="experiments/ettm2/gpt4ts_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTm2.csv",
+            "data": "ETTm2",
+            "model_id": "ETTm2_96_96",
+            "d_model": 768, "d_ff": 768,
+            "e_layers": 6, "d_layers": 1,
+        },
+    ),
+    Experiment(
+        name="Weather_GPT4TS",
+        dataset="Weather", model="GPT4TS",
+        liulian_config="experiments/weather/gpt4ts_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        tsl_overrides={
+            "root_path": "./dataset/weather/",
+            "data_path": "weather.csv",
+            "data": "custom",
+            "model_id": "weather_96_96",
+            "enc_in": 21, "dec_in": 21, "c_out": 21,
+            "d_model": 768, "d_ff": 768,
+            "e_layers": 6, "d_layers": 1,
+        },
+    ),
+    Experiment(
+        name="ECL_GPT4TS",
+        dataset="ECL", model="GPT4TS",
+        liulian_config="experiments/electricity/gpt4ts_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        large=True,
+        tsl_overrides={
+            "root_path": "./dataset/electricity/",
+            "data_path": "electricity.csv",
+            "data": "custom",
+            "model_id": "ECL_96_96",
+            "enc_in": 321, "dec_in": 321, "c_out": 321,
+            "d_model": 768, "d_ff": 768,
+            "e_layers": 6, "d_layers": 1,
+        },
+    ),
+    Experiment(
+        name="Traffic_GPT4TS",
+        dataset="Traffic", model="GPT4TS",
+        liulian_config="experiments/traffic/gpt4ts_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        large=True,
+        tsl_overrides={
+            "root_path": "./dataset/traffic/",
+            "data_path": "traffic.csv",
+            "data": "custom",
+            "model_id": "traffic_96_96",
+            "enc_in": 862, "dec_in": 862, "c_out": 862,
+            "d_model": 768, "d_ff": 768,
+            "e_layers": 6, "d_layers": 1,
+        },
+    ),
+    Experiment(
+        name="Exchange_GPT4TS",
+        dataset="Exchange", model="GPT4TS",
+        liulian_config="experiments/exchange_rate/gpt4ts_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        tsl_overrides={
+            "root_path": "./dataset/exchange_rate/",
+            "data_path": "exchange_rate.csv",
+            "data": "custom",
+            "model_id": "Exchange_96_96",
+            "enc_in": 8, "dec_in": 8, "c_out": 8,
+            "d_model": 768, "d_ff": 768,
+            "e_layers": 6, "d_layers": 1,
+        },
+    ),
+    Experiment(
+        name="ILI_GPT4TS",
+        dataset="ILI", model="GPT4TS",
+        liulian_config="experiments/illness/gpt4ts_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        tsl_overrides={
+            "root_path": "./dataset/illness/",
+            "data_path": "national_illness.csv",
+            "data": "custom",
+            "model_id": "ili_36_24",
+            "seq_len": 36, "label_len": 18, "pred_len": 24,
+            "d_model": 768, "d_ff": 768,
+            "e_layers": 6, "d_layers": 1,
+        },
+    ),
+
+    # ── TimeLLM (external reference, no bundled TSL long-term counterpart) ──
+    Experiment(
+        name="ETTh1_TimeLLM",
+        dataset="ETTh1", model="TimeLLM",
+        liulian_config="experiments/etth1/timellm_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no bundled TSL long-term counterpart (external Time-LLM repo)",
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTh1.csv",
+            "data": "ETTh1",
+            "model_id": "ETTh1_96_96",
+        },
+    ),
+    Experiment(
+        name="ETTh2_TimeLLM",
+        dataset="ETTh2", model="TimeLLM",
+        liulian_config="experiments/etth2/timellm_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no bundled TSL long-term counterpart (external Time-LLM repo)",
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTh2.csv",
+            "data": "ETTh2",
+            "model_id": "ETTh2_96_96",
+        },
+    ),
+    Experiment(
+        name="ETTm1_TimeLLM",
+        dataset="ETTm1", model="TimeLLM",
+        liulian_config="experiments/ettm1/timellm_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no bundled TSL long-term counterpart (external Time-LLM repo)",
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTm1.csv",
+            "data": "ETTm1",
+            "model_id": "ETTm1_96_96",
+        },
+    ),
+    Experiment(
+        name="ETTm2_TimeLLM",
+        dataset="ETTm2", model="TimeLLM",
+        liulian_config="experiments/ettm2/timellm_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no bundled TSL long-term counterpart (external Time-LLM repo)",
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTm2.csv",
+            "data": "ETTm2",
+            "model_id": "ETTm2_96_96",
+        },
+    ),
+    Experiment(
+        name="Weather_TimeLLM",
+        dataset="Weather", model="TimeLLM",
+        liulian_config="experiments/weather/timellm_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no bundled TSL long-term counterpart (external Time-LLM repo)",
+        tsl_overrides={
+            "root_path": "./dataset/weather/",
+            "data_path": "weather.csv",
+            "data": "custom",
+            "model_id": "weather_96_96",
+            "enc_in": 21, "dec_in": 21, "c_out": 21,
+        },
+    ),
+    Experiment(
+        name="ECL_TimeLLM",
+        dataset="ECL", model="TimeLLM",
+        liulian_config="experiments/electricity/timellm_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no bundled TSL long-term counterpart (external Time-LLM repo)",
+        large=True,
+        tsl_overrides={
+            "root_path": "./dataset/electricity/",
+            "data_path": "electricity.csv",
+            "data": "custom",
+            "model_id": "ECL_96_96",
+            "enc_in": 321, "dec_in": 321, "c_out": 321,
+        },
+    ),
+    Experiment(
+        name="Traffic_TimeLLM",
+        dataset="Traffic", model="TimeLLM",
+        liulian_config="experiments/traffic/timellm_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no bundled TSL long-term counterpart (external Time-LLM repo)",
+        large=True,
+        tsl_overrides={
+            "root_path": "./dataset/traffic/",
+            "data_path": "traffic.csv",
+            "data": "custom",
+            "model_id": "traffic_96_96",
+            "enc_in": 862, "dec_in": 862, "c_out": 862,
+        },
+    ),
+    Experiment(
+        name="Exchange_TimeLLM",
+        dataset="Exchange", model="TimeLLM",
+        liulian_config="experiments/exchange_rate/timellm_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no bundled TSL long-term counterpart (external Time-LLM repo)",
+        tsl_overrides={
+            "root_path": "./dataset/exchange_rate/",
+            "data_path": "exchange_rate.csv",
+            "data": "custom",
+            "model_id": "Exchange_96_96",
+            "enc_in": 8, "dec_in": 8, "c_out": 8,
+        },
+    ),
+    Experiment(
+        name="ILI_TimeLLM",
+        dataset="ILI", model="TimeLLM",
+        liulian_config="experiments/illness/timellm_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no bundled TSL long-term counterpart (external Time-LLM repo)",
+        tsl_overrides={
+            "root_path": "./dataset/illness/",
+            "data_path": "national_illness.csv",
+            "data": "custom",
+            "model_id": "ili_36_24",
+            "seq_len": 36, "label_len": 18, "pred_len": 24,
+        },
+    ),
+
+    # ── TimeMoE (TSL model exists, but comparison task mismatch) ───────────
+    Experiment(
+        name="ETTh1_TimeMoE",
+        dataset="ETTh1", model="TimeMoE",
+        liulian_config="experiments/etth1/timemoe_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="TimeMoE is zero-shot task in current code, not long_term_forecast",
+        tsl_overrides={
+            "task_name": "zero_shot_forecast",
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTh1.csv",
+            "data": "ETTh1",
+            "model_id": "ETTh1_96_96",
+        },
+    ),
+    Experiment(
+        name="ETTh2_TimeMoE",
+        dataset="ETTh2", model="TimeMoE",
+        liulian_config="experiments/etth2/timemoe_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="TimeMoE is zero-shot task in current code, not long_term_forecast",
+        tsl_overrides={
+            "task_name": "zero_shot_forecast",
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTh2.csv",
+            "data": "ETTh2",
+            "model_id": "ETTh2_96_96",
+        },
+    ),
+    Experiment(
+        name="ETTm1_TimeMoE",
+        dataset="ETTm1", model="TimeMoE",
+        liulian_config="experiments/ettm1/timemoe_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="TimeMoE is zero-shot task in current code, not long_term_forecast",
+        tsl_overrides={
+            "task_name": "zero_shot_forecast",
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTm1.csv",
+            "data": "ETTm1",
+            "model_id": "ETTm1_96_96",
+        },
+    ),
+    Experiment(
+        name="ETTm2_TimeMoE",
+        dataset="ETTm2", model="TimeMoE",
+        liulian_config="experiments/ettm2/timemoe_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="TimeMoE is zero-shot task in current code, not long_term_forecast",
+        tsl_overrides={
+            "task_name": "zero_shot_forecast",
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTm2.csv",
+            "data": "ETTm2",
+            "model_id": "ETTm2_96_96",
+        },
+    ),
+    Experiment(
+        name="Weather_TimeMoE",
+        dataset="Weather", model="TimeMoE",
+        liulian_config="experiments/weather/timemoe_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="TimeMoE is zero-shot task in current code, not long_term_forecast",
+        tsl_overrides={
+            "task_name": "zero_shot_forecast",
+            "root_path": "./dataset/weather/",
+            "data_path": "weather.csv",
+            "data": "custom",
+            "model_id": "weather_96_96",
+            "enc_in": 21, "dec_in": 21, "c_out": 21,
+        },
+    ),
+    Experiment(
+        name="ECL_TimeMoE",
+        dataset="ECL", model="TimeMoE",
+        liulian_config="experiments/electricity/timemoe_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="TimeMoE is zero-shot task in current code, not long_term_forecast",
+        large=True,
+        tsl_overrides={
+            "task_name": "zero_shot_forecast",
+            "root_path": "./dataset/electricity/",
+            "data_path": "electricity.csv",
+            "data": "custom",
+            "model_id": "ECL_96_96",
+            "enc_in": 321, "dec_in": 321, "c_out": 321,
+        },
+    ),
+    Experiment(
+        name="Traffic_TimeMoE",
+        dataset="Traffic", model="TimeMoE",
+        liulian_config="experiments/traffic/timemoe_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="TimeMoE is zero-shot task in current code, not long_term_forecast",
+        large=True,
+        tsl_overrides={
+            "task_name": "zero_shot_forecast",
+            "root_path": "./dataset/traffic/",
+            "data_path": "traffic.csv",
+            "data": "custom",
+            "model_id": "traffic_96_96",
+            "enc_in": 862, "dec_in": 862, "c_out": 862,
+        },
+    ),
+    Experiment(
+        name="Exchange_TimeMoE",
+        dataset="Exchange", model="TimeMoE",
+        liulian_config="experiments/exchange_rate/timemoe_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="TimeMoE is zero-shot task in current code, not long_term_forecast",
+        tsl_overrides={
+            "task_name": "zero_shot_forecast",
+            "root_path": "./dataset/exchange_rate/",
+            "data_path": "exchange_rate.csv",
+            "data": "custom",
+            "model_id": "Exchange_96_96",
+            "enc_in": 8, "dec_in": 8, "c_out": 8,
+        },
+    ),
+    Experiment(
+        name="ILI_TimeMoE",
+        dataset="ILI", model="TimeMoE",
+        liulian_config="experiments/illness/timemoe_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="TimeMoE is zero-shot task in current code, not long_term_forecast",
+        tsl_overrides={
+            "task_name": "zero_shot_forecast",
+            "root_path": "./dataset/illness/",
+            "data_path": "national_illness.csv",
+            "data": "custom",
+            "model_id": "ili_36_24",
+            "seq_len": 36, "label_len": 18, "pred_len": 24,
+        },
+    ),
+
+    # ── ETSformer (TSL scripts exist for ETTh1/ECL; liulian adapter pending) ─
+    Experiment(
+        name="ETTh1_ETSformer",
+        dataset="ETTh1", model="ETSformer",
+        liulian_config="experiments/etth1/etsformer_config.yaml",
+        has_tsl_script=True,
+        # skip_reason omitted for test
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTh1.csv",
+            "data": "ETTh1",
+            "model_id": "ETTh1_96_96",
+            "e_layers": 2, "d_layers": 2, "factor": 3,
+        },
+    ),
+    Experiment(
+        name="ETTh2_ETSformer",
+        dataset="ETTh2", model="ETSformer",
+        liulian_config="experiments/etth2/etsformer_config.yaml",
+        has_tsl_script=False,
+        # skip_reason omitted for test
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTh2.csv",
+            "data": "ETTh2",
+            "model_id": "ETTh2_96_96",
+            "e_layers": 2, "d_layers": 2, "factor": 3,
+        },
+    ),
+    Experiment(
+        name="ETTm1_ETSformer",
+        dataset="ETTm1", model="ETSformer",
+        liulian_config="experiments/ettm1/etsformer_config.yaml",
+        has_tsl_script=False,
+        # skip_reason omitted for test
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTm1.csv",
+            "data": "ETTm1",
+            "model_id": "ETTm1_96_96",
+            "e_layers": 2, "d_layers": 2, "factor": 3,
+        },
+    ),
+    Experiment(
+        name="ETTm2_ETSformer",
+        dataset="ETTm2", model="ETSformer",
+        liulian_config="experiments/ettm2/etsformer_config.yaml",
+        has_tsl_script=False,
+        # skip_reason omitted for test
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/",
+            "data_path": "ETTm2.csv",
+            "data": "ETTm2",
+            "model_id": "ETTm2_96_96",
+            "e_layers": 2, "d_layers": 2, "factor": 3,
+        },
+    ),
+    Experiment(
+        name="Weather_ETSformer",
+        dataset="Weather", model="ETSformer",
+        liulian_config="experiments/weather/etsformer_config.yaml",
+        has_tsl_script=False,
+        # skip_reason omitted for test
+        tsl_overrides={
+            "root_path": "./dataset/weather/",
+            "data_path": "weather.csv",
+            "data": "custom",
+            "model_id": "weather_96_96",
+            "enc_in": 21, "dec_in": 21, "c_out": 21,
+            "e_layers": 2, "d_layers": 2, "factor": 3,
+        },
+    ),
+    Experiment(
+        name="ECL_ETSformer",
+        dataset="ECL", model="ETSformer",
+        liulian_config="experiments/electricity/etsformer_config.yaml",
+        has_tsl_script=True,
+        # skip_reason omitted for test
+        large=True,
+        tsl_overrides={
+            "root_path": "./dataset/electricity/",
+            "data_path": "electricity.csv",
+            "data": "custom",
+            "model_id": "ECL_96_96",
+            "enc_in": 321, "dec_in": 321, "c_out": 321,
+            "e_layers": 2, "d_layers": 2, "factor": 3,
+        },
+    ),
+    Experiment(
+        name="Traffic_ETSformer",
+        dataset="Traffic", model="ETSformer",
+        liulian_config="experiments/traffic/etsformer_config.yaml",
+        has_tsl_script=False,
+        # skip_reason omitted for test
+        large=True,
+        tsl_overrides={
+            "root_path": "./dataset/traffic/",
+            "data_path": "traffic.csv",
+            "data": "custom",
+            "model_id": "traffic_96_96",
+            "enc_in": 862, "dec_in": 862, "c_out": 862,
+            "e_layers": 2, "d_layers": 2, "factor": 3,
+        },
+    ),
+    Experiment(
+        name="Exchange_ETSformer",
+        dataset="Exchange", model="ETSformer",
+        liulian_config="experiments/exchange_rate/etsformer_config.yaml",
+        has_tsl_script=False,
+        # skip_reason omitted for test
+        tsl_overrides={
+            "root_path": "./dataset/exchange_rate/",
+            "data_path": "exchange_rate.csv",
+            "data": "custom",
+            "model_id": "Exchange_96_96",
+            "enc_in": 8, "dec_in": 8, "c_out": 8,
+            "e_layers": 2, "d_layers": 2, "factor": 3,
+        },
+    ),
+    Experiment(
+        name="ILI_ETSformer",
+        dataset="ILI", model="ETSformer",
+        liulian_config="experiments/illness/etsformer_config.yaml",
+        has_tsl_script=False,
+        # skip_reason omitted for test
+        tsl_overrides={
+            "root_path": "./dataset/illness/",
+            "data_path": "national_illness.csv",
+            "data": "custom",
+            "model_id": "ili_36_24",
+            "seq_len": 36, "label_len": 18, "pred_len": 24,
+            "e_layers": 2, "d_layers": 2, "factor": 3,
+        },
+    ),
+
+    # ── Stationary (no canonical model in TSL/liulian registry) ────────────
+    Experiment(
+        name="ETTh1_Stationary",
+        dataset="ETTh1", model="Stationary",
+        liulian_config="experiments/etth1/stationary_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no canonical Stationary model in current TSL/liulian setup",
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/", "data_path": "ETTh1.csv", "data": "ETTh1", "model_id": "ETTh1_96_96",
+        },
+    ),
+    Experiment(
+        name="ETTh2_Stationary",
+        dataset="ETTh2", model="Stationary",
+        liulian_config="experiments/etth2/stationary_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no canonical Stationary model in current TSL/liulian setup",
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/", "data_path": "ETTh2.csv", "data": "ETTh2", "model_id": "ETTh2_96_96",
+        },
+    ),
+    Experiment(
+        name="ETTm1_Stationary",
+        dataset="ETTm1", model="Stationary",
+        liulian_config="experiments/ettm1/stationary_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no canonical Stationary model in current TSL/liulian setup",
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/", "data_path": "ETTm1.csv", "data": "ETTm1", "model_id": "ETTm1_96_96",
+        },
+    ),
+    Experiment(
+        name="ETTm2_Stationary",
+        dataset="ETTm2", model="Stationary",
+        liulian_config="experiments/ettm2/stationary_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no canonical Stationary model in current TSL/liulian setup",
+        tsl_overrides={
+            "root_path": "./dataset/ETT-small/", "data_path": "ETTm2.csv", "data": "ETTm2", "model_id": "ETTm2_96_96",
+        },
+    ),
+    Experiment(
+        name="Weather_Stationary",
+        dataset="Weather", model="Stationary",
+        liulian_config="experiments/weather/stationary_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no canonical Stationary model in current TSL/liulian setup",
+        tsl_overrides={
+            "root_path": "./dataset/weather/", "data_path": "weather.csv", "data": "custom", "model_id": "weather_96_96", "enc_in": 21, "dec_in": 21, "c_out": 21,
+        },
+    ),
+    Experiment(
+        name="ECL_Stationary",
+        dataset="ECL", model="Stationary",
+        liulian_config="experiments/electricity/stationary_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no canonical Stationary model in current TSL/liulian setup",
+        large=True,
+        tsl_overrides={
+            "root_path": "./dataset/electricity/", "data_path": "electricity.csv", "data": "custom", "model_id": "ECL_96_96", "enc_in": 321, "dec_in": 321, "c_out": 321,
+        },
+    ),
+    Experiment(
+        name="Traffic_Stationary",
+        dataset="Traffic", model="Stationary",
+        liulian_config="experiments/traffic/stationary_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no canonical Stationary model in current TSL/liulian setup",
+        large=True,
+        tsl_overrides={
+            "root_path": "./dataset/traffic/", "data_path": "traffic.csv", "data": "custom", "model_id": "traffic_96_96", "enc_in": 862, "dec_in": 862, "c_out": 862,
+        },
+    ),
+    Experiment(
+        name="Exchange_Stationary",
+        dataset="Exchange", model="Stationary",
+        liulian_config="experiments/exchange_rate/stationary_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no canonical Stationary model in current TSL/liulian setup",
+        tsl_overrides={
+            "root_path": "./dataset/exchange_rate/", "data_path": "exchange_rate.csv", "data": "custom", "model_id": "Exchange_96_96", "enc_in": 8, "dec_in": 8, "c_out": 8,
+        },
+    ),
+    Experiment(
+        name="ILI_Stationary",
+        dataset="ILI", model="Stationary",
+        liulian_config="experiments/illness/stationary_config.yaml",
+        has_tsl_script=False,
+        tsl_comparable=False,
+        skip_reason="no canonical Stationary model in current TSL/liulian setup",
+        tsl_overrides={
+            "root_path": "./dataset/illness/", "data_path": "national_illness.csv", "data": "custom", "model_id": "ili_36_24", "seq_len": 36, "label_len": 18, "pred_len": 24,
+        },
+    ),
+
+    # ── Additional missing datasets requested by history (PatchTST/DLinear) ──
+    Experiment(
+        name="Solar_PatchTST",
+        dataset="Solar-Energy", model="PatchTST",
+        liulian_config="experiments/solar_energy/patchtst_config.yaml",
+        has_tsl_script=False,
+        skip_reason="dataset/config not integrated in liulian long_term comparison",
+        tsl_overrides={"root_path": "./dataset/Solar/", "data_path": "solar_AL.txt", "data": "Solar", "model_id": "Solar_96_96"},
+    ),
+    Experiment(
+        name="Solar_DLinear",
+        dataset="Solar-Energy", model="DLinear",
+        liulian_config="experiments/solar_energy/dlinear_config.yaml",
+        has_tsl_script=False,
+        skip_reason="dataset/config not integrated in liulian long_term comparison",
+        tsl_overrides={"root_path": "./dataset/Solar/", "data_path": "solar_AL.txt", "data": "Solar", "model_id": "Solar_96_96"},
+    ),
+    Experiment(
+        name="PEMS03_PatchTST",
+        dataset="PEMS03", model="PatchTST",
+        liulian_config="experiments/pems03/patchtst_config.yaml",
+        has_tsl_script=False,
+        skip_reason="TSL PEMS scripts are short-term; long-term compare path not aligned",
+        tsl_overrides={"data": "PEMS", "root_path": "./dataset/PEMS03/", "data_path": "PEMS03.npz", "model_id": "PEMS03_96_12"},
+    ),
+    Experiment(
+        name="PEMS03_DLinear",
+        dataset="PEMS03", model="DLinear",
+        liulian_config="experiments/pems03/dlinear_config.yaml",
+        has_tsl_script=False,
+        skip_reason="TSL PEMS scripts are short-term; long-term compare path not aligned",
+        tsl_overrides={"data": "PEMS", "root_path": "./dataset/PEMS03/", "data_path": "PEMS03.npz", "model_id": "PEMS03_96_12"},
+    ),
+    Experiment(
+        name="PEMS04_PatchTST",
+        dataset="PEMS04", model="PatchTST",
+        liulian_config="experiments/pems04/patchtst_config.yaml",
+        has_tsl_script=False,
+        skip_reason="TSL PEMS scripts are short-term; long-term compare path not aligned",
+        tsl_overrides={"data": "PEMS", "root_path": "./dataset/PEMS04/", "data_path": "PEMS04.npz", "model_id": "PEMS04_96_12"},
+    ),
+    Experiment(
+        name="PEMS04_DLinear",
+        dataset="PEMS04", model="DLinear",
+        liulian_config="experiments/pems04/dlinear_config.yaml",
+        has_tsl_script=False,
+        skip_reason="TSL PEMS scripts are short-term; long-term compare path not aligned",
+        tsl_overrides={"data": "PEMS", "root_path": "./dataset/PEMS04/", "data_path": "PEMS04.npz", "model_id": "PEMS04_96_12"},
+    ),
+    Experiment(
+        name="PEMS07_PatchTST",
+        dataset="PEMS07", model="PatchTST",
+        liulian_config="experiments/pems07/patchtst_config.yaml",
+        has_tsl_script=False,
+        skip_reason="TSL PEMS scripts are short-term; long-term compare path not aligned",
+        tsl_overrides={"data": "PEMS", "root_path": "./dataset/PEMS07/", "data_path": "PEMS07.npz", "model_id": "PEMS07_96_12"},
+    ),
+    Experiment(
+        name="PEMS07_DLinear",
+        dataset="PEMS07", model="DLinear",
+        liulian_config="experiments/pems07/dlinear_config.yaml",
+        has_tsl_script=False,
+        skip_reason="TSL PEMS scripts are short-term; long-term compare path not aligned",
+        tsl_overrides={"data": "PEMS", "root_path": "./dataset/PEMS07/", "data_path": "PEMS07.npz", "model_id": "PEMS07_96_12"},
+    ),
+    Experiment(
+        name="PEMS08_PatchTST",
+        dataset="PEMS08", model="PatchTST",
+        liulian_config="experiments/pems08/patchtst_config.yaml",
+        has_tsl_script=False,
+        skip_reason="TSL PEMS scripts are short-term; long-term compare path not aligned",
+        tsl_overrides={"data": "PEMS", "root_path": "./dataset/PEMS08/", "data_path": "PEMS08.npz", "model_id": "PEMS08_96_12"},
+    ),
+    Experiment(
+        name="PEMS08_DLinear",
+        dataset="PEMS08", model="DLinear",
+        liulian_config="experiments/pems08/dlinear_config.yaml",
+        has_tsl_script=False,
+        skip_reason="TSL PEMS scripts are short-term; long-term compare path not aligned",
+        tsl_overrides={"data": "PEMS", "root_path": "./dataset/PEMS08/", "data_path": "PEMS08.npz", "model_id": "PEMS08_96_12"},
+    ),
+    Experiment(
+        name="CovidDeaths_PatchTST",
+        dataset="Covid Deaths", model="PatchTST",
+        liulian_config="experiments/covid_deaths/patchtst_config.yaml",
+        has_tsl_script=False,
+        skip_reason="no canonical TSL script/config mapping in current repository",
+        tsl_overrides={"model_id": "covid_deaths_96_96"},
+    ),
+    Experiment(
+        name="CovidDeaths_DLinear",
+        dataset="Covid Deaths", model="DLinear",
+        liulian_config="experiments/covid_deaths/dlinear_config.yaml",
+        has_tsl_script=False,
+        skip_reason="no canonical TSL script/config mapping in current repository",
+        tsl_overrides={"model_id": "covid_deaths_96_96"},
+    ),
+    Experiment(
+        name="NYCTaxi_PatchTST",
+        dataset="NYC Taxi", model="PatchTST",
+        liulian_config="experiments/nyc_taxi/patchtst_config.yaml",
+        has_tsl_script=False,
+        skip_reason="no canonical TSL script/config mapping in current repository",
+        tsl_overrides={"model_id": "nyc_taxi_96_96"},
+    ),
+    Experiment(
+        name="NYCTaxi_DLinear",
+        dataset="NYC Taxi", model="DLinear",
+        liulian_config="experiments/nyc_taxi/dlinear_config.yaml",
+        has_tsl_script=False,
+        skip_reason="no canonical TSL script/config mapping in current repository",
+        tsl_overrides={"model_id": "nyc_taxi_96_96"},
+    ),
+    Experiment(
+        name="NN5_PatchTST",
+        dataset="NN5", model="PatchTST",
+        liulian_config="experiments/nn5/patchtst_config.yaml",
+        has_tsl_script=False,
+        skip_reason="no canonical TSL script/config mapping in current repository",
+        tsl_overrides={"model_id": "nn5_96_56"},
+    ),
+    Experiment(
+        name="NN5_DLinear",
+        dataset="NN5", model="DLinear",
+        liulian_config="experiments/nn5/dlinear_config.yaml",
+        has_tsl_script=False,
+        skip_reason="no canonical TSL script/config mapping in current repository",
+        tsl_overrides={"model_id": "nn5_96_56"},
+    ),
+    Experiment(
+        name="FREDMD_PatchTST",
+        dataset="FRED-MD", model="PatchTST",
+        liulian_config="experiments/fred_md/patchtst_config.yaml",
+        has_tsl_script=False,
+        skip_reason="no canonical TSL script/config mapping in current repository",
+        tsl_overrides={"model_id": "fred_md_96_96"},
+    ),
+    Experiment(
+        name="FREDMD_DLinear",
+        dataset="FRED-MD", model="DLinear",
+        liulian_config="experiments/fred_md/dlinear_config.yaml",
+        has_tsl_script=False,
+        skip_reason="no canonical TSL script/config mapping in current repository",
+        tsl_overrides={"model_id": "fred_md_96_96"},
+    ),
 ]
 
 # ---------------------------------------------------------------------------
 # TSL command builder
 # ---------------------------------------------------------------------------
 
+@lru_cache(maxsize=None)
+def load_liulian_config_backfills(config_rel_path: str) -> dict[str, object]:
+    """Load dataset-facing backfills from the liulian YAML config.
+
+    These are only used when a TSL script/pair definition leaves a setting
+    implicit. The most important case is ``freq``: many bundled TSL scripts
+    omit ``--freq``, which otherwise falls back to run.py's hourly default
+    even for daily / weekly / minute datasets.
+    """
+    config_path = PROJECT_ROOT / config_rel_path
+    try:
+        data = yaml.safe_load(config_path.read_text()) or {}
+    except Exception:
+        return {}
+
+    if not isinstance(data, dict):
+        return {}
+
+    backfills: dict[str, object] = {}
+    freq = data.get('freq')
+    if freq not in (None, ''):
+        backfills['freq'] = normalize_tsl_freq(freq)
+    return backfills
+
+
+def normalize_tsl_freq(freq: object) -> object:
+    """Normalize liulian frequency values to TSL's expected tokens.
+
+    TSL's ``TimeFeatureEmbedding`` expects compact codes like ``h``, ``d``, ``t``,
+    while liulian configs may use readable values such as ``15min``.
+    """
+    if not isinstance(freq, str):
+        return freq
+    f = freq.strip().lower()
+    if not f:
+        return freq
+
+    # Minute-level aliases (TSL uses "t").
+    if f in {'t', 'min', 'mins', 'minute', 'minutes'}:
+        return 't'
+    if re.fullmatch(r'\d+\s*(min|mins|minute|minutes)', f):
+        return 't'
+
+    # Common aliases for other granularities.
+    alias_map = {
+        'hour': 'h',
+        'hourly': 'h',
+        '1h': 'h',
+        'day': 'd',
+        'daily': 'd',
+        '1d': 'd',
+        'week': 'w',
+        'weekly': 'w',
+        'month': 'm',
+        'monthly': 'm',
+        'year': 'a',
+        'yearly': 'a',
+        'annual': 'a',
+        'business': 'b',
+        'businessday': 'b',
+        'second': 's',
+        'secondly': 's',
+    }
+    return alias_map.get(f, freq)
+
+
 def build_tsl_cmd(
     exp: Experiment,
     epoch_limit: Optional[int] = None,
     disable_es: bool = False,
+    extra_overrides: Optional[dict] = None,
 ) -> list[str]:
     """Build the TSL run.py command for an experiment."""
     args = dict(TSL_BASE_ARGS)
     args["model"] = exp.model
     args.update(exp.tsl_overrides)
+    for key, value in load_liulian_config_backfills(exp.liulian_config).items():
+        args.setdefault(key, value)
+    if extra_overrides:
+        args.update(extra_overrides)
     if epoch_limit is not None:
         args["train_epochs"] = epoch_limit
     if disable_es:
@@ -1886,6 +2873,19 @@ def build_tsl_cmd(
 
     cmd = [PYTHON, "-u", "run.py"]
     for k, v in args.items():
+        if isinstance(v, bool):
+            if v:
+                cmd.append(f"--{k}")
+            continue
+
+        if k == "use_amp":
+            sv_amp = str(v).strip().lower()
+            if sv_amp in {"1", "true", "yes", "on"}:
+                cmd.append("--use_amp")
+                continue
+            if sv_amp in {"0", "false", "no", "off"}:
+                continue
+
         sv = str(v)
         # Some TSL args are nargs='+' (e.g., --p_hidden_dims 256 256).
         # If the value contains spaces, split into separate arguments.
@@ -1901,6 +2901,8 @@ def build_liulian_cmd(
     exp: Experiment,
     epoch_limit: Optional[int] = None,
     disable_es: bool = False,
+    tsl_extra_overrides: Optional[dict] = None,
+    cli_overrides: Optional[dict] = None,
 ) -> list[str]:
     """Build the liulian experiments/run.py command."""
     config_path = str(PROJECT_ROOT / exp.liulian_config)
@@ -1910,6 +2912,29 @@ def build_liulian_cmd(
         cmd.extend(["--train_epochs", str(epoch_limit)])
     if disable_es:
         cmd.append("--disable_early_stopping")
+    
+    effective_tsl_overrides = dict(exp.tsl_overrides)
+    if tsl_extra_overrides:
+        effective_tsl_overrides.update(tsl_extra_overrides)
+
+    # MATCH TSL RANDOM SEED (TSL uses fix_seed=2021 hardcoded in run.py)
+    # Liulian defaults to seed=2026, so we override it to match TSL
+    cmd.extend(["--seed", "2021"])
+
+    # MATCH TSL SCALING (TSL defaults to inverse=False)
+    if not effective_tsl_overrides.get("inverse", False):
+        cmd.append("--no_eval_denorm")
+
+    if cli_overrides:
+        for key, value in cli_overrides.items():
+            if isinstance(value, bool):
+                if value:
+                    cmd.append(f'--{key}')
+                else:
+                    cmd.append(f'--no_{key}')
+                continue
+            cmd.extend([f'--{key}', str(value)])
+
     return cmd
 
 # ---------------------------------------------------------------------------
@@ -1991,7 +3016,13 @@ def parse_liulian_output(output: str) -> dict:
 # Runner
 # ---------------------------------------------------------------------------
 
-def run_cmd(cmd: list[str], cwd: str, label: str) -> tuple[str, float, int]:
+def run_cmd(
+    cmd: list[str],
+    cwd: str,
+    label: str,
+    timeout_seconds: int = 7200,
+    progress_interval_seconds: int = 30,
+) -> tuple[str, float, int]:
     """Run a command, return (combined_output, elapsed_seconds, returncode)."""
     print(f"\n{'='*60}")
     print(f"  Running: {label}")
@@ -1999,15 +3030,47 @@ def run_cmd(cmd: list[str], cwd: str, label: str) -> tuple[str, float, int]:
     print(f"  CMD: {' '.join(cmd[:6])} ...")
     print(f"{'='*60}")
 
+    # Progress behaviour policy:
+    # - TSL reference long-term pipeline (run.py + exp/*.py) does not expose
+    #   a reusable global progress-bar API; it prints periodic textual logs.
+    # - liulian uses tqdm in trainer loops, but those are local batch/epoch bars
+    #   rather than one global per-run pipeline bar.
+    # Therefore we keep a runner-level fallback progress bar based on timeout
+    # budget, which is stable across both pipelines.
+    print("  Progress mode: fallback runner progress bar")
+
     t0 = time.time()
-    proc = subprocess.run(
-        cmd, cwd=cwd,
-        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-        text=True, timeout=7200,  # 2 hour max per experiment
+    popen = subprocess.Popen(
+        cmd,
+        cwd=cwd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
     )
-    elapsed = time.time() - t0
-    print(f"  Finished in {elapsed:.1f}s (exit code {proc.returncode})")
-    return proc.stdout, elapsed, proc.returncode
+
+    while True:
+        elapsed = time.time() - t0
+        if elapsed >= timeout_seconds:
+            popen.kill()
+            out, _ = popen.communicate()
+            raise subprocess.TimeoutExpired(cmd, timeout_seconds, output=out)
+
+        wait_s = min(progress_interval_seconds, max(timeout_seconds - elapsed, 0.1))
+        try:
+            out, _ = popen.communicate(timeout=wait_s)
+            elapsed = time.time() - t0
+            print(f"  Finished in {elapsed:.1f}s (exit code {popen.returncode})")
+            return out, elapsed, popen.returncode
+        except subprocess.TimeoutExpired:
+            elapsed = time.time() - t0
+            pct = min(99.9, (elapsed / timeout_seconds) * 100.0)
+            bar_width = 24
+            filled = int((pct / 100.0) * bar_width)
+            bar = "#" * filled + "-" * (bar_width - filled)
+            print(
+                f"  ... {label} [{bar}] {pct:5.1f}% "
+                f"({elapsed:.1f}s / {timeout_seconds}s timeout budget)"
+            )
 
 
 def _tail_lines(text: str, n: int = 40) -> str:
@@ -2022,6 +3085,164 @@ def is_completed_result(entry: dict) -> bool:
     """Return True if a stored result counts as a completed comparison."""
     status = entry.get('status', '')
     return status in COMPLETED_STATUSES or (isinstance(status, str) and status.startswith('skipped'))
+
+
+def parse_runtime_overrides_env() -> dict[str, dict]:
+    """Parse optional pair runtime overrides from LIULIAN_COMPARE_RUNTIME_OVERRIDES.
+
+    Expected JSON shape:
+    {
+      "PairName": {
+        "tsl_overrides": {...},
+        "liulian_cli_overrides": {...}
+      }
+    }
+    """
+    raw = os.getenv(RUNTIME_OVERRIDES_ENV_VAR)
+    if not raw:
+        return {}
+
+    try:
+        parsed = json.loads(raw)
+    except Exception as exc:
+        print(
+            f'Warning: failed to parse {RUNTIME_OVERRIDES_ENV_VAR}: {exc}. '
+            'Ignoring runtime overrides.'
+        )
+        return {}
+
+    if not isinstance(parsed, dict):
+        print(
+            f'Warning: {RUNTIME_OVERRIDES_ENV_VAR} must be a JSON object. '
+            'Ignoring runtime overrides.'
+        )
+        return {}
+
+    normalized: dict[str, dict] = {}
+    for pair_name, pair_cfg in parsed.items():
+        if not isinstance(pair_name, str) or not isinstance(pair_cfg, dict):
+            continue
+
+        tsl_overrides = pair_cfg.get('tsl_overrides', {})
+        liulian_cli_overrides = pair_cfg.get('liulian_cli_overrides', {})
+        if not isinstance(tsl_overrides, dict) or not isinstance(liulian_cli_overrides, dict):
+            continue
+
+        normalized[pair_name] = {
+            'tsl_overrides': dict(tsl_overrides),
+            'liulian_cli_overrides': dict(liulian_cli_overrides),
+        }
+    return normalized
+
+
+def merge_runtime_overrides(
+    base_overrides: dict[str, dict],
+    extra_overrides: dict[str, dict],
+) -> dict[str, dict]:
+    """Merge pair runtime overrides with per-scope dict update semantics.
+
+    Known scopes:
+    - tsl_overrides
+    - liulian_cli_overrides
+    """
+    merged: dict[str, dict] = {}
+
+    for source in (base_overrides, extra_overrides):
+        for pair_name, pair_cfg in source.items():
+            if not isinstance(pair_name, str) or not isinstance(pair_cfg, dict):
+                continue
+
+            target = merged.setdefault(
+                pair_name,
+                {
+                    'tsl_overrides': {},
+                    'liulian_cli_overrides': {},
+                },
+            )
+
+            tsl_overrides = pair_cfg.get('tsl_overrides')
+            if isinstance(tsl_overrides, dict):
+                target['tsl_overrides'].update(tsl_overrides)
+
+            liulian_cli_overrides = pair_cfg.get('liulian_cli_overrides')
+            if isinstance(liulian_cli_overrides, dict):
+                target['liulian_cli_overrides'].update(liulian_cli_overrides)
+
+    return merged
+
+
+def build_smoke_tsl_data_overrides(exp: Experiment, max_rows: int) -> dict[str, str]:
+    """Create a small CSV subset for TSL-side smoke testing.
+
+    Returns TSL CLI overrides (`root_path`, `data_path`) when source paths are
+    available for this experiment; otherwise returns an empty dict.
+    """
+    root_path = exp.tsl_overrides.get('root_path')
+    data_path = exp.tsl_overrides.get('data_path')
+    if not root_path or not data_path:
+        return {}
+
+    src_path = (TSL_ROOT / str(root_path) / str(data_path)).resolve()
+    if not src_path.exists():
+        print(f"Warning: smoke source CSV not found for {exp.name}: {src_path}")
+        return {}
+
+    smoke_dir = PROJECT_ROOT / 'artifacts' / 'tsl_smoke_data' / exp.name
+    smoke_dir.mkdir(parents=True, exist_ok=True)
+    dst_path = smoke_dir / src_path.name
+
+    seq_len = int(exp.tsl_overrides.get('seq_len', TSL_BASE_ARGS.get('seq_len', 96)))
+    pred_len = int(exp.tsl_overrides.get('pred_len', TSL_BASE_ARGS.get('pred_len', 96)))
+    min_required_rows = max(seq_len + pred_len + 64, pred_len * 10 + 64)
+    effective_rows = max(max_rows, min_required_rows)
+    line_limit = max(2, effective_rows + 1)
+    with src_path.open('r', encoding='utf-8') as src_f, dst_path.open('w', encoding='utf-8') as dst_f:
+        for line_idx, line in enumerate(src_f):
+            dst_f.write(line)
+            if line_idx + 1 >= line_limit:
+                break
+
+    rel_root = os.path.relpath(smoke_dir, TSL_ROOT).replace(os.sep, '/')
+    if not rel_root.endswith('/'):
+        rel_root += '/'
+
+    return {
+        'root_path': f'./{rel_root}',
+        'data_path': dst_path.name,
+    }
+
+
+def collect_special_settings(
+    args: argparse.Namespace,
+    exp: Experiment,
+    tsl_runtime_overrides: dict,
+    ll_cli_runtime_overrides: dict,
+) -> dict[str, object]:
+    tags: list[str] = []
+
+    if args.oom_fallback and exp.name in OOM_FALLBACK_PROFILES:
+        tags.append('oom_fallback')
+    if args.smoke_test:
+        tags.append('smoke_test')
+    if args.single_pair_diagnostic:
+        tags.append('single_pair_diagnostic')
+    if args.disable_es:
+        tags.append('disable_es')
+    if args.timeout_seconds != 7200:
+        tags.append('custom_timeout')
+    if tsl_runtime_overrides or ll_cli_runtime_overrides:
+        tags.append('runtime_overrides')
+
+    return {
+        'special_settings_applied': bool(tags),
+        'special_settings_tags': tags,
+        'special_settings_detail': {
+            'tsl_overrides': dict(tsl_runtime_overrides),
+            'liulian_cli_overrides': dict(ll_cli_runtime_overrides),
+            'timeout_seconds': int(args.timeout_seconds),
+            'progress_interval_seconds': int(args.progress_interval_seconds),
+        },
+    }
 
 
 def compare_metrics(
@@ -2111,7 +3332,58 @@ def main() -> None:
             "isolate the effect of ES divergence on results."
         ),
     )
+    parser.add_argument(
+        "--oom-fallback", action="store_true",
+        help=(
+            "Apply built-in OOM fallback runtime overrides for heavy pairs "
+            "(Traffic_TimesNet, ILI_TimesNet, Traffic_TimeXer): "
+            "TSL and liulian both use aligned low-memory settings "
+            "(batch_size/d_model/d_ff/n_heads/train_epochs; TimeXer learning_rate). "
+            "No environment variable needed."
+        ),
+    )
+    parser.add_argument(
+        "--timeout-seconds", type=int, default=7200,
+        help="Per-process timeout in seconds for each TSL/liulian run (default: 7200).",
+    )
+    parser.add_argument(
+        "--progress-interval-seconds", type=int, default=30,
+        help="Heartbeat print interval in seconds while a TSL/liulian process is running.",
+    )
+    parser.add_argument(
+        "--single-pair-diagnostic", action="store_true",
+        help=(
+            "Require exactly one selected pair and run in diagnostic single-pair mode. "
+            "Useful for heavy cases to isolate runtime issues and avoid multi-pair queues."
+        ),
+    )
+    parser.add_argument(
+        "--smoke-test", action="store_true",
+        help=(
+            "Run a real lightweight execution (not dry-run) on small data slices "
+            "for quick pipeline sanity checks. "
+            "TSL uses sampled CSV rows; liulian uses max_samples + quick_test."
+        ),
+    )
+    parser.add_argument(
+        "--smoke-max-rows", type=int, default=1024,
+        help="Max data rows (excluding header) kept in TSL sampled CSV for smoke test.",
+    )
+    parser.add_argument(
+        "--smoke-max-samples", type=int, default=64,
+        help="Liulian --max_samples value for smoke test mode.",
+    )
+    parser.add_argument(
+        "--smoke-train-epochs", type=int, default=1,
+        help="Train epochs used in smoke test mode.",
+    )
     args = parser.parse_args()
+    runtime_overrides_by_pair = parse_runtime_overrides_env()
+    if args.oom_fallback:
+        runtime_overrides_by_pair = merge_runtime_overrides(
+            OOM_FALLBACK_PROFILES,
+            runtime_overrides_by_pair,
+        )
 
     experiments = EXPERIMENTS
     if args.pairs:
@@ -2124,6 +3396,20 @@ def main() -> None:
 
     selected_experiments = experiments
     selected_names = {e.name for e in selected_experiments}
+
+    if args.timeout_seconds <= 0:
+        print("--timeout-seconds must be > 0")
+        sys.exit(2)
+    if args.progress_interval_seconds <= 0:
+        print("--progress-interval-seconds must be > 0")
+        sys.exit(2)
+
+    if args.single_pair_diagnostic and len(experiments) != 1:
+        print(
+            "--single-pair-diagnostic requires exactly one selected pair. "
+            "Use --pairs with a single name."
+        )
+        sys.exit(2)
 
     existing_results_by_name: dict[str, dict] = {}
     if args.remaining_only:
@@ -2177,25 +3463,133 @@ def main() -> None:
         print(f"# {exp.name}  (large={exp.large}, has_script={exp.has_tsl_script})")
         print(f"{'#'*70}")
 
-        epoch_limit = 2 if exp.large else None
+        epoch_limit = args.smoke_train_epochs if args.smoke_test else (2 if exp.large else None)
         disable_es = getattr(args, 'disable_es', False)
-        tsl_cmd = build_tsl_cmd(exp, epoch_limit=epoch_limit, disable_es=disable_es)
-        ll_cmd = build_liulian_cmd(exp, epoch_limit=epoch_limit, disable_es=disable_es)
+
+        if exp.skip_reason is not None or not exp.tsl_comparable:
+            reason = exp.skip_reason
+            if reason is None:
+                reason = 'no tsl counterpart'
+            status = f'skipped: {reason}'
+            if not exp.tsl_comparable and exp.skip_reason is None:
+                detail = (
+                    f"Model {exp.model} has no counterpart in the bundled "
+                    f"Time-Series-Library reference repo; pair is tracked but "
+                    f"not directly comparable."
+                )
+            else:
+                detail = (
+                    f"Pair {exp.name} is tracked in comparison inventory but "
+                    f"skipped: {reason}."
+                )
+            r = {
+                "name": exp.name,
+                "dataset": exp.dataset,
+                "model": exp.model,
+                "has_tsl_script": exp.has_tsl_script,
+                "large": exp.large,
+                "epoch_limit": epoch_limit,
+                "tsl_epochs_run": 0,
+                "ll_epochs_run": 0,
+                "tsl_time_s": 0.0,
+                "ll_time_s": 0.0,
+                "tsl_final_mse": None,
+                "tsl_final_mae": None,
+                "ll_final_mse": None,
+                "ll_final_mae": None,
+                "status": status,
+                "detail": detail,
+            }
+            results.append(r)
+            print(f"\n  ── Result: {status} ──")
+            print(detail)
+            continue
+
+        pair_runtime = runtime_overrides_by_pair.get(exp.name, {})
+        tsl_runtime_overrides = dict(pair_runtime.get('tsl_overrides') or {})
+        ll_cli_runtime_overrides = dict(pair_runtime.get('liulian_cli_overrides') or {})
+
+        if args.smoke_test:
+            tsl_runtime_overrides.update(build_smoke_tsl_data_overrides(exp, args.smoke_max_rows))
+            tsl_runtime_overrides.update(
+                {
+                    'use_amp': False,
+                    'batch_size': 1,
+                }
+            )
+
+            if exp.model in {'TimesNet', 'TimeXer'}:
+                tsl_runtime_overrides.update(
+                    {
+                        'd_model': 128,
+                        'd_ff': 256,
+                        'n_heads': 4,
+                    }
+                )
+
+            ll_cli_runtime_overrides.update(
+                {
+                    'max_samples': args.smoke_max_samples,
+                    'quick_test': True,
+                    'batch_size': 1,
+                }
+            )
+
+            if exp.model in {'TimesNet', 'TimeXer'}:
+                ll_cli_runtime_overrides.update(
+                    {
+                        'd_model': 128,
+                        'd_ff': 256,
+                        'n_heads': 4,
+                    }
+                )
+
+        special_settings = collect_special_settings(
+            args=args,
+            exp=exp,
+            tsl_runtime_overrides=tsl_runtime_overrides,
+            ll_cli_runtime_overrides=ll_cli_runtime_overrides,
+        )
+
+        tsl_cmd = build_tsl_cmd(
+            exp,
+            epoch_limit=epoch_limit,
+            disable_es=disable_es,
+            extra_overrides=tsl_runtime_overrides,
+        )
+        ll_cmd = build_liulian_cmd(
+            exp,
+            epoch_limit=epoch_limit,
+            disable_es=disable_es,
+            tsl_extra_overrides=tsl_runtime_overrides,
+            cli_overrides=ll_cli_runtime_overrides,
+        )
 
         if args.dry_run:
             print(f"  TSL cmd: {' '.join(tsl_cmd)}")
             print(f"  LL  cmd: {' '.join(ll_cmd)}")
             results.append({
-                "name": exp.name, "status": "dry-run",
+                "name": exp.name,
+                "dataset": exp.dataset,
+                "model": exp.model,
+                "has_tsl_script": exp.has_tsl_script,
+                "large": exp.large,
+                "epoch_limit": epoch_limit,
+                "status": "dry-run",
                 "tsl_cmd": " ".join(tsl_cmd),
                 "ll_cmd": " ".join(ll_cmd),
+                **special_settings,
             })
             continue
 
         # --- Run TSL ---
         try:
             tsl_out, tsl_time, tsl_rc = run_cmd(
-                tsl_cmd, cwd=str(TSL_ROOT), label=f"TSL {exp.name}",
+                tsl_cmd,
+                cwd=str(TSL_ROOT),
+                label=f"TSL {exp.name}",
+                timeout_seconds=args.timeout_seconds,
+                progress_interval_seconds=args.progress_interval_seconds,
             )
         except subprocess.TimeoutExpired:
             tsl_out, tsl_time, tsl_rc = '', -1, -1
@@ -2206,7 +3600,11 @@ def main() -> None:
         # --- Run liulian ---
         try:
             ll_out, ll_time, ll_rc = run_cmd(
-                ll_cmd, cwd=str(PROJECT_ROOT), label=f"liulian {exp.name}",
+                ll_cmd,
+                cwd=str(PROJECT_ROOT),
+                label=f"liulian {exp.name}",
+                timeout_seconds=args.timeout_seconds,
+                progress_interval_seconds=args.progress_interval_seconds,
             )
         except subprocess.TimeoutExpired:
             ll_out, ll_time, ll_rc = '', -1, -1
@@ -2238,6 +3636,7 @@ def main() -> None:
             "name": exp.name,
             "dataset": exp.dataset,
             "model": exp.model,
+            "smoke_test": bool(args.smoke_test),
             "has_tsl_script": exp.has_tsl_script,
             "large": exp.large,
             "epoch_limit": epoch_limit,
@@ -2251,6 +3650,7 @@ def main() -> None:
             "ll_final_mae": ll_metrics.get("final_mae"),
             "status": status,
             "detail": detail,
+            **special_settings,
         }
         results.append(r)
 
@@ -2285,7 +3685,7 @@ def main() -> None:
                     if isinstance(existing, list):
                         for entry in existing:
                             name = entry.get('name')
-                            if name and is_completed_result(entry) and name not in all_existing:
+                            if name and name not in all_existing:
                                 all_existing[name] = entry
                 except Exception:
                     pass
@@ -2310,6 +3710,9 @@ def main() -> None:
             else:
                 f.write(f"  Dataset: {r.get('dataset', '')}\n")
                 f.write(f"  Model: {r.get('model', '')}\n")
+                f.write(f"  Special settings applied: {r.get('special_settings_applied', False)}\n")
+                if r.get('special_settings_tags'):
+                    f.write(f"  Special settings tags: {', '.join(r.get('special_settings_tags', []))}\n")
                 f.write(f"  Has TSL script: {r.get('has_tsl_script', '')}\n")
                 f.write(f"  Large dataset: {r.get('large', False)}\n")
                 f.write(f"  Epoch limit: {r.get('epoch_limit', 'full')}\n")
@@ -2332,12 +3735,12 @@ def main() -> None:
         f.write("SUMMARY\n")
         f.write("=" * 80 + "\n")
         f.write(f"{'Name':<25} {'TSL ep':>6} {'LL ep':>5} "
-                f"{'TSL time':>9} {'LL time':>8} {'Status'}\n")
+                f"{'TSL time':>9} {'LL time':>8} {'Special':>8} {'Status'}\n")
         f.write("-" * 80 + "\n")
         for r in results_to_write:
             if r.get("status") == "dry-run":
                 f.write(f"{r['name']:<25} {'---':>6} {'---':>5} "
-                        f"{'---':>9} {'---':>8} dry-run\n")
+                        f"{'---':>9} {'---':>8} {'yes' if r.get('special_settings_applied') else 'no':>8} dry-run\n")
             else:
                 f.write(
                     f"{r['name']:<25} "
@@ -2345,6 +3748,7 @@ def main() -> None:
                     f"{r.get('ll_epochs_run', '?'):>5} "
                     f"{r.get('tsl_time_s', '?'):>8}s "
                     f"{r.get('ll_time_s', '?'):>7}s "
+                    f"{'yes' if r.get('special_settings_applied') else 'no':>8} "
                     f"{r['status']}\n"
                 )
 

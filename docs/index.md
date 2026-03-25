@@ -25,6 +25,8 @@ python examples/quick_run.py
 ## Documentation
 
 - [Architecture](architecture.md) — Design decisions and module overview
+- [Forecasting Pipeline Guide](forecasting_pipeline.md) — End-to-end run flow using `liulian.pipeline`
+- [Demo Gallery](demo_gallery.md) — Runnable forecasting demos
 - [Adapter Guide](adapter_guide.md) — How to write model adapters
 - [Manifest Specification](manifest_spec.md) — YAML dataset manifest format
 - [Contributing](contributing.md) — How to contribute to liulian

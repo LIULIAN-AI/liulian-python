@@ -1,6 +1,5 @@
-# Electricity dataset — DLinear (linear decomposition)
-#
-# Electricity dataset: 321 clients' hourly electricity consumption.
+# Electricity dataset: 321 clients' hourly consumption.
+# DLinear (has TSL benchmark script)
 #
 # Usage:
 #   liulian run experiments/electricity/dlinear_config.yaml
@@ -17,9 +16,10 @@ data: electricity
 seq_len: 96
 pred_len: 96
 features: M
-label_len: 0
+label_len: 48
 train_split: 0.7
 max_samples: null
+freq: h
 
 # ── Task & mode ─────────────────────────────────────────────────────────
 task: forecast
@@ -34,7 +34,7 @@ gap_mode: split
 max_mask_consecutive: 10
 
 # ── Noise injection ─────────────────────────────────────────────────────
-noise_type: null                  # null | gaussian | gaussian_a | impulse | impulse_a | quantization
+noise_type: null
 noise_level: 0.01
 noise_probability: 0.01
 noise_scale_factor: 5.0
@@ -47,7 +47,7 @@ include_historical_predicted_y: false
 identifier_mode: none
 id_integration: concat_to_x
 embedding_size: 10
-num_embeddings: null              # Auto-detected (321 clients)
+num_embeddings: null
 
 # ── Graph / spatial ─────────────────────────────────────────────────────
 graph_mode: none
@@ -94,13 +94,13 @@ num_workers: 0
 # ── HPO (Ray Tune) ─────────────────────────────────────────────────────
 hpo: false
 hpo_num_samples: 200
-hpo_scheduler: asha               # asha | none
+hpo_scheduler: asha
 hpo_grace_period: 5
 hpo_reduction_factor: 1.5
-hpo_storage_path: null            # Default: artifacts/ray_results
+hpo_storage_path: null
 hpo_resources_cpu: 1
 hpo_resources_gpu: 0.25
-hpo_num_cpus: null                # Auto
+hpo_num_cpus: null
 hpo_max_concurrent: null
 hpo_resume: false
 hpo_save_checkpoints: true
@@ -113,17 +113,17 @@ hpo_experiment_name: null
 hpo_local_mode: false
 
 # ── Logging ─────────────────────────────────────────────────────────────
-wandb_project: null               # Set to enable wandb (e.g. "traffic-benchmark")
+wandb_project: null
 wandb_entity: null
 dev_run: false
 
 # ── Visualisation ───────────────────────────────────────────────────────
 auto_viz: true
-viz_method: mean                  # mean | median | last | longest_history | best | worst | single
+viz_method: mean
 
 # ── Misc model keys (compat) ───────────────────────────────────────────
 embed: timeF
 activation: gelu
 output_attention: false
-factor: 1
+factor: 3
 task_name: long_term_forecast
