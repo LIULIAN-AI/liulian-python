@@ -61,3 +61,7 @@ wandb/
 
 # Scratch files
 _test_batch.py
+
+# Local git worktrees
+.worktrees/
+worktrees/
