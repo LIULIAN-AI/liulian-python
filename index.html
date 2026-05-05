@@ -49,7 +49,7 @@
       <div class="hero-loader">
         <div class="hero-loader-text">
           <span>Loading workspace</span>
-          <span><span class="num">2 143</span> stations · <span class="num">12</span> models</span>
+          <span><span class="num">28</span> stations · <span class="num">26</span> edges · <span class="num">12</span> models</span>
         </div>
         <div class="hero-loader-bar"></div>
       </div>
@@ -99,6 +99,27 @@
           <pre class="code-body" data-content="manifest"></pre>
         </div>
 
+        <div class="data-viz">
+          <div class="viz-head">
+            <span class="viz-title">Water-temperature trace</span>
+            <span class="viz-meta">4 stations · 365 d · sampled every 3 d · °C</span>
+          </div>
+          <div class="viz-row">
+            <div class="ts-chart" data-ts-chart></div>
+            <div class="viz-side">
+              <div class="hg-head">All values · histogram</div>
+              <div class="hg-chart" data-histogram></div>
+              <div class="hg-meta">227 k samples · range −1 °C → 18 °C · median 6.8 °C</div>
+              <div class="ts-legend">
+                <div class="leg-item"><span class="sw" style="background:#E20613"></span><span>2 009 m · valley</span></div>
+                <div class="leg-item"><span class="sw" style="background:#B00010"></span><span>2 091 m · trunk</span></div>
+                <div class="leg-item"><span class="sw" style="background:#5C6066"></span><span>2 500 m · mid-alpine</span></div>
+                <div class="leg-item"><span class="sw" style="background:#94989D"></span><span>2 634 m · high-alpine</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div class="data-preview">
           <div class="preview-head">
             <span class="preview-title">Preview</span>
@@ -136,7 +157,7 @@
         <div class="panel">
           <div class="panel-head">Coverage</div>
           <div class="coverage-bar"><span style="width:99.7%"></span></div>
-          <div class="coverage-meta">2 138 / 2 143 stations live</div>
+          <div class="coverage-meta">28 / 28 stations live</div>
           <div class="map-mini"></div>
         </div>
       </aside>
@@ -156,7 +177,21 @@
           <div class="train-sub">epoch <span data-meta="epoch">56 / 80</span> · <span class="muted">started 14:23 UTC</span></div>
         </div>
 
-        <div class="loss-chart panel"></div>
+        <div class="train-charts">
+          <div class="loss-chart panel"></div>
+          <div class="vpg-chart panel">
+            <div class="vpg-head">
+              <span class="vpg-title">Validation forecast · Innertkirchen-Aare</span>
+              <span class="vpg-meta">epoch 56 · 200 d window · °C</span>
+            </div>
+            <div class="vpg-svg" data-vpg></div>
+            <div class="vpg-legend">
+              <span class="vpg-leg"><span class="sw" style="background:#2F3437"></span>ground truth</span>
+              <span class="vpg-leg"><span class="sw" style="background:#E20613"></span>transformer-entity-aware-v3</span>
+              <span class="vpg-meta-r">RMSE 0.91 °C · MAE 0.73 °C</span>
+            </div>
+          </div>
+        </div>
 
         <div class="metric-row">
           <div class="metric-card">
@@ -342,7 +377,7 @@
         <div class="map-host" data-real-map></div>
 
         <div class="map-meta">
-          <h3>River network <span class="meta">2 143 stations · live</span></h3>
+          <h3>River network <span class="meta">28 alpine stations · 26 tributary edges · live</span></h3>
 
           <div class="basin-callout">
             <div class="callout-title">Affected basin</div>

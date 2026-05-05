@@ -524,9 +524,348 @@ const Charts = (() => {
     });
   }
 
+  /* ---- Real Swiss map (uses dataset/swiss_river/graph_swiss-1990.pth) -- */
+  /* Country outline — refined path through ~30 known landmarks
+     (CH1903 coords projected to viewBox 0 0 1000 620). Still hand-drawn
+     but follows actual geographic landmarks rather than abstract bumps. */
+  const COUNTRY_REAL =
+    "M 31 493 L 24 510 L 80 535 L 165 552 L 245 558 L 295 530 L 340 495 " +
+    "L 395 490 L 460 510 L 510 545 L 555 555 L 595 575 L 640 595 L 672 600 " +
+    "L 668 590 L 660 550 L 678 540 L 680 510 L 720 470 L 800 425 " +
+    "L 855 395 L 920 365 L 955 345 L 970 295 L 945 250 L 905 220 L 860 200 " +
+    "L 810 195 L 790 175 L 800 130 L 815 105 L 790 80 L 755 78 L 700 68 " +
+    "L 660 50 L 620 38 L 600 30 L 580 25 L 555 35 L 525 50 L 480 65 " +
+    "L 425 80 L 365 80 L 320 100 L 280 130 L 250 165 L 210 215 L 175 270 " +
+    "L 155 320 L 120 380 L 90 430 L 55 470 Z";
+
+  function drawRealNetworkMap(host, opts = {}) {
+    if (!host) return;
+    host.innerHTML = "";
+    const annotate = opts.annotate !== false;
+
+    const svg = el("svg", {
+      class: "real-swiss-map",
+      viewBox: "0 0 1000 620",
+      preserveAspectRatio: "xMidYMid meet",
+    }, host);
+
+    /* Country */
+    el("path", { class: "rs-country", d: COUNTRY_REAL }, svg);
+
+    /* CH1903 km grid (very faint reference) */
+    const gridGroup = el("g", { class: "rs-grid" }, svg);
+    for (let i = 0; i <= 1000; i += 100) {
+      el("line", { x1: i, y1: 0, x2: i, y2: 620 }, gridGroup);
+    }
+    for (let j = 0; j <= 620; j += 100) {
+      el("line", { x1: 0, y1: j, x2: 1000, y2: j }, gridGroup);
+    }
+
+    /* Lakes (rough but positioned over their real centroids) */
+    [
+      { cx: 125, cy: 440, rx: 80, ry: 14, rot:  10 },  // Léman
+      { cx: 720, cy:  78, rx: 75, ry: 12, rot:  -3 },  // Constance/Bodensee
+      { cx: 195, cy: 260, rx: 35, ry: 11, rot:  35 },  // Neuchâtel
+      { cx: 605, cy: 145, rx: 38, ry:  9, rot: -28 },  // Zürich
+      { cx: 525, cy: 220, rx: 22, ry: 13, rot:  18 },  // Lucerne
+      { cx: 380, cy: 280, rx: 22, ry:  6, rot: -12 },  // Thun
+      { cx: 415, cy: 285, rx: 20, ry:  6, rot: -10 },  // Brienz
+    ].forEach((lk) => {
+      el("ellipse", {
+        class: "rs-lake",
+        cx: lk.cx, cy: lk.cy, rx: lk.rx, ry: lk.ry,
+        transform: `rotate(${lk.rot} ${lk.cx} ${lk.cy})`,
+      }, svg);
+    });
+
+    /* River-network edges (drawn first, behind stations) */
+    const stations = MOCK.realStations;
+    const edges = MOCK.realEdges;
+    edges.forEach(([up, dn], i) => {
+      const a = stations[up];
+      const b = stations[dn];
+      if (!a || !b) return;
+      el("line", {
+        class: "rs-edge",
+        x1: a.x, y1: a.y, x2: b.x, y2: b.y,
+        style: `animation-delay: ${0.4 + i * 0.04}s;`,
+      }, svg);
+    });
+
+    /* Station dots — colour-coded by elevation */
+    const elevs = stations.map((s) => s.elev);
+    const minElev = Math.min(...elevs), maxElev = Math.max(...elevs);
+    stations.forEach((s, i) => {
+      const t = (s.elev - minElev) / (maxElev - minElev || 1);
+      // light (low elev) -> dark (high elev) on the ink scale
+      const grey = Math.round(170 - t * 110);
+      const color = `rgb(${grey}, ${grey + 4}, ${grey + 8})`;
+      const r = 3.4 + t * 1.6;
+      el("circle", {
+        class: "rs-real-station",
+        cx: s.x, cy: s.y, r,
+        fill: color,
+        style: `animation-delay: ${0.6 + i * 0.022}s;`,
+      }, svg);
+    });
+
+    /* Highlight the trunk-outlet (id 0): the most-downstream station of
+       the main 24-station tributary tree. */
+    if (annotate) {
+      const trunk = stations[0];
+      el("circle", {
+        class: "rs-halo-real",
+        cx: trunk.x, cy: trunk.y, r: 24,
+      }, svg);
+      el("circle", {
+        class: "rs-ripple",
+        cx: trunk.x, cy: trunk.y, r: 18,
+      }, svg);
+      el("circle", {
+        class: "rs-real-flagged",
+        cx: trunk.x, cy: trunk.y, r: 6.5,
+      }, svg);
+
+      /* Outlet → downstream Basel arrow */
+      const arrowTo = { x: 365, y: 80 };
+      el("path", {
+        class: "rs-arrow",
+        d: `M ${trunk.x} ${trunk.y - 6} Q ${(trunk.x + arrowTo.x) / 2} ${(trunk.y + arrowTo.y) / 2 - 30} ${arrowTo.x} ${arrowTo.y + 6}`,
+      }, svg);
+      el("circle", {
+        class: "rs-arrow-tip",
+        cx: arrowTo.x, cy: arrowTo.y, r: 6,
+      }, svg);
+      el("text", {
+        class: "rs-arrow-label",
+        x: arrowTo.x + 12, y: arrowTo.y - 4,
+      }, svg).textContent = "→ Rhein-Basel · 2 412 m³/s @ T+18 h";
+      el("text", {
+        class: "rs-arrow-sub",
+        x: arrowTo.x + 12, y: arrowTo.y + 12,
+      }, svg).textContent = "elevated · drainage 36 472 km²";
+
+      /* Trunk callout */
+      el("text", {
+        class: "rs-real-label",
+        x: trunk.x + 14, y: trunk.y - 4,
+      }, svg).textContent = `${stations[0].code} · TRUNK OUTLET`;
+      el("text", {
+        class: "rs-real-sub",
+        x: trunk.x + 14, y: trunk.y + 10,
+      }, svg).textContent = `${stations[0].name} · ${stations[0].elev} m`;
+    }
+
+    /* Cardinal labels */
+    el("text", { class: "rs-card", x:  60, y:  18 }, svg).textContent = "N";
+    el("text", { class: "rs-card", x: 980, y: 318 }, svg).textContent = "E";
+    el("text", { class: "rs-card", x: 980, y: 612 }, svg).textContent = "S";
+    el("text", { class: "rs-card", x:  10, y: 412 }, svg).textContent = "W";
+
+    /* City labels (kept for geographic context) */
+    [
+      { name: "GENÈVE",    x:  44, y: 470 },
+      { name: "BERN",      x: 268, y: 270, brand: true },
+      { name: "BASEL",     x: 320, y: 102, brand: true },
+      { name: "ZÜRICH",    x: 588, y: 132 },
+      { name: "LUGANO",    x: 638, y: 555 },
+      { name: "ST GALLEN", x: 740, y: 102 },
+      { name: "CHUR",      x: 740, y: 230 },
+      { name: "SION",      x: 285, y: 410 },
+    ].forEach(({ name, x, y, brand }) => {
+      el("text", {
+        class: "rs-city" + (brand ? " brand" : ""),
+        x, y,
+      }, svg).textContent = name;
+    });
+
+    /* Top-left corner: provenance stamp */
+    el("text", {
+      class: "rs-prov",
+      x: 12, y: 612,
+    }, svg).textContent = "swiss-river-1990 · 28 stations · 26 tributary edges · CH1903 (LV03)";
+  }
+
+  /* ---- Real-data time-series chart (Data tab visualization) -------- */
+  function drawDataTimeseries(host) {
+    if (!host) return;
+    host.innerHTML = "";
+    const ts = MOCK.realTimeseries;
+    const W = 760, H = 240, PAD = { l: 36, r: 12, t: 14, b: 26 };
+
+    const svg = el("svg", {
+      viewBox: `0 0 ${W} ${H}`,
+      preserveAspectRatio: "none",
+    }, host);
+
+    const series = ts.series;
+    const allVals = [].concat(...Object.values(series));
+    const yMin = Math.floor(Math.min(...allVals));
+    const yMax = Math.ceil(Math.max(...allVals));
+    const n = ts.epoch_day.length;
+
+    const xScale = (i) => PAD.l + (W - PAD.l - PAD.r) * (i / (n - 1));
+    const yScale = (v) => PAD.t + (H - PAD.t - PAD.b) * (1 - (v - yMin) / (yMax - yMin || 1));
+
+    /* Grid */
+    [yMin, (yMin + yMax) / 2, yMax].forEach((v) => {
+      const y = yScale(v);
+      el("line", {
+        class: "ts-grid",
+        x1: PAD.l, y1: y, x2: W - PAD.r, y2: y,
+      }, svg);
+      el("text", {
+        class: "ts-axis",
+        x: PAD.l - 6, y: y + 3, "text-anchor": "end",
+      }, svg).textContent = `${v.toFixed(0)}°C`;
+    });
+
+    /* Quarter ticks on x-axis (3 month labels assuming ~365-day year sampled every 3) */
+    const months = ["Jan", "Apr", "Jul", "Oct"];
+    months.forEach((m, i) => {
+      const x = PAD.l + (W - PAD.l - PAD.r) * (i / 3);
+      el("text", {
+        class: "ts-axis",
+        x, y: H - 8, "text-anchor": "middle",
+      }, svg).textContent = m;
+    });
+
+    /* Lines, layered low-to-high elevation. Low elev = warm (warmer water),
+       high elev = cool. Use two ink shades + bern-deep for the mid-tier. */
+    const colors = {
+      "2009 m": "#E20613",
+      "2091 m": "#B00010",
+      "2500 m": "#5C6066",
+      "2634 m": "#94989D",
+    };
+    Object.entries(series).forEach(([key, vals], i) => {
+      const d = "M " + vals.map((v, j) => `${xScale(j).toFixed(1)} ${yScale(v).toFixed(1)}`).join(" L ");
+      el("path", {
+        class: "ts-line",
+        d,
+        stroke: colors[key],
+        "stroke-width": (key === "2009 m" || key === "2091 m") ? 1.5 : 1.1,
+        style: `animation-delay: ${i * 0.18}s`,
+      }, svg);
+    });
+  }
+
+  /* Validation pred-vs-ground-truth panel for the Train tab.
+     Mirrors experiments/artifacts/.../figures/pred_vs_gt.png from main-branch:
+     ground truth seasonal swing (blue / ink) vs transformer-entity-aware-v3 prediction (red). */
+  function drawValPredGt(host) {
+    if (!host) return;
+    host.innerHTML = "";
+    const W = 760, H = 220, PAD = { l: 38, r: 14, t: 14, b: 26 };
+    const svg = el("svg", {
+      viewBox: `0 0 ${W} ${H}`,
+      preserveAspectRatio: "none",
+    }, host);
+
+    const { epoch_day, ground, pred } = MOCK.realPredVsGt;
+    const n = epoch_day.length;
+    const yMin = 5;
+    const yMax = 25;
+
+    const xScale = (i) => PAD.l + (W - PAD.l - PAD.r) * (i / (n - 1));
+    const yScale = (v) => PAD.t + (H - PAD.t - PAD.b) * (1 - (v - yMin) / (yMax - yMin));
+
+    /* Y-grid every 5 °C */
+    [5, 10, 15, 20, 25].forEach((v) => {
+      const y = yScale(v);
+      el("line", {
+        class: "ts-grid",
+        x1: PAD.l, y1: y, x2: W - PAD.r, y2: y,
+      }, svg);
+      el("text", {
+        class: "ts-axis",
+        x: PAD.l - 6, y: y + 3, "text-anchor": "end",
+      }, svg).textContent = `${v}°C`;
+    });
+
+    /* X-axis epoch-day labels — 4 evenly spaced points */
+    [0, 0.33, 0.66, 1].forEach((f) => {
+      const x = PAD.l + (W - PAD.l - PAD.r) * f;
+      const idx = Math.round((n - 1) * f);
+      el("text", {
+        class: "ts-axis",
+        x, y: H - 8, "text-anchor": "middle",
+      }, svg).textContent = epoch_day[idx];
+    });
+
+    /* Ground-truth path (charcoal ink, thicker, dashed when prediction agrees better) */
+    const gtD = "M " + ground.map((v, i) => `${xScale(i).toFixed(1)} ${yScale(v).toFixed(1)}`).join(" L ");
+    el("path", {
+      class: "vpg-gt",
+      d: gtD,
+    }, svg);
+
+    /* Prediction path (UniBE red) */
+    const pD = "M " + pred.map((v, i) => `${xScale(i).toFixed(1)} ${yScale(v).toFixed(1)}`).join(" L ");
+    el("path", {
+      class: "vpg-pred",
+      d: pD,
+      style: "animation-delay: 0.6s",
+    }, svg);
+
+    /* End-point dots */
+    el("circle", {
+      cx: xScale(n - 1), cy: yScale(ground[n - 1]),
+      r: 3, fill: "#2F3437", stroke: "#FFFFFF", "stroke-width": 1.4,
+      style: "opacity:0; animation: fadeIn 0.4s ease 1.2s forwards;",
+    }, svg);
+    el("circle", {
+      cx: xScale(n - 1), cy: yScale(pred[n - 1]),
+      r: 3.5, fill: "#E20613", stroke: "#FFFFFF", "stroke-width": 1.4,
+      style: "opacity:0; animation: fadeIn 0.4s ease 1.4s forwards;",
+    }, svg);
+
+    /* X-axis baseline */
+    el("line", {
+      class: "axis",
+      x1: PAD.l, y1: H - PAD.b, x2: W - PAD.r, y2: H - PAD.b,
+    }, svg);
+  }
+
+  function drawDataHistogram(host) {
+    if (!host) return;
+    host.innerHTML = "";
+    const W = 280, H = 90, PAD = { l: 4, r: 4, t: 6, b: 16 };
+    const svg = el("svg", {
+      viewBox: `0 0 ${W} ${H}`,
+      preserveAspectRatio: "none",
+    }, host);
+    const { bins, counts } = MOCK.realHistogram;
+    const maxC = Math.max(...counts);
+    const barW = (W - PAD.l - PAD.r) / counts.length;
+    counts.forEach((c, i) => {
+      const h = (c / maxC) * (H - PAD.t - PAD.b);
+      el("rect", {
+        class: "hg-bar",
+        x: PAD.l + i * barW + 0.5,
+        y: H - PAD.b - h,
+        width: barW - 1,
+        height: h,
+        style: `animation-delay: ${i * 18}ms`,
+      }, svg);
+    });
+    /* Bin labels (only at 0, mid, max) */
+    [0, Math.floor(counts.length / 2), counts.length - 1].forEach((i) => {
+      el("text", {
+        class: "hg-axis",
+        x: PAD.l + i * barW + barW / 2,
+        y: H - 4, "text-anchor": "middle",
+      }, svg).textContent = `${bins[i].toFixed(0)}°C`;
+    });
+  }
+
   return {
     drawSwissMap, drawLossCurve, drawForecast, sparkline, genSpark,
     drawRealSwissMap,
+    drawRealNetworkMap,
+    drawDataTimeseries,
+    drawDataHistogram,
+    drawValPredGt,
     STATIONS_REAL,
   };
 })();
