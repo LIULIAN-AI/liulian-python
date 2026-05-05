@@ -43,7 +43,7 @@
        ===================================================== -->
   <section class="hero" aria-label="LIULIAN platform introduction">
     <div class="hero-inner">
-      <div class="hero-pretitle">Spatiotemporal Research Platform</div>
+      <div class="hero-pretitle">Liquid Intelligence · Unified Logic · Interactive Adaptive Networks</div>
       <h1 class="hero-wordmark">LIULIAN</h1>
       <p class="hero-tagline">Modeling <em>rivers</em>, sensors, signals. Together, in <em>time</em>.</p>
       <div class="hero-loader">
@@ -77,7 +77,7 @@
         <div class="sidebar-section">
           <div class="sidebar-head">
             <span class="sidebar-title">Schema</span>
-            <span class="sidebar-meta">8 fields</span>
+            <span class="sidebar-meta">10 fields</span>
           </div>
           <ul class="column-list" data-list="columns"></ul>
         </div>
@@ -161,7 +161,7 @@
         <div class="metric-row">
           <div class="metric-card">
             <div class="metric-lab">val MSE</div>
-            <div class="metric-val" data-meta="loss">0.0418</div>
+            <div class="metric-val" data-meta="loss">0.0822</div>
             <div class="metric-delta down">−18.6 % vs baseline</div>
           </div>
           <div class="metric-card">
@@ -296,42 +296,85 @@
          SCREEN: INSIGHT
          ============================================ -->
     <section class="screen" data-screen="insight" hidden>
-      <aside class="insight-sidebar">
-        <div class="sidebar-section">
-          <div class="sidebar-head">
-            <span class="sidebar-title">Conversations</span>
-            <button class="sidebar-add">+</button>
-          </div>
-          <ul class="session-list" data-list="sessions"></ul>
-        </div>
-      </aside>
 
-      <div class="chat-main">
-        <div class="chat-head">
-          <div class="chat-title">Flood risk this week</div>
-          <div class="chat-sub muted small">Insight · grounded in swiss-river-1990</div>
+      <!-- Top row: sessions | chat | context -->
+      <div class="insight-top">
+        <aside class="insight-sidebar">
+          <div class="sidebar-section">
+            <div class="sidebar-head">
+              <span class="sidebar-title">Conversations</span>
+              <button class="sidebar-add">+</button>
+            </div>
+            <ul class="session-list" data-list="sessions"></ul>
+          </div>
+        </aside>
+
+        <div class="chat-main">
+          <div class="chat-head">
+            <div class="chat-title">Flood risk this week</div>
+            <div class="chat-sub muted small">Insight · grounded in swiss-river-1990</div>
+          </div>
+          <div class="chat-body" data-chat></div>
+          <div class="chat-input">
+            <input type="text" aria-label="Ask the agent" placeholder="Ask about a basin, a station, or a horizon…" disabled>
+            <button class="btn-send" disabled>Send</button>
+          </div>
         </div>
-        <div class="chat-body" data-chat></div>
-        <div class="chat-input">
-          <input type="text" placeholder="Ask about a basin, a station, or a horizon…" disabled>
-          <button class="btn-send" disabled>Send</button>
+
+        <aside class="insight-right">
+          <div class="panel">
+            <div class="panel-head">Context</div>
+            <div class="ctx-row"><span>Dataset</span><span class="v">swiss-river-1990</span></div>
+            <div class="ctx-row"><span>Model</span><span class="v">transformer-entity-aware-v3</span></div>
+            <div class="ctx-row"><span>Run</span><span class="v">t-002</span></div>
+            <div class="ctx-row"><span>Sources</span><span class="v">4</span></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">Reasoning trail</div>
+            <ol class="trail" data-trail></ol>
+          </div>
+        </aside>
+      </div>
+
+      <!-- Section 2: River network — realistic map -->
+      <div class="insight-river-section">
+        <div class="map-host" data-real-map></div>
+
+        <div class="map-meta">
+          <h3>River network <span class="meta">2 143 stations · live</span></h3>
+
+          <div class="basin-callout">
+            <div class="callout-title">Affected basin</div>
+            <div class="callout-name">Rhein at Basel</div>
+            <div class="callout-rows">
+              <div class="row"><span class="lab">Drainage area</span><span class="v">36 472 km²</span></div>
+              <div class="row"><span class="lab">Now</span><span class="v">1 343 m³/s</span></div>
+              <div class="row"><span class="lab">T+18 h</span><span class="v alarm">2 412 m³/s</span></div>
+              <div class="row"><span class="lab">Threshold</span><span class="v">2 400 m³/s</span></div>
+              <div class="row"><span class="lab">Probability</span><span class="v alarm">0.87</span></div>
+            </div>
+          </div>
+
+          <div class="river-legend">
+            <div class="leg">
+              <span class="swatch river"></span>
+              <span>Major river paths (Rhine, Aare, Rhône, Reuss, Limmat, Inn, Ticino)</span>
+            </div>
+            <div class="leg">
+              <span class="swatch lake"></span>
+              <span>Major lakes (Léman, Constance, Neuchâtel, Zürich, Lucerne, Thun)</span>
+            </div>
+            <div class="leg"><span><span class="dot gray"></span></span><span>Stations · streaming</span></div>
+            <div class="leg"><span><span class="dot dark"></span></span><span>Upstream contributors (Aare basin)</span></div>
+            <div class="leg"><span><span class="dot red"></span></span><span>At-risk station · pulse-marked</span></div>
+          </div>
         </div>
       </div>
 
-      <aside class="insight-right">
-        <div class="panel">
-          <div class="panel-head">Context</div>
-          <div class="ctx-row"><span>Dataset</span><span class="v">swiss-river-1990</span></div>
-          <div class="ctx-row"><span>Model</span><span class="v">transformer-entity-aware-v3</span></div>
-          <div class="ctx-row"><span>Run</span><span class="v">t-002</span></div>
-          <div class="ctx-row"><span>Sources</span><span class="v">4</span></div>
-        </div>
+      <!-- Section 3: Upstream contributors row -->
+      <div class="insight-contributors" data-contribs></div>
 
-        <div class="panel">
-          <div class="panel-head">Reasoning trail</div>
-          <ol class="trail" data-trail></ol>
-        </div>
-      </aside>
     </section>
 
   </main>

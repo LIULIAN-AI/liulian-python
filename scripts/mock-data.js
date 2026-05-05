@@ -157,20 +157,22 @@ const MOCK = (() => {
     'integrity:',
     '  algo: sha256',
     '  digest: a3b4c1f2…',
-    'columns: [ts, station, value, qc, basin, lat, lon, elev]',
+    'columns: [ts, station, value, qc, basin, canton, lat, lon, elev, src]',
     'license: CC-BY-4.0',
   ];
 
-  /* Schema columns (data screen sidebar) */
+  /* Schema columns (data screen sidebar) — must match Field match 10/10 */
   const columns = [
     { name: "ts",       type: "datetime[UTC]", null: false },
     { name: "station",  type: "str",           null: false },
     { name: "value",    type: "float32",       null: true  },
     { name: "qc",       type: "uint8",         null: false },
     { name: "basin",    type: "str",           null: false },
+    { name: "canton",   type: "str",           null: false },
     { name: "lat",      type: "float32",       null: false },
     { name: "lon",      type: "float32",       null: false },
     { name: "elev",     type: "int16",         null: true  },
+    { name: "src",      type: "str",           null: false },
   ];
 
   /* Data preview rows (data screen main) */
@@ -278,6 +280,15 @@ const MOCK = (() => {
     },
   ];
 
+  /* Upstream contributors to Rhein-Basel — drives the cards row */
+  const contributors = [
+    { code: "AAR-BE", name: "Aare-Bern",       basin: "Aare",   now: 548, next: 712, share: 28, alarm: true  },
+    { code: "AAR-BG", name: "Aare-Brugg",      basin: "Aare",   now: 318, next: 401, share: 14, alarm: false },
+    { code: "REU-ML", name: "Reuss-Mellingen", basin: "Reuss",  now: 271, next: 342, share: 12, alarm: false },
+    { code: "AAR-TH", name: "Aare-Thun",       basin: "Aare",   now: 218, next: 256, share:  9, alarm: false },
+    { code: "LIM-BA", name: "Limmat-Baden",    basin: "Limmat", now: 207, next: 233, share:  8, alarm: false },
+  ];
+
   /* Insight context (right rail) */
   const context = {
     dataset: "swiss-river-1990",
@@ -298,5 +309,7 @@ const MOCK = (() => {
     /* v3 */
     datasets, manifest, columns, dataRows, runs, trainConfig,
     endpoint, codeSnippet, sessions, chatMessages, context,
+    /* v4 */
+    contributors,
   };
 })();

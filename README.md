@@ -62,11 +62,15 @@ What the screen says: *"You can call this from Python. Latency is single-digit m
 
 ### Insight — *Hex Magic / Julius AI / Cursor chat*
 
-```
-[ conversations ]   [ chat: user prompt → agent response with embedded forecast chart and source chips ]   [ context · reasoning trail ]
-```
+The Insight tab is **scrollable** and contains three stacked sections:
 
-What the screen says: *"Ask a question, get a sentence a hydrologist can act on. The chart and the data are linked back to the manifest, the model run, and the upstream sources."*
+1. **Conversation** (top, full viewport) — sessions sidebar, chat with user prompt → streamed agent response with embedded mini forecast chart + colour-coded source chips, context + reasoning trail right rail.
+2. **River network · live** (mid, full-width panel) — a credible Switzerland map (country outline, six major lakes, seven rivers — Rhine, Rhône, Aare, Reuss, Limmat, Inn, Ticino — and 30 stations with realistic placement). The at-risk Rhein-Basel station is pulse-marked, with the upstream Aare contributors (`AAR-BE`, `AAR-BG`, `AAR-TH`) highlighted. The right rail of the panel shows an `Affected basin` callout (drainage area, current vs T+18 h, flood threshold, probability) and a legend.
+3. **Upstream contributors** (bottom row) — five mini cards, one per major contributor station, each showing current m³/s, predicted at T+18 h, share of basin discharge, and a micro-bar visualising the share.
+
+During the live demo the page auto-scrolls from the chat down to the river-network section at t = 17.4 s — that's the credibility moment.
+
+What the screen says: *"Ask a question, get a sentence a hydrologist can act on. Then look at where the answer comes from on a real map of the basins."*
 
 ---
 
@@ -74,8 +78,8 @@ What the screen says: *"Ask a question, get a sentence a hydrologist can act on.
 
 | t | Beat |
 |---|------|
-| 0.0 s  | Hero overlay: wordmark `LIULIAN` reveals letter-by-letter; the `U` is red italic. |
-| 1.0 s  | Tagline: *"Modeling rivers, sensors, and signals — together, in time."* |
+| 0.0 s  | Hero overlay: wordmark `LIULIAN` reveals letter-by-letter; the `U` is red italic. Pretitle reads *"Liquid Intelligence · Unified Logic · Interactive Adaptive Networks"* — the canonical LIULIAN slogan. |
+| 1.0 s  | Tagline: *"Modeling rivers, sensors, signals. Together, in time."* |
 | 1.4 s  | Loader bar fills under "2 143 stations · 12 models". |
 | 2.4 s  | Hero fades. Top tab strip becomes visible. |
 | 2.5 s  | **Tab → Data.** Datasets list cascades; manifest types in; data table rows tick in. |
@@ -83,9 +87,9 @@ What the screen says: *"Ask a question, get a sentence a hydrologist can act on.
 | 10.0 s | **Tab → Inference.** Endpoint card visible; "Run inference" button flashes red; output chart materialises; latency badge counts 0 → 8 ms. |
 | 13.8 s | **Tab → Insight.** User question appears; typing dots; agent response streams in with red emphasis on `Rhein-Basel`, `2 400 m³/s`, `May 8 ~14:00 UTC`, `87 %`, and `elevated`. |
 | 16.6 s | Mini forecast chart slides into the agent bubble. |
-| 17.4 s | Second paragraph + source chips. |
+| 17.4 s | Page auto-scrolls down to the **River network · live** section. The Switzerland map paints country outline, six major lakes, seven rivers; 30 stations cascade in; the at-risk Rhein-Basel marker pulses with a halo. The right-rail callout populates the basin numbers. |
 | 18.4 s | Reasoning trail in the right rail marks each step done in sequence. |
-| 18.8 s | A single line slides in at the bottom: *"From manifest to forecast — in 24 hours."* |
+| 18.8 s | A single line slides in at the bottom: *"From manifest to forecast, in 24 hours."* |
 | 20.0 s | Hold. `?loop=1` reloads. |
 
 The four tab activations are the story beats. An investor watching once still gets the message just from the underline jumping across the tab strip.
@@ -136,7 +140,8 @@ Pure HTML / CSS / JS. No build step, no node_modules, no API calls. Total payloa
 | `?freeze=train`      | Freeze on the Train screen.                                         |
 | `?freeze=inference`  | Freeze on the Inference screen.                                     |
 | `?freeze=insight`    | Freeze on the Insight chat (with response complete).                |
-| `?freeze=finale`     | Freeze on Insight + closing stamp visible.                          |
+| `?freeze=map`        | Freeze on the river-network map (Insight scrolled to map section).  |
+| `?freeze=finale`     | Freeze on map + closing stamp visible.                              |
 | `?speed=2`           | Run the 20-second timeline at 2× speed.                             |
 | `?loop=1`            | Auto-reload at t = 20 s.                                            |
 

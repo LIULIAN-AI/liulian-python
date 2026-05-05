@@ -204,16 +204,16 @@ input, select { font-family: inherit; font-size: inherit; }
 }
 .hero-pretitle {
   font-family: var(--mono);
-  font-size: 11px; letter-spacing: 0.4em;
+  font-size: 10.5px; letter-spacing: 0.28em;
   color: var(--ink-muted); text-transform: uppercase;
   margin: 0 0 28px 0;
-  display: inline-flex; align-items: center; gap: 14px;
+  display: inline-flex; align-items: center; gap: 16px;
   opacity: 0;
   animation: fadeInDown 0.8s var(--ease-out) 0.1s forwards;
 }
 .hero-pretitle::before, .hero-pretitle::after {
   content: ""; display: block;
-  width: 60px; height: 1px;
+  width: 36px; height: 1px;
   background: var(--hairline-2);
 }
 .hero-wordmark {
@@ -703,6 +703,320 @@ input, select { font-family: inherit; font-size: inherit; }
 @keyframes stationPulse {
   0%   { r: 5;  opacity: 0.6; }
   100% { r: 18; opacity: 0; }
+}
+
+/* --- Realistic Swiss map (Insight river-network section) ----------- */
+.real-swiss-map {
+  width: 100%; height: 100%; display: block;
+}
+.real-swiss-map .rs-country {
+  fill: var(--paper-soft);
+  stroke: var(--ink-quiet);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 1px 0 rgba(0, 0, 0, 0.02));
+}
+.real-swiss-map .rs-lake {
+  fill: #DEEAF1;
+  stroke: #BBCEDB;
+  stroke-width: 0.8;
+}
+.real-swiss-map .rs-river {
+  fill: none;
+  stroke: #6F8AA1;
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1200;
+  stroke-dashoffset: 1200;
+  animation: drawLine 2.6s var(--ease-out) forwards;
+}
+.real-swiss-map .rs-station {
+  fill: var(--ink-faint);
+  stroke: white;
+  stroke-width: 1.2;
+  opacity: 0;
+  animation: stationPop 0.4s var(--ease-spring) forwards;
+}
+.real-swiss-map .rs-upstream {
+  fill: var(--ink);
+  stroke: white;
+  stroke-width: 1.4;
+}
+.real-swiss-map .rs-flagged {
+  fill: var(--bern);
+  stroke: white;
+  stroke-width: 2;
+  filter: drop-shadow(0 0 6px rgba(226, 6, 19, 0.35));
+  animation: stationPop 0.4s var(--ease-spring) 1.4s forwards, flagPulse 2.4s ease-in-out 1.8s infinite;
+}
+.real-swiss-map .rs-halo {
+  fill: rgba(226, 6, 19, 0.06);
+  stroke: rgba(226, 6, 19, 0.20);
+  stroke-width: 1;
+  opacity: 0;
+  animation: fadeIn 0.6s ease 1.6s forwards;
+}
+.real-swiss-map .rs-ripple {
+  fill: none;
+  stroke: var(--bern);
+  stroke-width: 1.2;
+  opacity: 0;
+  animation: rippleOut 2.4s ease-out 2.0s infinite;
+}
+@keyframes flagPulse {
+  0%, 100% { transform: scale(1);   transform-origin: center; }
+  50%      { transform: scale(1.18); }
+}
+@keyframes rippleOut {
+  0%   { r: 8;  opacity: 0.6; }
+  100% { r: 28; opacity: 0; }
+}
+.real-swiss-map .rs-annot-line {
+  stroke: var(--bern);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0;
+  animation: fadeIn 0.5s ease 2.0s forwards;
+}
+.real-swiss-map .rs-annot-label {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  fill: var(--bern);
+  opacity: 0;
+  animation: fadeIn 0.5s ease 2.2s forwards;
+}
+.real-swiss-map .rs-annot-value {
+  font-family: var(--mono);
+  font-size: 11px;
+  fill: var(--ink);
+  opacity: 0;
+  animation: fadeIn 0.5s ease 2.4s forwards;
+}
+.real-swiss-map .rs-annot-sub {
+  font-family: var(--mono);
+  font-size: 10px;
+  fill: var(--ink-muted);
+  opacity: 0;
+  animation: fadeIn 0.5s ease 2.6s forwards;
+}
+.real-swiss-map .rs-up-label {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  fill: var(--ink);
+  font-weight: 500;
+  opacity: 0;
+  animation: fadeIn 0.5s ease 2.4s forwards;
+}
+.real-swiss-map .rs-card {
+  font-family: var(--mono);
+  font-size: 10px;
+  fill: var(--ink-quiet);
+  letter-spacing: 0.08em;
+}
+.real-swiss-map .rs-city {
+  font-family: var(--sans);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  fill: var(--ink-muted);
+  pointer-events: none;
+}
+.real-swiss-map .rs-city.brand {
+  fill: var(--ink);
+}
+
+/* --- Insight scrollable layout ------------------------------------- */
+.screen[data-screen="insight"] {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+  height: 100%;
+}
+.insight-top {
+  display: grid;
+  grid-template-columns: 232px 1fr 240px;
+  gap: 14px;
+  height: 540px;
+  flex-shrink: 0;
+}
+.insight-river-section {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: 14px;
+  height: 460px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  padding: 16px 20px;
+}
+.insight-river-section .map-host {
+  position: relative;
+  min-height: 0;
+}
+.insight-river-section .map-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.insight-river-section h3 {
+  margin: 0 0 12px 0;
+  font-family: var(--sans);
+  font-size: var(--t-md);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.insight-river-section h3 .meta {
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  font-weight: 400;
+  color: var(--ink-muted);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.river-legend {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 12px 14px;
+  background: var(--paper-soft);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+}
+.river-legend .leg {
+  display: grid; grid-template-columns: 18px 1fr;
+  gap: 10px;
+  font-size: var(--t-sm);
+  align-items: center;
+  color: var(--ink-soft);
+}
+.river-legend .leg .swatch {
+  width: 14px; height: 4px;
+  border-radius: 2px;
+  display: inline-block;
+}
+.river-legend .leg .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-left: 5px;
+}
+.river-legend .leg .dot.gray { background: var(--ink-faint); }
+.river-legend .leg .dot.dark { background: var(--ink); }
+.river-legend .leg .dot.red  {
+  background: var(--bern);
+  box-shadow: 0 0 0 2px rgba(226, 6, 19, 0.15);
+}
+.river-legend .leg .swatch.river { background: #6F8AA1; }
+.river-legend .leg .swatch.lake  { background: #DEEAF1; border: 1px solid #BBCEDB; height: 6px; }
+
+.basin-callout {
+  border: 1px solid var(--bern);
+  background: var(--bern-pale);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.basin-callout .callout-title {
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: var(--bern-deep);
+  margin-bottom: 6px;
+}
+.basin-callout .callout-name {
+  font-family: var(--serif);
+  font-size: var(--t-xl);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+.basin-callout .callout-rows {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: var(--t-sm);
+}
+.basin-callout .callout-rows .row {
+  display: flex; justify-content: space-between;
+  gap: 14px;
+}
+.basin-callout .callout-rows .lab { color: var(--ink-muted); }
+.basin-callout .callout-rows .v {
+  font-family: var(--mono);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+.basin-callout .callout-rows .v.alarm {
+  color: var(--bern);
+}
+
+/* --- Upstream contributors row ------------------------------------ */
+.insight-contributors {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  flex-shrink: 0;
+}
+.contrib-card {
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  padding: 12px 14px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.contrib-card .head {
+  display: flex; align-items: center; justify-content: space-between;
+}
+.contrib-card .code {
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  font-weight: 600;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+}
+.contrib-card .pct {
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--paper-soft);
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+.contrib-card .pct.high {
+  background: var(--bern-pale);
+  color: var(--bern-deep);
+}
+.contrib-card .name {
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--ink);
+}
+.contrib-card .row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  font-family: var(--mono);
+  font-size: var(--t-sm);
+  font-variant-numeric: tabular-nums;
+}
+.contrib-card .row .lab {
+  color: var(--ink-muted);
+  font-size: var(--t-xs);
+}
+.contrib-card .row .now { color: var(--ink); }
+.contrib-card .row .next { color: var(--bern); font-weight: 600; }
+.contrib-card .micro-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--paper-soft);
+  position: relative; overflow: hidden;
+}
+.contrib-card .micro-bar .fill {
+  position: absolute; inset: 0 auto 0 0;
+  background: var(--bern);
 }
 
 /* --- 10. Train screen ---------------------------------------------- */
