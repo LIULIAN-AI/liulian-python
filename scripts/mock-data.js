@@ -136,8 +136,167 @@ const MOCK = (() => {
     { t: ". Recommend hydrology team review before 2026-05-07T18:00Z." },
   ];
 
+  /* ---- v3 additions: per-screen content -------------------------- */
+
+  /* Datasets list (data screen sidebar) */
+  const datasets = [
+    { id: "swiss-river-1990", name: "swiss-river-1990", span: "1990 – 2026", count: "2 143", selected: true },
+    { id: "swiss-river-2000", name: "swiss-river-2000", span: "2000 – 2026", count: "1 892" },
+    { id: "mch-radar-2020",   name: "mch-radar-2020",   span: "2020 – 2026", count: "5 × 5 km grid" },
+    { id: "smn-meteo-1980",   name: "smn-meteo-1980",   span: "1980 – 2026", count: "468" },
+    { id: "glaciers-vaw",     name: "glaciers-vaw",     span: "1959 – 2024", count: "21 sites" },
+  ];
+
+  /* Manifest YAML text (data screen, code block) */
+  const manifest = [
+    'name: swiss-river-1990',
+    'schema: hydro-v2',
+    'freq: 10min',
+    'span: ["1990-01-01", "2026-05-05"]',
+    'stations: 2143',
+    'integrity:',
+    '  algo: sha256',
+    '  digest: a3b4c1f2…',
+    'columns: [ts, station, value, qc, basin, lat, lon, elev]',
+    'license: CC-BY-4.0',
+  ];
+
+  /* Schema columns (data screen sidebar) */
+  const columns = [
+    { name: "ts",       type: "datetime[UTC]", null: false },
+    { name: "station",  type: "str",           null: false },
+    { name: "value",    type: "float32",       null: true  },
+    { name: "qc",       type: "uint8",         null: false },
+    { name: "basin",    type: "str",           null: false },
+    { name: "lat",      type: "float32",       null: false },
+    { name: "lon",      type: "float32",       null: false },
+    { name: "elev",     type: "int16",         null: true  },
+  ];
+
+  /* Data preview rows (data screen main) */
+  const dataRows = [
+    ["2026-05-05 14:38:00", "RHE-BS", "1342.7", "0", "Rhein"],
+    ["2026-05-05 14:37:50", "AAR-BE", " 548.2", "0", "Aare"],
+    ["2026-05-05 14:37:40", "RHE-DI", " 412.6", "1", "Rhein"],
+    ["2026-05-05 14:37:30", "INN-SC", "  89.1", "0", "Inn"],
+    ["2026-05-05 14:37:20", "REU-LZ", " 271.9", "0", "Reuss"],
+    ["2026-05-05 14:37:10", "TIC-BL", " 156.4", "0", "Ticino"],
+    ["2026-05-05 14:37:00", "LIM-BA", " 207.6", "0", "Limmat"],
+    ["2026-05-05 14:36:50", "RHO-SI", " 234.1", "0", "Rhône"],
+  ];
+
+  /* Training runs table (train screen) */
+  const runs = [
+    { id: "t-002", model: "Transformer-E", status: "running", mse: 0.0418, epoch: "56/80", time: "14:23", best: true  },
+    { id: "t-001", model: "DLinear-E",     status: "done",    mse: 0.0432, epoch: "80/80", time: "09:48" },
+    { id: "t-000", model: "Mamba",         status: "done",    mse: 0.0451, epoch: "80/80", time: "12:11" },
+    { id: "t-aaf", model: "LSTM",          status: "done",    mse: 0.0476, epoch: "80/80", time: "06:15" },
+    { id: "t-93c", model: "ETSformer",     status: "done",    mse: 0.0492, epoch: "80/80", time: "11:02" },
+    { id: "t-77b", model: "TSMixer",       status: "done",    mse: 0.0514, epoch: "80/80", time: "07:38" },
+    { id: "t-55a", model: "DLinear",       status: "failed",  mse: null,   epoch: "32/80", time: "04:18" },
+  ];
+
+  /* Training config YAML (train screen, code block) */
+  const trainConfig = [
+    'model: transformer',
+    'dim: 128',
+    'layers: 4',
+    'heads: 8',
+    'entity_mode: hash',
+    'lr: 3e-4',
+    'batch: 64',
+    'epochs: 80',
+    'optimizer: adamw',
+    'scheduler: cosine',
+  ];
+
+  /* Inference endpoint info */
+  const endpoint = {
+    method: "POST",
+    url:    "api.liulian.ch/v1/forecast",
+    desc:   "Forecast discharge at any Swiss station, 1–72 h horizon.",
+    p50:    "2.3 ms",
+    p99:    "8 ms",
+    rps:    "1 240 req/s",
+  };
+
+  /* Inference code snippet (Python) */
+  const codeSnippet = [
+    'from liulian import client',
+    '',
+    'resp = client.forecast(',
+    '    station="RHE-BS",',
+    '    horizon=24,',
+    '    ci=0.95,',
+    ')',
+    'print(resp.crossing)',
+    '# 2026-05-08T14:00Z, p=0.87, elevated',
+  ];
+
+  /* Insight sessions (chat sidebar) */
+  const sessions = [
+    { id: "s-now",  title: "Flood risk this week",     when: "now",       active: true },
+    { id: "s-001",  title: "Aare-Bern anomaly review", when: "yesterday" },
+    { id: "s-002",  title: "Compare 2025 vs 2026",     when: "Apr 30" },
+    { id: "s-003",  title: "Glacier melt scenario",    when: "Apr 24" },
+    { id: "s-004",  title: "Sensor 412 outage",        when: "Apr 18" },
+  ];
+
+  /* Insight chat content */
+  const chatMessages = [
+    {
+      role: "user",
+      time: "14:38",
+      text: "Is there flood risk in the next 7 days?",
+    },
+    {
+      role: "agent",
+      time: "14:38",
+      author: "Insight",
+      // segments either ASCII text or { strong, risk } markers — typed sequentially
+      segments: [
+        { t: "Yes. " },
+        { t: "Rhein-Basel", strong: true },
+        { t: " is forecast to exceed " },
+        { t: "2 400 m³/s", strong: true },
+        { t: " on " },
+        { t: "May 8, ~14:00 UTC", strong: true },
+        { t: ", with " },
+        { t: "87 %", strong: true },
+        { t: " confidence (" },
+        { t: "elevated", risk: true },
+        { t: ").\n\n" },
+        { chart: true },
+        { t: "\n\nThe crossing happens 18 hours from now. Confidence is tight (±60 m³/s); the upstream Aare contribution is well observed by Aare-Bern (AAR-BE) and Aare-Brugg (AAR-BG)." },
+      ],
+      sources: [
+        { name: "swiss-river-1990",            kind: "data" },
+        { name: "transformer-entity-aware-v3", kind: "model" },
+        { name: "run t-002",                   kind: "run" },
+        { name: "MCH precip 24h",              kind: "data" },
+      ],
+    },
+  ];
+
+  /* Insight context (right rail) */
+  const context = {
+    dataset: "swiss-river-1990",
+    model:   "transformer-entity-aware-v3",
+    runId:   "t-002",
+    sources: 4,
+    trail: [
+      { label: "Fetch data",      done: true  },
+      { label: "Run forecast",    done: true  },
+      { label: "Reason over CI",  done: true  },
+      { label: "Compose answer",  done: true  },
+    ],
+  };
+
   return {
     stations, rivers, topoLines, streamSamples,
     lossCurve, hpoRows, forecast, kpis, insightCards, insightText,
+    /* v3 */
+    datasets, manifest, columns, dataRows, runs, trainConfig,
+    endpoint, codeSnippet, sessions, chatMessages, context,
   };
 })();

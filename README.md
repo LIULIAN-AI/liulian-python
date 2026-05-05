@@ -1,112 +1,119 @@
 # LIULIAN — GUI Demo
 
-A self-contained, frontend-only product demo of the **LIULIAN Spatiotemporal Research Platform** for the University of Bern × ETH hydrology workflow. The page is designed to be recorded once as a 20-second video or animated GIF and dropped into a slide for an investor / stakeholder presentation.
+A self-contained, frontend-only product demo of the **LIULIAN spatiotemporal research platform** (UniBE × ETH hydrology workflow). The page is built as a **four-screen product tour** — Data → Train → Inference → Insight — and is meant to be screen-recorded once as a 20-second video or animated GIF and dropped into a presentation slide.
 
 ```
 .worktrees/gui-demo/
-├── index.html              page structure
-├── styles/main.css         design system + components
+├── index.html                  page structure (top nav + 4 screens)
+├── styles/main.css             design system + components
 ├── scripts/
-│   ├── mock-data.js        illustrative datasets (no real telemetry)
-│   ├── charts.js           SVG renderers (map / loss / forecast / spark)
-│   └── scene-controller.js 20-second timeline orchestrator
-├── screenshots/            captured stage references
-└── README.md               this file
+│   ├── mock-data.js            illustrative datasets (no real telemetry)
+│   ├── charts.js               SVG renderers (map / loss / forecast / spark)
+│   └── scene-controller.js     20-second timeline orchestrator
+├── screenshots/
+│   ├── final_01_hero.png       hero (t = 1.5 s)
+│   ├── final_02_data.png       data screen
+│   ├── final_03_train.png      train screen
+│   ├── final_04_inference.png  inference screen
+│   ├── final_05_insight.png    insight screen
+│   ├── final_06_finale.png     insight + closing stamp
+│   ├── iter01_*.png            rejected dark/cyan design (kept for log)
+│   ├── iter02_*.png            rejected single-page bento (kept for log)
+│   └── iter03_*.png            this revision in progress
+├── docs/
+│   ├── screens-design.md       multi-screen design specification
+│   └── design-report.md        end-to-end design report
+└── README.md                   this file
 ```
 
-The branch (`feat/gui-demo`) is intentionally an **orphan branch** — only the demo code lives here, with no inheritance from the main research codebase, so it can be served, embedded, or shipped without the wider Python project.
+The branch (`feat/gui-demo`) is intentionally an **orphan branch** so the demo ships independently of the main research codebase.
 
 ---
 
-## Why this exists
+## The four screens
 
-LIULIAN is a research framework. Investors and external collaborators do not benchmark against `pytest -v`; they look at a screen and ask **"what does this team actually ship?"** The demo answers that question in twenty seconds:
+The demo is structured exactly the way real research/data tools are structured: a top tab strip switches between purpose-built workspaces. Reference products in parentheses.
 
-1. We have a real **data substrate** (Swiss-River 1990 — 2026, 2 143 stations).
-2. We have a real **model atelier** (LSTM, Transformer, DLinear, Mamba, ETSformer, TSMixer — entity-aware variants).
-3. We have a real **inference engine** (24-hour discharge forecast with 95 % CI).
-4. We have a real **insight layer** (natural-language risk briefs grounded in the forecast).
+### Data — *Snowflake catalog × Hex Magic*
 
-Each of those four claims maps to one card on the dashboard.
+```
+[ datasets sidebar ] [ manifest.yaml + data preview table ] [ schema · integrity · coverage + mini map ]
+```
 
----
+What the screen says: *"We have a real data substrate. The schema is verified, the manifest is hashed, 2 138 of 2 143 stations are streaming."*
 
-## Design language
+### Train — *Weights & Biases*
 
-| Aspect | Choice | Rationale |
-|---|---|---|
-| Canvas | Warm paper `#FBFBFA` + faint grain | Editorial document feel, not a "neon SaaS" |
-| Accent | UniBE red `#E20613` (used sparingly) | Brand-correct, semantically loaded — predictions, alerts, active stations |
-| Display type | `Fraunces` variable serif (italic for the accent character) | Editorial, distinctive, plays well with the red |
-| Body type | `Switzer` | Geometric-humanist, none of the Inter/Roboto generic look |
-| Mono | `JetBrains Mono` | Standard for technical labels and tabular numerals |
-| Card chrome | `1px solid #EAEAEA`, 10 px radius, no shadow | Per `minimalist-ui` audit rules — restraint over ornament |
-| Motion | Pure `transform` + `opacity` only, < 1 s curves | Quiet sophistication, never spectacle |
-| Status pills | Desaturated pastels (`#EDF3EC`, `#FDEBEC`, `#E1F3FE`) | Color-by-meaning, not by decoration |
+```
+[ run header · live loss curve · 4 metric cards · config.yaml ]   [ filterable runs table ]
+```
 
-What we explicitly **avoided** (to remove the AI-generic look):
+What the screen says: *"We train models. The active Transformer-E run is at epoch 56/80, val MSE 0.0418 — 18.6 % below baseline. Five other architectures are ranked behind it in the runs table."*
 
-- No cyan / purple gradient meshes
-- No neon `box-shadow` or SVG `feGaussianBlur` glow
-- No glassmorphism beyond a `backdrop-filter` on the topbar
-- No `Inter` / `Roboto` / `Open Sans`
-- No emoji icons
-- No copy clichés ("Elevate", "Seamless", "Unleash", "Next-Gen")
-- No purple-on-white gradients
+### Inference — *Replicate / Hugging Face Inference Endpoints*
 
-These constraints come from the bundled `minimalist-ui` skill, which was used as the audit checklist during iteration 2.
+```
+[ POST  api.liulian.ch/v1/forecast    p50 2.3 ms · p99 8 ms · 1 240 r/s ]
+[ inputs ]  [ output forecast chart with 95 % CI band, threshold, marker ]
+[ python code snippet ]
+```
 
----
+What the screen says: *"You can call this from Python. Latency is single-digit ms. The output already includes a threshold-crossing point and a probability."*
 
-## The 20-second timeline
+### Insight — *Hex Magic / Julius AI / Cursor chat*
 
-Wall-clock seconds, all triggered by `scripts/scene-controller.js`:
+```
+[ conversations ]   [ chat: user prompt → agent response with embedded forecast chart and source chips ]   [ context · reasoning trail ]
+```
 
-| t        | Event                                                                              |
-|----------|------------------------------------------------------------------------------------|
-| 0.0 s    | Hero overlay paints. Wordmark `LIULIAN` reveals letter-by-letter; the `U` is the red italic accent. |
-| 1.4 s    | Loader bar fills under "2 143 sensors · 12 models · 4 agents".                     |
-| 2.6 s    | Hero starts to fade out (opacity + 1.5 % scale).                                   |
-| 3.0 s    | **Data Agent** card reveals. Swiss river map draws — country outline, then 4 river paths, then 15 station markers cascading. Two stations glow red (active). |
-| 3.25 s   | **Live Discharge** stream begins, one row every 340 ms. `RHE-DI` and `THU-AN` flagged `RISE`. |
-| 3.5 s    | **Ingestion KPIs** cards mount with red sparklines.                                |
-| 5.0 s    | **Training** card reveals. Train (red solid) and val (charcoal dashed) loss curves draw across 80 epochs. Live meta numbers tick: epoch 0/80 → 80/80, GPU 78 %, val MSE 0.0418. |
-| 5.4 s    | **HPO leaderboard** cascades in: Transformer, DLinear+E, Mamba, LSTM, ETSformer, TSMixer. Top row pinned in red. |
-| 8.4 s    | **Insight Agent** card reveals.                                                    |
-| 8.7 s    | **Forecast** card reveals — observed (charcoal) + predicted (red) lines draw, 95 % CI band materialises behind. |
-| 9.0 s    | **Insight typing** begins: a multi-segment natural-language brief streams in at ~80 char/s, with `RHEIN-BASEL`, `2 400 m³/s`, `MAY 8 14:00 UTC`, `87 %` highlighted in red and `ELEVATED` rendered as a red pill. |
-| 9.0–14.5 s | The pipeline trail (`Data fetched → Forecast computed → Reasoning → Alert dispatch`) progresses one step at a time. |
-| 14.0 s   | Insight typing completes; cursor disappears.                                       |
-| 15.7 s   | **End-to-End** stamp slides in at the bottom centre — a black-on-white pill with a red signal dot. |
-| 17.0 s   | Forecast threshold-crossing marker pulses to draw the eye.                         |
-| 18.0–20 s | Hold on the full dashboard.                                                        |
-
-`?loop=1` reloads at 20 s for unattended recording. `?freeze=hero|data|train|insight|finale` pauses at a stage for screenshotting. `?speed=2` doubles the timeline.
+What the screen says: *"Ask a question, get a sentence a hydrologist can act on. The chart and the data are linked back to the manifest, the model run, and the upstream sources."*
 
 ---
 
-## Module reference
+## The 20-second tour
 
-### Data Agent (`.card.data-agent`)
-A bare Switzerland silhouette with four river paths and fifteen sensor stations. Two stations (Rhein-Basel and Aare-Bern) are coloured red and pulse — these are the basins under active forecasting load. The bottom-left chip surfaces the manifest filename, the SHA-256 verification result, and the cache hit-state — three claims that map directly to LIULIAN's data-contract architecture in the main repo.
+| t | Beat |
+|---|------|
+| 0.0 s  | Hero overlay: wordmark `LIULIAN` reveals letter-by-letter; the `U` is red italic. |
+| 1.0 s  | Tagline: *"Modeling rivers, sensors, and signals — together, in time."* |
+| 1.4 s  | Loader bar fills under "2 143 stations · 12 models". |
+| 2.4 s  | Hero fades. Top tab strip becomes visible. |
+| 2.5 s  | **Tab → Data.** Datasets list cascades; manifest types in; data table rows tick in. |
+| 6.0 s  | **Tab → Train.** Loss chart axis appears, train line draws over 2 s, then val (dashed); metric cards count up; runs table cascades; config.yaml types in. |
+| 10.0 s | **Tab → Inference.** Endpoint card visible; "Run inference" button flashes red; output chart materialises; latency badge counts 0 → 8 ms. |
+| 13.8 s | **Tab → Insight.** User question appears; typing dots; agent response streams in with red emphasis on `Rhein-Basel`, `2 400 m³/s`, `May 8 ~14:00 UTC`, `87 %`, and `elevated`. |
+| 16.6 s | Mini forecast chart slides into the agent bubble. |
+| 17.4 s | Second paragraph + source chips. |
+| 18.4 s | Reasoning trail in the right rail marks each step done in sequence. |
+| 18.8 s | A single line slides in at the bottom: *"From manifest to forecast — in 24 hours."* |
+| 20.0 s | Hold. `?loop=1` reloads. |
 
-### Live Discharge (`.card.data-stream`)
-A scrolling table of `(timestamp, station code, m³/s value, status tag)` rows. Rows tagged `RISE` are flagged in red; the rest are pale green. The panel updates continuously to convey "this is a live feed" without being noisy.
+The four tab activations are the story beats. An investor watching once still gets the message just from the underline jumping across the tab strip.
 
-### Ingestion KPIs (`.card.data-kpi`)
-Four KPI cards: stations online, records today, manifest hash status, p99 latency. Each carries a 16-point sparkline. Numbers use Fraunces with optical-size 60 for editorial presence.
+---
 
-### Training (`.card.training`)
-The classic train/val loss-vs-epoch view, but rendered Swiss-style — solid red train, dashed charcoal val, no neon. Below the curves: live epoch / loss / learning-rate / GPU utilisation.
+## Why this revision exists
 
-### HPO Leaderboard (`.card.hpo`)
-Six rows from Ray Tune ASHA. The top row is pinned with the UniBE red treatment (red border, red text, pale red surface). Each row exposes the configuration string in monospace so an evaluator can read the actual hyperparameters.
+This branch went through three iterations. All are kept in `screenshots/` for reference.
 
-### Insight Agent (`.card.insight`)
-Two parts. The italic Fraunces brief is a typed-out natural-language summary that calls out the basin, the threshold, the timestamp, and the confidence. Below sit four KPI tiles, including an `ELEVATED` alert tile in red. A four-step pipeline trail at the bottom shows the progression `Data fetched → Forecast computed → Reasoning → Alert dispatch`.
+- **iter01** — dark canvas + cyan + violet + amber + gradient mesh + topographic-line backgrounds. Visually striking, but read as the same template every AI-generated mockup uses on the public internet. Rejected.
+- **iter02** — light paper canvas, UniBE red, single-page bento dashboard with 7 cards. Less AI-generic, but the bento pattern itself is a tell — investors see "yet another AI dashboard" in the layout. Rejected.
+- **iter03** *(this revision)* — split into four screens, each modelled after a real industry tool. Tab-switched. The product *is* the ornament; almost no decoration remains. The iter01 and iter02 screenshots stay in the repo as part of the audit log.
 
-### Forecast (`.card.forecast`)
-A 6-day horizon for Rhein-Basel discharge: charcoal observed series, red predicted continuation, faint red 95 % CI band, dashed `NOW` line, deep-red flood threshold at 2 400 m³/s, and a red marker on the predicted threshold-crossing point at T+18 h. The marker pulses three times at t = 17 s for emphasis.
+Specific patterns deliberately removed across the journey:
+
+- ☑ No bento grid / single-page dashboard.
+- ☑ No "Agent" suffix in visible UI titles.
+- ☑ No corner brackets, rotated side marks, or scan-line effects.
+- ☑ No all-caps "STREAMING" / "ELEVATED" / "LIVE" pills with extreme letter-spacing.
+- ☑ No mono eyebrow above every section.
+- ☑ No display-serif title above every working pane (Fraunces is used only for the hero wordmark and the brand name in the topbar).
+- ☑ No `Inter` / `Roboto` / `Open Sans` / `Lucide`.
+- ☑ No glow filters, no purple gradient, no neon.
+- ☑ No emoji.
+- ☑ No copy clichés ("Production Ready", "End-to-End Orchestration", "Spatiotemporal Intelligence", "Where space and time converge…").
+
+Words actually used on the page: `Run`, `Endpoint`, `Latency`, `Throughput`, `Schema`, `Source`, `Send`, `Step`, `Epoch`, `val MSE`. These are the actual nouns of working ML tools.
 
 ---
 
@@ -118,41 +125,35 @@ python3 -m http.server 8765 --bind 127.0.0.1
 # then open http://127.0.0.1:8765/index.html
 ```
 
-The page is pure HTML / CSS / JS — no build step, no node_modules, no API. Mock data is hardcoded in `scripts/mock-data.js`.
+Pure HTML / CSS / JS. No build step, no node_modules, no API calls. Total payload is well under 100 KB plus the Google Fonts and Fontshare CDN requests.
 
 ### URL parameters
 
-| Param | Effect |
-|---|---|
-| `?freeze=hero` | Stop after the hero stage (~1.5 s in). Useful for capturing the brand reveal. |
-| `?freeze=data` | Stop after the data row reveals (~4.5 s in). |
-| `?freeze=train` | Stop after the training row reveals (~7.5 s in). |
-| `?freeze=insight` | Stop after the insight row reveals and typing has run (~13.5 s in). |
-| `?freeze=finale` | Stop in the final hold (~19 s in) — the badge will be visible. |
-| `?speed=2` | Double-time the whole timeline. |
-| `?loop=1` | Auto-reload at t = 20 s — for unattended video capture. |
+| Param                | Effect                                                              |
+|----------------------|---------------------------------------------------------------------|
+| `?freeze=hero`       | Freeze on the hero wordmark.                                        |
+| `?freeze=data`       | Freeze on the Data screen.                                          |
+| `?freeze=train`      | Freeze on the Train screen.                                         |
+| `?freeze=inference`  | Freeze on the Inference screen.                                     |
+| `?freeze=insight`    | Freeze on the Insight chat (with response complete).                |
+| `?freeze=finale`     | Freeze on Insight + closing stamp visible.                          |
+| `?speed=2`           | Run the 20-second timeline at 2× speed.                             |
+| `?loop=1`            | Auto-reload at t = 20 s.                                            |
 
 ---
 
-## Recording the demo
+## Recording
 
-For a slide deck, the simplest workflow is screen-record at 1080p / 60 fps for 20 seconds, then either embed the resulting MP4 or convert to GIF (`ffmpeg -i in.mp4 -vf "fps=24,scale=1280:-1:flags=lanczos" out.gif`).
+For a slide deck, screen-record at 1920×1080 / 60 fps for 20 seconds, then either embed the resulting MP4 or convert to GIF:
 
-A `?loop=1` URL is helpful if your recording tool needs a few seconds of head-room — the page resets cleanly every 20 seconds.
+```bash
+ffmpeg -i in.mp4 -vf "fps=24,scale=1280:-1:flags=lanczos" out.gif
+```
 
----
-
-## What was iterated
-
-This was built in two visible passes, both captured in `screenshots/`:
-
-- **Iteration 1** — Editorial dark theme with cyan accent and SVG glow filters. Worked aesthetically but felt "AI-generic" (the very same dark + cyan + topographic-line look one sees on auto-generated AI landing pages).
-- **Iteration 2** — Full repaint to a paper canvas with UniBE red as the only accent, audited against the `minimalist-ui` skill: no cyan, no glow, no gradient mesh, no Inter/Roboto, no AI marketing clichés, and copy rewritten to be plainly descriptive ("Modeling rivers, sensors, and signals — together, in time" replaces the original "Where space and time converge in intelligence").
-
-The contrast between the two iterations is the most important artefact the demo carries with it: it shows we noticed and corrected the generic look rather than shipping it.
+`?loop=1` is helpful if your recording tool needs head-room — the page resets cleanly every 20 seconds.
 
 ---
 
 ## License
 
-Same as the parent LIULIAN project. Mock data is illustrative — no real telemetry from any operator is reproduced.
+Same as the parent LIULIAN project. All on-screen data is illustrative; no real operator telemetry is reproduced.
