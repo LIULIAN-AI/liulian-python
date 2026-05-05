@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>LIULIAN · Spatiotemporal Intelligence Platform</title>
+  <meta name="viewport" content="width=1920" />
+  <meta name="description" content="LIULIAN — task-driven research framework for spatiotemporal forecasting, hyperparameter search, and explainable BI." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=switzer@200,300,400,500,600,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+
+  <!-- Decorative SVG defs -->
+  <svg class="svg-defs" aria-hidden="true">
+    <defs>
+      <filter id="glow"><feGaussianBlur stdDeviation="2"/></filter>
+    </defs>
+  </svg>
+
+  <!-- ============================================================
+       Top bar
+       ============================================================ -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"></div>
+      <span class="brand-name">LIULIAN</span>
+      <span class="brand-sub">Spatiotemporal Research Platform · UniBE × ETH</span>
+    </div>
+
+    <div class="topbar-center">
+      <span class="crumb">Workbench</span>
+      <span class="sep">/</span>
+      <span class="crumb">Swiss-River 1990 – 2026</span>
+      <span class="sep">/</span>
+      <span class="crumb active">Live Forecasting</span>
+    </div>
+
+    <div class="topbar-right">
+      <span class="live-pill"><span class="live-dot"></span>LIVE</span>
+      <span data-clock>14:38:02 UTC</span>
+      <span>Bern · Hydrology Lab</span>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       Hero overlay (first 3 s)
+       ============================================================ -->
+  <section class="hero" aria-label="LIULIAN platform introduction">
+    <div class="hero-side-mark">University of Bern · Spatiotemporal Research</div>
+    <div class="hero-side-mark right">Liulian Platform · Build 0.9.4 · 2026</div>
+    <div class="hero-inner">
+      <div class="hero-pretitle">Spatiotemporal Research Platform</div>
+      <h1 class="hero-wordmark">LIULIAN</h1>
+      <p class="hero-tagline">Modeling <em>rivers</em>, sensors, and signals — together, in <em>time</em>.</p>
+      <div class="hero-loader">
+        <div class="hero-loader-text">
+          <span>Loading substrate</span>
+          <span><span class="num">2 143</span> sensors · <span class="num">12</span> models · <span class="num">4</span> agents</span>
+        </div>
+        <div class="hero-loader-bar"></div>
+      </div>
+      <div class="hero-stamp">
+        <span class="marker"></span>
+        <span>Data Agent · Model Atelier · Inference · Insight</span>
+        <span class="marker"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       Stage / bento grid
+       ============================================================ -->
+  <main class="stage">
+
+    <!-- Data Agent ----------------------------------------------- -->
+    <article class="card data-agent">
+      <header class="card-head">
+        <div>
+          <div class="card-eyebrow">Data Agent · Spatial Topology</div>
+          <h2 class="card-title">Sensor Network — Swiss River Basin</h2>
+        </div>
+        <span class="card-status"><span class="dot"></span>Streaming</span>
+      </header>
+
+      <div class="map-frame">
+        <div class="map-stat-strip">
+          <span>Stations <span class="v">2 143</span></span>
+          <span>Active <span class="v red">2 138</span></span>
+          <span>Window <span class="v">1989 — 2026</span></span>
+        </div>
+        <div class="map-overlay">
+          <div class="row"><span class="lab">Manifest</span><span class="val">swiss-river-1990.yaml</span></div>
+          <div class="row"><span class="lab">Integrity</span><span class="val red">sha256 verified</span></div>
+          <div class="row"><span class="lab">Cache</span><span class="val">L1 47 ms · L2 hot</span></div>
+        </div>
+      </div>
+    </article>
+
+    <!-- Stream / live data --------------------------------------- -->
+    <article class="card data-stream">
+      <header class="card-head">
+        <div>
+          <div class="card-eyebrow">Stream · Telemetry</div>
+          <h2 class="card-title">Live Discharge</h2>
+        </div>
+        <span class="card-status"><span class="dot"></span>1.2K req/s</span>
+      </header>
+      <div class="stream-table"></div>
+    </article>
+
+    <!-- KPI grid -------------------------------------------------- -->
+    <article class="card data-kpi">
+      <header class="card-head">
+        <div>
+          <div class="card-eyebrow">Pipeline · Health</div>
+          <h2 class="card-title">Ingestion KPIs</h2>
+        </div>
+        <span class="card-status"><span class="dot"></span>Healthy</span>
+      </header>
+      <div class="kpi-grid"></div>
+    </article>
+
+    <!-- Training -------------------------------------------------- -->
+    <article class="card training">
+      <header class="card-head">
+        <div>
+          <div class="card-eyebrow">Model Atelier · Adapter Pattern</div>
+          <h2 class="card-title">Training Run · Transformer (entity-aware)</h2>
+        </div>
+        <span class="card-status"><span class="dot"></span>Epoch 80/80</span>
+      </header>
+
+      <div class="training-grid">
+        <div class="loss-chart">
+          <div class="legend">
+            <span class="train"><span class="swatch"></span>train</span>
+            <span class="val"><span class="swatch"></span>val</span>
+          </div>
+        </div>
+        <div class="training-meta">
+          <div class="item"><div class="lab">Epoch</div><div class="val cyan" data-meta="epoch">80/80</div></div>
+          <div class="item"><div class="lab">Val MSE</div><div class="val" data-meta="loss">0.0418</div></div>
+          <div class="item"><div class="lab">LR</div><div class="val" data-meta="lr">3.0e-4</div></div>
+          <div class="item"><div class="lab">GPU</div><div class="val jade" data-meta="gpu">78.4%</div></div>
+        </div>
+      </div>
+    </article>
+
+    <!-- HPO leaderboard ------------------------------------------- -->
+    <article class="card hpo">
+      <header class="card-head">
+        <div>
+          <div class="card-eyebrow">Optimiser · Ray Tune</div>
+          <h2 class="card-title">HPO Leaderboard</h2>
+        </div>
+        <span class="card-status"><span class="dot"></span>48 trials</span>
+      </header>
+      <div class="hpo-list"></div>
+      <div class="hpo-meta">
+        <span>Search · ASHA</span>
+        <span>Best <span class="v">0.0418 MSE</span></span>
+        <span>−18.6% vs base</span>
+      </div>
+    </article>
+
+    <!-- Insight (BI) --------------------------------------------- -->
+    <article class="card insight">
+      <header class="card-head">
+        <div>
+          <div class="card-eyebrow">Insight Agent · Natural-Language Brief</div>
+          <h2 class="card-title">Reasoned Forecast Brief</h2>
+        </div>
+        <span class="card-status warn"><span class="dot"></span>Risk Elevated</span>
+      </header>
+
+      <div class="insight-grid">
+        <div class="insight-summary">
+          <span class="agent-tag">INSIGHT AGENT</span>
+        </div>
+        <div class="insight-cards"></div>
+        <div class="insight-trail">
+          <span class="step done">Data fetched</span>
+          <span class="sep">→</span>
+          <span class="step active">Forecast computed</span>
+          <span class="sep">→</span>
+          <span class="step pending">Reasoning</span>
+          <span class="sep">→</span>
+          <span class="step pending">Alert dispatch</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- Forecast chart ------------------------------------------- -->
+    <article class="card forecast">
+      <header class="card-head">
+        <div>
+          <div class="card-eyebrow">Inference Engine · 24 h horizon</div>
+          <h2 class="card-title">Discharge Forecast — Rhein-Basel</h2>
+        </div>
+        <span class="card-status"><span class="dot"></span>2.3 ms p50</span>
+      </header>
+
+      <div class="forecast-chart">
+        <div class="legend">
+          <span class="actual"><span class="swatch"></span>Observed</span>
+          <span class="pred"><span class="swatch"></span>Predicted</span>
+          <span class="ci"><span class="swatch"></span>95% CI</span>
+        </div>
+      </div>
+    </article>
+
+  </main>
+
+  <!-- ============================================================
+       Status bar (footer)
+       ============================================================ -->
+  <footer class="status-bar">
+    <div class="left">
+      <span class="ticker">Phase <span class="v">Production</span></span>
+      <span class="ticker">Experiments <span class="v">1 284</span></span>
+      <span class="ticker">Artifacts <span class="v">42.7 GB</span></span>
+    </div>
+    <div class="center">
+      <span>Init &nbsp;·&nbsp; Train &nbsp;·&nbsp; Eval &nbsp;·&nbsp; Infer &nbsp;·&nbsp; Completed</span>
+    </div>
+    <div class="right">
+      <span>Jobs <span class="v">12 running</span></span>
+      <span>Cache <span class="v green">98.6 % hit</span></span>
+      <span>Alerts <span class="v warn">1 elevated</span></span>
+    </div>
+  </footer>
+
+  <!-- Production-ready badge appears at finale -->
+  <div class="ready-badge">
+    <span class="badge-dot"></span>
+    <span class="label">End-to-End</span>
+    Manifest · Train · Reason · Forecast — in 24 hours
+  </div>
+
+  <!-- ============================================================
+       Scripts
+       ============================================================ -->
+  <script src="scripts/mock-data.js"></script>
+  <script src="scripts/charts.js"></script>
+  <script src="scripts/scene-controller.js"></script>
+</body>
+</html>
