@@ -935,11 +935,11 @@ input, select { font-family: inherit; font-size: inherit; }
   display: grid;
   grid-template-columns: 1fr 280px;
   gap: 14px;
-  height: 460px;
+  height: 360px;
   background: var(--surface);
   border: 1px solid var(--hairline);
   border-radius: 10px;
-  padding: 16px 20px;
+  padding: 14px 18px;
 }
 .insight-river-section .map-host {
   position: relative;
@@ -958,7 +958,7 @@ input, select { font-family: inherit; font-size: inherit; }
   display: block;
   width: 100%;
   height: 100%;
-  max-height: 380px;
+  max-height: 300px;
   object-fit: contain;
   border-radius: 6px;
   background: var(--paper-soft);
@@ -1018,6 +1018,16 @@ input, select { font-family: inherit; font-size: inherit; }
 .river-legend .leg .dot.net1990     { background: #B5D9E6; }
 .river-legend .leg .dot.net2010     { background: #6FB7BD; }
 .river-legend .leg .dot.netzurich   { background: #14365A; }
+
+/* Coverage panel thumbnail — small real-network preview, replaces synthetic map. */
+.coverage-thumb {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  border-radius: 4px;
+  background: var(--paper-soft);
+  object-fit: contain;
+}
 .river-legend .leg .swatch.river { background: #6F8AA1; }
 .river-legend .leg .swatch.lake  { background: #DEEAF1; border: 1px solid #BBCEDB; height: 6px; }
 
@@ -1060,9 +1070,9 @@ input, select { font-family: inherit; font-size: inherit; }
   border-radius: 6px;
   background: var(--surface);
 }
-.real-figure .real-img.tight { max-height: 200px; object-fit: contain; }
-.real-figure .real-img.wide  { max-height: 220px; object-fit: contain; }
-.real-figure .real-img.full  { max-height: 280px; object-fit: contain; }
+.real-figure .real-img.tight { max-height: 150px; object-fit: contain; }
+.real-figure .real-img.wide  { max-height: 165px; object-fit: contain; }
+.real-figure .real-img.full  { max-height: 200px; object-fit: contain; }
 .real-figure .real-prov {
   font-family: var(--mono);
   font-size: 10px;
@@ -1293,9 +1303,10 @@ input, select { font-family: inherit; font-size: inherit; }
 }
 .train-main {
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
+  grid-template-rows: auto auto auto auto auto;
   gap: 12px;
   min-height: 0;
+  overflow-y: auto;
 }
 .train-right { display: flex; flex-direction: column; }
 .train-head { padding-bottom: 4px; }
@@ -1333,8 +1344,11 @@ input, select { font-family: inherit; font-size: inherit; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-  min-height: 0;
+  min-height: 200px;
 }
+.train-charts .loss-chart { min-height: 200px; }
+.train-charts .vpg-real { min-height: 200px; }
+.train-charts .vpg-real .real-img.tight { max-height: 130px; }
 .vpg-chart {
   padding: 12px 16px 14px;
   display: flex;
