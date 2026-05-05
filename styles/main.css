@@ -945,6 +945,24 @@ input, select { font-family: inherit; font-size: inherit; }
   position: relative;
   min-height: 0;
 }
+.insight-river-section .map-real {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 6px;
+  min-height: 0;
+}
+.insight-river-section .map-real-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 380px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: var(--paper-soft);
+}
 .insight-river-section .map-meta {
   display: flex;
   flex-direction: column;
@@ -997,8 +1015,62 @@ input, select { font-family: inherit; font-size: inherit; }
   background: var(--bern);
   box-shadow: 0 0 0 2px rgba(226, 6, 19, 0.15);
 }
+.river-legend .leg .dot.net1990     { background: #B5D9E6; }
+.river-legend .leg .dot.net2010     { background: #6FB7BD; }
+.river-legend .leg .dot.netzurich   { background: #14365A; }
 .river-legend .leg .swatch.river { background: #6F8AA1; }
 .river-legend .leg .swatch.lake  { background: #DEEAF1; border: 1px solid #BBCEDB; height: 6px; }
+
+/* Real-figure embeds — first-class citizens, not decoration. */
+.real-figure {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px 14px;
+  background: var(--surface);
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  min-height: 0;
+}
+.real-figure.panel { padding: 12px 16px 14px; }
+.real-figure .real-cap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+.real-figure .real-title {
+  font-family: var(--sans);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.005em;
+}
+.real-figure .real-meta {
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+.real-figure .real-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  background: var(--surface);
+}
+.real-figure .real-img.tight { max-height: 200px; object-fit: contain; }
+.real-figure .real-img.wide  { max-height: 220px; object-fit: contain; }
+.real-figure .real-img.full  { max-height: 280px; object-fit: contain; }
+.real-figure .real-prov {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--ink-faint);
+  letter-spacing: 0.005em;
+}
+.vpg-real .real-img.tight { max-height: 168px; }
+.node-diff-figure { margin-top: 14px; }
 
 .basin-callout {
   border: 1px solid var(--bern);

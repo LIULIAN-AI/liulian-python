@@ -99,26 +99,14 @@
           <pre class="code-body" data-content="manifest"></pre>
         </div>
 
-        <div class="data-viz">
-          <div class="viz-head">
-            <span class="viz-title">Water-temperature trace</span>
-            <span class="viz-meta">4 stations · 365 d · sampled every 3 d · °C</span>
-          </div>
-          <div class="viz-row">
-            <div class="ts-chart" data-ts-chart></div>
-            <div class="viz-side">
-              <div class="hg-head">All values · histogram</div>
-              <div class="hg-chart" data-histogram></div>
-              <div class="hg-meta">227 k samples · range −1 °C → 18 °C · median 6.8 °C</div>
-              <div class="ts-legend">
-                <div class="leg-item"><span class="sw" style="background:#E20613"></span><span>2 009 m · valley</span></div>
-                <div class="leg-item"><span class="sw" style="background:#B00010"></span><span>2 091 m · trunk</span></div>
-                <div class="leg-item"><span class="sw" style="background:#5C6066"></span><span>2 500 m · mid-alpine</span></div>
-                <div class="leg-item"><span class="sw" style="background:#94989D"></span><span>2 634 m · high-alpine</span></div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <figure class="real-figure">
+          <figcaption class="real-cap">
+            <span class="real-title">Yearly water-temperature trend</span>
+            <span class="real-meta">63 Swiss water stations · 1980 – 2020 · BAFU + EAWAG public archive</span>
+          </figcaption>
+          <img class="real-img" src="assets/figures/yearly_trends.png" alt="Yearly trend of 63 Swiss water stations 1980-2020 with temperature gradient">
+          <figcaption class="real-prov">source: refer_projects/swiss-river-network-benchmark · yearly_trends.ipynb</figcaption>
+        </figure>
 
         <div class="data-preview">
           <div class="preview-head">
@@ -179,19 +167,24 @@
 
         <div class="train-charts">
           <div class="loss-chart panel"></div>
-          <div class="vpg-chart panel">
-            <div class="vpg-head">
-              <span class="vpg-title">Validation forecast · Innertkirchen-Aare</span>
-              <span class="vpg-meta">epoch 56 · 200 d window · °C</span>
-            </div>
-            <div class="vpg-svg" data-vpg></div>
-            <div class="vpg-legend">
-              <span class="vpg-leg"><span class="sw" style="background:#2F3437"></span>ground truth</span>
-              <span class="vpg-leg"><span class="sw" style="background:#E20613"></span>transformer-entity-aware-v3</span>
-              <span class="vpg-meta-r">RMSE 0.91 °C · MAE 0.73 °C</span>
-            </div>
-          </div>
+          <figure class="real-figure panel vpg-real">
+            <figcaption class="real-cap">
+              <span class="real-title">Validation forecast · target station</span>
+              <span class="real-meta">LSTM · epoch 80 · 200 d window · °C</span>
+            </figcaption>
+            <img class="real-img tight" src="assets/figures/pred_vs_gt.png" alt="LSTM prediction vs ground truth water temperature, 200 day window">
+            <figcaption class="real-prov">source: experiments/artifacts/swiss-river-1990_lstm_forecast_per_entity_20260310_180208/figures/pred_vs_gt.png</figcaption>
+          </figure>
         </div>
+
+        <figure class="real-figure panel">
+          <figcaption class="real-cap">
+            <span class="real-title">Model comparison · Swiss-1990 (28 stations)</span>
+            <span class="real-meta">RMSE distribution + learnable parameters · 4 model classes</span>
+          </figcaption>
+          <img class="real-img wide" src="assets/figures/model_compare.png" alt="RMSE box plot and learnable parameters comparison across LSTM, Graphlet, LSTM-E, ST-GNN">
+          <figcaption class="real-prov">source: refer_projects/swiss-river-network-benchmark · visualize_results.ipynb</figcaption>
+        </figure>
 
         <div class="metric-row">
           <div class="metric-card">
@@ -372,12 +365,15 @@
         </aside>
       </div>
 
-      <!-- Section 2: River network — realistic map -->
+      <!-- Section 2: Real Swiss river network map (from main-branch generate_figures.ipynb) -->
       <div class="insight-river-section">
-        <div class="map-host" data-real-map></div>
+        <figure class="map-real">
+          <img class="map-real-img" src="assets/figures/swiss_network_map.png" alt="Real Switzerland map with swiss-1990 and swiss-2010 station networks, Zurich highlighted">
+          <figcaption class="real-prov">source: refer_projects/swiss-river-network-benchmark · generate_figures.ipynb</figcaption>
+        </figure>
 
         <div class="map-meta">
-          <h3>River network <span class="meta">28 alpine stations · 26 tributary edges · live</span></h3>
+          <h3>River network <span class="meta">swiss-1990 + swiss-2010 + zurich · live overlay</span></h3>
 
           <div class="basin-callout">
             <div class="callout-title">Affected basin</div>
@@ -392,20 +388,26 @@
           </div>
 
           <div class="river-legend">
+            <div class="leg"><span><span class="dot net1990"></span></span><span>swiss-1990 · 28 stations</span></div>
+            <div class="leg"><span><span class="dot net2010"></span></span><span>swiss-2010 · 35 stations</span></div>
+            <div class="leg"><span><span class="dot netzurich"></span></span><span>zurich sub-network · highlighted</span></div>
             <div class="leg">
               <span class="swatch river"></span>
-              <span>Major river paths (Rhine, Aare, Rhône, Reuss, Limmat, Inn, Ticino)</span>
+              <span>Real river paths from BAFU hydrography</span>
             </div>
-            <div class="leg">
-              <span class="swatch lake"></span>
-              <span>Major lakes (Léman, Constance, Neuchâtel, Zürich, Lucerne, Thun)</span>
-            </div>
-            <div class="leg"><span><span class="dot gray"></span></span><span>Stations · streaming</span></div>
-            <div class="leg"><span><span class="dot dark"></span></span><span>Upstream contributors (Aare basin)</span></div>
-            <div class="leg"><span><span class="dot red"></span></span><span>At-risk station · pulse-marked</span></div>
           </div>
         </div>
       </div>
+
+      <!-- Section 2b: Model evidence row — node-wise differences -->
+      <figure class="real-figure node-diff-figure">
+        <figcaption class="real-cap">
+          <span class="real-title">Node-wise prediction differences vs LSTM baseline</span>
+          <span class="real-meta">Swiss-1990 · Graphlet, LSTM-E, ST-GNN · color shows MSE delta</span>
+        </figcaption>
+        <img class="real-img full" src="assets/figures/node_wise_diff.png" alt="Per-station prediction MSE differences vs LSTM baseline across Graphlet, LSTM-E, ST-GNN models">
+        <figcaption class="real-prov">source: refer_projects/swiss-river-network-benchmark · visualize_results.ipynb</figcaption>
+      </figure>
 
       <!-- Section 3: Upstream contributors row -->
       <div class="insight-contributors" data-contribs></div>
