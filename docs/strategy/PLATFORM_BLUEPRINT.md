@@ -123,17 +123,32 @@ via `neoctl`).
 | **`liulian-design-system`** (new) | TypeScript + CSS + JSON | Design tokens (OKLCH + UniBe red), Tailwind preset, RN StyleSheet exports, Figma library link. Published as `@liulian/design-tokens` npm + read by Python via JSON in `liulian-api`. | new |
 | **`liulian-ops`** (new) | Python CLI + Helm charts + Terraform modules + GitHub Actions reusable workflows | The neoctl-equivalent. `liulianctl deploy all` orchestrates rolling deploys across repos. Owns `infra/{helm,terraform,grafana}/` and `.github/workflows/*` reusable workflows. | new |
 
-### 4.2 Why multi-repo, justified per concern
+### 4.2 Why multi-repo (audit-honest justification)
 
-| Concern | Monorepo would say | Multi-repo wins because |
-|---|---|---|
-| Type sharing | "single source of truth" | OpenAPI schema published as a versioned artefact from `liulian-api`; codegen consumed by `liulian-web` and `liulian-sdk`. Cross-repo type sharing via published artefact > shared source — same as protobuf. |
-| Independent release cadence | "Turborepo handles it" | Mobile reviews + Vercel deploys + Python releases truly run on different cycles; tagging per-repo is honest |
-| CI duration | "cache helps" | Per-repo CI is < 5 min vs. monorepo > 15 min; matters when you push 20× a day |
-| Open-source legibility | "subfolders are fine" | A model contributor to `liulian-python` doesn't need to clone the Helm charts; reduces friction |
-| Cold-start for collaborators | "easier" | A frontend collaborator only clones `liulian-web` — no Python at all |
-| When code is shared (rare) | "import from sibling" | Promote to `liulian-python` (or design-tokens) and publish a version; the friction is *useful* — forces stability |
-| Aligns with neobanker pattern | n/a | User already has a deployment CLI mental model from neobanker; reuse the muscle memory |
+The audit (`AUDIT_REPORT_2026-05-12.md §B.1`) flagged the original
+justification as preference-presented-as-evidence. Honest version:
+
+**Defensible reasons** (survive research-critic):
+
+| Reason | Why it holds |
+|---|---|
+| Operator muscle memory | User already runs neobanker with multi-repo + `neoctl`; reusing that mental model is genuinely lower cognitive cost than learning Turborepo. |
+| Smaller per-repo surface for OSS contributors | Model contributors to `liulian-python` shouldn't clone Helm charts; frontend contributors shouldn't need Python. Per-repo onboarding is genuinely easier. |
+| Divergent release cadences | Mobile (EAS Build / store review) and web (Vercel push) and Python core (PyPI tag) ship on different rhythms. Multi-repo makes the cadences honest. |
+| Cross-repo type sharing via published OpenAPI artefact | Versioned schema, codegen consumed by web + SDK + mobile. Cleaner than shared source files in a monorepo for our case (same idea as protobuf). |
+
+**Claims we drop** (would not survive audit):
+
+- *"CI is faster"* — unmeasured. Turborepo with caching would likely
+  match per-repo CI for JS apps.
+- *"Saves 2 days in the sprint"* — a priori guess.
+
+**Reversibility clause**:
+If cross-repo coordination becomes painful by M3 (e.g. opening 4 PRs to
+ship one feature), we can collapse the three JS repos (`liulian-web` +
+`liulian-mobile` + `liulian-design-system`) into a Turborepo monorepo
+while keeping the five Python repos separate. One-week migration, not
+one-month. Tracked in `adr/0001-multi-repo-split.md`.
 
 ### 4.3 What stays on this repo (`liulian-python`)
 

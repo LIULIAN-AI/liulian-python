@@ -233,11 +233,18 @@ provider modules already; we *add* DeepSeek (which is OpenAI-API-compatible
 so we may not need a new module — can use `GLMProvider`'s base-URL knob
 or write a 30-line `DeepSeekProvider`). Total work: ≤ 1h.
 
-### 2.6 Estimated reuse fraction
+### 2.6 Estimated reuse fraction *(TBD after Sprint Day 1 fork spike)*
 
-Lines copied verbatim: ~70%.
-Lines adapted (rename, prompt rewrite, tool swap): ~25%.
-New code: ~5%.
+- Lines copied verbatim: **~50 to 70%** — depends on how much
+  bank-domain coupling sits in `state.py`, `conversation_cache.py`,
+  prompt templates beyond the obvious `bank_matcher.py`.
+- Lines adapted (rename, prompt rewrite, tool swap): **~25 to 40%**.
+- New code: **~5 to 15%**.
+
+Day 1 fork spike: clone, strip bank-domain code, count remaining LOC,
+replace the range above with the measured number. The platform's
+success does *not* depend on hitting these numbers; only on shipping
+the M1 demo end-to-end.
 
 ---
 
@@ -286,11 +293,12 @@ GitHub Actions job in `liulian-ingest` against `liulian-python`'s
 `main`. The Pydantic-typed schema is shared via a tiny `liulian-schemas`
 sub-package published on PyPI.
 
-### 3.4 Estimated reuse fraction
+### 3.4 Estimated reuse fraction *(TBD after Day 1 fork spike)*
 
-Lines copied verbatim: ~80%.
-Lines adapted (sources.yaml, dictionary): ~15%.
-New code (manifest auto-PR): ~5%.
+- Lines copied verbatim: **~50 to 80%** — crawler is small and lean; upper
+  bound realistic if HTTP retry / idempotency code is source-domain-agnostic.
+- Lines adapted (sources.yaml, data_dictionary.yaml): **~10 to 30%**.
+- New code (manifest auto-PR pipeline): **~5 to 15%**.
 
 ---
 
@@ -421,11 +429,17 @@ with low-opacity red radial spots; 12-col × 8-row bento grid). All
 visual decisions in `liulian-web` cite the `gui-demo`'s
 `styles/main.css` and `docs/design-report.md`.
 
-### 4.6 Estimated reuse fraction
+### 4.6 Estimated reuse fraction *(TBD after Day 1 fork spike)*
 
-Lines copied verbatim: ~50% (chrome + chat + charts + tooling).
-Lines adapted (route swap, antd theme override, content rewrite): ~40%.
-New code (BI canvas with mosaic + map + agent integration): ~10%.
+- Lines copied verbatim: **~30 to 50%** — chrome + chat + chart wrappers +
+  tooling. Lower than agent/crawler because the *visual* layer is rewritten
+  per §0.1 (visual originality rule).
+- Lines adapted (route swap, antd theme override, content rewrite,
+  brand re-skin): **~40 to 60%**.
+- New code (BI canvas + map + agent integration + brand layer): **~10 to 20%**.
+
+The `assistant/Canvas*.tsx` family (§14.2) is the highest-value reuse;
+~40 to 60% of *that subset* is keepable, saving ~2 weeks.
 
 ---
 
@@ -479,11 +493,12 @@ neoctl/
 - `liulianctl/manifest_sync.py` → run `liulian-ingest` once, then PR
   the manifest into `liulian-python`.
 
-### 5.4 Estimated reuse fraction
+### 5.4 Estimated reuse fraction *(TBD after Day 1 fork spike)*
 
-Lines copied verbatim: ~85%.
-Adapted: ~10%.
-New: ~5%.
+- Lines copied verbatim: **~70 to 85%** — `ssh.py`, `tunnel.py`,
+  `llm_setup.py`, `detect.py`, `doctor.py` are domain-neutral.
+- Adapted (service names, config schema): **~10 to 25%**.
+- New (mobile/eas, web/vercel, manifest sync): **~5 to 15%**.
 
 ---
 
@@ -1081,22 +1096,26 @@ These join the seeded list (PLATFORM_BLUEPRINT §18) — see
   hybrid (shadcn primary, antd ConfigProvider-themed for chat +
   high-density tables, Refine.dev for studio CRUD).
 
-### 14.7 Estimated total reuse — revised with deeper inspection
+### 14.7 Estimated total reuse — RANGES, audit-honest
 
-| Repo | Verbatim | Adapted | New | Confidence |
+| Repo | Verbatim | Adapted | New | Status |
 |---|---|---|---|---|
-| `liulian-agent` | 70% | 25% | 5% | high — code reviewed |
-| `liulian-ingest` | 80% | 15% | 5% | high — small surface |
-| `liulian-web` | **~55%** | ~30% | ~15% | medium — depends on Refine.dev fit |
-| `liulian-ops` | 85% | 10% | 5% | high — code reviewed |
-| `liulian-dev-env` | 70% | 30% | 0% | medium |
-| `liulian-api` | 0% verbatim (Java→Python) | 50% pattern translation | 50% new | medium |
-| `liulian-mobile` | 0% (greenfield) | 40% pattern from web | 60% new | high |
-| `liulian-design-system` | 80% (from gui-demo) | 15% | 5% | high |
+| `liulian-agent` | 50–70% | 25–40% | 5–15% | TBD Day 1 spike |
+| `liulian-ingest` | 50–80% | 10–30% | 5–15% | TBD Day 1 spike |
+| `liulian-web` | 30–50% | 40–60% | 10–20% | TBD Day 1; visual layer rewritten per §0.1 |
+| `liulian-ops` | 70–85% | 10–25% | 5–15% | TBD Day 1 spike |
+| `liulian-dev-env` | 60–80% | 20–40% | 0–10% | TBD Day 1 spike |
+| `liulian-api` | 0% verbatim (Java → Python) | 40–60% pattern translation | 40–60% new code | new repo |
+| `liulian-mobile` | 0% (Expo template) | 30–50% pattern from web | 50–70% new | new repo |
+| `liulian-design-system` | 70–85% (from gui-demo CSS) | 10–20% | 5–10% | seeded from feat/gui-demo |
 
-Weighted by repo size, the platform-wide reuse fraction is ~55–60% —
-a **~3 month** acceleration on a from-scratch build, conservatively
-estimated.
+Platform-wide weighted reuse: **~40 to 60%** (range, not point).
+Day 1 fork spike replaces every range with measured numbers in this
+section's commit follow-up.
+
+The acceleration claim ("~3 months saved") is *aspirational*; the true
+saving depends on how much bank-domain coupling sits inside neobanker's
+code. We will know on Day 1.
 
 ---
 

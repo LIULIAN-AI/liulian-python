@@ -46,23 +46,50 @@ not "tests pass".
 
 ---
 
-### Day 1 — Tue 2026-05-13 — *scaffold + identity*
+### Day 1 — Tue 2026-05-13 — *fork-and-measure spike + scaffold + identity*
+
+> **Audit-driven revision** (per `AUDIT_REPORT_2026-05-12.md` and the
+> iteration-3 multi-repo decision in `ADR 0001`): the iteration-1 plan
+> here was based on a monorepo; we now fork from neo-banker per
+> `NEOBANKER_REUSE_MAP.md §1`. Plain Postgres is the Day-1 default;
+> TimescaleDB extension is enabled only after M1 demo is shipping
+> (`ADR 0003`).
 
 **Flagship**: a screenshotable marketing landing page at `localhost:3000`
-with hero, three feature blocks, and a single CTA button.
-**Scaffold**: monorepo workspaces wired; FastAPI `/healthz` returns 200;
-design tokens shipped to all three apps.
+with hero, three editorial bands, and a single text-arrow CTA — built
+with LIULIAN brand tokens.
+**Scaffold**: 8 repos initialised and forked per
+`NEOBANKER_REUSE_MAP.md §1`; plain Postgres up via docker-compose;
+FastAPI `/healthz` returns 200; `@liulian/design-tokens` published to
+private npm and consumed by web.
 
 #### Tasks (priority order)
 
-1. **Workspace scaffolding** (2h)
-   - Create `apps/`, `packages/`, `infra/` top-level dirs.
-   - Move existing `liulian/` package to `packages/liulian-core/` —
-     update `pyproject.toml` workspaces (`tool.uv.workspace.members = [...]`).
-     Run `pytest` to confirm zero regressions. (This is the only existing-code
-     touch; treat as non-breaking renaming.)
-   - Add `apps/api/`, `apps/web/`, `apps/mobile/`, `apps/docs-site/`.
-   - `pnpm-workspace.yaml` for the JS apps.
+**0. Fork-and-measure spike (FIRST, 90 min cap)** — replaces the
+"guess" rows in `NEOBANKER_REUSE_MAP.md §14.7` with measured numbers.
+
+   For each forkable repo, in order: agent → crawler → neoctl →
+   frontend → dev-env:
+   - `gh repo fork neo-banker/neobanker-<x> --clone --org=jajupmochi`
+   - rename remotely (`gh repo rename liulian-<x>`) and locally
+   - strip bank-domain code: delete `bank_*` modules, bank prompts,
+     bank fixtures, bank scenario JSON
+   - `cloc .` → count LOC remaining
+   - update the `Estimated reuse fraction` section of the reuse map
+     with the measured number (replaces the TBD range)
+   - commit rename + strip in one PR per repo
+
+   If the spike runs long, ship what's measured and finish on Day 2
+   morning. Do not let it block the rest of Day 1.
+
+1. **Workspace scaffolding (in `liulian-python` only)** (60 min)
+   - Move existing `liulian/` package contents stay as-is (no
+     refactor to `packages/liulian-core/` — the iter-3 multi-repo
+     decision means the package itself stays at `liulian/`; only
+     metadata + boundary changes).
+   - Run `pytest` to confirm zero regressions on `liulian-python`.
+   - This repo only carries `docs/strategy/` + minor metadata changes
+     during the sprint; everything else moves to its own repo.
 
 2. **Design tokens** (1.5h) — `packages/design-tokens/`:
    - One source file `tokens.json` with the OKLCH palette + spacing + radii +
