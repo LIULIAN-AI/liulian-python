@@ -112,16 +112,19 @@ via `neoctl`).
 
 ### 4.1 Repo map
 
+**7-repo federation** (revised after Sprint Day 1 evening user feedback;
+see ADR 0001 §Mid-sprint mergers / un-mergers):
+
 | Repo | Stack | Purpose | Branch in flight |
 |---|---|---|---|
-| **`liulian-python`** (this repo) | Python 3.10+ · numpy · pyyaml · torch (extra) · ray (extra) | **Research core only**: tasks · data · models · adapters · runtime · optim · viz · plugins. *No web, no FastAPI, no UI deps in core.* Stays `pip install liulian`-clean. | `feat/platform-upgrade-2026-05` (will only carry minor rename + package boundary cleanups + this `docs/strategy/` set; everything else moves out) |
-| **`liulian-api`** (new) | Python · FastAPI · Pydantic v2 · SQLModel · Postgres-TimescaleDB · Redis · arq | HTTP gateway over `liulian-python`. Talks to DB, MinIO, Ray Serve, agent. Owns the OpenAPI contract. | new |
-| **`liulian-agent`** (new) | Python · custom orchestrator · DeepSeek/GLM/Gemini providers · pgvector | Stand-alone LLM agent service (FastAPI on port 8000 with `/health`, mirroring neobanker `~/neobanker/agent`). 3 personas (data · model · BI). | new |
-| **`liulian-ingest`** (new) | Python · async httpx · playwright (for scraping) · pydantic-extra-types | The "crawler" equivalent: scheduled fetchers for swisstopo BAFU hydrology, SwissGrid energy, PhysioNet healthcare, OpenWeather, etc. Writes to MinIO + manifests. | new |
-| **`liulian-web`** (new) | TypeScript · Next.js 14 (App Router) · tRPC · Tailwind · shadcn/ui · Tremor · ECharts · MapLibre | The BI canvas + marketing site + studio. Derives visual system from `feat/gui-demo` branch of `liulian-python`. | new |
-| **`liulian-mobile`** (new) | TypeScript · Expo SDK 51 · React Native · Expo Router · Victory Native XL | Mobile companion. iOS + Android via single codebase. | new |
-| **`liulian-design-system`** (new) | TypeScript + CSS + JSON | Design tokens (OKLCH + UniBe red), Tailwind preset, RN StyleSheet exports, Figma library link. Published as `@liulian/design-tokens` npm + read by Python via JSON in `liulian-api`. | new |
-| **`liulian-ops`** (new) | Python CLI + Helm charts + Terraform modules + GitHub Actions reusable workflows | The neoctl-equivalent. `liulianctl deploy all` orchestrates rolling deploys across repos. Owns `infra/{helm,terraform,grafana}/` and `.github/workflows/*` reusable workflows. | new |
+| **`liulian-python`** (this repo) | Python 3.10+ · numpy · pyyaml · torch (extra) · ray (extra) | **Research core only**: tasks · data · models · adapters · runtime · optim · viz · plugins. *No web, no FastAPI, no UI deps in core.* Stays `pip install liulian`-clean. | `feat/platform-upgrade-2026-05` (carries `docs/strategy/` only) |
+| **`liulian-api`** | Python · FastAPI · Pydantic v2 · SQLModel · plain Postgres (TimescaleDB after M1) · Redis · arq | HTTP gateway over `liulian-python`. Owns OpenAPI contract. **Day-1 live: 6 endpoints (healthz, readyz, models, experiments x4, forecasts x2), 6/6 tests pass.** | `main` |
+| **`liulian-agent`** | Python · custom orchestrator · DeepSeek/GLM/Gemini/Claude/Ollama providers · pgvector | Stand-alone LLM agent service (FastAPI on port 8001 with `/health`, mirroring neobanker). 3 personas (data · model · BI). **Day-5 live: 9 tools registered, 9/9 tests pass.** | `main` |
+| **`liulian-ingest`** | Python · async httpx · playwright · pydantic-extra-types | Runtime crawler service: scheduled fetchers for swisstopo BAFU / SwissGrid / PhysioNet etc; writes parquet to MinIO + auto-PRs manifest to `liulian-python`. **Kept separate** from ops (runtime service ≠ infra tooling). | `main` |
+| **`liulian-web`** | TypeScript · Next.js 14 (App Router) · ECharts · Antd (chat sidebar) · Tailwind · framer-motion · contentlayer · MapLibre (planned) | BI canvas + marketing site + studio. Derives visual system from `feat/gui-demo`. **Day-3 live: `app/forecast/` page with ForecastChart + StationList + KpiStrip components; standalone landing HTML.** | `main` |
+| **`liulian-mobile`** | TypeScript · Expo SDK 51 · React Native · Expo Router · Victory Native XL | Mobile companion. iOS + Android via single codebase. | placeholder; Day 4 |
+| **`liulian-design-system`** | TypeScript + CSS + JSON | `@liulian/design-tokens` npm package. Source: `src/tokens.json`. Emits CSS / ESM / CJS / TS types / RN StyleSheet / Tailwind preset / antd ConfigProvider. **Kept separate** from web (multiple future consumers: mobile / marketing slides / Figma library / email templates). **Day-1 live: 65 tokens × 7 outputs.** | `main` |
+| **`liulian-ops`** | Python CLI (`liulianctl`, fork of neoctl) + Helm + Terraform + reusable GH Actions + **`devcontainer/`** subfolder (was `liulian-dev-env`, merged in) | Operations + IaC + local dev environment. Owns `infra/{helm,terraform,grafana}/`, `.github/workflows/*` reusable workflows, and the Codespaces devcontainer config. | `main` |
 
 ### 4.2 Why multi-repo (audit-honest justification)
 
