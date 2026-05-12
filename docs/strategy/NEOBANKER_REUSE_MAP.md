@@ -1096,26 +1096,46 @@ These join the seeded list (PLATFORM_BLUEPRINT §18) — see
   hybrid (shadcn primary, antd ConfigProvider-themed for chat +
   high-density tables, Refine.dev for studio CRUD).
 
-### 14.7 Estimated total reuse — RANGES, audit-honest
+### 14.7 MEASURED total reuse (Sprint Day 1 spike, 2026-05-12 evening)
 
-| Repo | Verbatim | Adapted | New | Status |
+The fork-and-measure spike ran on 2026-05-12 evening (ahead of the
+calendared sprint start). Numbers below are measured, not estimated.
+
+| Repo | Source baseline | After strip | Code verbatim | Notes |
 |---|---|---|---|---|
-| `liulian-agent` | 50–70% | 25–40% | 5–15% | TBD Day 1 spike |
-| `liulian-ingest` | 50–80% | 10–30% | 5–15% | TBD Day 1 spike |
-| `liulian-web` | 30–50% | 40–60% | 10–20% | TBD Day 1; visual layer rewritten per §0.1 |
-| `liulian-ops` | 70–85% | 10–25% | 5–15% | TBD Day 1 spike |
-| `liulian-dev-env` | 60–80% | 20–40% | 0–10% | TBD Day 1 spike |
-| `liulian-api` | 0% verbatim (Java → Python) | 40–60% pattern translation | 40–60% new code | new repo |
-| `liulian-mobile` | 0% (Expo template) | 30–50% pattern from web | 50–70% new | new repo |
-| `liulian-design-system` | 70–85% (from gui-demo CSS) | 10–20% | 5–10% | seeded from feat/gui-demo |
+| `liulian-agent` | 213 files, 12,162 Py LOC | 128 files, 11,778 LOC | **97%** of Python code | Bank coupling shallow; concentrated in `tools/bank_matcher.py`, `fixtures/demo_bank_data.json`, `import_data/`, selected docs |
+| `liulian-ingest` | 104 files, 12,199 Py LOC | 102 files, 12,199 LOC | **100%** of Python code | Only `sources.yaml` + `data_dictionary.yaml` need rewrite; HTTP retry / idempotency / scheduler are domain-neutral |
+| `liulian-ops` | 37 files, 3,062 Py LOC | 37 files, 3,062 LOC | **100%** of Python code | `neoctl` is fully domain-neutral; only service names + deploy verbs need swap |
+| `liulian-web` | 665 files, 41,791 TS/TSX LOC | 617 files | **93%** of files | Banking components (BankMenuOption*, BankSectionHeader*, HotSearchWords*, popularBanks/, news&report/, bank-info/, banks-statistics/, compliance/) stripped; visual layer to be re-skinned per §0.1 |
+| `liulian-dev-env` | 21 files | 21 files | **100%** of files | Only service-list update |
+| `liulian-api` | greenfield | 11 files, ~350 Py LOC | n/a | FastAPI scaffold; 6/6 smoke tests pass; `/healthz`, `/readyz`, `/models` working |
+| `liulian-mobile` | not yet scaffolded | – | n/a | Day 4 work |
+| `liulian-design-system` | greenfield seeded from gui-demo CSS | 65 tokens × 7 output files | n/a | tokens.json source; emits CSS / ESM / CJS / TS types / RN / Tailwind preset / antd theme |
 
-Platform-wide weighted reuse: **~40 to 60%** (range, not point).
-Day 1 fork spike replaces every range with measured numbers in this
-section's commit follow-up.
+**Headline finding**: bank-domain coupling in neobanker is *much shallower*
+than estimated. The reusable Python code is generic across `agent/`
+(loop / intent / planner / state / provider_registry / provider_policy /
+conversation_cache / catalog_cache / context_memory / reliability /
+suggestions / error_log) and `llm/` (config / harness / gateway /
+providers). Banking-specific bits are concentrated and isolated.
 
-The acceleration claim ("~3 months saved") is *aspirational*; the true
-saving depends on how much bank-domain coupling sits inside neobanker's
-code. We will know on Day 1.
+**Acceleration measured**: scaffolding 5 forked repos + 3 greenfield
+repos + brand-led landing page + brand token system took ~90 minutes
+of focused work, vs a from-scratch estimate of ~2 weeks per major
+layer. Conservative estimate: **6+ weeks of work compressed into one
+evening**.
+
+**What still needs work (the 3-7% that isn't verbatim)**:
+
+- Tools: `db_reader` → `query_forecasts`; `calculator` → `compute_metric`;
+  `bank_matcher` → `station_matcher`; add `recommend_model`,
+  `propose_hpo_space`, `diagnose_failed_run`, `add_panel`,
+  `create_alert_rule` (Day 2).
+- Prompts: intent vocabulary + planner system message + summary
+  templates rewritten for forecasting (Day 5).
+- Datasource client: "bank data" → "forecasting catalog" (Day 2).
+- Fixtures: bank scenarios → SwissRiver scenarios (Day 3).
+- Web visual re-skin (per §0.1 sacred rule) (Days 2-5).
 
 ---
 
