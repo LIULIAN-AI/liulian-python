@@ -882,44 +882,133 @@ This is **directly reusable** for LIULIAN's `/forecast` canvas. Rename
 **This single reuse saves 2–3 weeks of bespoke React work** for a
 production-grade canvas with drag/drop/save/share/widget-config.
 
-### 14.3 Modern professional dashboard framework — Refine.dev for /studio
+### 14.3 Dashboard framework — Refine.dev REJECTED as UI source; hand-rolled Linear-terminal editorial direction
 
-User feedback: *"或许可使用更现代专业的产品模式代码和框架"*. After
-2026-survey of the dashboard framework landscape:
+**User feedback (2026-05-12)**: *"Refine.dev 设计太普通了，没特色，不抓眼球"*.
+Agreed. Refine.dev's templates look like every other 2020s admin
+panel — same gray cards, same Inter font, same blue primary. That
+violates our §0.1 sacred rule (visual originality) and our gui-demo
+brand. **Refine.dev is rejected as a UI source.**
 
-- **Refine.dev** — headless framework, multi-UI (Mantine / Ant Design /
-  MUI / Chakra / shadcn), data-provider abstraction (REST / GraphQL /
-  Supabase / Hasura / Strapi), auth (Auth0 / Keycloak / custom JWT),
-  built-in `useTable` / `useForm` / `useSelect` with sort+filter+page.
-- **shadcn-admin** — popular OSS template; basic CRUD scaffolding.
-- **Tremor** — analytics-specialised; KPI cards + chart primitives.
-- **Mantine** — 100+ components, strong for B2B; not a framework but a
-  component library.
+Revised decision (ADR 0007 will be rewritten):
 
-**Decision** (encoded as ADR 0007 below): **Refine.dev for `/studio`
-CRUD layers, hand-rolled (using `liulian-design-system` + `react-mosaic-component`
-+ `@ant-design/x` + ECharts + MapLibre) for `/forecast` BI canvas,
-shadcn-admin patterns for `/admin`, framer-motion + Magic UI / Aceternity
-for `/(marketing)`.**
+> **`/studio` is hand-rolled with a *Linear-meets-Bloomberg-terminal*
+> editorial Swiss aesthetic.** TanStack Query + TanStack Table give us
+> headless data + table primitives without any visual template.
+> Refine.dev's data-provider abstraction can be revisited at M3 *only
+> if* per-tenant RBAC + audit-log boilerplate becomes painful — never
+> for its UI.
 
-Layer map:
+#### What "Linear-meets-Bloomberg-terminal editorial Swiss" means
 
-| Surface | Framework | Why |
+Three reference lineages, fused with intent:
+
+| Lineage | What we take | What we drop |
 |---|---|---|
-| `/(marketing)` landing | hand-rolled + framer-motion + Magic UI / Aceternity | brand is editorial Swiss; we control every pixel |
-| `/studio/experiments` | **Refine.dev** + shadcn UI | CRUD over experiments, runs, models, datasets — generic, framework saves 2 weeks |
-| `/studio/models` | **Refine.dev** + shadcn UI | model registry CRUD |
-| `/studio/datasets` | **Refine.dev** + shadcn UI | dataset CRUD + manifest editor |
-| `/studio/users` (M3+) | **Refine.dev** + Clerk integration | user / tenant admin |
-| `/forecast` BI canvas | **hand-rolled** + neobanker `assistant/Canvas*` + `react-mosaic-component` + ECharts + MapLibre + `@ant-design/x` chat sidebar | the differentiated surface |
-| `/forecast/r/{slug}` shared report | hand-rolled + ECharts + Plotly fan-charts | read-only public reports |
-| `/agents/{persona}` chat-only | **`@ant-design/x`** | AI chat is its specialty |
-| `/admin` ops console | **shadcn-admin** patterns | per-tenant ops, jobs, alerts |
-| `/docs` MDX site | **contentlayer** (from neobanker) + Tailwind typography | technical + bilingual |
+| **Linear** (linear.app) | Cmd+K command palette as the *primary* navigation; keyboard-first; ultra-restrained chrome; status-priority-assignee triplet pattern adapted to status-model-dataset triplet; shimmer skeleton loading states; per-item peek-pane on row hover | Their purple-on-dark identity; their typeface (Inter) |
+| **Bloomberg Terminal** (lineage, not literal) | Information density done with whitespace + microtype, not visual clutter; tabular numerals everywhere; per-column keyboard-jump (`gg` to top, `G` to bottom, `j/k` row nav); orange highlight ribbons (we substitute UniBe red); the *feeling* of "professional tool, not consumer SaaS" | Black-on-orange-on-black palette; CRT-era fixed-width-everywhere; the 80s grids |
+| **Editorial Swiss** (Müller-Brockmann · Helvetica · Müller's grids · `feat/gui-demo`) | Fraunces display + Switzer body + JetBrains Mono; warm-bone canvas; UniBe red as sole spot color; rule-of-thirds asymmetric grids; the wonk-1 italic accent character; rhythmic vertical white | Anything purely decorative; gradients; glass effects; "delightful" micro-interactions that don't earn their place |
 
-Refine.dev's *headless* mode is critical: we can plug `liulian-api`
-straight in as a custom data provider, no GraphQL/Supabase
-intermediary.
+The fusion that emerges is **distinctive and ours** — not Linear cloned,
+not Bloomberg cloned, not Swiss-school cloned, but a coherent third
+position that signals: *serious tool, scientific register, deliberate*.
+
+#### Concrete `/studio` design moves
+
+1. **Cmd+K command palette as primary nav** — every action accessible
+   in <300ms via `cmdk` library (Vercel's, OSS); keyboard-first
+   discipline borrowed from Linear, but the palette itself is restyled
+   editorially (Fraunces section headings, warm-bone background, UniBe
+   red on selected row).
+2. **Sidebar is 56px collapsed by default** — icons only, expand on
+   hover; saves screen real estate for data; opposite of the
+   240–280px sidebar dogma in §"Dashboard Design Patterns 2026" search.
+3. **Tables are dense, monotype** — JetBrains Mono on every number,
+   tabular numerals, `j/k` row nav, `o` to open peek, `e` to edit.
+   `vim`-modal feel without going full vim.
+4. **Asymmetric two-column hero on every list page** — left column is
+   the table (60% width); right column is a Fraunces-italic Q&A:
+   *"What is this?"* "A list of all training runs for the
+   swiss-river-1990 dataset." This is editorial-magazine, not SaaS-dashboard.
+5. **Status pills** are pastel ribbons (1px border, no fill, lowercase
+   monospace label) — *not* coloured pill buttons.
+6. **Loading states** = shimmer placeholders (Linear pattern), but
+   shimmer is warm-bone, not gray.
+7. **One spot color**: UniBe red `#E20613` on (a) the leading dot
+   (a 6×6 px disc, *not* a side-stripe) of the currently-selected
+   row, (b) the live-runs counter in the header, (c) destructive-action
+   confirmation. Nothing else. (Side-stripe accents > 1px are
+   explicitly banned per `UI_AUDIT_CHECKLIST.md`.)
+8. **Zero icons in the table cells**: text and color do the work.
+   Icons appear only in the sidebar + Cmd+K.
+9. **Status as typography, not chromatic pills**: "running" in
+   Fraunces italic 13px, "failed" in Fraunces bold-roman 13px,
+   "completed" in Switzer 13px regular. The *shape of the word*
+   carries the state. Pills are reserved for severity ribbons.
+10. **Scientific running header on every page** (newspaper-of-record
+    pattern): `LIULIAN · Studio · 2026-05-12 14:38 UTC ·
+    swiss-river-1990 / lstm / entity=none / seed=42`. JetBrains Mono
+    11px, `--ink-faint`. Anchors the user in space and time before
+    any content.
+11. **Numbers default to scientific notation** for orders of
+    magnitude outside `[0.01, 1000]`: `1.23e-3` instead of `0.00123`,
+    hover to expand. Tabular numerals throughout.
+12. **Easter egg, dose: one**: when a forecast crosses an alert
+    threshold, a single `流` character ripples once at the marker
+    (300ms, ease-out-quart, opacity 0 → 0.4 → 0). Distinctive,
+    domain-true, never repeated on the same page.
+
+#### Revised layer map
+
+| Surface | Direction | Tooling (under the design) |
+|---|---|---|
+| `/(marketing)` landing | **Editorial-magazine**: full-bleed wonk-1 italic hero, asymmetric grid, real scientific photography (swisstopo CC0 satellite tiles), no scroll-jacking | Next.js 14 + Tailwind + framer-motion (sparingly) + brand tokens. *No* Magic UI / Aceternity templates — too "look-at-me dev-tools." |
+| `/studio/*` | **Linear-meets-Bloomberg editorial Swiss** (above) | shadcn primitives + `cmdk` palette + TanStack Query + TanStack Table + brand tokens. Refine.dev NOT used. |
+| `/forecast` BI canvas | **Bento-grid editorial** evolved from gui-demo's 12×8 layout; UniBe red on active station + threshold-crossing marker; warm-bone canvas with two faint red radial spots | `react-mosaic-component` for tile drag/resize + ECharts (custom theme matching brand) + MapLibre (custom layer style) + neobanker `Canvas*.tsx` plumbing (restyled). |
+| `/forecast/r/{slug}` shared report | Read-only editorial layout; export-to-PDF preserves typography | Headless render via Puppeteer; same React components, no chrome |
+| `/agents/{persona}` chat | **Conversation as a scientific notebook**: tool calls render as inline collapsible "method calls" with their JSON-Schema docstring visible; references appear as Chicago-style citation footnotes; no avatar bubbles | `@ant-design/x` heavily themed (ConfigProvider override) — *or* hand-rolled if antd resists; decide on Day 5 spike |
+| `/admin` ops console | Same Linear/Bloomberg discipline; alerts pane is a single-column severity ribbon (Datadog lineage, restyled) | shadcn + cmdk |
+| `/docs` MDX site | **Long-form editorial**: Fraunces body for prose passages (yes, body), Switzer for code captions, JetBrains Mono for code | contentlayer + Tailwind typography (`prose-fraunces` custom variant) |
+
+#### Why hand-rolling /studio is worth the cost (honest version)
+
+- **Time delta**: ~2 to 3 weeks beyond using a Refine.dev template,
+  measured in Sprint Day 1 spike. Range, not point estimate.
+- **Identity delta**: a hand-rolled editorial-Swiss surface is rarer
+  than a generic admin panel and contributes to brand
+  differentiation. It is one axis of evaluation by recruiters and VCs;
+  it is rarely the decisive axis.
+- **The case for paying the cost** is *positioning fit*, not ROI on
+  a pitch. LIULIAN's positioning is vertical scientific-AI for
+  regulated sectors; a generic admin look-and-feel contradicts that
+  positioning. Distinctiveness in the studio surface is therefore a
+  *consistency* investment, not a *performance* investment.
+- **Counter-investments to revisit at M2**: spending the same 2 to 3
+  weeks on (a) a deeper Chronos vs Time-Series-Library benchmark, (b)
+  a swisstopo or Eawag pilot conversation, or (c) a public blog post
+  on a SwissRiver dataset insight could be higher-leverage. We pick
+  the studio investment because the brand surface compounds across
+  every future pitch, blog post, and demo; benchmarks and pilots are
+  individually higher-leverage but compound less.
+
+This trade-off is reviewed at M2 with whatever real metrics exist
+(time to demo, hire conversations, advisor commitments) and the
+direction is reversible if the evidence points the other way.
+
+#### What we keep from the Refine.dev investigation
+
+- **The shape of CRUD hooks** (`useList`, `useGetOne`, `useCreate`,
+  `useUpdate`, `useDelete`) — we write the same hooks on top of
+  TanStack Query; that's 200 LOC across `liulian-web/lib/api/`. Same
+  benefit, none of the framework lock-in or visual baggage.
+- **The audit-log philosophy** (every write logs who/what/when).
+  Implemented in `liulian-api` not the frontend, so no Refine
+  dependency.
+- **RBAC abstraction**: revisit at M3 if we decide to ship.
+
+This decision is encoded as **ADR 0007 (rewritten)**:
+*Reject Refine.dev as a UI source; hand-roll /studio in a Linear-meets-
+Bloomberg editorial Swiss direction.*
 
 ### 14.4 12 reference-platform designs we explicitly reuse
 

@@ -215,36 +215,37 @@ The contract diagram lives in `PLATFORM_DESIGN.md §1`.
 | Background ML | Ray Serve for online inference; arq for batch | Ray is already pinned for HPO; one infra fewer |
 | Observability | OpenTelemetry → Prometheus + Grafana + Tempo + Loki | Standard. Sentry on top |
 
-### 5.1 Why TimescaleDB ("eat our own dogfood" explained)
+### 5.1 Why TimescaleDB (operational, not slogan)
 
-The phrase "eat our own dogfood" is a software-industry idiom: *use your
-own product on your own infrastructure*. It signals seriousness — if
-your own service can't run on your own primitive, why would a customer
-trust it?
+LIULIAN's `run_metric`, `forecast`, and `alert` tables are append-only
+time-keyed streams that will reach millions of rows within M2. Two
+candidate paths:
 
-LIULIAN is a **time-series + spatio-temporal product**. The natural
-storage primitive is therefore a **time-series-native database**. Choosing
-TimescaleDB (Postgres extension, Apache-2.0) means:
+1. **Plain Postgres** + manual partitioning (`pg_partman` + `pg_cron`).
+   Works. Requires us to write and maintain the partition schedule.
+2. **TimescaleDB extension** (Postgres-compatible, Apache-2.0).
+   Hypertables auto-partition. `CREATE EXTENSION timescaledb` is the
+   only adoption cost; SQLModel works unchanged.
 
-1. **Operational legibility** — every customer-facing claim ("forecast at
-   each station has Q05–Q95 over 30 days") corresponds to a hypertable
-   query the same shape as what we'd recommend to *them*. We
-   experience our customers' pain.
-2. **Compute predicate**: `time_bucket('1h', recorded_at)` over millions
-   of rows is < 50 ms on a small VM. Plain Postgres would need manual
-   sharding by date. We get the perf for free.
-3. **No new query language**: it's still PostgreSQL. SQLModel works
-   unchanged.
-4. **Migration story**: customers running plain Postgres can adopt
-   TimescaleDB by `CREATE EXTENSION timescaledb` — zero downtime.
-5. **Eject path**: if scale exceeds what TimescaleDB handles
-   (rare at our trajectory), we already documented TDengine as the
-   migration target (REFERENCE_DESIGNS §D1).
+Choosing TimescaleDB for these three tables eliminates partition-management
+code at zero query-language cost. That is the primary justification.
 
-This is the kind of decision that converts an engineer-reviewer in a
-hiring loop: *"of course they picked Timescale, they live in time
-series"*. The alternative (plain Postgres for an explicitly TS product)
-would look unserious.
+Secondary, narrative-only benefits:
+
+- A TS product running on a TS-native primitive has internal
+  consistency. Some engineer-reviewers in hiring loops appreciate the
+  fit; others don't notice. Treat this as small upside, not the
+  reason.
+- Customers running plain Postgres can adopt TimescaleDB the same way
+  we did. Same migration story for both sides.
+- Eject path: if scale exceeds what TimescaleDB handles (rare on our
+  trajectory), TDengine is the documented migration target
+  (REFERENCE_DESIGNS §D1).
+
+Sprint-time pragmatism: Day 1 of `liulian-api` uses **plain Postgres**;
+TimescaleDB extension is enabled in a follow-up commit only after the
+M1 demo is shipping. This removes one risk vector from the sprint
+without losing the option.
 
 ### 5.2 API surface (v1)
 
@@ -809,19 +810,29 @@ docs/strategy/
 
 ---
 
-## 15. Roadmap (six months — sprint-extended)
+## 15. Roadmap (three-track timeline, sprint-extended)
 
-| Milestone | Window | Defining deliverable | Investor narrative |
-|---|---|---|---|
-| **M1: Portfolio-ready** | 2026-05-13 → 2026-05-19 (sprint) | Live demo URLs (web + mobile) + 7 repos initialised + ARTORG application shipped | "Built a federated TS/ST product solo in a week" |
-| **M2: BI flagship** | 2026-05-20 → 2026-06-30 | 8-panel SwissRiver dashboard fully interactive; Chronos zero-shot; custom agent v1 with three personas | "Production-grade BI on a 30-model zoo" |
-| **M3: Multi-tenant cloud** | 2026-07 | Helm + Terraform on EKS; Clerk auth; per-tenant isolation; status page | "Deployable to a customer's cloud in 1 day" |
-| **M4: Vertical pilots** | 2026-08 | Two more verticals — energy demand, healthcare ECG; one-page case study each | "Vertical-agnostic by design" |
-| **M5: Agent autopilot** | 2026-09 | Autopilot mode: nightly anomaly sweep, retrain decisions, drift detection | "From dashboards to decisions" |
-| **M6: Pre-seed** | 2026-10 → 2026-11 | Pitch deck + 18-month financial model + first LOI | "Raise CHF 800k pre-seed" |
+The original M1–M6 table assumed full-time effort. Linlin's actual
+constraint is ~20 hours/week alongside the postdoc role. Research
+deadlines (ICPR camera-ready, SNSF / ERC cycles) will collide.
+Therefore three timelines are tracked in parallel; M1 is fixed for
+all three because the ARTORG application is an external deadline.
+
+| Milestone | Aggressive (zero slip) | Realistic (1 slip) | Conservative (multiple slips) | Defining deliverable |
+|---|---|---|---|---|
+| **M1: Portfolio-ready** | 2026-05-19 | 2026-05-19 | 2026-05-19 | Live demo URLs + 7 repos initialised + ARTORG submission |
+| **M2: BI flagship** | 2026-06-30 | 2026-08-01 | 2026-09 | 8-panel SwissRiver canvas + Chronos zero-shot + agent v1 |
+| **M3: Multi-tenant cloud** | 2026-07 | 2026-09 | 2026-10 | Helm + Terraform on EKS, Clerk auth, status page |
+| **M4: Vertical pilots** | 2026-08 | 2026-10 | 2026-12 | Energy demand + healthcare ECG case studies |
+| **M5: Agent autopilot** | 2026-09 | 2026-12 | 2027-Q1 | Nightly anomaly sweep, retrain decisions, drift detection |
+| **M6: Pre-seed** | 2026-11 | 2027-Q1 | 2027-Q2 | Pitch deck + financial model + first LOI |
+
+Plan-of-record: **Realistic**. We communicate Realistic timing to
+external stakeholders; we work toward Aggressive; we hold
+Conservative as the floor.
 
 Each milestone has one **visible artefact** (URL, deck, chart) legible
-without reading code.
+without reading code. The artefact, not the date, is the deliverable.
 
 ---
 
