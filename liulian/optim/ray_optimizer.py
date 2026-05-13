@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import itertools
 import logging
+import os
 from typing import Any, Callable, Dict, List, Optional
 
 from liulian.optim.base import BaseOptimizer, OptimizationResult
@@ -89,11 +90,33 @@ def make_trainable(
                 model = model_cls(**vars(args)).float()
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        # Disable early stopping inside HPO trials — ASHA handles pruning
-        merged['disable_early_stopping'] = True
+        # Keep trainer-level early stopping behavior from the base config
+        # (Swiss-River style): patience-driven stop remains active unless the
+        # caller explicitly sets ``disable_early_stopping=True``.
+        merged.setdefault('disable_early_stopping', False)
+        # Use a trial-unique checkpoint directory so concurrent Ray trials do
+        # not overwrite each other's best checkpoints.
+        trial_checkpoint_dir = os.path.join('checkpoints', f'pid_{os.getpid()}')
+        try:
+            from ray import tune
+
+            get_context = getattr(tune, 'get_context', None)
+            if callable(get_context):
+                context = get_context()
+                if context is not None:
+                    trial_id = context.get_trial_id()
+                    if trial_id:
+                        trial_checkpoint_dir = os.path.join(
+                            'checkpoints', f'trial_{trial_id}'
+                        )
+        except Exception:
+            # Keep PID-scoped fallback if Ray context is unavailable.
+            pass
         trainer = ForecastTrainer(
-            config=merged, device=device
-        )  # todo: checkpoint_dir and exp_logger?
+            config=merged,
+            device=device,
+            checkpoint_dir=trial_checkpoint_dir,
+        )
 
         train_loader = loaders['train']
         val_loader = loaders['val']

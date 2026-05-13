@@ -88,7 +88,7 @@ parent: ONE_WEEK_SPRINT.md
 #### 验收
 
 - `curl localhost:8000/healthz` → 200
-- 8 个仓在 `jajupmochi/liulian-*` 可见
+- 8 个仓在 `liulian-ai/liulian-*` 可见
 - reuse map 里 reuse 比例已是实测数
 - landing 截图视觉与 gui-demo 同调
 

@@ -32,7 +32,7 @@ Usage::
 
 from __future__ import annotations
 
-from typing import Dict, Literal
+from typing import Any, Dict, Literal, Sequence
 
 import numpy as np
 import torch
@@ -56,6 +56,7 @@ def aggregate_predictions(
     *,
     method: AggMethod = 'mean',
     pred_len: int | None = None,
+    entity_ids: Sequence[Any] | torch.Tensor | np.ndarray | None = None,
 ) -> Dict[str, np.ndarray]:
     """Aggregate overlapping sliding-window predictions into one time-series.
 
@@ -73,6 +74,12 @@ def aggregate_predictions(
         Aggregation strategy (see module docstring).
     pred_len : int or None
         If *None*, inferred from ``preds.shape[1]``.
+    entity_ids : sequence or array-like, optional
+        Entity ID per sample/window (length ``N``). When provided and
+        containing multiple entities, overlap resolution is done **per entity**
+        first, then aggregated across entities at each time-step. This avoids
+        mixing windows from different stations when they share the same
+        timestamps (common in per-entity split mode).
 
     Returns
     -------
@@ -81,15 +88,48 @@ def aggregate_predictions(
         ``pred`` — ``(T, C)`` aggregated predictions.
         ``true`` — ``(T, C)`` ground-truth values.
     """
-    # todo: fixme: this function may be incorrect if there are multiple stations. It might influence viz as well.
     preds = _to_numpy(preds)
     trues = _to_numpy(trues)
     times = _to_numpy(times)
 
     N = preds.shape[0]
+    if times.ndim == 3 and times.shape[-1] == 1:
+        times = times[..., 0]
+    if times.ndim == 1:
+        times = times[None, :]
+    if times.ndim != 2:
+        raise ValueError(
+            f'Expected times with 2 dims after normalization, got shape={times.shape}.'
+        )
     if pred_len is None:
         pred_len = preds.shape[1]
     C = preds.shape[2]
+    if trues.shape[:2] != preds.shape[:2]:
+        raise ValueError(
+            f'preds and trues must share leading dims (N, pred_len). '
+            f'Got preds={preds.shape}, trues={trues.shape}.'
+        )
+    if times.shape[0] != N:
+        raise ValueError(
+            f'times first dimension must match N. Got times={times.shape}, N={N}.'
+        )
+    if times.shape[1] < pred_len:
+        raise ValueError(
+            f'times second dimension must be >= pred_len ({pred_len}). '
+            f'Got times={times.shape}.'
+        )
+
+    normalized_entity_ids = _normalize_entity_ids(entity_ids, expected_n=N)
+    if normalized_entity_ids is not None and len(set(normalized_entity_ids)) > 1:
+        return _agg_by_entity_then_mean(
+            preds=preds,
+            trues=trues,
+            times=times,
+            entity_ids=normalized_entity_ids,
+            method=method,
+            pred_len=pred_len,
+            C=C,
+        )
 
     # Extract time indices corresponding to the prediction horizon
     # times has shape (N, win_len); we need the last pred_len entries.
@@ -129,13 +169,96 @@ def _to_numpy(x: torch.Tensor | np.ndarray) -> np.ndarray:
     return np.asarray(x)
 
 
+def _normalize_entity_ids(
+    entity_ids: Sequence[Any] | torch.Tensor | np.ndarray | None,
+    *,
+    expected_n: int,
+) -> np.ndarray | None:
+    """Normalize optional per-window entity IDs to a 1-D object array."""
+    if entity_ids is None:
+        return None
+
+    ids_np = _to_numpy(entity_ids)
+    if ids_np.ndim == 0:
+        ids_np = ids_np.reshape(1)
+    if ids_np.ndim > 1:
+        ids_np = ids_np.reshape(-1)
+    if ids_np.shape[0] != expected_n:
+        raise ValueError(
+            f'entity_ids length must match N. Got len={ids_np.shape[0]}, N={expected_n}.'
+        )
+    return ids_np.astype(object)
+
+
+def _agg_by_entity_then_mean(
+    *,
+    preds: np.ndarray,
+    trues: np.ndarray,
+    times: np.ndarray,
+    entity_ids: np.ndarray,
+    method: AggMethod,
+    pred_len: int,
+    C: int,
+) -> Dict[str, np.ndarray]:
+    """Resolve overlaps per entity, then average across entities by time."""
+    per_entity_results: list[Dict[str, np.ndarray]] = []
+    seen: set[Any] = set()
+    ordered_entities: list[Any] = []
+    for entity in entity_ids.tolist():
+        if entity in seen:
+            continue
+        seen.add(entity)
+        ordered_entities.append(entity)
+
+    for entity in ordered_entities:
+        mask = entity_ids == entity
+        if not np.any(mask):
+            continue
+        result = aggregate_predictions(
+            preds[mask],
+            trues[mask],
+            times[mask],
+            method=method,
+            pred_len=pred_len,
+            entity_ids=None,
+        )
+        per_entity_results.append(result)
+
+    all_times = np.unique(
+        np.concatenate([result['time'] for result in per_entity_results]).astype(np.int64)
+    )
+    all_times.sort()
+    T = len(all_times)
+    time_to_idx = {int(t): i for i, t in enumerate(all_times)}
+
+    pred_groups: list[list[np.ndarray]] = [[] for _ in range(T)]
+    true_groups: list[list[np.ndarray]] = [[] for _ in range(T)]
+    for result in per_entity_results:
+        for i, t in enumerate(result['time']):
+            idx = time_to_idx[int(t)]
+            pred_groups[idx].append(result['pred'][i])
+            true_groups[idx].append(result['true'][i])
+
+    agg_pred = np.zeros((T, C), dtype=np.float32)
+    agg_true = np.zeros((T, C), dtype=np.float32)
+    for i in range(T):
+        agg_pred[i] = np.mean(np.asarray(pred_groups[i]), axis=0)
+        agg_true[i] = np.mean(np.asarray(true_groups[i]), axis=0)
+
+    return {
+        'time': all_times,
+        'pred': agg_pred,
+        'true': agg_true,
+    }
+
+
 def _agg_longest_history(
     flat_times: np.ndarray,
     flat_preds: np.ndarray,
     flat_trues: np.ndarray,
     C: int,
 ) -> Dict[str, np.ndarray]:
-    """Keep first occurrence (= longest history) for each time step."""  # todo, fixme: I don't think this is correct.
+    """Keep first occurrence (= longest history) for each time step."""
     unique_times, first_idx = np.unique(flat_times, return_index=True)
     return {
         'time': unique_times,

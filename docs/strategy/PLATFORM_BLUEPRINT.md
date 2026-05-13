@@ -184,7 +184,7 @@ Everything else (`apps/api`, `apps/web`, `apps/mobile`, `infra/`,
 The contract surface between repos is intentionally narrow:
 
 1. **`liulian-python` → `liulian-api`** — Python import (`pip install -e
-   git+https://github.com/jajupmochi/liulian-python@vX.Y.Z`). API depends
+   git+https://github.com/liulian-ai/liulian-python@vX.Y.Z`). API depends
    on tagged versions, not main.
 2. **`liulian-api` → `liulian-web` / `liulian-mobile` / `liulian-sdk`** —
    OpenAPI schema published per release. Web + SDK codegen consumes a
@@ -694,13 +694,13 @@ name: ci
 on: [push, pull_request]
 jobs:
   lint:
-    uses: jajupmochi/liulian-ops/.github/workflows/python-lint.yml@v1
+    uses: liulian-ai/liulian-ops/.github/workflows/python-lint.yml@v1
   type:
-    uses: jajupmochi/liulian-ops/.github/workflows/python-mypy.yml@v1
+    uses: liulian-ai/liulian-ops/.github/workflows/python-mypy.yml@v1
   test:
-    uses: jajupmochi/liulian-ops/.github/workflows/python-pytest.yml@v1
+    uses: liulian-ai/liulian-ops/.github/workflows/python-pytest.yml@v1
   build-image:
-    uses: jajupmochi/liulian-ops/.github/workflows/python-image.yml@v1
+    uses: liulian-ai/liulian-ops/.github/workflows/python-image.yml@v1
 ```
 
 (JS repos use a parallel set: `js-lint.yml`, `js-tsc.yml`, `js-vitest.yml`,

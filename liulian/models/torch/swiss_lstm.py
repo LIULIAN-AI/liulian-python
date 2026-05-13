@@ -296,6 +296,7 @@ _TRANSPARENT_MODES = frozenset(
         'onehot',
         'coordinates',
         'sinusoidal',
+        'random',
         'descriptors',
         'numeric_id',
     }

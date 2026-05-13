@@ -45,6 +45,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     'seed': 2026,
     'quick_test': False,
     'eval_only': False,
+    'deterministic': False,  # Enable full CUDA determinism for identical results
     # ── Data ────────────────────────────────────────────────────────
     'data': 'swiss-river-1990',
     'seq_len': 90,
@@ -53,6 +54,9 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     'label_len': 0,
     'train_split': 0.8,
     'max_samples': None,
+    # Cap only the training split size (fast pipeline checks without shrinking val/test).
+    'max_train_samples': None,
+    'data_dtype': 'float32',  # 'float32' (default) or 'float64' (TSL-compatible)
     # ── Task & mode ─────────────────────────────────────────────────
     'task': 'forecast',
     'split_mode': 'per_entity',
@@ -76,6 +80,9 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     'id_integration': 'concat_to_x',
     'embedding_size': 10,
     'num_embeddings': None,
+    'sinusoidal_dim': 16,
+    'random_identifier_dim': 16,
+    'random_identifier_seed': 2026,
     # ── Graph / spatial ─────────────────────────────────────────────
     'graph_mode': 'none',
     'graphlet_num_hops': 1,

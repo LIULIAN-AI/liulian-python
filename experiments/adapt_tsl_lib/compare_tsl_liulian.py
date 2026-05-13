@@ -2857,6 +2857,7 @@ def build_tsl_cmd(
     epoch_limit: Optional[int] = None,
     disable_es: bool = False,
     extra_overrides: Optional[dict] = None,
+    deterministic_subprocess: bool = False,
 ) -> list[str]:
     """Build the TSL run.py command for an experiment."""
     args = dict(TSL_BASE_ARGS)
@@ -2870,6 +2871,8 @@ def build_tsl_cmd(
         args["train_epochs"] = epoch_limit
     if disable_es:
         args["patience"] = 9999  # effectively disable early stopping
+    if deterministic_subprocess:
+        args["dropout"] = 0.0  # disable dropout for deterministic mode
 
     cmd = [PYTHON, "-u", "run.py"]
     for k, v in args.items():
@@ -2903,6 +2906,7 @@ def build_liulian_cmd(
     disable_es: bool = False,
     tsl_extra_overrides: Optional[dict] = None,
     cli_overrides: Optional[dict] = None,
+    deterministic_subprocess: bool = False,
 ) -> list[str]:
     """Build the liulian experiments/run.py command."""
     config_path = str(PROJECT_ROOT / exp.liulian_config)
@@ -2912,6 +2916,11 @@ def build_liulian_cmd(
         cmd.extend(["--train_epochs", str(epoch_limit)])
     if disable_es:
         cmd.append("--disable_early_stopping")
+    
+    # Add deterministic mode flags for identical comparison
+    if deterministic_subprocess:
+        cmd.append("--deterministic")
+        cmd.extend(["--data_dtype", "float64"])
     
     effective_tsl_overrides = dict(exp.tsl_overrides)
     if tsl_extra_overrides:
@@ -3012,6 +3021,218 @@ def parse_liulian_output(output: str) -> dict:
         result["epochs_run"] = int(m.group(1))
     return result
 
+
+# ---------------------------------------------------------------------------
+# Identical Mode (in-process comparison with shared dataloaders)
+# ---------------------------------------------------------------------------
+
+def run_identical_comparison(
+    dataset_name: str,
+    model_name: str,
+    epochs: int = 3,
+    seed: int = 2021,
+) -> dict:
+    """Run identical comparison for a dataset-model pair.
+    
+    Returns dict with keys: 'identical', 'tsl_mse', 'liulian_mse', 'diff', 'error'.
+    """
+    import os
+    import random
+    
+    import numpy as np
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    
+    # Dataset configurations
+    DATASET_CONFIGS = {
+        'ETTh1': {'root_path': 'dataset/ETT-small/', 'data_path': 'ETTh1.csv', 'enc_in': 7, 'freq': 'h'},
+        'ETTh2': {'root_path': 'dataset/ETT-small/', 'data_path': 'ETTh2.csv', 'enc_in': 7, 'freq': 'h'},
+        'ETTm1': {'root_path': 'dataset/ETT-small/', 'data_path': 'ETTm1.csv', 'enc_in': 7, 'freq': 't'},
+        'ETTm2': {'root_path': 'dataset/ETT-small/', 'data_path': 'ETTm2.csv', 'enc_in': 7, 'freq': 't'},
+        'Weather': {'root_path': 'dataset/weather/', 'data_path': 'weather.csv', 'enc_in': 21, 'freq': 'h'},
+    }
+    
+    if dataset_name not in DATASET_CONFIGS:
+        return {'identical': False, 'error': f'Dataset {dataset_name} not supported in identical mode'}
+    
+    if model_name != 'Transformer':
+        return {'identical': False, 'error': f'Model {model_name} not supported in identical mode (only Transformer)'}
+    
+    cfg = DATASET_CONFIGS[dataset_name]
+    
+    def set_deterministic(s: int):
+        random.seed(s)
+        np.random.seed(s)
+        torch.manual_seed(s)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed_all(s)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+        os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+        os.environ['PYTHONHASHSEED'] = str(s)
+        try:
+            torch.use_deterministic_algorithms(True)
+        except Exception:
+            pass
+    
+    try:
+        from experiments.adapt_tsl_lib.tsl_float64_dataloader import create_tsl_aligned_dataloader
+        
+        # Import models
+        sys.path.insert(0, str(TSL_ROOT))
+        from models.Transformer import Model as TSLModel
+        sys.path.pop(0)
+        from liulian.models.torch.transformer import TransformerAdapter
+        
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
+        # TSL Args (dropout=0 for determinism)
+        class TSLArgs:
+            task_name = 'long_term_forecast'
+            seq_len = 96
+            label_len = 48
+            pred_len = 96
+            enc_in = cfg['enc_in']
+            dec_in = cfg['enc_in']
+            c_out = cfg['enc_in']
+            d_model = 512
+            n_heads = 8
+            e_layers = 2
+            d_layers = 1
+            d_ff = 2048
+            factor = 3
+            dropout = 0.0
+            activation = 'gelu'
+            embed = 'timeF'
+            freq = cfg['freq']
+            output_attention = False
+        
+        tsl_args = TSLArgs()
+        
+        # Liulian config (dropout=0 for determinism)
+        liulian_config = {
+            'seq_len': 96, 'pred_len': 96, 'label_len': 48,
+            'enc_in': cfg['enc_in'], 'dec_in': cfg['enc_in'], 'c_out': cfg['enc_in'],
+            'd_model': 512, 'n_heads': 8, 'e_layers': 2, 'd_layers': 1,
+            'd_ff': 2048, 'factor': 3, 'dropout': 0.0, 'activation': 'gelu',
+            'embed': 'timeF', 'freq': cfg['freq'], 'task_name': 'long_term_forecast',
+        }
+        
+        criterion = nn.MSELoss()
+        
+        # Create models (same seed = same weights)
+        set_deterministic(seed)
+        tsl_model = TSLModel(tsl_args).float().to(device)
+        tsl_optimizer = optim.Adam(tsl_model.parameters(), lr=0.0001)
+        
+        set_deterministic(seed)
+        adapter = TransformerAdapter(liulian_config)
+        liu_model = adapter._model.float().to(device)
+        liu_optimizer = optim.Adam(liu_model.parameters(), lr=0.0001)
+        
+        # Create dataloaders (after models to preserve RNG state)
+        root_path = str(PROJECT_ROOT / cfg['root_path'])
+        train_loader = create_tsl_aligned_dataloader(
+            root_path=root_path, data_path=cfg['data_path'], flag='train',
+            seq_len=96, label_len=48, pred_len=96, features='M',
+            batch_size=32, shuffle=True, drop_last=True, freq=cfg['freq'],
+        )
+        val_loader = create_tsl_aligned_dataloader(
+            root_path=root_path, data_path=cfg['data_path'], flag='val',
+            seq_len=96, label_len=48, pred_len=96, features='M',
+            batch_size=32, shuffle=False, drop_last=True, freq=cfg['freq'],
+        )
+        test_loader = create_tsl_aligned_dataloader(
+            root_path=root_path, data_path=cfg['data_path'], flag='test',
+            seq_len=96, label_len=48, pred_len=96, features='M',
+            batch_size=32, shuffle=False, drop_last=False, freq=cfg['freq'],
+        )
+        
+        # Cache batches for identical iteration
+        train_batches = list(train_loader)
+        val_batches = list(val_loader)
+        test_batches = list(test_loader)
+        
+        label_len, pred_len = 48, 96
+        
+        def train_epoch(model, optimizer, batches):
+            model.train()
+            losses = []
+            for batch in batches:
+                batch_x, batch_y, batch_x_mark, batch_y_mark = [b.float().to(device) for b in batch]
+                optimizer.zero_grad()
+                dec_inp = torch.cat([
+                    batch_y[:, :label_len, :],
+                    torch.zeros_like(batch_y[:, -pred_len:, :])
+                ], dim=1).to(device)
+                outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+                loss = criterion(outputs[:, -pred_len:, :], batch_y[:, -pred_len:, :])
+                loss.backward()
+                optimizer.step()
+                losses.append(loss.item())
+            return sum(losses) / len(losses)
+        
+        def evaluate(model, batches):
+            model.eval()
+            total_loss, count = 0, 0
+            with torch.no_grad():
+                for batch in batches:
+                    batch_x, batch_y, batch_x_mark, batch_y_mark = [b.float().to(device) for b in batch]
+                    dec_inp = torch.cat([
+                        batch_y[:, :label_len, :],
+                        torch.zeros_like(batch_y[:, -pred_len:, :])
+                    ], dim=1).to(device)
+                    outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark)
+                    loss = criterion(outputs[:, -pred_len:, :], batch_y[:, -pred_len:, :])
+                    total_loss += loss.item() * batch_x.size(0)
+                    count += batch_x.size(0)
+            return total_loss / count
+        
+        # Training loop
+        all_diffs_zero = True
+        for epoch in range(1, epochs + 1):
+            set_deterministic(seed + epoch)
+            tsl_train_loss = train_epoch(tsl_model, tsl_optimizer, train_batches)
+            set_deterministic(seed)
+            tsl_val_loss = evaluate(tsl_model, val_batches)
+            
+            set_deterministic(seed + epoch)
+            liu_train_loss = train_epoch(liu_model, liu_optimizer, train_batches)
+            set_deterministic(seed)
+            liu_val_loss = evaluate(liu_model, val_batches)
+            
+            train_diff = abs(tsl_train_loss - liu_train_loss)
+            val_diff = abs(tsl_val_loss - liu_val_loss)
+            if train_diff > 1e-9 or val_diff > 1e-9:
+                all_diffs_zero = False
+            print(f"   Epoch {epoch}: train_diff={train_diff:.2e} val_diff={val_diff:.2e}")
+        
+        # Test evaluation
+        set_deterministic(seed)
+        tsl_test_mse = evaluate(tsl_model, test_batches)
+        set_deterministic(seed)
+        liu_test_mse = evaluate(liu_model, test_batches)
+        
+        diff = abs(tsl_test_mse - liu_test_mse)
+        identical = diff < 1e-9 and all_diffs_zero
+        
+        return {
+            'identical': identical,
+            'tsl_mse': tsl_test_mse,
+            'liulian_mse': liu_test_mse,
+            'diff': diff,
+            'error': None,
+        }
+    
+    except Exception as e:
+        import traceback
+        return {
+            'identical': False,
+            'error': f'{type(e).__name__}: {e}\n{traceback.format_exc()}',
+        }
+
+
 # ---------------------------------------------------------------------------
 # Runner
 # ---------------------------------------------------------------------------
@@ -3022,12 +3243,21 @@ def run_cmd(
     label: str,
     timeout_seconds: int = 7200,
     progress_interval_seconds: int = 30,
+    env: dict | None = None,
 ) -> tuple[str, float, int]:
-    """Run a command, return (combined_output, elapsed_seconds, returncode)."""
+    """Run a command, return (combined_output, elapsed_seconds, returncode).
+    
+    Parameters
+    ----------
+    env : dict | None
+        Optional environment variables to set. Merged with current environment.
+    """
     print(f"\n{'='*60}")
     print(f"  Running: {label}")
     print(f"  CWD: {cwd}")
     print(f"  CMD: {' '.join(cmd[:6])} ...")
+    if env:
+        print(f"  ENV: {env}")
     print(f"{'='*60}")
 
     # Progress behaviour policy:
@@ -3039,6 +3269,12 @@ def run_cmd(
     # budget, which is stable across both pipelines.
     print("  Progress mode: fallback runner progress bar")
 
+    # Merge env with current environment
+    run_env = None
+    if env:
+        run_env = os.environ.copy()
+        run_env.update(env)
+
     t0 = time.time()
     popen = subprocess.Popen(
         cmd,
@@ -3046,6 +3282,7 @@ def run_cmd(
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        env=run_env,
     )
 
     while True:
@@ -3377,6 +3614,29 @@ def main() -> None:
         "--smoke-train-epochs", type=int, default=1,
         help="Train epochs used in smoke test mode.",
     )
+    parser.add_argument(
+        "--identical", action="store_true",
+        help=(
+            "Run in IDENTICAL comparison mode. Both TSL and Liulian models "
+            "are run IN-PROCESS with shared dataloaders, deterministic settings, "
+            "dropout=0.0, and float64 data alignment. This mode achieves 0.00e+00 "
+            "difference for properly adapted models. Requires: Transformer model. "
+            "Ignores subprocess-based comparison and uses compare_identical logic."
+        ),
+    )
+    parser.add_argument(
+        "--deterministic-subprocess", action="store_true",
+        help=(
+            "Run Liulian with --deterministic --data_dtype float64 flags via subprocess. "
+            "This enables full CUDA determinism, dropout=0, and float64 data processing "
+            "in the main pipeline to match TSL's sklearn StandardScaler behavior. "
+            "Unlike --identical, this still uses subprocess-based comparison (no shared dataloader)."
+        ),
+    )
+    parser.add_argument(
+        "--identical-epochs", type=int, default=3,
+        help="Number of epochs for identical mode (default: 3).",
+    )
     args = parser.parse_args()
     runtime_overrides_by_pair = parse_runtime_overrides_env()
     if args.oom_fallback:
@@ -3505,6 +3765,65 @@ def main() -> None:
             print(detail)
             continue
 
+        # --- IDENTICAL MODE: Run in-process comparison with shared dataloaders ---
+        if args.identical:
+            print(f"\n  Running IDENTICAL mode comparison...")
+            print(f"  Dataset: {exp.dataset}, Model: {exp.model}, Epochs: {args.identical_epochs}")
+            
+            result = run_identical_comparison(
+                dataset_name=exp.dataset,
+                model_name=exp.model,
+                epochs=args.identical_epochs,
+                seed=2021,
+            )
+            
+            if result.get('error'):
+                status = 'identical mode error'
+                detail = result['error']
+                r = {
+                    "name": exp.name,
+                    "dataset": exp.dataset,
+                    "model": exp.model,
+                    "has_tsl_script": exp.has_tsl_script,
+                    "large": exp.large,
+                    "epoch_limit": args.identical_epochs,
+                    "status": status,
+                    "detail": detail,
+                    "identical_mode": True,
+                }
+            else:
+                tsl_mse = result['tsl_mse']
+                liu_mse = result['liulian_mse']
+                diff = result['diff']
+                identical = result['identical']
+                
+                if identical:
+                    status = 'checked and matched'
+                    detail = f'IDENTICAL: TSL={tsl_mse:.10f}, Liulian={liu_mse:.10f}, diff={diff:.2e}'
+                else:
+                    status = 'checked but not matched'
+                    detail = f'NOT IDENTICAL: TSL={tsl_mse:.10f}, Liulian={liu_mse:.10f}, diff={diff:.2e}'
+                
+                r = {
+                    "name": exp.name,
+                    "dataset": exp.dataset,
+                    "model": exp.model,
+                    "has_tsl_script": exp.has_tsl_script,
+                    "large": exp.large,
+                    "epoch_limit": args.identical_epochs,
+                    "tsl_final_mse": tsl_mse,
+                    "ll_final_mse": liu_mse,
+                    "mse_diff": diff,
+                    "status": status,
+                    "detail": detail,
+                    "identical_mode": True,
+                }
+            
+            results.append(r)
+            print(f"\n  ── Result: {status} ──")
+            print(f"  {detail}")
+            continue
+
         pair_runtime = runtime_overrides_by_pair.get(exp.name, {})
         tsl_runtime_overrides = dict(pair_runtime.get('tsl_overrides') or {})
         ll_cli_runtime_overrides = dict(pair_runtime.get('liulian_cli_overrides') or {})
@@ -3556,6 +3875,7 @@ def main() -> None:
             epoch_limit=epoch_limit,
             disable_es=disable_es,
             extra_overrides=tsl_runtime_overrides,
+            deterministic_subprocess=args.deterministic_subprocess,
         )
         ll_cmd = build_liulian_cmd(
             exp,
@@ -3563,6 +3883,7 @@ def main() -> None:
             disable_es=disable_es,
             tsl_extra_overrides=tsl_runtime_overrides,
             cli_overrides=ll_cli_runtime_overrides,
+            deterministic_subprocess=args.deterministic_subprocess,
         )
 
         if args.dry_run:
@@ -3583,6 +3904,15 @@ def main() -> None:
             continue
 
         # --- Run TSL ---
+        # Deterministic env vars for subprocess mode
+        det_env = None
+        if args.deterministic_subprocess:
+            det_env = {
+                'CUBLAS_WORKSPACE_CONFIG': ':4096:8',
+                'PYTHONHASHSEED': '2021',
+                'TSL_NO_SHUFFLE': '1',  # Disable shuffle for deterministic comparison
+            }
+        
         try:
             tsl_out, tsl_time, tsl_rc = run_cmd(
                 tsl_cmd,
@@ -3590,6 +3920,7 @@ def main() -> None:
                 label=f"TSL {exp.name}",
                 timeout_seconds=args.timeout_seconds,
                 progress_interval_seconds=args.progress_interval_seconds,
+                env=det_env,
             )
         except subprocess.TimeoutExpired:
             tsl_out, tsl_time, tsl_rc = '', -1, -1
@@ -3605,6 +3936,7 @@ def main() -> None:
                 label=f"liulian {exp.name}",
                 timeout_seconds=args.timeout_seconds,
                 progress_interval_seconds=args.progress_interval_seconds,
+                env=det_env,
             )
         except subprocess.TimeoutExpired:
             ll_out, ll_time, ll_rc = '', -1, -1

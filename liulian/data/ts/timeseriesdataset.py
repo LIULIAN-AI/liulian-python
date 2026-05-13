@@ -14,7 +14,7 @@ Key features (all preserved):
 * **Historical target inclusion** — ground-truth or predicted y.
 * **Full-history mode** — variable-length segments (one sample each).
 * **Nowcasting / forecasting** tasks.
-* **Entity identifiers** — embedding, one-hot, coordinates, sinusoidal.
+* **Entity identifiers** — embedding, one-hot, coordinates, sinusoidal, random.
 
 Adapted from:
 - refer_projects/swiss-river-network-benchmark/…/dataset.py
@@ -23,9 +23,13 @@ Adapted from:
 
 from __future__ import annotations
 
+import logging
 import math
+import hashlib
 from functools import cached_property
-from typing import Any, Dict, Mapping, Optional, Sequence
+from typing import Any, Dict, Mapping, Sequence
+
+logger = logging.getLogger(__name__)
 
 import numpy as np
 import pandas as pd
@@ -66,6 +70,8 @@ def make_entity_features(
     *,
     coordinates: dict[str, tuple[float, float]] | None = None,
     sinusoidal_dim: int = 16,
+    random_dim: int = 16,
+    random_seed: int = 2026,
     descriptors: dict[str, list[float]] | None = None,
 ) -> torch.Tensor | None:
     """Build a 2-D entity feature block ``(seq_len, D)`` for one station.
@@ -80,6 +86,8 @@ def make_entity_features(
     * ``'numeric_id'``    — normalized scalar in ``[0, 1]``.
     * ``'coordinates'``   — 2-D geographic ``(lat, lon)`` vector.
     * ``'sinusoidal'``    — positional encoding of dimension *sinusoidal_dim*.
+    * ``'random'``        — deterministic random vector baseline of dimension
+      *random_dim* (seeded by station + *random_seed*).
     * ``'descriptors'``   — user-supplied numeric descriptor vector per station.
 
     Returns ``None`` when ``mode='none'`` or ``mode='embedding'``.
@@ -105,6 +113,21 @@ def make_entity_features(
             vec = torch.zeros(2, dtype=torch.float32)
     elif mode == 'sinusoidal':
         vec = _sinusoidal_encoding(idx, sinusoidal_dim)
+    elif mode == 'random':
+        if random_dim <= 0:
+            raise ValueError('random_dim must be positive for random identifier mode.')
+        # Keep random identifiers stable across runs for fair comparisons.
+        key = f'{random_seed}:{station_name}'
+        digest = hashlib.sha256(key.encode('utf-8')).digest()
+        seed = int.from_bytes(digest[:8], byteorder='little', signed=False) % (2**32)
+        rng = np.random.default_rng(seed)
+        vec = torch.tensor(
+            rng.standard_normal(random_dim).astype(np.float32),
+            dtype=torch.float32,
+        )
+        norm = torch.linalg.norm(vec)
+        if torch.isfinite(norm) and float(norm) > 0:
+            vec = vec / norm
     elif mode == 'descriptors':
         if descriptors and station_name in descriptors:
             vec = torch.tensor(descriptors[station_name], dtype=torch.float32)
@@ -418,9 +441,9 @@ class TimeSeriesSplit(Dataset):
         When ``label_len > 0`` (Transformer decoder warm-up), the
         decoder target includes an overlap with the encoder tail::
 
-            x_enc  = feat[:seq_len]                   # (seq_len, D)
-            y_dec  = targ[seq_len - label_len :]      # (label_len + pred_len, D)
-            y_mark = time[seq_len - label_len :]      # matching time marks
+            x_enc = feat[:seq_len]  # (seq_len, D)
+            y_dec = targ[seq_len - label_len :]  # (label_len + pred_len, D)
+            y_mark = time[seq_len - label_len :]  # matching time marks
 
         The first ``label_len`` rows of ``y_dec`` are ground-truth
         values the decoder uses as warm-up context; the remaining
@@ -481,8 +504,8 @@ class TimeSeriesSplit(Dataset):
         #   seq_y = data[i + seq_len - ll : i + seq_len + pred_len]  # decoder
         s = self.seq_len
         if s is not None and s < x.shape[0]:
-            x_enc = x[:s]                 # (seq_len, D_x)
-            x_mark = t[:s]                # (seq_len, T_feat)
+            x_enc = x[:s]  # (seq_len, D_x)
+            x_mark = t[:s]  # (seq_len, T_feat)
 
             # label_len: Transformer decoder warm-up overlap.
             # When ll > 0 the decoder target starts ll rows *before*
@@ -491,10 +514,10 @@ class TimeSeriesSplit(Dataset):
             # full window diagram.
             ll = self.label_len
             if ll is not None and ll > 0:
-                y_dec = y[s - ll :]       # (label_len + pred_len, D_y)
+                y_dec = y[s - ll :]  # (label_len + pred_len, D_y)
                 y_mark = t[s - ll :]
             else:
-                y_dec = y[s:]             # (pred_len, D_y)
+                y_dec = y[s:]  # (pred_len, D_y)
                 y_mark = t[s:]
         else:
             # Nowcast / full-history: no split
@@ -759,9 +782,13 @@ class TimeSeriesDataset(BaseDataset):
         id_integration: str = 'concat_to_x',
         coordinates: dict[str, tuple[float, float]] | None = None,
         station_name: str | None = None,
+        sinusoidal_dim: int = 16,
+        random_identifier_dim: int = 16,
+        random_identifier_seed: int = 2026,
         label_len: int | None = None,
         scaler_type: str = 'none',
         time_feature_cols: Sequence[str] | None = None,
+        data_dtype: str = 'float32',
         # BaseDataset args
         topology: TopologySpec | None = None,
         fields: list[FieldSpec] | None = None,
@@ -799,9 +826,13 @@ class TimeSeriesDataset(BaseDataset):
         self.id_integration = id_integration
         self.coordinates = coordinates or {}
         self.station_name = station_name
+        self.sinusoidal_dim = int(sinusoidal_dim)
+        self.random_identifier_dim = int(random_identifier_dim)
+        self.random_identifier_seed = int(random_identifier_seed)
         self.label_len = label_len
         self.scaler_type = scaler_type.strip().lower() if scaler_type else 'none'
         self.time_feature_cols = list(time_feature_cols) if time_feature_cols else []
+        self.data_dtype = data_dtype
         self._scaler = None
 
         # Apply scaler to raw splits before tensor conversion
@@ -859,7 +890,9 @@ class TimeSeriesDataset(BaseDataset):
             if cols_present:
                 vals = df[cols_present].values.copy()
                 # Handle NaN: only transform non-NaN rows
-                nan_mask = np.isnan(vals).any(axis=1)  # todo: maybe raise an error if there are NaNs.
+                nan_mask = np.isnan(vals).any(
+                    axis=1
+                )  # todo: maybe raise an error if there are NaNs.
                 if not nan_mask.all():
                     vals[~nan_mask] = scaler.transform(vals[~nan_mask])
                     df[cols_present] = vals
@@ -1049,15 +1082,18 @@ class TimeSeriesDataset(BaseDataset):
         f_cols = [c for c in self.feature_cols if c in df.columns]
         t_cols = [c for c in self.target_cols if c in df.columns]
 
+        # Resolve dtype from config
+        torch_dtype = torch.float64 if self.data_dtype == 'float64' else torch.float32
+
         feat = (
-            torch.tensor(df[f_cols].values, dtype=torch.float32)
+            torch.tensor(df[f_cols].values, dtype=torch_dtype)
             if f_cols
-            else torch.zeros(N, 0)
+            else torch.zeros(N, 0, dtype=torch_dtype)
         )
         targ = (
-            torch.tensor(df[t_cols].values, dtype=torch.float32)
+            torch.tensor(df[t_cols].values, dtype=torch_dtype)
             if t_cols
-            else torch.zeros(N, 0)
+            else torch.zeros(N, 0, dtype=torch_dtype)
         )
 
         # Time column — use time_feature_cols if available (multi-dim),
@@ -1066,12 +1102,12 @@ class TimeSeriesDataset(BaseDataset):
         if tf_cols:
             time_tensor = torch.tensor(
                 df[tf_cols].values,
-                dtype=torch.float32,
+                dtype=torch_dtype,
             )
         else:
             time_tensor = torch.tensor(
                 df[self.time_col].values,
-                dtype=torch.float32,
+                dtype=torch_dtype,
             )
 
         # Historical predicted y → extra features
@@ -1079,7 +1115,7 @@ class TimeSeriesDataset(BaseDataset):
             py_cols = [c for c in self.predicted_y_cols if c in df.columns]
             if py_cols:
                 feat = torch.cat(
-                    [feat, torch.tensor(df[py_cols].values, dtype=torch.float32)],
+                    [feat, torch.tensor(df[py_cols].values, dtype=torch_dtype)],
                     dim=-1,
                 )
 
@@ -1090,11 +1126,29 @@ class TimeSeriesDataset(BaseDataset):
             py_cols = [c for c in self.predicted_y_cols if c in df.columns]
             if py_cols:
                 feat = torch.cat(
-                    [feat, torch.tensor(df[py_cols].values, dtype=torch.float32)],
+                    [feat, torch.tensor(df[py_cols].values, dtype=torch_dtype)],
                     dim=-1,
                 )
 
         # Entity identifiers (optional)
+        _transparent_modes = {
+            'onehot',
+            'coordinates',
+            'sinusoidal',
+            'random',
+            'descriptors',
+            'numeric_id',
+        }
+        if self.identifier_mode in _transparent_modes and self.station_name is None:
+            logger.warning(
+                'identifier_mode=%r requires station_name to generate '
+                'entity features in the data layer, but station_name is '
+                'None. Entity features will NOT be produced. For '
+                'multi_channel mode, use ChannelTransparentWrapper in '
+                'the model adapter instead. For per_entity mode, ensure '
+                'the dataset sets station_name for each station.',
+                self.identifier_mode,
+            )
         if self.identifier_mode != 'none' and self.station_name is not None:
             ent = make_entity_features(
                 self.station_name,
@@ -1102,6 +1156,9 @@ class TimeSeriesDataset(BaseDataset):
                 self.identifier_mode,
                 N,
                 coordinates=self.coordinates,
+                sinusoidal_dim=self.sinusoidal_dim,
+                random_dim=self.random_identifier_dim,
+                random_seed=self.random_identifier_seed,
             )
             if ent is not None:
                 if self.id_integration == 'concat_to_x':
@@ -1150,6 +1207,7 @@ class TimeSeriesDataset(BaseDataset):
         self,
         batch_size: int = 32,
         num_workers: int = 0,
+        shuffle_train: bool = True,
     ) -> Dict[str, Any]:
         """Create train/val/test torch DataLoaders.
 
@@ -1168,6 +1226,11 @@ class TimeSeriesDataset(BaseDataset):
         * ``batch_y_mark`` — time values ``cat(encoder, decoder)``
         * ``entity_id_strs`` (optional) — list of entity-ID strings (length B)
         * ``entity_idx``     (optional) — integer station indices (B,)
+
+        Args:
+            batch_size: Batch size for all loaders.
+            num_workers: Number of dataloader workers.
+            shuffle_train: Whether to shuffle training data. Set False for deterministic mode.
         """
         import torch
         from torch.utils.data import DataLoader
@@ -1186,15 +1249,16 @@ class TimeSeriesDataset(BaseDataset):
             xs, ys, x_mark, y_mark = fields[0], fields[1], fields[2], fields[3]
             entity_id_strs = list(fields[4]) if n_fields > 4 else None
 
-            x = torch.stack(xs)       # (B, seq_len, D_x)
-            y = torch.stack(ys)       # (B, pred_len, D_y)  or (B, label_len+pred_len, D_y)
+            x = torch.stack(xs)  # (B, seq_len, D_x)
+            y = torch.stack(ys)  # (B, pred_len, D_y)  or (B, label_len+pred_len, D_y)
             xt = torch.stack(x_mark)  # (B, seq_len, T_feat)
-            yt = torch.stack(y_mark)  # (B, *, T_feat)
+            yt = torch.stack(y_mark)  # (B, label_len+pred_len, T_feat)
 
             batch_x = x[:, :seq_len, :]
             batch_y = y
             batch_x_mark = xt[:, :seq_len]
-            batch_y_mark = torch.cat([xt[:, :seq_len], yt], dim=1)
+            # TSL convention: y_mark is already (label_len + pred_len), no concat needed
+            batch_y_mark = yt
 
             if entity_id_strs is not None:
                 # Convert string station IDs → integer index tensor (B,)
@@ -1217,7 +1281,7 @@ class TimeSeriesDataset(BaseDataset):
             return DataLoader(
                 split,
                 batch_size=batch_size,
-                shuffle=(split_name == 'train'),
+                shuffle=(split_name == 'train' and shuffle_train),
                 num_workers=num_workers,
                 drop_last=False,
                 collate_fn=_collate,

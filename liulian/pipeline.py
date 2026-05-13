@@ -41,16 +41,37 @@ logger = logging.getLogger(__name__)
 # ── Helpers ─────────────────────────────────────────────────────────────
 
 
-def seed_everything(seed: int) -> None:
-    """Set random seeds for reproducibility (random, numpy, torch)."""
+def seed_everything(seed: int, deterministic: bool = False) -> None:
+    """Set random seeds for reproducibility (random, numpy, torch).
+    
+    Args:
+        seed: Random seed value.
+        deterministic: If True, enable full CUDA determinism for identical results.
+            This is slower but guarantees bit-exact reproducibility.
+    """
+    import os
+    
     random.seed(seed)
     np.random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    
     try:
         import torch
 
         torch.manual_seed(seed)
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(seed)
+        
+        if deterministic:
+            # Full CUDA determinism for identical results
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+            os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+            try:
+                torch.use_deterministic_algorithms(True)
+            except Exception:
+                pass
+            logger.info('Deterministic mode enabled (CUDA)')
     except ImportError:
         pass
     logger.info('Random seed set to %d', seed)
@@ -174,6 +195,9 @@ def build_dataset(config: Dict[str, Any]) -> Any:
             include_historical_predicted_y=config['include_historical_predicted_y'],
             identifier_mode=config['identifier_mode'],
             id_integration=config['id_integration'],
+            sinusoidal_dim=config.get('sinusoidal_dim', 16),
+            random_identifier_dim=config.get('random_identifier_dim', 16),
+            random_identifier_seed=config.get('random_identifier_seed', 2026),
             graph_mode=config['graph_mode'],
             graphlet_num_hops=config['graphlet_num_hops'],
             max_samples=config.get('max_samples'),
@@ -204,7 +228,12 @@ def build_dataset(config: Dict[str, Any]) -> Any:
             freq=config.get('freq', 'h'),
             identifier_mode=config.get('identifier_mode', 'none'),
             id_integration=config.get('id_integration', 'concat_to_x'),
+            sinusoidal_dim=config.get('sinusoidal_dim', 16),
+            random_identifier_dim=config.get('random_identifier_dim', 16),
+            random_identifier_seed=config.get('random_identifier_seed', 2026),
             graph_mode=config.get('graph_mode', 'none'),
+            data_dtype=config.get('data_dtype', 'float32'),
+            max_samples=config.get('max_samples'),
         )
 
         if data_name in ('ETTh1', 'ETTh2'):
@@ -235,7 +264,11 @@ def build_dataset(config: Dict[str, Any]) -> Any:
             scaler_type=config.get('scaler', 'standard'),
             identifier_mode=config.get('identifier_mode', 'none'),
             id_integration=config.get('id_integration', 'concat_to_x'),
+            sinusoidal_dim=config.get('sinusoidal_dim', 16),
+            random_identifier_dim=config.get('random_identifier_dim', 16),
+            random_identifier_seed=config.get('random_identifier_seed', 2026),
             graph_mode=config.get('graph_mode', 'none'),
+            max_samples=config.get('max_samples'),
         )
         # Propagate split_mode for info()
         dataset.split_mode = config.get('split_mode', 'multi_channel')
@@ -474,9 +507,39 @@ def build_loaders(dataset: Any, config: Dict[str, Any]) -> Dict[str, Any]:
     Delegates to ``dataset.get_data_loaders()`` which is the standard
     interface for liulian datasets.
     """
+    max_train_samples = config.get('max_train_samples')
+    if max_train_samples is not None:
+        max_train_samples = int(max_train_samples)
+        if max_train_samples <= 0:
+            raise ValueError(
+                f'max_train_samples must be positive, got {max_train_samples}.'
+            )
+        train_split = dataset.get_split('train')
+        if not hasattr(train_split, 'with_max_samples'):
+            raise ValueError(
+                'Dataset train split does not support max_train_samples capping.'
+            )
+        capped_train = train_split.with_max_samples(max_train_samples)
+        split_cache = getattr(dataset, '_split_cache', None)
+        if not isinstance(split_cache, dict):
+            raise ValueError(
+                'Dataset does not expose mutable split cache for max_train_samples.'
+            )
+        split_cache['train'] = capped_train
+        logger.info(
+            'Applied max_train_samples=%d (train split: %d -> %d)',
+            max_train_samples,
+            len(train_split),
+            len(capped_train),
+        )
+
+    # In deterministic mode, disable shuffle for reproducible batch ordering
+    shuffle_train = not config.get('deterministic', False)
+    
     return dataset.get_data_loaders(
         batch_size=config.get('batch_size', 8),
         num_workers=config.get('num_workers', 0),
+        shuffle_train=shuffle_train,
     )
 
 
@@ -549,11 +612,18 @@ def build_optimizer(config: Dict[str, Any]) -> Optional[Any]:
         )
 
     logger.info(
-        'HPO enabled: %d samples, grace=%s, reduction=%s, storage=%s',
+        'HPO enabled: samples=%s, grace=%s, reduction=%s, storage=%s, '
+        'resources_per_trial={cpu:%s,gpu:%s}, max_concurrent=%s, '
+        'early_stopping=%s (patience=%s)',
         config.get('hpo_num_samples', 200),
         config.get('hpo_grace_period', 5),
         config.get('hpo_reduction_factor', 1.5),
         config.get('hpo_storage_path', 'artifacts/ray_results'),
+        config.get('hpo_resources_cpu', 1),
+        config.get('hpo_resources_gpu', 0),
+        config.get('hpo_max_concurrent'),
+        not bool(config.get('disable_early_stopping', False)),
+        config.get('patience', 10),
     )
     return optimizer
 
@@ -738,9 +808,16 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
     from liulian.config import apply_quick_test
 
     t0 = time.time()
+    
+    # Check for deterministic mode
+    deterministic = config.get('deterministic', False)
+
+    # In deterministic mode, force dropout=0 to eliminate stochasticity
+    if deterministic:
+        config['dropout'] = 0.0
 
     # ── Seed ────────────────────────────────────────────────────────
-    seed_everything(config.get('seed', 2026))
+    seed_everything(config.get('seed', 2026), deterministic=deterministic)
 
     # ── Quick-test overrides ────────────────────────────────────────
     if config.get('quick_test', False):
@@ -751,12 +828,12 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
 
     # ── Build ───────────────────────────────────────────────────────
     dataset = build_dataset(config)
-    print_dataset_summary(dataset)
     # TSL seeds once and instantiates the model before building loaders.
     # Re-seed here so dataset construction does not perturb the model/init RNG
     # stream relative to the TSL reference pipeline.
-    seed_everything(config.get('seed', 2026))
+    seed_everything(config.get('seed', 2026), deterministic=deterministic)
     model = build_model(config, dataset)
+    print_dataset_summary(dataset)  # Print after model build to avoid any RNG consumption
     loaders = build_loaders(dataset, config)
     exp = build_experiment(config, dataset, model, loaders)
 
@@ -789,6 +866,7 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
                 preds=pred_result['preds'],
                 trues=pred_result['trues'],
                 times=pred_result['times'],
+                entity_ids=pred_result.get('entity_ids'),
                 method=viz_method,
                 output_dir=viz_dir,
                 title_prefix=f'{config["data"]} / {config["model"]} — ',
@@ -805,12 +883,15 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
     # Save raw predictions as .npz
     if pred_result is not None:
         npz_path = os.path.join(artifacts_dir, 'predictions.npz')
-        np.savez_compressed(
-            npz_path,
-            preds=pred_result['preds'].numpy(),
-            trues=pred_result['trues'].numpy(),
-            times=pred_result['times'].numpy(),
-        )
+        npz_payload: dict[str, Any] = {
+            'preds': pred_result['preds'].numpy(),
+            'trues': pred_result['trues'].numpy(),
+            'times': pred_result['times'].numpy(),
+        }
+        entity_ids = pred_result.get('entity_ids')
+        if entity_ids is not None:
+            npz_payload['entity_ids'] = np.asarray(entity_ids, dtype=object)
+        np.savez_compressed(npz_path, **npz_payload)
         logger.ok('Raw predictions saved → %s', npz_path)
 
     # ── Console report ──────────────────────────────────────────────
@@ -940,6 +1021,12 @@ def print_experiment_info(config: Dict[str, Any]) -> None:
     print(_kv_line('Loss', config.get('loss', 'mse')))
     print(_kv_line('Metrics', config.get('metrics', 'N/A')))
     print(_kv_line('Patience', config.get('patience', 'N/A')))
+    print(
+        _kv_line(
+            'Early stopping',
+            not bool(config.get('disable_early_stopping', False)),
+        )
+    )
     print(_kv_line('Eval denorm', config.get('eval_denorm', True)))
 
     # ── Noise ───────────────────────────────────────────────────────
@@ -956,6 +1043,16 @@ def print_experiment_info(config: Dict[str, Any]) -> None:
         print(_kv_line('Num samples', config.get('hpo_num_samples', 100)))
         print(_kv_line('Scheduler', config.get('hpo_scheduler', 'asha')))
         print(_kv_line('Grace period', config.get('hpo_grace_period', 5)))
+        print(
+            _kv_line(
+                'Resources / trial',
+                'cpu='
+                + str(config.get('hpo_resources_cpu', 1))
+                + ', gpu='
+                + str(config.get('hpo_resources_gpu', 0)),
+            )
+        )
+        print(_kv_line('Max concurrent', config.get('hpo_max_concurrent', 'auto')))
         print(_kv_line('Resume', config.get('hpo_resume', False)))
 
     # ── GPU ─────────────────────────────────────────────────────────

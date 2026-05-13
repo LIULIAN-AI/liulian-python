@@ -78,7 +78,7 @@ that.
 
 | LIULIAN repo (new) | Forked from | Branch model | Cross-link to LIULIAN-specific change set |
 |---|---|---|---|
-| **`liulian-agent`** | `neo-banker/neobanker-agent` | fork → rename → squash → push to `jajupmochi/liulian-agent`; keep history visible | §2 below |
+| **`liulian-agent`** | `neo-banker/neobanker-agent` | fork → rename → squash → push to `liulian-ai/liulian-agent`; keep history visible | §2 below |
 | **`liulian-ingest`** | `neo-banker/neobanker-crawler` | fork → rename → push | §3 |
 | **`liulian-web`** | `neo-banker/neobanker-frontend-MVP-V3` | fork → rename → push; redesign brand layer only | §4 |
 | **`liulian-ops`** | `neo-banker/neoctl` | fork → rename → push | §5 |
@@ -745,7 +745,7 @@ Per-repo workflow becomes a 6-line caller:
 ```yaml
 jobs:
   ci:
-    uses: jajupmochi/liulian-ops/.github/workflows/python-lint.yml@v1
+    uses: liulian-ai/liulian-ops/.github/workflows/python-lint.yml@v1
 ```
 
 ### 12.3 Deploy workflow

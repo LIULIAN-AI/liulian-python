@@ -584,6 +584,8 @@ class ForecastTrainer:
             - ``"trues"``  : ``(N, pred_len, c_out)`` — ground truth targets
             - ``"times"``  : ``(N, win_len)``          — time marks (epoch day)
               where *win_len* is the full window length of the target.
+            - ``"entity_ids"`` (optional) — per-window entity IDs (length ``N``)
+              when available from the dataloader.
         """
         cfg = self.config  # todo: maybe also allow predicting on train / val sets with different configs?
         model = model.to(self.device)
@@ -686,11 +688,23 @@ class ForecastTrainer:
                     exc,
                 )
 
-        return {
+        entity_ids_out: Any = None
+        if all_entity_ids:
+            if isinstance(all_entity_ids[0], torch.Tensor):
+                entity_ids_out = torch.cat(all_entity_ids, dim=0).detach().cpu().numpy()
+            elif isinstance(all_entity_ids[0], (list, tuple)):
+                entity_ids_out = np.asarray(sum(all_entity_ids, []), dtype=object)
+            else:
+                entity_ids_out = np.concatenate(all_entity_ids, axis=0)
+
+        out: Dict[str, Any] = {
             'preds': preds_cat,
             'trues': trues_cat,
             'times': times_cat,
         }
+        if entity_ids_out is not None:
+            out['entity_ids'] = entity_ids_out
+        return out
 
     # ------------------------------------------------------------------
     # Internal helpers

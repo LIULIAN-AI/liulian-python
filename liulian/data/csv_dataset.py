@@ -107,6 +107,7 @@ def _time_features_from_dates(
     dates: pd.DatetimeIndex,
     freq: str = 'h',
     timeenc: int = 0,
+    dtype: str = 'float32',
 ) -> np.ndarray:
     """Extract time features from a datetime index.
 
@@ -142,17 +143,21 @@ def _time_features_from_dates(
         Frequency hint (``'h'``, ``'t'``/``'min'``, etc.).
     timeenc : int
         0 = categorical (normalized), 1 = ``time_features()`` (default).
+    dtype : str
+        Output dtype: ``'float32'`` (default) or ``'float64'``.
 
     Returns
     -------
     np.ndarray
         Shape ``(len(dates), n_features)``.
     """
+    np_dtype = np.float64 if dtype == 'float64' else np.float32
+
     if timeenc == 1 and time_features is not None:
         tf = time_features(pd.to_datetime(dates), freq=freq)
         if isinstance(tf, torch.Tensor):
-            return tf.transpose(1, 0).numpy()
-        return tf.transpose(1, 0)
+            return tf.transpose(1, 0).numpy().astype(np_dtype)
+        return tf.transpose(1, 0).astype(np_dtype)
 
     # Categorical encoding (timeenc == 0 or fallback).
     # Normalized to [-0.5, 0.5] — see docstring for TSL deviation note.
@@ -164,7 +169,7 @@ def _time_features_from_dates(
     ]
     if freq in ('t', 'min'):
         features.append(dates.minute / 59.0 - 0.5)
-    return np.column_stack(features).astype(np.float32)
+    return np.column_stack(features).astype(np_dtype)
 
 
 # ---------------------------------------------------------------------------
@@ -231,6 +236,7 @@ class CSVTimeSeriesDataset(SpatialTempoDataset):
         scaler_type: str | None = None,
         timeenc: int = 0,
         freq: str = 'h',
+        data_dtype: str = 'float32',
         **kwargs,
     ) -> None:
         # Parse size
@@ -246,6 +252,7 @@ class CSVTimeSeriesDataset(SpatialTempoDataset):
         self.scale = scale
         self.timeenc = timeenc
         self.freq = freq
+        self.data_dtype = data_dtype
         # Store seq_len early so _compute_borders can use it
         self.seq_len = seq_len
         # Store label_len for later
@@ -295,6 +302,7 @@ class CSVTimeSeriesDataset(SpatialTempoDataset):
             label_len=label_len,
             scaler_type=resolved_scaler,
             time_feature_cols=tf_cols,
+            data_dtype=data_dtype,
             **kwargs,
         )
 
@@ -375,6 +383,7 @@ class CSVTimeSeriesDataset(SpatialTempoDataset):
             dates,
             freq=self.freq,
             timeenc=self.timeenc,
+            dtype=self.data_dtype,
         )
         time_feat_cols = [f'_tf_{i}' for i in range(time_feats.shape[1])]
 

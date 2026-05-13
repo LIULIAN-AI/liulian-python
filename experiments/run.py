@@ -50,6 +50,7 @@ import argparse
 import logging
 import os
 import sys
+from typing import Any
 
 # Path setup — ensure project root is importable regardless of cwd
 _SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -99,23 +100,34 @@ def _build_parser() -> argparse.ArgumentParser:
     return p
 
 
+def _collect_cli_overrides(args: argparse.Namespace) -> dict[str, Any]:
+    """Extract non-None CLI overrides excluding parser-only fields."""
+    skip = {'config'}
+    return {k: v for k, v in vars(args).items() if k not in skip and v is not None}
+
+
+def run_with_config(
+    *,
+    config_path: str,
+    cli_overrides: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Run one experiment from config path + overrides and return summary."""
+    cfg = load_config(yaml_path=config_path, cli_overrides=cli_overrides or {})
+    return run_experiment(cfg)
+
+
+def run_with_args(args: argparse.Namespace) -> dict[str, Any]:
+    """Run one experiment using parsed CLI args."""
+    return run_with_config(
+        config_path=args.config,
+        cli_overrides=_collect_cli_overrides(args),
+    )
+
+
 def main() -> None:
     parser = _build_parser()
     args = parser.parse_args()
-
-    # Collect non-None CLI overrides
-    skip = {'config'}
-    cli_overrides = {
-        k: v for k, v in vars(args).items() if k not in skip and v is not None
-    }
-
-    cfg = load_config(yaml_path=args.config, cli_overrides=cli_overrides)
-
-    # # Set up quick test mode to True:
-    # cfg['quick_test'] = True
-    # cfg['hpo'] = False
-
-    run_experiment(cfg)
+    run_with_args(args)
 
 
 if __name__ == '__main__':

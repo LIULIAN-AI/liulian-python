@@ -238,6 +238,49 @@ class TestSingle:
 
 
 # ---------------------------------------------------------------------------
+# Test: multi-entity windows (per-entity split)
+# ---------------------------------------------------------------------------
+
+
+class TestMultiEntity:
+    def test_longest_history_is_entity_aware_when_entity_ids_given(self):
+        """Overlaps should be resolved per entity, then averaged for global viz."""
+        # Two entities (A/B), each with two overlapping windows:
+        # A t=6: [2, 3] -> longest_history picks 2
+        # B t=6: [20, 30] -> longest_history picks 20
+        # Global aggregate should therefore use mean([2, 20]) = 11.
+        preds = np.array(
+            [
+                [[1.0], [2.0]],   # A window 0  -> times 5,6
+                [[3.0], [4.0]],   # A window 1  -> times 6,7
+                [[10.0], [20.0]], # B window 0  -> times 5,6
+                [[30.0], [40.0]], # B window 1  -> times 6,7
+            ],
+            dtype=np.float32,
+        )
+        trues = np.ones_like(preds, dtype=np.float32)
+        times = np.array(
+            [
+                [0, 1, 2, 3, 4, 5, 6],
+                [1, 2, 3, 4, 5, 6, 7],
+                [0, 1, 2, 3, 4, 5, 6],
+                [1, 2, 3, 4, 5, 6, 7],
+            ]
+        )
+        entity_ids = np.array(['A', 'A', 'B', 'B'])
+
+        result = aggregate_predictions(
+            preds,
+            trues,
+            times,
+            method='longest_history',
+            entity_ids=entity_ids,
+        )
+        idx_t6 = np.where(result['time'] == 6)[0][0]
+        assert result['pred'][idx_t6, 0] == pytest.approx(11.0)
+
+
+# ---------------------------------------------------------------------------
 # Test: unknown method raises
 # ---------------------------------------------------------------------------
 

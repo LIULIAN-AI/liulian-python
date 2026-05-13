@@ -42,6 +42,12 @@ nav:
   - Data:
       - Data Loaders: data_loaders.md
       - Datasets: datasets.md
+  - Benchmarks:
+      - TSL Comparison: tsl_comparison.md
+      - Training Comparison: training_comparison.md
+      - Results JSON: results_json.md
+      - Dataset Config Audit: dataset_config_audit.md
+      - Breakpoint Bridge: breakpoint_bridge.md
   - Contributing: contributing.md
 
 markdown_extensions:

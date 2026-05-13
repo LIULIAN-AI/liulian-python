@@ -1,6 +1,6 @@
 ================================================================================
 TSL vs Liulian Comparison Results
-Generated: 2026-03-25 14:51:31
+Generated: 2026-03-30 14:07:51
 ================================================================================
 
 --- ETTh1_PatchTST ---
@@ -1038,111 +1038,99 @@ Generated: 2026-03-25 14:51:31
   Dataset: ETTh1
   Model: Transformer
   Special settings applied: True
-  Special settings tags: custom_timeout
+  Special settings tags: disable_es, custom_timeout
   Has TSL script: True
   Large dataset: False
   Epoch limit: None
-  TSL epochs run: 4
-  TSL time (s): 57.2
-  Liulian epochs run: 6
-  Liulian time (s): 88.6
-  TSL final MSE: 0.835445
-  TSL final MAE: 0.7167075872421265
-  Liulian final MSE: 1.115380
-  Liulian final MAE: 0.8331774660886083
+  TSL epochs run: 10
+  TSL time (s): 134.8
+  Liulian epochs run: 10
+  Liulian time (s): 150.0
+  TSL final MSE: 0.891574
+  TSL final MAE: 0.7194489240646362
+  Liulian final MSE: 0.891569
+  Liulian final MAE: 0.7194466294463275
   Detail:
-  TSL  final: MSE=0.835445  MAE=0.716708
-  LL   final: MSE=1.115380  MAE=0.833177
-  Diff:       MSE=0.279935 (33.51%)  MAE=0.116470
-  Status: checked but not matched
+  TSL  final: MSE=0.891574  MAE=0.719449
+  LL   final: MSE=0.891569  MAE=0.719447
+  Diff:       MSE=0.000005 (0.00%)  MAE=0.000002
+  Status: checked and matched
 
 --- ETTh2_Transformer ---
   Dataset: ETTh2
   Model: Transformer
-  Special settings applied: True
-  Special settings tags: custom_timeout
+  Special settings applied: False
   Has TSL script: True
   Large dataset: False
-  Epoch limit: None
-  TSL epochs run: 4
-  TSL time (s): 57.6
-  Liulian epochs run: 4
-  Liulian time (s): 61.5
-  TSL final MSE: 2.743933
-  TSL final MAE: 1.3132082223892212
-  Liulian final MSE: 1.946473
-  Liulian final MAE: 1.1453088637100302
+  Epoch limit: 3
+  TSL epochs run: ?
+  TSL time (s): ?
+  Liulian epochs run: ?
+  Liulian time (s): ?
+  TSL final MSE: 2.167409
+  TSL final MAE: ?
+  Liulian final MSE: 2.167409
+  Liulian final MAE: ?
   Detail:
-  TSL  final: MSE=2.743933  MAE=1.313208
-  LL   final: MSE=1.946473  MAE=1.145309
-  Diff:       MSE=0.797460 (29.06%)  MAE=0.167899
-  Status: checked but not matched
+
+  Status: checked and matched
 
 --- ETTm1_Transformer ---
   Dataset: ETTm1
   Model: Transformer
-  Special settings applied: True
-  Special settings tags: custom_timeout
+  Special settings applied: False
   Has TSL script: True
   Large dataset: False
-  Epoch limit: None
-  TSL epochs run: 4
-  TSL time (s): 217.9
-  Liulian epochs run: 4
-  Liulian time (s): 231.9
-  TSL final MSE: 0.693046
-  TSL final MAE: 0.6053159236907959
-  Liulian final MSE: 0.626503
-  Liulian final MAE: 0.5822254851819129
+  Epoch limit: 3
+  TSL epochs run: ?
+  TSL time (s): ?
+  Liulian epochs run: ?
+  Liulian time (s): ?
+  TSL final MSE: 0.591638
+  TSL final MAE: ?
+  Liulian final MSE: 0.591638
+  Liulian final MAE: ?
   Detail:
-  TSL  final: MSE=0.693046  MAE=0.605316
-  LL   final: MSE=0.626503  MAE=0.582225
-  Diff:       MSE=0.066543 (9.60%)  MAE=0.023090
-  Status: checked but not matched
+
+  Status: checked and matched
 
 --- ETTm2_Transformer ---
   Dataset: ETTm2
   Model: Transformer
-  Special settings applied: True
-  Special settings tags: custom_timeout
+  Special settings applied: False
   Has TSL script: True
   Large dataset: False
-  Epoch limit: None
-  TSL epochs run: 4
-  TSL time (s): 217.5
-  Liulian epochs run: 4
-  Liulian time (s): 231.9
-  TSL final MSE: 0.522904
-  TSL final MAE: 0.5280907154083252
-  Liulian final MSE: 0.412039
-  Liulian final MAE: 0.46366356000858533
+  Epoch limit: 3
+  TSL epochs run: ?
+  TSL time (s): ?
+  Liulian epochs run: ?
+  Liulian time (s): ?
+  TSL final MSE: 0.667829
+  TSL final MAE: ?
+  Liulian final MSE: 0.667829
+  Liulian final MAE: ?
   Detail:
-  TSL  final: MSE=0.522904  MAE=0.528091
-  LL   final: MSE=0.412039  MAE=0.463664
-  Diff:       MSE=0.110865 (21.20%)  MAE=0.064427
-  Status: checked but not matched
+
+  Status: checked and matched
 
 --- Weather_Transformer ---
   Dataset: Weather
   Model: Transformer
-  Special settings applied: True
-  Special settings tags: custom_timeout
+  Special settings applied: False
   Has TSL script: True
   Large dataset: False
-  Epoch limit: None
-  TSL epochs run: 3
-  TSL time (s): 168.2
-  Liulian epochs run: 3
-  Liulian time (s): 180.4
-  TSL final MSE: 0.372275
-  TSL final MAE: 0.41316118836402893
-  Liulian final MSE: 0.270225
-  Liulian final MAE: 0.3475976485783275
+  Epoch limit: 3
+  TSL epochs run: ?
+  TSL time (s): ?
+  Liulian epochs run: ?
+  Liulian time (s): ?
+  TSL final MSE: 0.530486
+  TSL final MAE: ?
+  Liulian final MSE: 0.530486
+  Liulian final MAE: ?
   Detail:
-  TSL  final: MSE=0.372275  MAE=0.413161
-  LL   final: MSE=0.270225  MAE=0.347598
-  Diff:       MSE=0.102050 (27.41%)  MAE=0.065564
-  Status: checked but not matched
+
+  Status: checked and matched
 
 --- ECL_Transformer ---
   Dataset: ECL
@@ -1219,9 +1207,7 @@ Generated: 2026-03-25 14:51:31
   Liulian final MSE: 5.145920
   Liulian final MAE: 1.5651002729640286
   Detail:
-  TSL  final: MSE=4.519824  MAE=1.394013
-  LL   final: MSE=5.145920  MAE=1.565100
-  Diff:       MSE=0.626096 (13.85%)  MAE=0.171088
+
   Status: checked but not matched
 
 --- ETTh1_iTransformer ---
@@ -3324,11 +3310,11 @@ ECL_TimesNet                   2     0   2461.3s     3.4s       no run failed
 Traffic_TimesNet               2     2   3212.0s  3125.2s       no checked but not matched
 Exchange_TimesNet              4     4    187.9s   192.0s       no checked and matched
 ILI_TimesNet                   2     2    103.9s   100.3s       no checked but not matched
-ETTh1_Transformer              4     6     57.2s    88.6s      yes checked but not matched
-ETTh2_Transformer              4     4     57.6s    61.5s      yes checked but not matched
-ETTm1_Transformer              4     4    217.9s   231.9s      yes checked but not matched
-ETTm2_Transformer              4     4    217.5s   231.9s      yes checked but not matched
-Weather_Transformer            3     3    168.2s   180.4s      yes checked but not matched
+ETTh1_Transformer             10    10    134.8s   150.0s      yes checked and matched
+ETTh2_Transformer              ?     ?        ?s       ?s       no checked and matched
+ETTm1_Transformer              ?     ?        ?s       ?s       no checked and matched
+ETTm2_Transformer              ?     ?        ?s       ?s       no checked and matched
+Weather_Transformer            ?     ?        ?s       ?s       no checked and matched
 ECL_Transformer                2     2     75.5s   145.8s       no checked and matched
 Traffic_Transformer            2     2     73.8s   126.3s       no checked and matched
 Exchange_Transformer           5     5     42.0s    44.9s      yes checked and matched

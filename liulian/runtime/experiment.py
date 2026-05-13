@@ -318,6 +318,7 @@ class Experiment:
             preds,
             trues,
             times,
+            entity_ids=predictions.get('entity_ids'),
             method=viz_method,
             pred_len=pred_len,
             output_dir=output_dir,

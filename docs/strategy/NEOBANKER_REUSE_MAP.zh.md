@@ -32,7 +32,7 @@ parent: NEOBANKER_REUSE_MAP.md
 
 | LIULIAN 新仓 | fork 自 | 分支模式 | 变更集交叉链接 |
 |---|---|---|---|
-| **`liulian-agent`** | `neo-banker/neobanker-agent` | fork → 改名 → squash → push 到 `jajupmochi/liulian-agent` | §2 |
+| **`liulian-agent`** | `neo-banker/neobanker-agent` | fork → 改名 → squash → push 到 `liulian-ai/liulian-agent` | §2 |
 | **`liulian-ingest`** | `neo-banker/neobanker-crawler` | fork → 改名 → push | §3 |
 | **`liulian-web`** | `neo-banker/neobanker-frontend-MVP-V3` | fork → 改名 → push；只重写 brand 层 | §4 |
 | **`liulian-ops`** | `neo-banker/neoctl` | fork → 改名 → push | §5 |

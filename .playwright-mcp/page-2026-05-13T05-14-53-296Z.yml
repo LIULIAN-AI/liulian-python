@@ -1,0 +1,102 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e2]:
+    - generic [ref=e3]: LIULIAN
+    - generic [ref=e4]: ·
+    - generic [ref=e5]: Forecast
+    - generic [ref=e6]: ·
+    - generic [ref=e7]: ● live · 2026-05-13 05:08 UTC
+    - generic [ref=e8]: ·
+    - generic [ref=e9]: aare-bern / patchtst / entity=none / seed=42
+    - generic [ref=e10]: ⌘K palette · b agent
+  - generic [ref=e11]:
+    - navigation [ref=e12]:
+      - heading "Stations · 28 j/k to nav · o to open" [level=3] [ref=e13]:
+        - text: Stations · 28
+        - generic [ref=e14]: j/k to nav · o to open
+      - list [ref=e15]:
+        - listitem [ref=e16] [cursor=pointer]:
+          - generic [ref=e18]: Aare at Bern
+          - generic [ref=e19]: aare-bern
+        - listitem [ref=e20] [cursor=pointer]:
+          - generic [ref=e22]: Aare at Thun
+          - generic [ref=e23]: aare-thun
+        - listitem [ref=e24] [cursor=pointer]:
+          - generic [ref=e26]: Aare at Hagneck
+          - generic [ref=e27]: aare-hagneck
+        - listitem [ref=e28] [cursor=pointer]:
+          - generic [ref=e30]: Rhine at Basel
+          - generic [ref=e31]: rhine-basel
+        - listitem [ref=e32] [cursor=pointer]:
+          - generic [ref=e34]: Rhine at Rekingen
+          - generic [ref=e35]: rhine-rekingen
+        - listitem [ref=e36] [cursor=pointer]:
+          - generic [ref=e38]: Reuss at Luzern
+          - generic [ref=e39]: reuss-luzern
+        - listitem [ref=e40] [cursor=pointer]:
+          - generic [ref=e42]: Limmat at Zurich
+          - generic [ref=e43]: limmat-zurich
+        - listitem [ref=e44] [cursor=pointer]:
+          - generic [ref=e46]: Inn at Martina
+          - generic [ref=e47]: inn-martina
+        - listitem [ref=e48] [cursor=pointer]:
+          - generic [ref=e50]: Rhone at Porte
+          - generic [ref=e51]: rhone-porte
+        - listitem [ref=e52] [cursor=pointer]:
+          - generic [ref=e54]: Brienzersee
+          - generic [ref=e55]: brienz
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - heading "aare-bern" [level=1] [ref=e58]
+        - paragraph [ref=e59]: 72-hour forecast with Q05–Q95 prediction intervals · m³/s
+      - generic [ref=e60]:
+        - generic [ref=e61]: Swiss river network · 28 stations
+        - img [ref=e62]:
+          - generic "aare-bern (active)" [ref=e67]
+          - generic "aare-thun" [ref=e70]
+          - generic "aare-hagneck" [ref=e73]
+          - generic "rhine-basel" [ref=e76]
+          - generic "rhine-rekingen" [ref=e79]
+          - generic "reuss-luzern" [ref=e82]
+          - generic "limmat-zurich" [ref=e85]
+          - generic "inn-martina" [ref=e88]
+          - generic "rhone-porte" [ref=e91]
+          - generic "brienzersee" [ref=e94]
+      - generic [ref=e98]: aare-bern · patchtst · forecast_at 2026-05-13 05:00 UTC · horizon 72h
+      - generic [ref=e102]:
+        - generic [ref=e103]:
+          - generic [ref=e104]: MAE
+          - generic [ref=e105]: 8.42m³/s
+        - generic [ref=e106]:
+          - generic [ref=e107]: RMSE
+          - generic [ref=e108]: 11.27m³/s
+        - generic [ref=e109]:
+          - generic [ref=e110]: Coverage @ 90
+          - generic [ref=e111]: 88.5%
+        - generic [ref=e112]:
+          - generic [ref=e113]: Model · Horizon
+          - generic [ref=e114]: patchtst 72h
+      - generic [ref=e115]:
+        - heading "Alert timeline" [level=3] [ref=e116]
+        - generic [ref=e117]: 2026-05-09 → 2026-05-13 · 3 rules
+        - generic [ref=e119]: Basel watch rhine-basel
+        - generic [ref=e124]: Bern Q95 elevated aare-bern
+        - generic [ref=e129]: Bern Q95 critical aare-bern
+    - complementary [ref=e132]:
+      - generic [ref=e133]:
+        - generic [ref=e134]: bi agent
+        - generic [ref=e135]: ○ idle
+      - generic [ref=e136]:
+        - paragraph [ref=e137]: "Ask in plain English. Examples: \"Show stations where Q95 went above 850 last week.\" \"Compare TimesNet and Chronos for Bern.\""
+        - generic [ref=e138]: youShow Bern Q95 next 72 hours
+        - generic [ref=e139]:
+          - generic [ref=e140]: "[query_forecasts]"
+          - generic [ref=e141]: "{ \"action\": \"summary\", \"station_id\": \"aare-bern\", \"model_id\": \"patchtst\" }"
+          - generic [ref=e142]: "→ {\"mean_at_h24\": 412.4, \"q05_at_h24\": 388.0, \"q95_at_h24\": 437.1, \"observed_recent_mean\": 408.2, \"units\": \"m³/s\"}"
+        - generic [ref=e143]: "agentBern's 24-hour-ahead forecast: mean 412.4 m³/s, 90% CI [388.0, 437.1]. Within historical range; no alert thresholds projected to fire in the next 72 hours."
+        - generic [ref=e144]:
+          - button "Compare PatchTST vs Chronos-2 for Bern" [ref=e145] [cursor=pointer]
+          - button "What's the forecast quality on this station last week?" [ref=e146] [cursor=pointer]
+          - button "Show me upstream stations with elevated risk" [ref=e147] [cursor=pointer]
+      - generic [ref=e148]:
+        - textbox "Ask the bi agent…" [ref=e149]
+        - button "Ask" [ref=e150] [cursor=pointer]

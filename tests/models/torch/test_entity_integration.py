@@ -167,6 +167,7 @@ class TestEntityAwareMixin:
             'onehot',
             'coordinates',
             'sinusoidal',
+            'random',
             'descriptors',
             'numeric_id',
         ):

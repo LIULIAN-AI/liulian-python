@@ -1,0 +1,53 @@
+- generic [active] [ref=e1]:
+  - img
+  - banner [ref=e2]:
+    - generic [ref=e3]: University of Bern · Spatio-Temporal Research Platform
+    - generic [ref=e4]: v0.6.0 · Bern · Hydrology Lab
+  - main [ref=e5]:
+    - paragraph [ref=e6]: Liquid Intelligence · Unified Logic · Interactive Adaptive Networks
+    - heading "LIULIAN" [level=1] [ref=e7]
+    - paragraph [ref=e8]:
+      - text: "Open-source production stack for spatio-temporal AI: a"
+      - emphasis [ref=e9]: research-grade model zoo
+      - text: wrapped in
+      - emphasis [ref=e10]: production-grade BI
+      - text: .
+    - generic "Live platform counters" [ref=e11]:
+      - generic [ref=e12]:
+        - strong [ref=e13]: 2,143
+        - text: sensors live
+      - generic [ref=e14]:
+        - strong [ref=e15]: 30+
+        - text: models in benchmark
+      - generic [ref=e16]:
+        - strong [ref=e17]: "3"
+        - text: agents ready
+      - generic [ref=e18]:
+        - strong [ref=e19]: "17"
+        - text: datasets indexed
+  - region "Platform pillars" [ref=e20]:
+    - article [ref=e21]:
+      - heading "Manifest" [level=2] [ref=e22]
+      - paragraph [ref=e23]: Every dataset starts with a contract. Schema, topology, integrity hash. Reproducible by design.
+      - generic "Manifest YAML snippet" [ref=e24]:
+        - generic [ref=e25]: "version: 1.0 dataset: swiss-river-1990 fields: - {name: discharge, units: m³/s} - {name: temp_c, units: °C} topology: edges/aare.json integrity: sha256:7af1c…"
+      - paragraph [ref=e26]: "\"Every dataset starts with a contract.\""
+    - article [ref=e28]:
+      - heading "Train" [level=2] [ref=e29]
+      - paragraph [ref=e30]: Thirty models, one runtime. PatchTST, TimesNet, Chronos zero-shot, TSL graphs. Single-command benchmarks.
+      - generic "Loss curve" [ref=e31]:
+        - img [ref=e32]
+      - paragraph [ref=e35]: "\"Thirty models, one runtime.\""
+    - article [ref=e37]:
+      - heading "Forecast" [level=2] [ref=e38]
+      - paragraph [ref=e39]: From prediction to a hydrologist's risk brief, in twenty seconds. Probabilistic intervals, alert thresholds, exportable.
+      - generic "Forecast fan" [ref=e40]:
+        - img [ref=e41]
+      - paragraph [ref=e45]: "\"To a hydrologist's risk brief, in twenty seconds.\""
+  - link "Open SwissRiver demo →" [ref=e47] [cursor=pointer]:
+    - /url: /forecast
+    - text: Open SwissRiver demo
+    - generic [ref=e48]: →
+  - contentinfo [ref=e49]:
+    - generic [ref=e50]: © 2026 LIULIAN · MIT License
+    - generic [ref=e51]: Designed in Bern · Built with University of Bern PRG

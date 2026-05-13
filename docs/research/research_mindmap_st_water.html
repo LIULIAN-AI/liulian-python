@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research Mindmap: ST/TS/LLM/Hydrology</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+
+    :root {
+      --bg: #0d0f14;
+      --surface: #161b25;
+      --surface2: #1e2535;
+      --border: #2a3349;
+      --text: #d4daf0;
+      --text-dim: #7a8aaa;
+      --accent: #4fc3f7;
+
+      --c1: #4fc3f7;
+      /* Time Series */
+      --c2: #81c784;
+      /* Spatio-Temporal */
+      --c3: #ff8a65;
+      /* LLM for TS */
+      --c4: #ce93d8;
+      /* LLM for ST */
+      --c5: #ffcc02;
+      /* Graph Neural Networks */
+      --c6: #26c6da;
+      /* Hydrology */
+      --c7: #f48fb1;
+      /* Weather/Earth */
+      --c8: #a5d6a7;
+      /* Surveys & Benchmarks */
+      --c9: #90caf9;
+      /* Traffic */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      flex-shrink: 0;
+    }
+
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+      max-width: 340px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      color: var(--text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .search-box:focus {
+      border-color: var(--accent);
+    }
+
+    .search-box::placeholder {
+      color: var(--text-dim);
+    }
+
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn:hover {
+      background: var(--border);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn.export {
+      background: rgba(79, 195, 247, 0.12);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn.export:hover {
+      background: rgba(79, 195, 247, 0.25);
+    }
+
+    .legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--text-dim);
+      cursor: pointer;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    #canvas {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .node circle {
+      stroke-width: 2;
+      cursor: pointer;
+      transition: r 0.2s;
+    }
+
+    .node text {
+      font-family: 'IBM Plex Sans', sans-serif;
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .node:hover circle {
+      filter: brightness(1.3);
+    }
+
+    .link {
+      fill: none;
+      stroke: var(--border);
+      stroke-width: 1.5;
+      opacity: 0.6;
+    }
+
+    .link.highlight {
+      stroke: var(--accent);
+      stroke-width: 2.5;
+      opacity: 1;
+    }
+
+    /* Tooltip */
+    #tooltip {
+      position: fixed;
+      z-index: 1000;
+      max-width: 420px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.15s, transform 0.15s;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    #tooltip.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .tt-title {
+      font-weight: 700;
+      font-size: 13.5px;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .tt-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 3px;
+    }
+
+    .tt-label {
+      color: var(--text-dim);
+      min-width: 85px;
+      flex-shrink: 0;
+    }
+
+    .tt-val {
+      color: var(--text);
+    }
+
+    .tt-link a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .tt-link a:hover {
+      text-decoration: underline;
+    }
+
+    .stars {
+      color: #ffcc02;
+      letter-spacing: 1px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 3px;
+      padding: 1px 6px;
+      font-size: 10.5px;
+      margin-right: 3px;
+    }
+
+    #info-panel {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 11.5px;
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .dimmed {
+      opacity: 0.15;
+    }
+
+    /* Stats bar */
+    .stat-badge {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-family: 'IBM Plex Mono', monospace;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+
+    .stat-badge span {
+      color: var(--accent);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>📡 RESEARCH MINDMAP</h1>
+    <input class="search-box" id="searchInput" type="text" placeholder="Search papers, authors, methods..." />
+    <span class="stat-badge" id="statBadge"><span id="paperCount">0</span> papers</span>
+    <div class="controls">
+      <button class="btn" onclick="resetZoom()">⊙ Reset</button>
+      <button class="btn" onclick="expandAll()">▶ Expand All</button>
+      <button class="btn" onclick="collapseAll()">▼ Collapse</button>
+      <button class="btn export" onclick="exportPNG()">⬇ PNG</button>
+      <button class="btn export" onclick="exportSVG()">⬇ SVG</button>
+      <button class="btn export" onclick="exportPDF()">⬇ PDF</button>
+      <button class="btn export" onclick="exportMarkdown()">⬇ MD</button>
+    </div>
+    <div class="legend" id="legend"></div>
+  </header>
+
+  <div id="canvas"><svg id="svg"></svg></div>
+  <div id="tooltip"></div>
+  <div id="info-panel">🖱 Drag to pan · Scroll to zoom · Click to expand/collapse · Hover for details</div>
+
+  <script>
+    // ============================================================
+    // FULL PAPER DATABASE
+    // ============================================================
+    const CATEGORIES = [
+      { id: "ts", label: "Time Series (General)", color: "#4fc3f7", emoji: "📈" },
+      { id: "llm_ts", label: "LLM for Time Series", color: "#ff8a65", emoji: "🤖" },
+      { id: "st", label: "Spatio-Temporal (General)", color: "#81c784", emoji: "🗺️" },
+      { id: "traffic", label: "Traffic Prediction", color: "#90caf9", emoji: "🚦" },
+      { id: "llm_st", label: "LLM for Spatio-Temporal", color: "#ce93d8", emoji: "🧠" },
+      { id: "gnn", label: "Graph Neural Networks", color: "#ffcc02", emoji: "🕸️" },
+      { id: "hydro", label: "Hydrology (General)", color: "#26c6da", emoji: "💧" },
+      { id: "wtemp", label: "Water Temperature", color: "#4dd0e1", emoji: "🌡️" },
+      { id: "llm_hydro", label: "LLM for Hydrology", color: "#f48fb1", emoji: "🌊" },
+      { id: "weather", label: "Weather & Earth Science", color: "#ffb74d", emoji: "⛅" },
+      { id: "survey", label: "Surveys & Benchmarks", color: "#a5d6a7", emoji: "📚" },
+    ];
+
+    const PAPERS = [
+      // ── TIME SERIES GENERAL ──────────────────────────────────────
+      {
+        id: "timesnet",
+        title: "TimesNet: Temporal 2D-Variation Modeling for General Time Series Analysis",
+        year: 2023, citations: 900, venue: "ICLR 2023",
+        authors: "Wu et al.", method: "TimesNet",
+        url: "https://arxiv.org/abs/2210.02186",
+        code: "https://github.com/thuml/TimesNet",
+        summary: "Transforms 1D time series into 2D space to capture both intra- and inter-period variations using a dedicated TimesBlock, enabling multi-task TS analysis.",
+        domain: "General", task: "Forecasting, Imputation, Anomaly Detection, Classification",
+        datasets: "ETT, Weather, Traffic, ECL, Exchange",
+        category: "ts", importance: 5
+      },
+      {
+        id: "informer",
+        title: "Informer: Beyond Efficient Transformer for Long Sequence Time-Series Forecasting",
+        year: 2021, citations: 5000, venue: "AAAI 2021 (Best Paper)",
+        authors: "Zhou et al.", method: "Informer",
+        url: "https://arxiv.org/abs/2012.07436",
+        code: "https://github.com/zhouhaoyi/Informer2020",
+        summary: "Introduces ProbSparse self-attention and distilling operation to handle long-range dependencies in LSTF with O(L log L) complexity.",
+        domain: "General", task: "Long-term Forecasting",
+        datasets: "ETTh1, ETTh2, ETTm1, ETTm2, Electricity, Exchange",
+        category: "ts", importance: 5
+      },
+      {
+        id: "patchtst",
+        title: "A Time Series is Worth 64 Words: Long-term Forecasting with Transformers",
+        year: 2023, citations: 1200, venue: "ICLR 2023",
+        authors: "Nie et al.", method: "PatchTST",
+        url: "https://arxiv.org/abs/2211.14730",
+        code: "https://github.com/yuqinie98/PatchTST",
+        summary: "Segments time series into subseries patches as Transformer tokens, drastically reducing memory usage and capturing local semantics for long-term forecasting.",
+        domain: "General", task: "Long-term Forecasting",
+        datasets: "ETT, Weather, Traffic, ECL, ILI",
+        category: "ts", importance: 5
+      },
+      {
+        id: "tft",
+        title: "Temporal Fusion Transformers for Interpretable Multi-horizon Time Series Forecasting",
+        year: 2021, citations: 3500, venue: "International Journal of Forecasting",
+        authors: "Lim et al. (Google)", method: "TFT",
+        url: "https://arxiv.org/abs/1912.09363",
+        code: "https://github.com/google-research/google-research/tree/master/tft",
+        summary: "Combines recurrent layers for local processing and attention mechanisms for long-term dependencies with multi-head attention for variable selection and interpretability.",
+        domain: "General", task: "Multi-horizon Forecasting, Interpretability",
+        datasets: "Retail, Traffic, Electricity, Volatility",
+        category: "ts", importance: 5
+      },
+      {
+        id: "etsformer",
+        title: "ETSformer: Exponential Smoothing Transformers for Time-series Forecasting",
+        year: 2022, citations: 400, venue: "arXiv 2022 / ICLR",
+        authors: "Woo et al.", method: "ETSformer",
+        url: "https://arxiv.org/abs/2202.01381",
+        code: "https://github.com/salesforce/ETSformer",
+        summary: "Integrates exponential smoothing principles into Transformer architecture with exponential smoothing attention and frequency attention for better decomposition.",
+        domain: "General", task: "Forecasting",
+        datasets: "ETT, Electricity, Weather",
+        category: "ts", importance: 3
+      },
+      {
+        id: "unisf",
+        title: "Unified Training of Universal Time Series Forecasting Transformers",
+        year: 2024, citations: 200, venue: "ICML 2024",
+        authors: "Woo et al. (Salesforce)", method: "Moirai",
+        url: "https://arxiv.org/abs/2402.02592",
+        code: "https://github.com/SalesforceAIResearch/uni2ts",
+        summary: "Trains a universal TS forecasting model across diverse datasets with a patching strategy and multi-patch size projection to handle varying frequencies.",
+        domain: "General", task: "Zero-shot Forecasting",
+        datasets: "LOTSA (large-scale multi-domain TS corpus)",
+        category: "ts", importance: 4
+      },
+      {
+        id: "tfb",
+        title: "TFB: Towards Comprehensive and Fair Benchmarking of Time Series Forecasting Methods",
+        year: 2024, citations: 80, venue: "VLDB 2024",
+        authors: "Qiu et al.", method: "TFB Benchmark",
+        url: "https://arxiv.org/abs/2403.20150",
+        code: "https://github.com/decisionintelligence/TFB",
+        summary: "Proposes a comprehensive benchmark covering 7 types of TS from 10 domains with 21 evaluation dimensions to enable fair comparison of forecasting methods.",
+        domain: "General", task: "Benchmarking",
+        datasets: "Multiple (ETT, Traffic, Weather, ECL, Exchange, etc.)",
+        category: "ts", importance: 4
+      },
+      {
+        id: "ts_survey_arch",
+        title: "Deep Time Series Models: A Comprehensive Survey and Benchmark",
+        year: 2024, citations: 300, venue: "arXiv 2024",
+        authors: "Wang et al.", method: "Survey",
+        url: "https://arxiv.org/abs/2407.13278",
+        code: "https://github.com/thuml/Time-Series-Library",
+        summary: "Comprehensive survey of deep learning models for time series across 5 tasks, benchmarking 23 models on standardized datasets with analysis of architectural trade-offs.",
+        domain: "General", task: "Survey, Benchmarking",
+        datasets: "ETT, Weather, Traffic, ECL, and more",
+        category: "ts", importance: 5
+      },
+      {
+        id: "ts_survey_comp",
+        title: "A Comprehensive Survey of Time Series Forecasting: Architectural Diversity and Open Challenges",
+        year: 2024, citations: 150, venue: "arXiv 2024",
+        authors: "Various authors", method: "Survey",
+        url: "https://arxiv.org/abs/2411.05060",
+        code: null,
+        summary: "Surveys diverse architectures for TS forecasting including MLP, CNN, RNN, Transformer, GNN, SSM variants, and hybrid models with open challenges.",
+        domain: "General", task: "Survey",
+        datasets: "Various standard benchmarks",
+        category: "ts", importance: 4
+      },
+      {
+        id: "ts_freq_survey",
+        title: "Time Series Analysis in Frequency Domain: A Survey of Open Challenges, Opportunities and Benchmarks",
+        year: 2024, citations: 50, venue: "arXiv 2024",
+        authors: "Various authors", method: "Survey",
+        url: "https://arxiv.org/abs/2411.08552",
+        code: null,
+        summary: "Reviews frequency-domain analysis approaches for TS, identifying open challenges in spectral representations and opportunities for improvement.",
+        domain: "General", task: "Survey",
+        datasets: "Various",
+        category: "ts", importance: 3
+      },
+      {
+        id: "ts_dl_survey",
+        title: "A comprehensive survey of deep learning for time series forecasting: architectural diversity and open challenges",
+        year: 2024, citations: 200, venue: "Artificial Intelligence Review",
+        authors: "Lim & Zohren et al.", method: "Survey",
+        url: "https://link.springer.com/article/10.1007/s10462-024-10810-6",
+        code: null,
+        summary: "Comprehensive survey covering architectural diversity in DL for TS forecasting, analyzing CNN, RNN, Transformer, SSM paradigms and cross-domain applications.",
+        domain: "General", task: "Survey",
+        datasets: "Various",
+        category: "ts", importance: 4
+      },
+      {
+        id: "long_ts_survey",
+        title: "Long sequence time-series forecasting with deep learning: A survey",
+        year: 2023, citations: 150, venue: "Information Fusion",
+        authors: "Various authors", method: "Survey",
+        url: "https://www.sciencedirect.com/science/article/pii/S1566253523001446",
+        code: null,
+        summary: "Surveys long-horizon TS forecasting methods with focus on Transformer variants, decomposition strategies, and practical challenges.",
+        domain: "General", task: "Survey",
+        datasets: "Various",
+        category: "ts", importance: 3
+      },
+      {
+        id: "systematic_transformer",
+        title: "A systematic review for transformer-based long-term series forecasting",
+        year: 2023, citations: 120, venue: "arXiv / Applied Intelligence",
+        authors: "Various authors", method: "Survey",
+        url: "https://arxiv.org/abs/2309.01805",
+        code: null,
+        summary: "Systematic literature review of Transformer architectures for long-term TS forecasting, categorizing attention mechanisms and architectural innovations.",
+        domain: "General", task: "Survey",
+        datasets: "ETT, Weather, ECL",
+        category: "ts", importance: 3
+      },
+      {
+        id: "mitigate_bias",
+        title: "Mitigating Long-Term Forecasting Bias in Time-Series Neural Networks via Ensemble of Short-Term Dependencies",
+        year: 2024, citations: 20, venue: "arXiv 2024",
+        authors: "Various authors", method: "ESD Ensemble",
+        url: "https://arxiv.org/abs/2408.10669",
+        code: null,
+        summary: "Addresses accumulation of bias in long-horizon forecasting by ensembling multiple short-term prediction modules rather than extending context windows.",
+        domain: "General", task: "Long-term Forecasting",
+        datasets: "ETT, Weather",
+        category: "ts", importance: 2
+      },
+      {
+        id: "lookback_window",
+        title: "Impact of Lookback Window Sizes on LSTM Model Performance for Air Quality Forecasting",
+        year: 2023, citations: 40, venue: "Atmosphere / arXiv",
+        authors: "Various authors", method: "LSTM lookback analysis",
+        url: "https://arxiv.org/abs/2310.17977",
+        code: null,
+        summary: "Empirical study on how lookback window sizes affect LSTM performance for air quality forecasting, revealing diminishing returns beyond optimal window lengths.",
+        domain: "Environmental", task: "Forecasting",
+        datasets: "Air quality monitoring data",
+        category: "ts", importance: 2
+      },
+      {
+        id: "window_size_effects",
+        title: "Evaluating Window Size Effects on Univariate Time Series Forecasting with Machine Learning",
+        year: 2023, citations: 30, venue: "arXiv 2023",
+        authors: "Various authors", method: "Empirical study",
+        url: "https://arxiv.org/abs/2309.10280",
+        code: null,
+        summary: "Systematic evaluation of how input window size affects ML-based TS forecasting across models and datasets, providing practical guidelines for practitioners.",
+        domain: "General", task: "Forecasting",
+        datasets: "Various TS benchmarks",
+        category: "ts", importance: 2
+      },
+      {
+        id: "perf_metrics",
+        title: "Performance metrics for multi-step forecasting measuring win-loss, seasonal variance and forecast stability",
+        year: 2023, citations: 15, venue: "arXiv / Journal",
+        authors: "Various authors", method: "Metric analysis",
+        url: "https://arxiv.org/abs/2312.12609",
+        code: null,
+        summary: "Proposes win-loss, seasonal variance, and forecast stability metrics as complementary measures to standard MAE/MSE for evaluating multi-step forecasting.",
+        domain: "General", task: "Evaluation",
+        datasets: "Various",
+        category: "ts", importance: 2
+      },
+      // ── LLM FOR TIME SERIES ──────────────────────────────────────
+      {
+        id: "timellm",
+        title: "TIME-LLM: Time Series Forecasting by Reprogramming Large Language Models",
+        year: 2024, citations: 800, venue: "ICLR 2024",
+        authors: "Jin et al. (Monash / Salesforce)", method: "TIME-LLM",
+        url: "https://arxiv.org/abs/2310.01728",
+        code: "https://github.com/KimMeen/Time-LLM",
+        summary: "Reprograms time series tokens into text representations compatible with LLMs using patch reprogramming and prompt-as-prefix, achieving state-of-the-art few-shot forecasting.",
+        domain: "General", task: "Forecasting",
+        datasets: "ETT, Weather, ECL, Traffic, ILI",
+        category: "llm_ts", importance: 5
+      },
+      {
+        id: "timemoe",
+        title: "TIME-MOE: Billion-Scale Time Series Foundation Models with Mixture of Experts",
+        year: 2024, citations: 150, venue: "ICLR 2025 / arXiv 2024",
+        authors: "Shi et al.", method: "Time-MoE",
+        url: "https://arxiv.org/abs/2409.16040",
+        code: "https://github.com/Time-MoE/Time-MoE",
+        summary: "Builds billion-scale TS foundation model using Mixture of Experts architecture trained on 300B time points, enabling scalable universal forecasting.",
+        domain: "General", task: "Zero-shot Forecasting",
+        datasets: "Time-300B (custom large-scale dataset)",
+        category: "llm_ts", importance: 5
+      },
+      {
+        id: "llm_useful_ts",
+        title: "Are Language Models Actually Useful for Time Series Forecasting?",
+        year: 2024, citations: 200, venue: "NeurIPS 2024",
+        authors: "Tan et al.", method: "Critical analysis",
+        url: "https://arxiv.org/abs/2406.16964",
+        code: "https://github.com/BorealisAI/ts-llm-evaluation",
+        summary: "Critically evaluates LLM-based TS forecasters, finding that removing or replacing LLM components often yields similar or better results, questioning whether LLMs truly benefit TS forecasting.",
+        domain: "General", task: "Evaluation / Critique",
+        datasets: "ETT, Weather, ECL, Traffic",
+        category: "llm_ts", importance: 5
+      },
+      {
+        id: "autotimes",
+        title: "AutoTimes: Autoregressive Time Series Forecasters via Large Language Models",
+        year: 2024, citations: 120, venue: "NeurIPS 2024",
+        authors: "Liu et al.", method: "AutoTimes",
+        url: "https://arxiv.org/abs/2402.02370",
+        code: "https://github.com/thuml/AutoTimes",
+        summary: "Autoregressively forecasts TS by aligning TS segments with LLM token positions, leveraging in-context learning with textual timestamps for better temporal reasoning.",
+        domain: "General", task: "Forecasting",
+        datasets: "ETT, Weather, ECL, Traffic",
+        category: "llm_ts", importance: 4
+      },
+      {
+        id: "calf",
+        title: "CALF: Aligning LLMs for Time Series Forecasting via Cross-modal Fine-Tuning",
+        year: 2024, citations: 100, venue: "arXiv 2024",
+        authors: "Liu et al.", method: "CALF",
+        url: "https://arxiv.org/abs/2403.07300",
+        code: "https://github.com/Hank0626/CALF",
+        summary: "Introduces cross-modal fine-tuning to align TS tokens with LLM's text space, using a dual branch of TS and text to enrich temporal representations.",
+        domain: "General", task: "Forecasting",
+        datasets: "ETT, Weather, ECL, Traffic, ILI",
+        category: "llm_ts", importance: 4
+      },
+      {
+        id: "context_align",
+        title: "Context-Alignment: Activating and Enhancing LLM Capabilities in Time Series",
+        year: 2024, citations: 30, venue: "arXiv 2024",
+        authors: "Various authors", method: "Context-Alignment",
+        url: "https://arxiv.org/abs/2501.03747",
+        code: null,
+        summary: "Activates and enhances LLM capabilities for TS by aligning in-context TS samples with natural language descriptions for better pattern recognition.",
+        domain: "General", task: "Forecasting",
+        datasets: "ETT, Weather, ECL, Traffic",
+        category: "llm_ts", importance: 3
+      },
+      {
+        id: "ts_rag",
+        title: "TS-RAG: Retrieval-Augmented Generation based Time Series Foundation Models are Stronger Zero-Shot Forecaster",
+        year: 2024, citations: 20, venue: "arXiv 2024",
+        authors: "Various authors", method: "TS-RAG",
+        url: "https://arxiv.org/abs/2412.20170",
+        code: null,
+        summary: "Enhances TS foundation models with retrieval-augmented generation, fetching relevant historical TS patterns as demonstrations to improve zero-shot forecasting.",
+        domain: "General", task: "Zero-shot Forecasting",
+        datasets: "Multiple TS benchmarks",
+        category: "llm_ts", importance: 3
+      },
+      {
+        id: "xval",
+        title: "xVal: A Continuous Numerical Tokenization for Scientific Language Models",
+        year: 2023, citations: 80, venue: "NeurIPS 2023 Workshop",
+        authors: "Golkar et al. (Flatiron Institute)", method: "xVal",
+        url: "https://arxiv.org/abs/2310.02989",
+        code: "https://github.com/PolymathicAI/xVal",
+        summary: "Proposes continuous numerical tokenization where numbers are encoded as magnitude × unit embedding, enabling LLMs to reason more precisely over scientific numerical data.",
+        domain: "Scientific/General", task: "Representation, Numerical Reasoning",
+        datasets: "Various scientific datasets",
+        category: "llm_ts", importance: 4
+      },
+      {
+        id: "eval_llm_ts_text",
+        title: "Evaluating LLMs' Ability to Understand Numerical Time Series for Text Generation",
+        year: 2024, citations: 25, venue: "arXiv 2024",
+        authors: "Various authors", method: "Evaluation benchmark",
+        url: "https://arxiv.org/abs/2403.14831",
+        code: null,
+        summary: "Benchmarks LLMs on understanding numerical TS and generating textual descriptions, finding significant limitations in temporal numerical comprehension.",
+        domain: "General", task: "Evaluation, Text Generation",
+        datasets: "Custom evaluation benchmark",
+        category: "llm_ts", importance: 3
+      },
+      {
+        id: "llm_zeroshot_noise",
+        title: "Revisiting LLMs as Zero-Shot Time-Series Forecasters: Small Noise Can Break Large Models",
+        year: 2024, citations: 40, venue: "arXiv 2024",
+        authors: "Various authors", method: "Robustness analysis",
+        url: "https://arxiv.org/abs/2410.17221",
+        code: null,
+        summary: "Reveals that LLM-based TS forecasters are brittle to small Gaussian noise perturbations, challenging their robustness for real-world deployment.",
+        domain: "General", task: "Evaluation, Robustness",
+        datasets: "ETT, Weather, ECL",
+        category: "llm_ts", importance: 4
+      },
+      {
+        id: "guiding_llm",
+        title: "Guiding LLMs The Right Way: Fast, Non-Invasive Constrained Generation",
+        year: 2024, citations: 15, venue: "arXiv 2024",
+        authors: "Various authors", method: "Constrained decoding",
+        url: "https://arxiv.org/abs/2403.06988",
+        code: null,
+        summary: "Proposes non-invasive constrained generation to guide LLM outputs toward valid structured formats (e.g., numerical sequences) without modifying model weights.",
+        domain: "General", task: "Constrained Generation",
+        datasets: "Various",
+        category: "llm_ts", importance: 3
+      },
+      {
+        id: "timecma",
+        title: "TimeCMA: Towards LLM-Empowered Multivariate Time Series Forecasting via Cross-Modality Alignment",
+        year: 2024, citations: 50, venue: "arXiv 2024",
+        authors: "Various authors", method: "TimeCMA",
+        url: "https://arxiv.org/abs/2406.01638",
+        code: null,
+        summary: "Aligns TS and text modalities via cross-modal alignment for multivariate TS forecasting, capturing cross-variable dependencies through LLM's rich semantic space.",
+        domain: "General", task: "Multivariate Forecasting",
+        datasets: "ETT, Weather, ECL, Traffic",
+        category: "llm_ts", importance: 3
+      },
+      {
+        id: "tempo",
+        title: "TEMPO: Prompt-Based Generative Pre-Trained Transformer for Time Series Forecasting",
+        year: 2024, citations: 200, venue: "ICLR 2024",
+        authors: "Cao et al.", method: "TEMPO",
+        url: "https://arxiv.org/abs/2310.04948",
+        code: "https://github.com/DC-research/TEMPO",
+        summary: "Uses prompt-based GPT for TS forecasting with explicit trend/seasonal decomposition as separate prompts and instance normalization for distribution shift.",
+        domain: "General", task: "Forecasting",
+        datasets: "ETT, Weather, ECL, Traffic, ILI",
+        category: "llm_ts", importance: 4
+      },
+      {
+        id: "llm_ts_survey",
+        title: "Large Language Models for Time Series: A Survey",
+        year: 2024, citations: 400, venue: "arXiv 2024",
+        authors: "Jiang et al.", method: "Survey",
+        url: "https://arxiv.org/abs/2402.01801",
+        code: null,
+        summary: "Comprehensive survey of LLM applications in TS covering direct prompting, fine-tuning, and hybrid approaches across classification, forecasting, and anomaly detection.",
+        domain: "General", task: "Survey",
+        datasets: "Various",
+        category: "llm_ts", importance: 5
+      },
+      {
+        id: "large_models_survey",
+        title: "Large Models for Time Series and Spatio-Temporal Data: A Survey and Outlook",
+        year: 2024, citations: 250, venue: "arXiv 2024",
+        authors: "Jin et al.", method: "Survey",
+        url: "https://arxiv.org/abs/2310.10196",
+        code: "https://github.com/qingsongedu/Awesome-TimeSeries-SpatioTemporal-LM-LLM",
+        summary: "Surveys large models (foundation models, LLMs) applied to both temporal and spatio-temporal data, providing taxonomy and future directions.",
+        domain: "General", task: "Survey",
+        datasets: "Various",
+        category: "llm_ts", importance: 5
+      },
+      {
+        id: "time_aware_lang",
+        title: "Towards Effective Time-Aware Language Representation: Exploring Enhanced Temporal Understanding in Language Models",
+        year: 2023, citations: 30, venue: "arXiv 2023",
+        authors: "Various authors", method: "Temporal LM",
+        url: "https://arxiv.org/abs/2310.09497",
+        code: null,
+        summary: "Investigates how to enhance temporal understanding in language models through time-aware pretraining and position encoding modifications.",
+        domain: "NLP/General", task: "Temporal Reasoning",
+        datasets: "Temporal QA benchmarks",
+        category: "llm_ts", importance: 2
+      },
+      // ── SPATIO-TEMPORAL GENERAL ──────────────────────────────────
+      {
+        id: "mtgnn",
+        title: "Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks",
+        year: 2020, citations: 2000, venue: "KDD 2020",
+        authors: "Wu et al. (USC)", method: "MTGNN",
+        url: "https://arxiv.org/abs/2005.11650",
+        code: "https://github.com/nnzhan/MTGNN",
+        summary: "Learns graph structure from multivariate TS automatically using graph learning layer combined with graph convolution and temporal convolution for joint forecasting.",
+        domain: "General", task: "Multivariate Forecasting",
+        datasets: "Exchange-Rate, Solar-Energy, Electricity, Traffic",
+        category: "st", importance: 5
+      },
+      {
+        id: "localised_adaptive_st",
+        title: "Localised Adaptive Spatial-Temporal Graph Neural Network",
+        year: 2023, citations: 60, venue: "KDD 2023",
+        authors: "Authors (various)", method: "LASTS-GNN",
+        url: "https://arxiv.org/abs/2306.06930",
+        code: null,
+        summary: "Introduces localized adaptive graph learning to capture heterogeneous spatial correlations with dynamic node-specific temporal patterns for ST forecasting.",
+        domain: "Traffic/General", task: "Forecasting",
+        datasets: "METR-LA, PEMS-BAY, NYC taxi",
+        category: "st", importance: 3
+      },
+      {
+        id: "earthformer",
+        title: "Earthformer: Exploring Space-Time Transformers for Earth System Forecasting",
+        year: 2022, citations: 350, venue: "NeurIPS 2022",
+        authors: "Gao et al. (AWS)", method: "Earthformer",
+        url: "https://arxiv.org/abs/2207.05833",
+        code: "https://github.com/amazon-science/earth-forecasting-transformer",
+        summary: "Proposes Cuboid Attention for efficient space-time modeling by decomposing ST volumes into local cuboids, enabling scalable Earth system forecasting.",
+        domain: "Earth Science", task: "ST Forecasting",
+        datasets: "SEVIR, EarthNet2021, ICAR-ENSO",
+        category: "st", importance: 4
+      },
+      {
+        id: "robust_stgnn",
+        title: "Robust Spatio-Temporal Graph Neural Networks with Sparse Structure Learning",
+        year: 2024, citations: 30, venue: "arXiv / KDD 2024",
+        authors: "Various authors", method: "Robust-STGNN",
+        url: "https://arxiv.org/abs/2403.11690",
+        code: null,
+        summary: "Enhances robustness of ST-GNNs against noise and outliers through sparse structure learning that filters spurious edges in adaptive graphs.",
+        domain: "General", task: "Forecasting, Anomaly Detection",
+        datasets: "METR-LA, PEMS-BAY",
+        category: "st", importance: 3
+      },
+      {
+        id: "ood_stgnn",
+        title: "Out-of-Distribution Fault Detection in Multi-Sensor Systems using Spatio-Temporal Dynamic Graph Neural Networks",
+        year: 2024, citations: 20, venue: "arXiv / IEEE",
+        authors: "Various authors", method: "OOD-STGNN",
+        url: "https://arxiv.org/abs/2412.06435",
+        code: null,
+        summary: "Applies dynamic ST-GNNs for OOD fault detection in multi-sensor systems, using adaptive graph construction and anomaly scoring.",
+        domain: "Industrial/Sensor", task: "Anomaly Detection / Fault Detection",
+        datasets: "Multi-sensor industrial datasets",
+        category: "st", importance: 2
+      },
+      {
+        id: "tgformer",
+        title: "TGFormer: Towards Temporal Graph Transformer with Auto-Correlation Mechanism",
+        year: 2023, citations: 25, venue: "arXiv 2023",
+        authors: "Chen et al.", method: "TGFormer",
+        url: "https://www.researchgate.net/publication/382061299_TGFormer_Towards_Temporal_Graph_Transformer_with_Auto-Correlation_Mechanism",
+        code: null,
+        summary: "Proposes temporal graph Transformer that uses auto-correlation mechanism to capture periodic patterns in temporal graph data.",
+        domain: "General", task: "Forecasting",
+        datasets: "Traffic and TS benchmarks",
+        category: "st", importance: 2
+      },
+      {
+        id: "pgransnet",
+        title: "PGTransNet: A Physics-Guided Transformer Network for 3D Ocean Temperature and Salinity Predicting in Tropical Pacific",
+        year: 2024, citations: 35, venue: "IEEE TGRS / arXiv",
+        authors: "Various authors", method: "PGTransNet",
+        url: "https://arxiv.org/abs/2407.03077",
+        code: null,
+        summary: "Integrates physical constraints (thermodynamic equations) into Transformer architecture for 3D ocean temperature/salinity prediction in the tropical Pacific.",
+        domain: "Oceanography", task: "3D Temperature/Salinity Prediction",
+        datasets: "ORAS5, EN4 ocean reanalysis data",
+        category: "st", importance: 3
+      },
+      // ── TRAFFIC PREDICTION ──────────────────────────────────────
+      {
+        id: "bert_taxi",
+        title: "BERT-Based Deep Spatial-Temporal Network for Taxi Demand Prediction",
+        year: 2022, citations: 150, venue: "IEEE TKDE",
+        authors: "Various authors", method: "BDSTNet",
+        url: "https://ieeexplore.ieee.org/document/9535130",
+        code: null,
+        summary: "Applies BERT pretraining for spatial-temporal taxi demand prediction, encoding regional features with masked prediction and spatial attention layers.",
+        domain: "Urban Computing/Traffic", task: "Demand Prediction",
+        datasets: "NYC Taxi, Chicago Taxi",
+        category: "traffic", importance: 3
+      },
+      {
+        id: "sttn_traffic",
+        title: "Spatial-Temporal Transformer Networks for Traffic Flow Forecasting",
+        year: 2021, citations: 500, venue: "arXiv 2021",
+        authors: "Xu et al.", method: "STTN",
+        url: "https://arxiv.org/abs/2001.02908",
+        code: "https://github.com/wubin7019088/STTN",
+        summary: "Designs spatial Transformer for graph-structured traffic networks and temporal Transformer for time series, jointly modeling ST correlations.",
+        domain: "Traffic", task: "Traffic Flow Forecasting",
+        datasets: "METR-LA, PEMS-BAY",
+        category: "traffic", importance: 4
+      },
+      {
+        id: "sttns_pretrained",
+        title: "Spatial–Temporal Transformer Networks for Traffic Flow Forecasting Using a Pre-Trained Language Model",
+        year: 2022, citations: 80, venue: "Applied Sciences / MDPI",
+        authors: "Various authors", method: "STTNS-PLM",
+        url: "https://www.mdpi.com/2076-3417/12/10/5100",
+        code: null,
+        summary: "Enhances ST Transformer for traffic forecasting using pre-trained language model representations to encode contextual road network features.",
+        domain: "Traffic", task: "Traffic Flow Forecasting",
+        datasets: "METR-LA, PeMS",
+        category: "traffic", importance: 2
+      },
+      {
+        id: "rast",
+        title: "A Retrieval Augmented Spatio-Temporal Framework for Traffic Prediction",
+        year: 2024, citations: 30, venue: "arXiv 2024",
+        authors: "Various authors", method: "RAST",
+        url: "https://arxiv.org/abs/2405.03430",
+        code: null,
+        summary: "Proposes retrieval-augmented ST framework that retrieves similar historical ST patterns to augment traffic prediction context at inference time.",
+        domain: "Traffic", task: "Traffic Forecasting",
+        datasets: "METR-LA, PEMS-BAY, PEMS08",
+        category: "traffic", importance: 3
+      },
+      // ── LLM FOR SPATIO-TEMPORAL ───────────────────────────────────
+      {
+        id: "st_llm_traffic",
+        title: "Spatial-Temporal Large Language Model for Traffic Prediction",
+        year: 2024, citations: 80, venue: "MDM 2024 / arXiv",
+        authors: "Liu et al.", method: "ST-LLM (Traffic)",
+        url: "https://arxiv.org/abs/2401.10134",
+        code: "https://github.com/ChenxiLiu-HNU/ST-LLM",
+        summary: "Adapts LLMs for traffic prediction by tokenizing ST data and using spatial/temporal positional encoding with in-context prompting of traffic patterns.",
+        domain: "Traffic", task: "Traffic Forecasting",
+        datasets: "PeMSD4, PeMSD8, METR-LA, PEMS-BAY",
+        category: "llm_st", importance: 4
+      },
+      {
+        id: "stllm_temporal",
+        title: "ST-LLM: Large Language Models Are Effective Temporal Learners",
+        year: 2024, citations: 50, venue: "EMNLP 2024",
+        authors: "Various authors", method: "ST-LLM",
+        url: "https://arxiv.org/abs/2404.00308",
+        code: null,
+        summary: "Demonstrates LLMs as effective temporal learners for ST data by introducing partial temporal masking pre-training and ST-specific prompt engineering.",
+        domain: "General ST", task: "ST Forecasting",
+        datasets: "NYC-Bike, NYC-Taxi, PeMS",
+        category: "llm_st", importance: 4
+      },
+      {
+        id: "stllm_plus",
+        title: "ST-LLM+: Graph Enhanced Spatio-Temporal Large Language Models for Traffic Prediction",
+        year: 2024, citations: 20, venue: "arXiv 2024",
+        authors: "Various authors", method: "ST-LLM+",
+        url: "https://doi.org/10.1109/TKDE.2025.3570705",
+        code: null,
+        summary: "Extends ST-LLM with graph-enhanced spatial encoding, adding graph neural network components to better capture road network topology for traffic prediction.",
+        domain: "Traffic", task: "Traffic Forecasting",
+        datasets: "PeMSD4, PeMSD8, METR-LA",
+        category: "llm_st", importance: 3
+      },
+      {
+        id: "stca_llm",
+        title: "STCA-LLM: Spatial–Temporal Cross-Attention Large Language Model for Wind Speed Forecasting",
+        year: 2024, citations: 25, venue: "arXiv 2024",
+        authors: "Various authors", method: "STCA-LLM",
+        url: "https://www.researchgate.net/publication/388277649_STCA-LLM_Spatial-Temporal_Cross-Attention_Large_Language_Model_for_Wind_Speed_Forecasting",
+        code: null,
+        summary: "Applies LLM with spatial-temporal cross-attention for wind speed forecasting, integrating meteorological station graph with temporal LLM prompting.",
+        domain: "Meteorology", task: "Wind Speed Forecasting",
+        datasets: "Wind speed station data (multiple regions)",
+        category: "llm_st", importance: 3
+      },
+      {
+        id: "vision_llm_traffic",
+        title: "Vision-LLMs for Spatiotemporal Traffic Forecasting",
+        year: 2024, citations: 15, venue: "arXiv 2024",
+        authors: "Various authors", method: "Vision-LLM Traffic",
+        url: "https://arxiv.org/abs/2510.11282",
+        code: null,
+        summary: "Leverages vision-language models to interpret spatial traffic heatmaps and satellite imagery as inputs for ST traffic prediction.",
+        domain: "Traffic", task: "Traffic Forecasting",
+        datasets: "Traffic flow datasets with spatial imagery",
+        category: "llm_st", importance: 3
+      },
+      {
+        id: "llava_st",
+        title: "LLaVA-ST: A Multimodal Large Language Model for Fine-Grained Spatial-Temporal Understanding",
+        year: 2024, citations: 20, venue: "arXiv 2024",
+        authors: "Various authors", method: "LLaVA-ST",
+        url: "https://arxiv.org/abs/2501.08282",
+        code: null,
+        summary: "Extends LLaVA with fine-grained ST understanding capabilities by encoding spatial positions and temporal indices into video/spatial tokens.",
+        domain: "Video/Spatial", task: "ST Visual Understanding",
+        datasets: "Video QA, ST understanding benchmarks",
+        category: "llm_st", importance: 3
+      },
+      {
+        id: "stgllm",
+        title: "Spatio-Temporal Graph Learning with Large Language Model",
+        year: 2024, citations: 30, venue: "arXiv 2024",
+        authors: "Various authors", method: "STGLLM",
+        url: "https://openreview.net/forum?id=QUkcfqa6GX",
+        code: null,
+        summary: "Bridges ST graph learning and LLMs by converting graph topology and temporal signals to text, enabling LLMs to perform ST reasoning through chain-of-thought.",
+        domain: "General ST", task: "Forecasting, Reasoning",
+        datasets: "Traffic, Pedestrian ST datasets",
+        category: "llm_st", importance: 3
+      },
+      {
+        id: "llm4dyg",
+        title: "LLM4DyG: Can Large Language Models Solve Spatial-Temporal Problems on Dynamic Graphs?",
+        year: 2024, citations: 60, venue: "KDD 2024",
+        authors: "Zhang et al.", method: "LLM4DyG",
+        url: "https://arxiv.org/abs/2310.17110",
+        code: "https://github.com/wondergo2017/LLM4DyG",
+        summary: "Benchmarks LLMs on spatial-temporal problems over dynamic graphs (node classification, link prediction), finding mixed results and proposing ST-aware prompting.",
+        domain: "Dynamic Graphs", task: "Node/Edge Prediction",
+        datasets: "Dynamic graph benchmarks (Wikipedia, Reddit, MOOC)",
+        category: "llm_st", importance: 4
+      },
+      {
+        id: "how_llm_st",
+        title: "How Can Large Language Models Understand Spatial-Temporal Data?",
+        year: 2024, citations: 40, venue: "arXiv 2024",
+        authors: "Various authors", method: "Survey/Analysis",
+        url: "https://arxiv.org/abs/2401.14192",
+        code: null,
+        summary: "Systematically analyzes how LLMs can understand ST data through various representation strategies including text, images, and numerical encoding approaches.",
+        domain: "General ST", task: "Survey, Analysis",
+        datasets: "Various ST datasets",
+        category: "llm_st", importance: 4
+      },
+      // ── GRAPH NEURAL NETWORKS ─────────────────────────────────────
+      {
+        id: "kan_ts",
+        title: "Kolmogorov-Arnold Networks for Time Series: Bridging Predictive Power and Interpretability",
+        year: 2024, citations: 100, venue: "arXiv 2024",
+        authors: "Vaca-Rubio et al.", method: "KAN-TS",
+        url: "https://arxiv.org/abs/2406.02496",
+        code: "https://github.com/remigenet/TKAN",
+        summary: "Applies Kolmogorov-Arnold Networks to TS forecasting, replacing MLPs with learnable spline activations for improved interpretability and predictive capacity.",
+        domain: "General", task: "Forecasting, Interpretability",
+        datasets: "ETT, Weather, ECL",
+        category: "gnn", importance: 4
+      },
+      {
+        id: "gkan",
+        title: "GKAN: Graph Kolmogorov-Arnold Networks",
+        year: 2024, citations: 80, venue: "arXiv 2024",
+        authors: "Li et al.", method: "GKAN",
+        url: "https://arxiv.org/abs/2406.06470",
+        code: "https://github.com/yueliu1999/GKAN",
+        summary: "Combines KAN with graph neural networks, replacing linear transformations in GNNs with learnable spline functions for improved representation on graph data.",
+        domain: "General", task: "Graph Classification, Node Classification",
+        datasets: "Cora, Citeseer, ogbn-arxiv",
+        category: "gnn", importance: 4
+      },
+      // ── HYDROLOGY GENERAL ─────────────────────────────────────────
+      {
+        id: "hydronets",
+        title: "HydroNets: Leveraging River Structure for Hydrologic Modeling",
+        year: 2020, citations: 80, venue: "KDD Workshop 2020",
+        authors: "Moshe et al. (Google)", method: "HydroNets",
+        url: "https://arxiv.org/abs/2007.00595",
+        code: null,
+        summary: "Exploits river network topology as a DAG structure to share information between upstream and downstream nodes for improved streamflow simulation.",
+        domain: "Hydrology", task: "Streamflow Simulation",
+        datasets: "CAMELS US catchment dataset",
+        category: "hydro", importance: 4
+      },
+      {
+        id: "sgt_streamflow",
+        title: "Spatio-Temporal Graph Neural Networks for Streamflow Prediction in the Upper Colorado Basin",
+        year: 2023, citations: 45, venue: "Water Resources Research / arXiv",
+        authors: "Akkala et al.", method: "ST-GNN Streamflow",
+        url: "https://arxiv.org/abs/2306.08067",
+        code: null,
+        summary: "Applies ST-GNN to streamflow prediction using the river network graph structure, capturing spatial dependencies between gauges in the Upper Colorado Basin.",
+        domain: "Hydrology", task: "Streamflow Prediction",
+        datasets: "USGS streamflow gauge data, Upper Colorado Basin",
+        category: "hydro", importance: 4
+      },
+      {
+        id: "graph_regression_rivers",
+        title: "Exploring a Graph Regression Problem in River Networks",
+        year: 2023, citations: 30, venue: "arXiv 2023",
+        authors: "Fankhauser et al.", method: "Graph Regression",
+        url: "https://arxiv.org/abs/2310.11610",
+        code: null,
+        summary: "Formulates hydrological prediction as a graph regression task on river networks, comparing GNN architectures for spatial generalization.",
+        domain: "Hydrology", task: "Regression / Forecasting",
+        datasets: "US river gauge network data",
+        category: "hydro", importance: 3
+      },
+      {
+        id: "entity_aware_hydro",
+        title: "Are Deep Learning Models in Hydrology Entity Aware?",
+        year: 2022, citations: 60, venue: "Water Resources Research",
+        authors: "Kratzert et al.", method: "Entity-Aware LSTM",
+        url: "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2021WR031143",
+        code: null,
+        summary: "Investigates whether LSTM models learn entity-specific (catchment-specific) representations and how routing the entity embeddings improves regional generalization.",
+        domain: "Hydrology", task: "Streamflow Prediction",
+        datasets: "CAMELS dataset (671 catchments)",
+        category: "hydro", importance: 4
+      },
+      {
+        id: "spatial_stat_stream",
+        title: "Applications of Spatial Statistical Network Models to Stream Data",
+        year: 2014, citations: 500, venue: "WIREs Water",
+        authors: "Ver Hoef et al.", method: "Spatial Stream Network",
+        url: "https://wires.onlinelibrary.wiley.com/doi/10.1002/wat2.1023",
+        code: null,
+        summary: "Reviews spatial statistical models tailored for stream networks respecting flow direction and distance along stream lines, a foundational paper for hydrological spatial modeling.",
+        domain: "Hydrology/Statistics", task: "Spatial Prediction",
+        datasets: "Various stream network datasets",
+        category: "hydro", importance: 5
+      },
+      {
+        id: "hybrid_lstm_transformer_hydro",
+        title: "Application of a Hybrid Algorithm of LSTM and Transformer for Improving Rainfall-Runoff Simulation",
+        year: 2023, citations: 40, venue: "Scientific Reports",
+        authors: "Various authors", method: "LSTM-Transformer hybrid",
+        url: "https://www.nature.com/articles/s41598-023-45340-4",
+        code: null,
+        summary: "Combines LSTM for local temporal features with Transformer attention for long-range rainfall-runoff simulation, using random search for hyperparameter optimization.",
+        domain: "Hydrology", task: "Rainfall-Runoff Simulation",
+        datasets: "Streamflow and rainfall data (multiple basins)",
+        category: "hydro", importance: 3
+      },
+      {
+        id: "water_level_complex_network",
+        title: "Improvement of Deep Learning Models for River Water Level Prediction Using Complex Network Method",
+        year: 2022, citations: 35, venue: "Water Resources Research",
+        authors: "Kim et al.", method: "Complex Network + DL",
+        url: "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2022WR032528",
+        code: null,
+        summary: "Uses complex network analysis to select informative upstream gauges as auxiliary inputs for LSTM-based water level prediction, improving spatial awareness.",
+        domain: "Hydrology", task: "Water Level Prediction",
+        datasets: "River gauge network (China/US)",
+        category: "hydro", importance: 3
+      },
+      {
+        id: "joint_st_hydro",
+        title: "Joint Spatial and Temporal Modeling for Hydrological Prediction",
+        year: 2023, citations: 25, venue: "IEEE Access / arXiv",
+        authors: "Zhao et al.", method: "Joint ST Hydro",
+        url: "https://ieeexplore.ieee.org/document/9066914",
+        code: null,
+        summary: "Jointly models spatial correlations (river network) and temporal dependencies for hydrological prediction using graph-based recurrent networks.",
+        domain: "Hydrology", task: "Streamflow / Water Level Prediction",
+        datasets: "Multiple river basin datasets",
+        category: "hydro", importance: 3
+      },
+      {
+        id: "water_state_aware",
+        title: "Water-State-Aware Spatiotemporal Graph Transformer Network for Water-Level Prediction",
+        year: 2024, citations: 20, venue: "arXiv 2024",
+        authors: "Li et al.", method: "WSTGTransNet",
+        url: "https://arxiv.org/abs/2412.14046",
+        code: null,
+        summary: "Introduces water-state encoding (flood/drought conditions) as auxiliary input to ST graph Transformer for improved water level prediction in river networks.",
+        domain: "Hydrology", task: "Water Level Prediction",
+        datasets: "River gauge networks (multiple basins)",
+        category: "hydro", importance: 3
+      },
+      {
+        id: "graph_transformer_flood",
+        title: "Graph Transformer Network for Flood Forecasting with Heterogeneous Covariates",
+        year: 2024, citations: 30, venue: "arXiv 2024",
+        authors: "Shi et al.", method: "GTN-Flood",
+        url: "https://arxiv.org/abs/2407.04422",
+        code: null,
+        summary: "Proposes Graph Transformer for flood forecasting that handles heterogeneous covariates (rainfall, temperature, soil moisture) through modality-specific encoders.",
+        domain: "Hydrology", task: "Flood Forecasting",
+        datasets: "USGS flood event data, ERA5 climate covariates",
+        category: "hydro", importance: 3
+      },
+      {
+        id: "heterogeneous_stream_reservoir",
+        title: "Heterogeneous Stream-Reservoir Graph Networks with Data Assimilation",
+        year: 2022, citations: 60, venue: "KDD 2022 / arXiv",
+        authors: "Chen et al.", method: "HRGN",
+        url: "https://arxiv.org/abs/2208.05984",
+        code: null,
+        summary: "Models heterogeneous stream-reservoir networks with separate node types and data assimilation for more accurate water temperature/streamflow prediction.",
+        domain: "Hydrology", task: "Water Temperature / Streamflow",
+        datasets: "Stream-reservoir network in Delaware River Basin",
+        category: "hydro", importance: 4
+      },
+      {
+        id: "water_quality_gnn",
+        title: "Temporal and Spatial Feature Extraction Using Graph Neural Networks for Multi-Point Water Quality Prediction",
+        year: 2024, citations: 25, venue: "Water Resources Research / Journal",
+        authors: "Wan et al.", method: "WQ-GNN",
+        url: "https://www.sciencedirect.com/science/article/abs/pii/S0048969723081974",
+        code: null,
+        summary: "Extracts spatiotemporal features via GNN from monitoring station networks for multi-point water quality prediction (DO, BOD, pH).",
+        domain: "Hydrology/Environmental", task: "Water Quality Prediction",
+        datasets: "Water quality monitoring station data",
+        category: "hydro", importance: 3
+      },
+      {
+        id: "everglades_ts",
+        title: "How Effective are Large Time Series Models in Hydrology? A Study on Water Level Forecasting in Everglades",
+        year: 2024, citations: 15, venue: "arXiv 2024",
+        authors: "Rangaraj et al.", method: "Benchmarking study",
+        url: "https://arxiv.org/abs/2409.12983",
+        code: null,
+        summary: "Benchmarks modern large TS models (Chronos, Moirai, TimesFM) vs. traditional ML methods for water level forecasting in the Everglades, finding mixed results.",
+        domain: "Hydrology", task: "Water Level Forecasting",
+        datasets: "Everglades water level monitoring data",
+        category: "hydro", importance: 4
+      },
+      // ── WATER TEMPERATURE ─────────────────────────────────────────
+      {
+        id: "ml_streamtemp",
+        title: "Machine-Learning Methods for Stream Water Temperature Prediction",
+        year: 2019, citations: 300, venue: "Hydrology and Earth System Sciences",
+        authors: "Rahmati et al. / Kratzert et al.", method: "ML Survey for Wtemp",
+        url: "https://hess.copernicus.org/articles/23/3047/2019/",
+        code: null,
+        summary: "Reviews and benchmarks ML approaches (LSTM, Random Forest, XGBoost) for stream water temperature prediction, establishing key baselines in the field.",
+        domain: "Hydrology", task: "Water Temperature Prediction",
+        datasets: "Multiple US river gauge/temperature stations",
+        category: "wtemp", importance: 5
+      },
+      {
+        id: "physics_fair_graph_wtemp",
+        title: "Physics-Guided Fair Graph Sampling for Water Temperature Prediction in River Networks",
+        year: 2024, citations: 25, venue: "KDD 2024",
+        authors: "He et al.", method: "PFG-WTemp",
+        url: "https://arxiv.org/abs/2407.09481",
+        code: null,
+        summary: "Uses physics-guided sampling to construct fair graph representations that respect river network physics (upstream-downstream flow) for equitable water temperature prediction.",
+        domain: "Hydrology", task: "Water Temperature Prediction",
+        datasets: "Delaware River Basin temperature monitoring data",
+        category: "wtemp", importance: 4
+      },
+      {
+        id: "stream_temp_dl_arch",
+        title: "Stream Temperature Prediction in a Shifting Environment: Explaining the Influence of Deep Learning Architecture",
+        year: 2023, citations: 40, venue: "Water Resources Research",
+        authors: "Topp et al.", method: "DL Architecture Comparison",
+        url: "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023WR034751",
+        code: null,
+        summary: "Compares CNN, LSTM, and Transformer architectures for stream temperature prediction under climate shifts using explainability methods (SHAP).",
+        domain: "Hydrology", task: "Water Temperature Prediction",
+        datasets: "USGS stream temperature data (2000–2020)",
+        category: "wtemp", importance: 4
+      },
+      {
+        id: "pde_graph_wtemp",
+        title: "Partial Differential Equation Driven Dynamic Graph Networks for Predicting Stream Water Temperature",
+        year: 2024, citations: 20, venue: "SIAM / arXiv",
+        authors: "Bao et al.", method: "PDE-DyGN",
+        url: "https://arxiv.org/abs/2407.04442",
+        code: null,
+        summary: "Embeds PDE dynamics into dynamic graph network for stream water temperature, using advection-diffusion equations to guide temporal graph evolution.",
+        domain: "Hydrology", task: "Water Temperature Prediction",
+        datasets: "Delaware River Basin / Pennsylvania stream temperature",
+        category: "wtemp", importance: 4
+      },
+      {
+        id: "stgnn_wtemp",
+        title: "Spatio-Temporal Graph Neural Networks for Water Temperature Modeling",
+        year: 2023, citations: 35, venue: "Environmental Modelling & Software",
+        authors: "Stalder et al.", method: "STGNN-WTemp",
+        url: "https://www.sciencedirect.com/science/article/pii/S1364815222003085",
+        code: null,
+        summary: "Applies ST-GNN directly to river network topology for water temperature modeling, capturing spatial correlations between connected stream reaches.",
+        domain: "Hydrology", task: "Water Temperature Prediction",
+        datasets: "Swiss and US river temperature networks",
+        category: "wtemp", importance: 4
+      },
+      {
+        id: "lstm_embed_wtemp",
+        title: "Leveraging LSTM Embeddings for River Water Temperature Modeling",
+        year: 2023, citations: 20, venue: "Environmental Modelling & Software",
+        authors: "Fankhauser et al.", method: "LSTM-Embed",
+        url: "https://www.sciencedirect.com/science/article/pii/S1364815223002426",
+        code: null,
+        summary: "Uses LSTM-derived catchment embeddings as static features for water temperature modeling, improving cross-site generalization through representation sharing.",
+        domain: "Hydrology", task: "Water Temperature Prediction",
+        datasets: "Swiss river network data",
+        category: "wtemp", importance: 3
+      },
+      {
+        id: "impute_wtemp_lstm",
+        title: "Impute Water Temperature in the Swiss River Network Using LSTMs",
+        year: 2022, citations: 25, venue: "Environmental Modelling & Software",
+        authors: "Fankhauser et al.", method: "LSTM Imputation",
+        url: "https://www.sciencedirect.com/science/article/pii/S1364815222001883",
+        code: null,
+        summary: "Develops LSTM-based imputation method for missing water temperature records in Swiss river networks by leveraging upstream-downstream network structure.",
+        domain: "Hydrology", task: "Imputation",
+        datasets: "Swiss river temperature monitoring network",
+        category: "wtemp", importance: 3
+      },
+      {
+        id: "graph_dl_swiss",
+        title: "Graph-Based Deep Learning on the Swiss River Network",
+        year: 2022, citations: 40, venue: "Environmental Modelling & Software",
+        authors: "Fankhauser et al.", method: "GDL-Swiss",
+        url: "https://www.sciencedirect.com/science/article/pii/S1364815221003285",
+        code: null,
+        summary: "Applies graph-based deep learning to the complete Swiss river network, modeling upstream-downstream dependencies for water temperature and streamflow prediction.",
+        domain: "Hydrology", task: "Water Temperature / Streamflow",
+        datasets: "Swiss Hydrological Network (FOEN data)",
+        category: "wtemp", importance: 4
+      },
+      {
+        id: "eval_graphs_embed_wtemp",
+        title: "Evaluating the Role of Graphs and Embeddings in Spatio-Temporal Modeling of River Water Temperature",
+        year: 2024, citations: 10, venue: "Environmental Modelling & Software",
+        authors: "Fankhauser et al.", method: "Ablation study",
+        url: "https://www.sciencedirect.com/science/article/pii/S1364815224001853",
+        code: null,
+        summary: "Systematically evaluates the contribution of graph topology vs. embedding-based spatial representations in ST models for river water temperature prediction.",
+        domain: "Hydrology", task: "Water Temperature Prediction",
+        datasets: "Swiss river network, Delaware River Basin",
+        category: "wtemp", importance: 4
+      },
+      {
+        id: "extended_range_wtemp",
+        title: "Extended Range Forecasting of Stream Water Temperature with Deep Learning Models",
+        year: 2024, citations: 15, venue: "EGUsphere (EGU preprint)",
+        authors: "Padrón et al.", method: "Extended-range DL WTemp",
+        url: "https://egusphere.copernicus.org/preprints/2024/egusphere-2024-1296/",
+        code: null,
+        summary: "Develops deep learning models for extended-range (7–30 day) stream temperature forecasting using atmospheric reanalysis and climate forecasts as inputs.",
+        domain: "Hydrology", task: "Water Temperature Forecasting",
+        datasets: "ECMWF climate forecasts + stream temperature stations",
+        category: "wtemp", importance: 3
+      },
+      {
+        id: "pinn_lstm_river_temp",
+        title: "Hybrid PINN-LSTM Model for River Temperature Prediction: A Physics-Informed Deep Learning Approach",
+        year: 2024, citations: 20, venue: "Journal of Hydrology / arXiv",
+        authors: "Figueredo et al.", method: "PINN-LSTM",
+        url: "https://arxiv.org/abs/2406.08236",
+        code: null,
+        summary: "Combines Physics-Informed Neural Networks with LSTM to ensure thermodynamic consistency while leveraging data-driven patterns for river temperature prediction.",
+        domain: "Hydrology", task: "Water Temperature Prediction",
+        datasets: "River temperature monitoring (multiple basins)",
+        category: "wtemp", importance: 4
+      },
+      {
+        id: "st_temp_domain_adapt",
+        title: "Spatial–Temporal Temperature Forecasting Using Deep-Neural-Network-Based Domain Adaptation",
+        year: 2022, citations: 30, venue: "IEEE TGRS",
+        authors: "Various authors", method: "DNN Domain Adaptation",
+        url: "https://ieeexplore.ieee.org/document/9743463",
+        code: null,
+        summary: "Uses domain adaptation techniques to transfer learned temperature patterns between different geographic regions for improved spatial generalization.",
+        domain: "Environmental", task: "Temperature Forecasting",
+        datasets: "Air temperature / stream temperature datasets",
+        category: "wtemp", importance: 3
+      },
+      // ── LLM FOR HYDROLOGY ─────────────────────────────────────────
+      {
+        id: "physics_informed_large_hydro",
+        title: "Physics-Informed Large AI Models for Hydrology and the Water Cycle",
+        year: 2024, citations: 30, venue: "arXiv / Earth and Space Science",
+        authors: "Shen et al.", method: "PI-LargeAI",
+        url: "https://arxiv.org/abs/2406.07563",
+        code: null,
+        summary: "Argues for physics-informed large AI models for hydrology, proposing integration of hydrological process knowledge into foundation model training and fine-tuning.",
+        domain: "Hydrology", task: "Survey / Position Paper",
+        datasets: "CAMELS, ERA5, NLDAS",
+        category: "llm_hydro", importance: 5
+      },
+      {
+        id: "multimodal_llm_hydro",
+        title: "The Implementation of Multimodal Large Language Models for Hydrological Applications",
+        year: 2024, citations: 20, venue: "arXiv 2024",
+        authors: "Kadiyala et al.", method: "Multimodal LLM comparison",
+        url: "https://arxiv.org/abs/2408.03603",
+        code: null,
+        summary: "Compares GPT-4 Vision, Gemini, LLaVA, and Multimodal-GPT for hydrological applications including reading flood maps, interpreting hydrographs, and understanding satellite imagery.",
+        domain: "Hydrology", task: "Multimodal Analysis",
+        datasets: "Hydrological maps, satellite data, hydrographs",
+        category: "llm_hydro", importance: 4
+      },
+      {
+        id: "llm_climate_forecast",
+        title: "Exploring Large Language Models for Climate Forecasting",
+        year: 2024, citations: 25, venue: "arXiv 2024",
+        authors: "Wang et al.", method: "LLM climate analysis",
+        url: "https://arxiv.org/abs/2402.09512",
+        code: null,
+        summary: "Explores how LLMs can interpret climate data and generate forecasts by fine-tuning on climate indicators and using text-based representation of climate indices.",
+        domain: "Climate", task: "Climate Forecasting",
+        datasets: "ENSO, NAO, climate indices datasets",
+        category: "llm_hydro", importance: 3
+      },
+      {
+        id: "embracing_llm_hydro",
+        title: "Embracing Large Language Model (LLM) Technologies in Hydrology Research",
+        year: 2024, citations: 30, venue: "Geophysical Research Letters",
+        authors: "Ma et al.", method: "Position paper",
+        url: "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023GL106116",
+        code: null,
+        summary: "Position paper advocating for adoption of LLM technologies in hydrology for literature synthesis, code generation, and knowledge extraction from unstructured data.",
+        domain: "Hydrology", task: "Survey / Position Paper",
+        datasets: "N/A (conceptual)",
+        category: "llm_hydro", importance: 4
+      },
+      {
+        id: "hydrollm_benchmark",
+        title: "Toward HydroLLM: A Benchmark Dataset for Hydrology-Specific Knowledge Assessment for Large Language Models",
+        year: 2024, citations: 10, venue: "arXiv 2024",
+        authors: "Kizilkaya et al.", method: "HydroLLM Benchmark",
+        url: "https://arxiv.org/abs/2406.09101",
+        code: null,
+        summary: "Creates a benchmark dataset of hydrology-specific QA pairs to evaluate and compare LLMs on specialized hydrological knowledge including water cycle, flood, and drought terminology.",
+        domain: "Hydrology", task: "Benchmarking LLMs",
+        datasets: "HydroLLM QA benchmark (custom)",
+        category: "llm_hydro", importance: 4
+      },
+      {
+        id: "finetune_llm_environ",
+        title: "Fine-Tuning Large Language Models for Interdisciplinary Environmental Challenges",
+        year: 2024, citations: 15, venue: "arXiv 2024",
+        authors: "Zhang et al.", method: "Fine-tuning strategy",
+        url: "https://arxiv.org/abs/2406.07991",
+        code: null,
+        summary: "Develops fine-tuning strategies for adapting LLMs to interdisciplinary environmental domains including hydrology, ecology, and climate science using instruction tuning.",
+        domain: "Environmental", task: "Domain Adaptation",
+        datasets: "Environmental scientific literature",
+        category: "llm_hydro", importance: 3
+      },
+      {
+        id: "watergpt",
+        title: "WaterGPT: Training a Large Language Model to Become a Hydrology Expert",
+        year: 2024, citations: 10, venue: "arXiv 2024",
+        authors: "Ren et al.", method: "WaterGPT",
+        url: "https://arxiv.org/abs/2401.13231",
+        code: null,
+        summary: "Fine-tunes a GPT model on hydrological literature and data to create WaterGPT, a domain-specific assistant capable of answering hydrology questions and interpreting data.",
+        domain: "Hydrology", task: "QA, Knowledge Expert",
+        datasets: "Hydrological textbooks, papers, USGS data",
+        category: "llm_hydro", importance: 3
+      },
+      // ── WEATHER & EARTH SCIENCE ───────────────────────────────────
+      {
+        id: "stconvs2s",
+        title: "STConvS2S: Spatiotemporal Convolutional Sequence to Sequence Network for Weather Forecasting",
+        year: 2021, citations: 150, venue: "Neurocomputing",
+        authors: "Nascimento et al.", method: "STConvS2S",
+        url: "https://arxiv.org/abs/1912.00134",
+        code: "https://github.com/MLRG-CEFET-RJ/stconvs2s",
+        summary: "Combines sequence-to-sequence architecture with spatiotemporal convolutions for weather forecasting, handling both spatial and temporal patterns simultaneously.",
+        domain: "Meteorology", task: "Weather Forecasting",
+        datasets: "ERA5, CFSv2 reanalysis data",
+        category: "weather", importance: 3
+      },
+      {
+        id: "sttransnet_precip",
+        title: "ST-TransNet: A Spatiotemporal Transformer Network for Uncertainty Estimation from a Single Deterministic Precipitation Forecast",
+        year: 2024, citations: 20, venue: "Journal of Advances in Modeling Earth Systems",
+        authors: "Wang et al.", method: "ST-TransNet",
+        url: "https://agupubs.onlinelibrary.wiley.com/doi/10.1029/2023MS003635",
+        code: null,
+        summary: "ST Transformer that produces probabilistic precipitation forecasts from deterministic NWP model outputs, estimating forecast uncertainty via learned ensemble generation.",
+        domain: "Meteorology", task: "Precipitation Forecasting, Uncertainty Estimation",
+        datasets: "ECMWF IFS, GFS precipitation outputs",
+        category: "weather", importance: 3
+      },
+      {
+        id: "transformer_climate",
+        title: "Transformer Based Models with Hierarchical Graph Representations for Enhanced Climate Forecasting",
+        year: 2024, citations: 20, venue: "arXiv 2024",
+        authors: "Ramu et al.", method: "HiGraph-Transformer",
+        url: "https://arxiv.org/abs/2407.00716",
+        code: null,
+        summary: "Combines hierarchical graph representation of climate system with Transformer for multi-scale climate forecasting at different spatial and temporal resolutions.",
+        domain: "Climate", task: "Climate Forecasting",
+        datasets: "ERA5, NOAA climate datasets",
+        category: "weather", importance: 3
+      },
+    ];
+
+    // Count papers
+    document.getElementById('paperCount').textContent = PAPERS.length;
+
+    // ============================================================
+    // BUILD TREE DATA
+    // ============================================================
+    function buildTreeData() {
+      const catMap = {};
+      CATEGORIES.forEach(c => {
+        catMap[c.id] = {
+          id: c.id, name: `${c.emoji} ${c.label}`,
+          color: c.color, children: [], isCategory: true,
+          count: PAPERS.filter(p => p.category === c.id).length
+        };
+      });
+
+      PAPERS.forEach(p => {
+        if (catMap[p.category]) {
+          catMap[p.category].children.push({
+            id: p.id, name: p.title, data: p, isLeaf: true,
+            color: catMap[p.category].color
+          });
+        }
+      });
+
+      return {
+        id: "root",
+        name: "📡 ST / TS / LLM\nResearch Landscape",
+        color: "#4fc3f7",
+        children: CATEGORIES.map(c => catMap[c.id]).filter(c => c.count > 0),
+        isRoot: true
+      };
+    }
+
+    // ============================================================
+    // MINDMAP VISUALIZATION (D3 Tree)
+    // ============================================================
+    const svg = d3.select("#svg");
+    const width = window.innerWidth;
+    const height = window.innerHeight - 64;
+
+    const g = svg.append("g");
+
+    // Zoom
+    const zoom = d3.zoom()
+      .scaleExtent([0.05, 3])
+      .on("zoom", (event) => g.attr("transform", event.transform));
+    svg.call(zoom);
+
+    function resetZoom() {
+      svg.transition().duration(500).call(zoom.transform, d3.zoomIdentity.translate(width / 2, height / 2).scale(0.6));
+    }
+
+    let root;
+
+    function renderMindmap(filterText = "") {
+      g.selectAll("*").remove();
+
+      const treeData = buildTreeData();
+
+      // Apply filter
+      if (filterText.trim()) {
+        const fl = filterText.toLowerCase();
+        treeData.children.forEach(cat => {
+          cat.children = cat.children.filter(leaf =>
+            leaf.name.toLowerCase().includes(fl) ||
+            (leaf.data.authors && leaf.data.authors.toLowerCase().includes(fl)) ||
+            (leaf.data.method && leaf.data.method.toLowerCase().includes(fl)) ||
+            (leaf.data.summary && leaf.data.summary.toLowerCase().includes(fl)) ||
+            (leaf.data.venue && leaf.data.venue.toLowerCase().includes(fl)) ||
+            (leaf.data.domain && leaf.data.domain.toLowerCase().includes(fl))
+          );
+          cat.count = cat.children.length;
+        });
+      }
+
+      root = d3.hierarchy(treeData);
+
+      // Radial tree layout
+      const radius = Math.min(width, height) * 0.95;
+      const treeLayout = d3.tree()
+        .size([2 * Math.PI, radius / 2])
+        .separation((a, b) => (a.parent === b.parent ? 1.2 : 2.5) / a.depth);
+
+      treeLayout(root);
+
+      // Convert to cartesian
+      function radialPoint(x, y) {
+        return [(y = +y) * Math.cos(x -= Math.PI / 2), y * Math.sin(x)];
+      }
+
+      // Links
+      const linkGen = d3.linkRadial().angle(d => d.x).radius(d => d.y);
+
+      g.selectAll(".link")
+        .data(root.links())
+        .join("path")
+        .attr("class", "link")
+        .attr("d", linkGen)
+        .style("stroke", d => d.target.data.color || "#2a3349")
+        .style("stroke-width", d => d.source.depth === 0 ? 2 : 1.2)
+        .style("opacity", d => d.source.depth === 0 ? 0.6 : 0.35);
+
+      // Nodes
+      const node = g.selectAll(".node")
+        .data(root.descendants())
+        .join("g")
+        .attr("class", "node")
+        .attr("transform", d => `translate(${radialPoint(d.x, d.y)})`)
+        .style("cursor", d => d.data.isLeaf ? "pointer" : "pointer");
+
+      // Circles
+      node.append("circle")
+        .attr("r", d => d.data.isRoot ? 28 : (d.data.isCategory ? 14 : 5))
+        .attr("fill", d => {
+          if (d.data.isRoot) return "#0d1929";
+          if (d.data.isCategory) return d.data.color + "22";
+          return d.data.color + "44";
+        })
+        .attr("stroke", d => d.data.color || "#4fc3f7")
+        .attr("stroke-width", d => d.data.isRoot ? 3 : (d.data.isCategory ? 2.5 : 1.5));
+
+      // Stars for importance (leaf nodes)
+      node.filter(d => d.data.isLeaf && d.data.data)
+        .append("text")
+        .attr("dy", "0.35em")
+        .attr("text-anchor", "middle")
+        .attr("font-size", "6px")
+        .attr("fill", "#ffcc02")
+        .text(d => {
+          const imp = d.data.data.importance || 0;
+          return imp >= 5 ? "★★★" : imp >= 4 ? "★★" : imp >= 3 ? "★" : "";
+        });
+
+      // Labels
+      node.filter(d => !d.data.isLeaf)
+        .append("text")
+        .attr("dy", "0.35em")
+        .attr("x", d => {
+          const [x] = radialPoint(d.x, d.y);
+          return x > 0 ? (d.data.isRoot ? 0 : 18) : (d.data.isRoot ? 0 : -18);
+        })
+        .attr("text-anchor", d => {
+          if (d.data.isRoot) return "middle";
+          const [x] = radialPoint(d.x, d.y);
+          return x > 0 ? "start" : "end";
+        })
+        .style("font-size", d => d.data.isRoot ? "12px" : "11px")
+        .style("font-weight", d => d.data.isCategory ? "700" : "400")
+        .style("fill", d => d.data.color || "#d4daf0")
+        .each(function (d) {
+          const lines = d.data.isRoot
+            ? d.data.name.split("\n")
+            : [d.data.name + (d.data.count ? ` (${d.data.count})` : "")];
+          d3.select(this).text(null);
+          lines.forEach((line, i) => {
+            d3.select(this).append("tspan")
+              .attr("x", d.data.isRoot ? 0 : ((() => { const [x] = radialPoint(d.x, d.y); return x > 0 ? 18 : -18; })()))
+              .attr("dy", i === 0 ? (lines.length > 1 ? "-0.5em" : "0.35em") : "1.2em")
+              .text(line);
+          });
+        });
+
+      // Leaf labels (short title)
+      node.filter(d => d.data.isLeaf)
+        .append("text")
+        .attr("dy", "-8px")
+        .attr("x", d => {
+          const [x] = radialPoint(d.x, d.y);
+          return x > 0 ? 8 : -8;
+        })
+        .attr("text-anchor", d => {
+          const [x] = radialPoint(d.x, d.y);
+          return x > 0 ? "start" : "end";
+        })
+        .style("font-size", "8.5px")
+        .style("fill", "#c0c8e0")
+        .text(d => {
+          const title = d.data.data.method || d.data.name;
+          return title.length > 22 ? title.slice(0, 22) + "…" : title;
+        });
+
+      // Year badge on leaves
+      node.filter(d => d.data.isLeaf && d.data.data)
+        .append("text")
+        .attr("dy", "16px")
+        .attr("x", d => {
+          const [x] = radialPoint(d.x, d.y);
+          return x > 0 ? 8 : -8;
+        })
+        .attr("text-anchor", d => {
+          const [x] = radialPoint(d.x, d.y);
+          return x > 0 ? "start" : "end";
+        })
+        .style("font-size", "7.5px")
+        .style("fill", "#7a8aaa")
+        .text(d => `${d.data.data.year} · ${d.data.data.venue ? d.data.data.venue.split(' ')[0] : ''}`);
+
+      // Hover tooltip
+      node.filter(d => d.data.isLeaf)
+        .on("mousemove", function (event, d) {
+          showTooltip(event, d.data.data);
+        })
+        .on("mouseleave", () => hideTooltip());
+
+      // Click opens URL
+      node.filter(d => d.data.isLeaf)
+        .on("click", (event, d) => {
+          if (d.data.data && d.data.data.url) {
+            window.open(d.data.data.url, "_blank");
+          }
+        });
+    }
+
+    function showTooltip(event, paper) {
+      const tt = document.getElementById('tooltip');
+      const stars = "★".repeat(paper.importance || 0) + "☆".repeat(5 - (paper.importance || 0));
+      const codeLink = paper.code ? `<a href="${paper.code}" target="_blank">GitHub ↗</a>` : "—";
+      const paperLink = paper.url ? `<a href="${paper.url}" target="_blank">Paper ↗</a>` : "—";
+
+      tt.innerHTML = `
+    <div class="tt-title">${paper.title}</div>
+    <div class="tt-row"><span class="tt-label">✦ Method</span><span class="tt-val">${paper.method || "—"}</span></div>
+    <div class="tt-row"><span class="tt-label">📅 Year</span><span class="tt-val">${paper.year}</span></div>
+    <div class="tt-row"><span class="tt-label">📰 Venue</span><span class="tt-val">${paper.venue || "—"}</span></div>
+    <div class="tt-row"><span class="tt-label">👤 Authors</span><span class="tt-val">${paper.authors || "—"}</span></div>
+    <div class="tt-row"><span class="tt-label">🔢 Citations</span><span class="tt-val">${paper.citations ? paper.citations + "+" : "—"}</span></div>
+    <div class="tt-row"><span class="tt-label">⭐ Importance</span><span class="tt-val stars">${stars}</span></div>
+    <div class="tt-row"><span class="tt-label">🌐 Domain</span><span class="tt-val">${paper.domain || "—"}</span></div>
+    <div class="tt-row"><span class="tt-label">🎯 Task</span><span class="tt-val">${paper.task || "—"}</span></div>
+    <div class="tt-row"><span class="tt-label">📊 Datasets</span><span class="tt-val">${paper.datasets || "—"}</span></div>
+    <div class="tt-row" style="margin-top:6px"><span class="tt-label">📝 Summary</span><span class="tt-val">${paper.summary || "—"}</span></div>
+    <div class="tt-row tt-link" style="margin-top:6px"><span class="tt-label">🔗 Links</span><span class="tt-val">${paperLink} &nbsp; 💻 ${codeLink}</span></div>
+  `;
+
+      const x = Math.min(event.clientX + 16, window.innerWidth - 440);
+      const y = Math.min(event.clientY + 10, window.innerHeight - 300);
+      tt.style.left = x + "px";
+      tt.style.top = y + "px";
+      tt.classList.add("visible");
+    }
+
+    function hideTooltip() {
+      document.getElementById('tooltip').classList.remove("visible");
+    }
+
+    // ============================================================
+    // LEGEND
+    // ============================================================
+    const legendEl = document.getElementById('legend');
+    CATEGORIES.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'legend-item';
+      el.innerHTML = `<div class="legend-dot" style="background:${c.color}"></div>${c.emoji} ${c.label.split(' ')[0]}`;
+      legendEl.appendChild(el);
+    });
+
+    // ============================================================
+    // SEARCH
+    // ============================================================
+    let searchTimeout;
+    document.getElementById('searchInput').addEventListener('input', function () {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        renderMindmap(this.value);
+        resetZoom();
+      }, 300);
+    });
+
+    // ============================================================
+    // COLLAPSE / EXPAND (simple re-render toggles)
+    // ============================================================
+    function expandAll() { renderMindmap(document.getElementById('searchInput').value); }
+    function collapseAll() { renderMindmap("__NO_MATCH__"); }
+
+    // ============================================================
+    // EXPORT FUNCTIONS
+    // ============================================================
+    function exportSVG() {
+      const svgEl = document.getElementById('svg');
+      const serializer = new XMLSerializer();
+      let source = serializer.serializeToString(svgEl);
+      source = '<?xml version="1.0" encoding="UTF-8"?>\n' + source;
+      const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = "research_mindmap.svg"; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportPNG() {
+      const svgEl = document.getElementById('svg');
+      const serializer = new XMLSerializer();
+      const svgStr = serializer.serializeToString(svgEl);
+      const canvas = document.createElement('canvas');
+      canvas.width = window.innerWidth * 2;
+      canvas.height = window.innerHeight * 2;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = "#0d0f14";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const img = new Image();
+      const blob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const a = document.createElement('a'); a.href = canvas.toDataURL('image/png'); a.download = "research_mindmap.png"; a.click();
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    }
+
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a3' });
+
+      const svgEl = document.getElementById('svg');
+      const serializer = new XMLSerializer();
+      const svgStr = serializer.serializeToString(svgEl);
+      const canvas = document.createElement('canvas');
+      canvas.width = 2480; canvas.height = 1754;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = "#0d0f14";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      const img = new Image();
+      const blob = new Blob([svgStr], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        const imgData = canvas.toDataURL('image/jpeg', 0.92);
+        doc.addImage(imgData, 'JPEG', 0, 0, 420, 297);
+        doc.save("research_mindmap.pdf");
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    }
+
+    function exportMarkdown() {
+      let md = "# Research Mindmap: ST / TS / LLM / Hydrology\n\n";
+      md += `> **Total papers:** ${PAPERS.length}  |  Generated: ${new Date().toLocaleDateString()}\n\n`;
+      md += "---\n\n";
+
+      CATEGORIES.forEach(cat => {
+        const papers = PAPERS.filter(p => p.category === cat.id);
+        if (papers.length === 0) return;
+        md += `## ${cat.emoji} ${cat.label}\n\n`;
+        papers.forEach(p => {
+          const stars = "★".repeat(p.importance || 0);
+          md += `### ${p.method || p.title.slice(0, 40)}\n\n`;
+          md += `- **Full Title:** ${p.title}\n`;
+          md += `- **Year:** ${p.year}\n`;
+          md += `- **Venue:** ${p.venue || "—"}\n`;
+          md += `- **Authors:** ${p.authors || "—"}\n`;
+          md += `- **Citations:** ${p.citations ? p.citations + "+" : "—"}\n`;
+          md += `- **Importance:** ${stars} (${p.importance}/5)\n`;
+          md += `- **Domain:** ${p.domain || "—"}\n`;
+          md += `- **Task:** ${p.task || "—"}\n`;
+          md += `- **Datasets:** ${p.datasets || "—"}\n`;
+          md += `- **Summary:** ${p.summary || "—"}\n`;
+          md += `- **Paper:** [Link](${p.url || "#"})\n`;
+          if (p.code) md += `- **Code:** [GitHub](${p.code})\n`;
+          md += "\n";
+        });
+        md += "---\n\n";
+      });
+
+      const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = "research_mindmap.md"; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    renderMindmap();
+    setTimeout(() => {
+      svg.call(zoom.transform, d3.zoomIdentity.translate(width / 2, height / 2).scale(0.55));
+    }, 100);
+
+    window.addEventListener('resize', () => {
+      renderMindmap(document.getElementById('searchInput').value);
+      setTimeout(() => {
+        svg.call(zoom.transform, d3.zoomIdentity.translate(window.innerWidth / 2, (window.innerHeight - 64) / 2).scale(0.55));
+      }, 100);
+    });
+  </script>
+</body>
+
+</html>

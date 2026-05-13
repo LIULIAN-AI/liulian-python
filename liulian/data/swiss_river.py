@@ -114,6 +114,9 @@ class SwissRiverDataset(SpatialTempoDataset):
         include_historical_predicted_y: bool = False,
         identifier_mode: str = 'none',
         id_integration: str = 'concat_to_x',
+        sinusoidal_dim: int = 16,
+        random_identifier_dim: int = 16,
+        random_identifier_seed: int = 2026,
         graph_mode: str = 'none',
         graphlet_num_hops: int = 1,
         max_samples: Optional[int] = None,
@@ -125,6 +128,9 @@ class SwissRiverDataset(SpatialTempoDataset):
         self.scaler_type = scaler_type.strip().lower()
         self.graphlet_num_hops = graphlet_num_hops
         self.max_samples = max_samples
+        self.sinusoidal_dim = int(sinusoidal_dim)
+        self.random_identifier_dim = int(random_identifier_dim)
+        self.random_identifier_seed = int(random_identifier_seed)
 
         project_root = Path(__file__).resolve().parents[2]
         self.root_path = (
@@ -463,6 +469,9 @@ class SwissRiverDataset(SpatialTempoDataset):
                 id_integration=self.id_integration,
                 coordinates=(self.topology.coordinates if self.topology else {}),
                 station_name=station,
+                sinusoidal_dim=self.sinusoidal_dim,
+                random_identifier_dim=self.random_identifier_dim,
+                random_identifier_seed=self.random_identifier_seed,
             )
             parts.append(ds_station.get_split(split_name))
 
@@ -506,6 +515,17 @@ class SwissRiverDataset(SpatialTempoDataset):
             max_mask_consecutive=self.max_mask_consecutive,
             noise_type=self.noise_type,
             noise_kwargs=self.noise_kwargs,
+            # Entity identifier params — required so that downstream
+            # pipeline / adapter code (e.g. EntityAwareMixin,
+            # ChannelEntityWrapper, ChannelTransparentWrapper) can
+            # detect the configured mode and wrap the model accordingly.
+            station_ids=self.station_ids,
+            identifier_mode=self.identifier_mode,
+            id_integration=self.id_integration,
+            coordinates=(self.topology.coordinates if self.topology else {}),
+            sinusoidal_dim=self.sinusoidal_dim,
+            random_identifier_dim=self.random_identifier_dim,
+            random_identifier_seed=self.random_identifier_seed,
         )
         split = mc_ds.get_split(split_name)
         return split.with_max_samples(self.max_samples)

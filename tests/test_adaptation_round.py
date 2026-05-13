@@ -220,7 +220,7 @@ class TestEntityIdentifiers:
         from liulian.data.ts.timeseriesdataset import make_entity_features
 
         ids = ['s1', 's2', 's3']
-        for mode in ['embedding_idx', 'onehot', 'numeric_id', 'sinusoidal']:
+        for mode in ['embedding_idx', 'onehot', 'numeric_id', 'sinusoidal', 'random']:
             result = make_entity_features('s1', ids, mode=mode, seq_len=8)
             assert result is not None
             assert result.shape[0] == 8
