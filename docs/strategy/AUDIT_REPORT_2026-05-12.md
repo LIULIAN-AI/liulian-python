@@ -7,7 +7,7 @@ auditors:
   - skill: research-critic (claim-by-claim audit)
 target_docs:
   - PLATFORM_BLUEPRINT.md
-  - NEOBANKER_REUSE_MAP.md
+  - LIULIAN_REUSE_MAP.md
   - ONE_WEEK_SPRINT.md
   - REFERENCE_DESIGNS.md
 > **Language:** English | [中文](AUDIT_REPORT_2026-05-12.zh.md) *(zh stub pending)*
@@ -30,7 +30,7 @@ target_docs:
 | Ban | Status | Fix |
 |---|---|---|
 | Gradient text | clean | n/a |
-| Side-stripe borders > 1px as accent | **VIOLATION FOUND** in `NEOBANKER_REUSE_MAP.md §14.3` ("currently-selected row left edge (2px)") | **FIXED**: replaced with 6×6 px leading dot. |
+| Side-stripe borders > 1px as accent | **VIOLATION FOUND** in `LIULIAN_REUSE_MAP.md §14.3` ("currently-selected row left edge (2px)") | **FIXED**: replaced with 6×6 px leading dot. |
 | Hero-metric template | clean | n/a |
 | Identical card grids | clean (bento grid varies sizes) | n/a |
 | Modal as first thought | clean (peek-pane on row hover used instead) | n/a |
@@ -43,7 +43,7 @@ target_docs:
 
 Pre-audit: "Linear-meets-Bloomberg editorial Swiss" was a strong direction
 but the implementation moves were too few. Six bolder moves added to
-`NEOBANKER_REUSE_MAP.md §14.3`:
+`LIULIAN_REUSE_MAP.md §14.3`:
 
 1. Status as typography (Fraunces italic for "running", bold-roman for
    "failed", Switzer regular for "completed") instead of chromatic pills.
@@ -102,7 +102,7 @@ claims.
 | Alternatives ruled out? | NO — hybrid (Python repo + JS Turborepo monorepo) wasn't considered |
 
 **Restated honestly**: *We choose multi-repo for three reasons that ARE
-defensible: (a) operator muscle memory inherited from neobanker, (b)
+defensible: (a) operator muscle memory inherited from liulian, (b)
 smaller per-repo surface for open-source contributors, (c) genuinely
 divergent release cadences between mobile, web, Python core. We do
 NOT claim CI is faster; that would need measurement. The decision is
@@ -139,7 +139,7 @@ plain-Postgres path lets us ship M1-M2 faster.*
 | Falsifiable? | yes (measurable in lines once we fork) |
 | Design tests hypothesis? | NO — fractions are guesses; nothing forked yet |
 | Fair? | partially — assumes domain swap (finance → TS/ST) only touches `bank_matcher.py`-like surfaces, but the bank-domain assumptions may be deeper (prompt templates, context cache structure, intent vocabulary, demo scenarios) |
-| Leakage? | possible — tool I/O shapes differ (forecasts have time + station + quantile structure vs neobanker's tabular data) |
+| Leakage? | possible — tool I/O shapes differ (forecasts have time + station + quantile structure vs liulian's tabular data) |
 | Proportional? | false-precision. 70 / 80 / 85 reads as measured; they are estimates. |
 | Alternatives ruled out? | green-field considered and rejected, OK |
 
@@ -149,7 +149,7 @@ canvas-orchestrator ~40-60%. The full audit happens when we fork on
 Day 1. The platform's success does NOT depend on hitting these numbers;
 it depends only on shipping the M1 demo end-to-end.*
 
-→ `NEOBANKER_REUSE_MAP.md §2.6, §3.4, §4.6, §5.4, §14.7` to be amended
+→ `LIULIAN_REUSE_MAP.md §2.6, §3.4, §4.6, §5.4, §14.7` to be amended
 with the "(TBD after Day 1 spike)" caveat.
 
 ### B.4 "Hand-rolled /studio costs 3 weeks but pays back week-1 of pitch"
@@ -173,7 +173,7 @@ Chronos benchmark vs Time-Series-Library leaderboard, (b) a swisstopo
 or Eawag pilot conversation, (c) a public blog post on a technical
 insight from the SwissRiver dataset.*
 
-→ `NEOBANKER_REUSE_MAP.md §14.3` to be amended (this is the most
+→ `LIULIAN_REUSE_MAP.md §14.3` to be amended (this is the most
 overstated paragraph in the docs).
 
 ### B.5 M1-M6 to pre-seed in 6 months for a part-time founder
@@ -211,14 +211,14 @@ view.
 
 | Fix | Status | Location |
 |---|---|---|
-| Side-stripe ban violation | DONE | `NEOBANKER_REUSE_MAP.md §14.3` (6×6 px dot replaces 2px stripe) |
-| Six bolder /studio moves added | DONE | `NEOBANKER_REUSE_MAP.md §14.3` |
+| Side-stripe ban violation | DONE | `LIULIAN_REUSE_MAP.md §14.3` (6×6 px dot replaces 2px stripe) |
+| Six bolder /studio moves added | DONE | `LIULIAN_REUSE_MAP.md §14.3` |
 | `/(marketing)` concrete spec | PARTIAL (sketch in §A.4 of this doc; full move into `PLATFORM_DESIGN.md` deferred to M2) | this doc |
 | UI audit checklist formalised | NEW DOC PENDING | `docs/strategy/conventions/UI_AUDIT_CHECKLIST.md` (to be written next) |
 | Multi-repo justification honesty pass | QUEUED | `PLATFORM_BLUEPRINT.md §4.2` |
 | TimescaleDB "dogfood" toning down | QUEUED | `PLATFORM_BLUEPRINT.md §5.1` |
-| Reuse fractions caveated "(TBD Day 1)" | QUEUED | multiple sections of `NEOBANKER_REUSE_MAP.md` |
-| 3-week /studio overclaim softened | QUEUED | `NEOBANKER_REUSE_MAP.md §14.3 last paragraph` |
+| Reuse fractions caveated "(TBD Day 1)" | QUEUED | multiple sections of `LIULIAN_REUSE_MAP.md` |
+| 3-week /studio overclaim softened | QUEUED | `LIULIAN_REUSE_MAP.md §14.3 last paragraph` |
 | M1-M6 three-track timeline | QUEUED | `PLATFORM_BLUEPRINT.md §15, §17` |
 | Em-dash sweep | DEFERRED to Sprint Day 7 polish | all docs |
 
@@ -230,7 +230,7 @@ batch). They are not blocking the sprint kickoff.
 Two findings have immediate Day-1 implications:
 
 1. **Reuse-fraction spike**: first hour of Day 1 (after workspace
-   scaffold) is a structured "fork-and-measure" — clone neobanker-agent,
+   scaffold) is a structured "fork-and-measure" — clone liulian-agent,
    strip bank-domain code, count remaining LOC, recompute reuse
    fractions. This *replaces* speculation with data before any sprint
    estimate is committed.

@@ -30,7 +30,7 @@ length: long; treat sections as independent reference, not linear reading
 Compared to the first blueprint draft, the following decisions are
 **revised**; older revisions live in git history:
 
-1. **Multi-repo, not monorepo.** Modelled on neobanker (`backend` +
+1. **Multi-repo, not monorepo.** Modelled on liulian (`backend` +
    `frontend` + `agent` as three repos, orchestrated by `neoctl` CLI).
    We split the same way: `liulian-python` (core, this repo) +
    `liulian-api` + `liulian-web` + `liulian-mobile` + `liulian-agent` +
@@ -81,7 +81,7 @@ sovereign deployment.*
 | Power BI / FineBI | General BI on relational data. We are TS/ST-native BI with forecasting overlays, prediction intervals, online retraining. |
 | HydroForecast | Closed-source SaaS for one vertical. We are open-source core + vertical plugins (hydrology, traffic, energy, healthcare). |
 | Ultralytics HUB | Vision-only. We are temporal-first. |
-| neobanker | Financial vertical, Java backend, business analyst audience. We are scientific vertical, Python backend, research-engineer audience. Borrow their *operational pattern* (multi-repo, neoctl-style CLI), not their domain. |
+| liulian | Financial vertical, Java backend, business analyst audience. We are scientific vertical, Python backend, research-engineer audience. Borrow their *operational pattern* (multi-repo, neoctl-style CLI), not their domain. |
 
 ## 2. Audiences and personas (L1)
 
@@ -107,7 +107,7 @@ sovereign deployment.*
 
 The single-repo monorepo proposed in iteration 1 is replaced by a
 **federation of focused repos** orchestrated by an operations CLI. Same
-pattern as neobanker (`backend` + `frontend` + `agent` repos, deployed
+pattern as liulian (`backend` + `frontend` + `agent` repos, deployed
 via `neoctl`).
 
 ### 4.1 Repo map
@@ -119,7 +119,7 @@ see ADR 0001 §Mid-sprint mergers / un-mergers):
 |---|---|---|---|
 | **`liulian-python`** (this repo) | Python 3.10+ · numpy · pyyaml · torch (extra) · ray (extra) | **Research core only**: tasks · data · models · adapters · runtime · optim · viz · plugins. *No web, no FastAPI, no UI deps in core.* Stays `pip install liulian`-clean. | `feat/platform-upgrade-2026-05` (carries `docs/strategy/` only) |
 | **`liulian-api`** | Python · FastAPI · Pydantic v2 · SQLModel · plain Postgres (TimescaleDB after M1) · Redis · arq | HTTP gateway over `liulian-python`. Owns OpenAPI contract. **Day-1 live: 6 endpoints (healthz, readyz, models, experiments x4, forecasts x2), 6/6 tests pass.** | `main` |
-| **`liulian-agent`** | Python · custom orchestrator · DeepSeek/GLM/Gemini/Claude/Ollama providers · pgvector | Stand-alone LLM agent service (FastAPI on port 8001 with `/health`, mirroring neobanker). 3 personas (data · model · BI). **Day-5 live: 9 tools registered, 9/9 tests pass.** | `main` |
+| **`liulian-agent`** | Python · custom orchestrator · DeepSeek/GLM/Gemini/Claude/Ollama providers · pgvector | Stand-alone LLM agent service (FastAPI on port 8001 with `/health`, mirroring liulian). 3 personas (data · model · BI). **Day-5 live: 9 tools registered, 9/9 tests pass.** | `main` |
 | **`liulian-ingest`** | Python · async httpx · playwright · pydantic-extra-types | Runtime crawler service: scheduled fetchers for swisstopo BAFU / SwissGrid / PhysioNet etc; writes parquet to MinIO + auto-PRs manifest to `liulian-python`. **Kept separate** from ops (runtime service ≠ infra tooling). | `main` |
 | **`liulian-web`** | TypeScript · Next.js 14 (App Router) · ECharts · Antd (chat sidebar) · Tailwind · framer-motion · contentlayer · MapLibre (planned) | BI canvas + marketing site + studio. Derives visual system from `feat/gui-demo`. **Day-3 live: `app/forecast/` page with ForecastChart + StationList + KpiStrip components; standalone landing HTML.** | `main` |
 | **`liulian-mobile`** | TypeScript · Expo SDK 51 · React Native · Expo Router · Victory Native XL | Mobile companion. iOS + Android via single codebase. | placeholder; Day 4 |
@@ -135,7 +135,7 @@ justification as preference-presented-as-evidence. Honest version:
 
 | Reason | Why it holds |
 |---|---|
-| Operator muscle memory | User already runs neobanker with multi-repo + `neoctl`; reusing that mental model is genuinely lower cognitive cost than learning Turborepo. |
+| Operator muscle memory | User already runs liulian with multi-repo + `neoctl`; reusing that mental model is genuinely lower cognitive cost than learning Turborepo. |
 | Smaller per-repo surface for OSS contributors | Model contributors to `liulian-python` shouldn't clone Helm charts; frontend contributors shouldn't need Python. Per-repo onboarding is genuinely easier. |
 | Divergent release cadences | Mobile (EAS Build / store review) and web (Vercel push) and Python core (PyPI tag) ship on different rhythms. Multi-repo makes the cadences honest. |
 | Cross-repo type sharing via published OpenAPI artefact | Versioned schema, codegen consumed by web + SDK + mobile. Cleaner than shared source files in a monorepo for our case (same idea as protobuf). |
@@ -358,7 +358,7 @@ Stack summary; full brand + IA + panel-by-panel design is in L3 doc
 
 | Concern | Choice | Rationale |
 |---|---|---|
-| Framework | Next.js 14 (App Router, RSC) | SSR for share-by-link pages; same stack as neobanker frontend |
+| Framework | Next.js 14 (App Router, RSC) | SSR for share-by-link pages; same stack as liulian frontend |
 | Type-safe RPC | tRPC + openapi-typescript | tRPC inside the web app; OpenAPI codegen for FastAPI calls |
 | Styling | Tailwind + CSS variables | Token-based |
 | UI primitives | shadcn/ui (Radix under the hood) | Accessibility, copy-not-install |
@@ -517,7 +517,7 @@ for our needs it adds:
   maintenance cost grows.
 
 A custom orchestrator at ~300 LOC, using **only** `pydantic`, `httpx`,
-and `asyncio`, is the right size. We model neobanker's `~/neobanker/agent`
+and `asyncio`, is the right size. We model liulian's `~/liulian/agent`
 which is a FastAPI service that exposes `/health` + agent endpoints.
 
 ### 9.2 Provider layer — the three you have tokens for
@@ -584,7 +584,7 @@ and Anthropic equally).
 
 ### 9.6 Reference patterns we use
 
-- neobanker `~/neobanker/agent` deploys as a Python+uv FastAPI service on
+- liulian `~/liulian/agent` deploys as a Python+uv FastAPI service on
   port 8000 with `/health` — we mirror this **exactly** so `liulianctl
   deploy agent` matches the muscle memory.
 - `dsa` / `TradingAgents-CN` / `Vibe-Trading` (CN financial-agent OSS) —
@@ -596,7 +596,7 @@ and Anthropic equally).
 
 ## 10. Data ingest (`liulian-ingest`)
 
-The "crawler" equivalent to neobanker's data layer. Scheduled fetchers
+The "crawler" equivalent to liulian's data layer. Scheduled fetchers
 write to MinIO + manifests. Stack:
 
 - Python 3.10+ · `httpx` async · `playwright-python` (when JS rendering
@@ -724,12 +724,12 @@ liulianctl deploy all                     # all of the above, ordered
 liulianctl logs <service> [--follow]      # SSH + kubectl logs
 liulianctl restart <service>              # rolling restart
 liulianctl manifest sync                  # liulian-ingest → liulian-python manifests/ PR
-liulianctl tunnel ollama                  # autossh forward-tunnel to GPU LLM (per neobanker doc)
+liulianctl tunnel ollama                  # autossh forward-tunnel to GPU LLM (per liulian doc)
 ```
 
 Under the hood: SSH + `kubectl` + `helm upgrade` + GitHub API + Vercel
 API + EAS CLI. We document the *manual* fallback for each command —
-mirrored verbatim from neobanker's `manual-deployment.md`.
+mirrored verbatim from liulian's `manual-deployment.md`.
 
 ### 12.3 Where infra/deployment files live (revised)
 

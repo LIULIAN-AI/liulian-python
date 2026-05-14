@@ -7,7 +7,7 @@ last_revised: 2026-05-12
 companion_docs:
   - PLATFORM_BLUEPRINT.md      (L1–L2 vision + architecture)
   - ONE_WEEK_SPRINT.md         (L4 implementation)
-  - NEOBANKER_REUSE_MAP.md     (concrete fork-and-adapt plan)
+  - LIULIAN_REUSE_MAP.md     (concrete fork-and-adapt plan)
   - conventions/UI_AUDIT_CHECKLIST.md  (every PR runs through this)
 source_canon:
   - .worktrees/gui-demo/styles/main.css       (the visual canon: tokens, layout)
@@ -27,18 +27,18 @@ source_canon:
 ## 0. Visual originality contract (the single most important rule)
 
 LIULIAN reuses code, architecture, and operational patterns from
-neobanker and the 12 reference platforms. **Every visible pixel is
+liulian and the 12 reference platforms. **Every visible pixel is
 original.** No screenshot of any LIULIAN surface should be mistakable
 for:
 
-- a neobanker screen with text swapped
+- a liulian screen with text swapped
 - a Refine.dev template with logo swapped
 - a generic shadcn-admin starter
 - any 2026 SaaS-default admin panel
 - a Vercel / Linear / Stripe surface with our copy on it
 
 Every PR runs the 4 tests in `conventions/UI_AUDIT_CHECKLIST.md` §I:
-AI-slop, category-reflex, neobanker-copy, gui-demo cross-check. Any
+AI-slop, category-reflex, liulian-copy, gui-demo cross-check. Any
 failure blocks merge.
 
 ---
@@ -249,7 +249,7 @@ carries identity at ~5% of total inked area; warm-bone neutrals carry
 ### 2.5 Iconography
 
 - Library: **Phosphor Icons (Regular weight 1.5px stroke)** for system
-  icons. Lucide as fallback (used by neobanker; consistent with code
+  icons. Lucide as fallback (used by liulian; consistent with code
   reuse).
 - Custom icons (hand-drawn-feel): for any *domain-specific* glyph
   (river-network node, threshold marker, etc.), draw bespoke at 24px
@@ -353,9 +353,12 @@ bento grid). Single column scroll on mobile.
                                               └───────────────────────┘
 ```
 
-Tile drag/resize via `react-mosaic-component` (forked from neobanker
-frontend's `assistant/Canvas*.tsx`). Layouts persist per user; share
-URL freezes them read-only.
+Tile drag/resize via `react-mosaic-component`; the orchestration shell
+(`CanvasOrchestrator` + `ReportBuilder` + per-widget config panel) is
+adapted from a private fintech codebase the author worked on
+previously — see `adr/0008-canvas-orchestrator-reuse.md` for the
+attribution and adaptation map. Layouts persist per user; share URL
+freezes them read-only.
 
 ### 4.2 The eight canonical panels
 
@@ -683,7 +686,7 @@ button. Hovering shifts the arrow 4px right at 200ms ease-out-quart.
 ## 7. Agent conversation flows
 
 Three agent personas; same engine, different tool surfaces. SSE event
-shapes (inherited from `neobanker-agent`):
+shapes (inherited from `liulian-agent`):
 
 ```
 event: thinking      data: { message: "Resolving station-id…" }
@@ -743,7 +746,7 @@ event: done          data: null
 - **Provider degradation banner** (e.g. Gemini blocked in CN):
   `--pastel-blue` background, one line: *"Routing to GLM for this
   conversation (Gemini unavailable in your region)."* Same SSE event
-  shape as neobanker's `DegradationBanner.tsx`.
+  shape as liulian's `DegradationBanner.tsx`.
 
 ---
 
@@ -914,7 +917,7 @@ unchecked rows block merge.
 
 The non-negotiable rows:
 
-- Visual originality (no neobanker/Refine/template lookalike)
+- Visual originality (no liulian/Refine/template lookalike)
 - Brand canon (UniBe red ≤ 2 visible per viewport on most pages)
 - AI-slop test pass
 - Category-reflex test pass
@@ -923,6 +926,6 @@ The non-negotiable rows:
 ---
 
 *See `PLATFORM_BLUEPRINT.md` for the architectural why behind these
-surface decisions. See `NEOBANKER_REUSE_MAP.md §14.3` for the
+surface decisions. See `LIULIAN_REUSE_MAP.md §14.3` for the
 "Linear-meets-Bloomberg editorial Swiss" framing source. See
 `conventions/UI_AUDIT_CHECKLIST.md` for the per-PR gates.*

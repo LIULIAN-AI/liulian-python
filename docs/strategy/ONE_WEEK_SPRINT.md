@@ -50,8 +50,8 @@ not "tests pass".
 
 > **Audit-driven revision** (per `AUDIT_REPORT_2026-05-12.md` and the
 > iteration-3 multi-repo decision in `ADR 0001`): the iteration-1 plan
-> here was based on a monorepo; we now fork from neo-banker per
-> `NEOBANKER_REUSE_MAP.md §1`. Plain Postgres is the Day-1 default;
+> here was based on a monorepo; we now fork from liulian-ai per
+> `LIULIAN_REUSE_MAP.md §1`. Plain Postgres is the Day-1 default;
 > TimescaleDB extension is enabled only after M1 demo is shipping
 > (`ADR 0003`).
 
@@ -59,18 +59,18 @@ not "tests pass".
 with hero, three editorial bands, and a single text-arrow CTA — built
 with LIULIAN brand tokens.
 **Scaffold**: 8 repos initialised and forked per
-`NEOBANKER_REUSE_MAP.md §1`; plain Postgres up via docker-compose;
+`LIULIAN_REUSE_MAP.md §1`; plain Postgres up via docker-compose;
 FastAPI `/healthz` returns 200; `@liulian/design-tokens` published to
 private npm and consumed by web.
 
 #### Tasks (priority order)
 
 **0. Fork-and-measure spike (FIRST, 90 min cap)** — replaces the
-"guess" rows in `NEOBANKER_REUSE_MAP.md §14.7` with measured numbers.
+"guess" rows in `LIULIAN_REUSE_MAP.md §14.7` with measured numbers.
 
    For each forkable repo, in order: agent → crawler → neoctl →
    frontend → dev-env:
-   - `gh repo fork neo-banker/neobanker-<x> --clone --org=jajupmochi`
+   - `gh repo fork liulian-ai/liulian-<x> --clone --org=jajupmochi`
    - rename remotely (`gh repo rename liulian-<x>`) and locally
    - strip bank-domain code: delete `bank_*` modules, bank prompts,
      bank fixtures, bank scenario JSON

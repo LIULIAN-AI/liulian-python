@@ -35,17 +35,17 @@ parent: ONE_WEEK_SPRINT.md
 > 第三轮（审计驱动）改动：先做 fork-and-measure spike 替代第一轮的 reuse-fraction 估值；Day 1 用纯 Postgres，TimescaleDB extension 等 M1 demo 上线后开（ADR 0003）。
 
 **Flagship**：可截图的营销 landing 在 `localhost:3000`，hero + 三条编辑带 + 单条 text-arrow CTA，用 LIULIAN brand tokens。
-**Scaffold**：8 仓初始化并 fork（按 `NEOBANKER_REUSE_MAP.md §1`）；纯 Postgres 通过 docker-compose 起来；FastAPI `/healthz` 返 200；`@liulian/design-tokens` 发到私有 npm 供 web 消费。
+**Scaffold**：8 仓初始化并 fork（按 `LIULIAN_REUSE_MAP.md §1`）；纯 Postgres 通过 docker-compose 起来；FastAPI `/healthz` 返 200；`@liulian/design-tokens` 发到私有 npm 供 web 消费。
 
 #### 任务序列
 
 **0. Fork-and-measure spike**（先做，90 分钟硬上限）
 
-替代 NEOBANKER_REUSE_MAP §14.7 的"估值"行为实测数：
+替代 LIULIAN_REUSE_MAP §14.7 的"估值"行为实测数：
 
 每个可 fork 的仓，顺序：agent → crawler → neoctl → frontend → dev-env：
 
-- `gh repo fork neo-banker/neobanker-<x> --clone --org=jajupmochi`
+- `gh repo fork liulian-ai/liulian-<x> --clone --org=jajupmochi`
 - 远程改名 (`gh repo rename liulian-<x>`) + 本地改名
 - 删银行域代码：`bank_*` 模块、银行 prompts、银行 fixtures、银行 scenario JSON
 - `cloc .` → 数余下 LOC
@@ -74,7 +74,7 @@ parent: ONE_WEEK_SPRINT.md
 
 **4. liulian-web landing（剩余时间）**
 
-- fork 自 `neobanker-frontend-MVP-V3`（spike 已本地 clone）
+- fork 自 `liulian-web`（spike 已本地 clone）
 - 改写 `app/(marketing)/page.tsx` 按 `PLATFORM_DESIGN.md §6`
 - Brand tokens 通过 Tailwind preset 注入
 - 所有 antd UI 通过 `liulianAntdTheme` ConfigProvider 主题化（ADR 0010）
@@ -166,7 +166,7 @@ parent: ONE_WEEK_SPRINT.md
 1. Chronos-2 adapter（1.5h）：`liulian/adapters/chronos/` 包 `Chronos2Pipeline`；capabilities `["zero_shot", "probabilistic", ...]`；UI 加按钮
 2. TSL adapter 提升（1h）：把 `experiments/adapt_tsl_lib/` 提为 `liulian/adapters/tsl/`，至少暴露 `STConvNet`
 3. 地图拓扑（1h）：manifest 加 river-network edges；SVG 覆盖 MapLibre
-4. Agent 层 v0（3h）：`liulian-agent` 仓 fork 自 neobanker-agent，改名 → 工具替换 → prompt 重写。LiteLLM 代理 + DeepSeek / GLM / Gemini provider 配置。FastAPI 端点 `POST /agents/{name}/invoke` SSE 流。web 侧栏 `<ChatPanel />` 用 Vercel AI SDK `useChat()`
+4. Agent 层 v0（3h）：`liulian-agent` 仓 fork 自 liulian-agent，改名 → 工具替换 → prompt 重写。LiteLLM 代理 + DeepSeek / GLM / Gemini provider 配置。FastAPI 端点 `POST /agents/{name}/invoke` SSE 流。web 侧栏 `<ChatPanel />` 用 Vercel AI SDK `useChat()`
 5. 一条 canned 交互（0.5h）：prompt "为 Q95 > 850 的站加 alert next week" → agent 调 `create_alert_rule` → BI 更新
 
 #### 验收
@@ -283,4 +283,4 @@ parent: ONE_WEEK_SPRINT.md
 
 ---
 
-*详细英文权威版：`ONE_WEEK_SPRINT.md`。架构上游：`PLATFORM_BLUEPRINT.md`。视觉表面：`PLATFORM_DESIGN.md`。复用计划：`NEOBANKER_REUSE_MAP.md`。*
+*详细英文权威版：`ONE_WEEK_SPRINT.md`。架构上游：`PLATFORM_BLUEPRINT.md`。视觉表面：`PLATFORM_DESIGN.md`。复用计划：`LIULIAN_REUSE_MAP.md`。*

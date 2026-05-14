@@ -276,6 +276,7 @@ def build_cli_overrides(
     hpo_storage_path: Path | None = None,
     hpo_max_concurrent: int | None = None,
     hpo_resources_gpu: float | None = None,
+    hpo_resume: bool = False,
 ) -> dict[str, Any]:
     """Build deterministic CLI overrides for one job.
 
@@ -326,6 +327,11 @@ def build_cli_overrides(
         overrides['hpo_num_samples'] = int(hpo_num_samples)
     if hpo_storage_path is not None:
         overrides['hpo_storage_path'] = str(hpo_storage_path)
+    if hpo_resume:
+        # Ray Tune will resume from the cell's storage_path if any prior trial
+        # state exists there — survives sbatch walltime timeouts without
+        # re-running already-completed trials.
+        overrides['hpo_resume'] = True
     if hpo:
         default_max_concurrent, default_gpu_per_trial = recommend_hpo_parallelism(job)
         overrides['hpo_max_concurrent'] = (

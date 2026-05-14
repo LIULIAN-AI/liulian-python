@@ -12,7 +12,7 @@ parent: UI_AUDIT_CHECKLIST.md
 
 ## A. 神圣规则（不可妥协）
 
-- [ ] **代码复用 vs 视觉原创清晰隔离**。新表面截图不应像 neobanker / Refine.dev / shadcn-template 换文字。(NEOBANKER_REUSE_MAP §0.1)
+- [ ] **代码复用 vs 视觉原创清晰隔离**。新表面截图不应像 liulian / Refine.dev / shadcn-template 换文字。(LIULIAN_REUSE_MAP §0.1)
 - [ ] **双语规则尊重**（claude-config bilingual-docs）：用户面向字符串都通过 next-intl key，en + zh 都译，切换可见
 
 ## B. 颜色
@@ -82,7 +82,7 @@ parent: UI_AUDIT_CHECKLIST.md
 
 - [ ] **AI-slop 测试**：viewer 会毫不犹豫说"AI 做的"吗？→ 拒
 - [ ] **类别反射测试**：色板能从"水文" / "TS forecasting" 独猜出吗？→ 重做色彩策略
-- [ ] **neobanker-copy 测试**：页像 neobanker 换文字吗？→ 重做风格
+- [ ] **liulian-copy 测试**：页像 liulian 换文字吗？→ 重做风格
 - [ ] **gui-demo 交叉校验**：暖纸 + UniBe 红做唯一 spot + 编辑级排版还在主导吗？→ 不然辩护
 
 ## J. 无障碍（尽量委托自动工具）
@@ -105,7 +105,7 @@ PR body 粘这块，每框勾或为未勾框写简短理由：
 ```markdown
 ## UI 审计 (UI_AUDIT_CHECKLIST.md)
 
-A. 神圣规则       ✓ 视觉原创（无 neobanker 看相）；双语 ✓
+A. 神圣规则       ✓ 视觉原创（无 liulian 看相）；双语 ✓
 B. 颜色          ✓ Restrained；UniBe 红仅阈值 marker
 C. 排版          ✓ Fraunces 32/24/16；指标 tabular nums
 D. 布局          ✓ 间距有节奏；hairline 边

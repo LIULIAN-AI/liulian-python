@@ -330,7 +330,7 @@ when blueprint sections feel weak.
 
 ## F. Frontend / monorepo (the engineering references)
 
-### F1. neobanker (linlin's prior fintech project)
+### F1. liulian (linlin's prior fintech project)
 
 - **One-liner**: Next.js 14 + Ant Design + Spring Boot + MySQL/ES/Redis
   fintech platform.

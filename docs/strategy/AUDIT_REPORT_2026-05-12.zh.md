@@ -10,7 +10,7 @@ parent: AUDIT_REPORT_2026-05-12.md
 
 审计者：`impeccable` 技能（设计审）+ `research-critic` 技能（声明逐条审）
 
-目标文档：PLATFORM_BLUEPRINT.md / NEOBANKER_REUSE_MAP.md / ONE_WEEK_SPRINT.md / REFERENCE_DESIGNS.md
+目标文档：PLATFORM_BLUEPRINT.md / LIULIAN_REUSE_MAP.md / ONE_WEEK_SPRINT.md / REFERENCE_DESIGNS.md
 
 ## A. impeccable 设计审
 
@@ -27,7 +27,7 @@ parent: AUDIT_REPORT_2026-05-12.md
 | 禁令 | 状态 | 修 |
 |---|---|---|
 | 渐变文本 | clean | – |
-| 侧条 > 1px | **违规** in NEOBANKER_REUSE_MAP §14.3 ("选中行 2px 左条") | **已修**：换 6×6 px 红点 |
+| 侧条 > 1px | **违规** in LIULIAN_REUSE_MAP §14.3 ("选中行 2px 左条") | **已修**：换 6×6 px 红点 |
 | Hero-metric 模板 | clean | – |
 | 同款 card grid | clean（bento grid 尺寸不一）| – |
 | modal 第一反应 | clean（用 row hover peek 替代）| – |
@@ -38,7 +38,7 @@ parent: AUDIT_REPORT_2026-05-12.md
 
 ### A.3 鲜明度审（/studio 够独特吗？）
 
-审前："Linear-meets-Bloomberg editorial Swiss" 方向强但 implementation move 太少。审后加了 6 个更狠的招到 NEOBANKER_REUSE_MAP §14.3：
+审前："Linear-meets-Bloomberg editorial Swiss" 方向强但 implementation move 太少。审后加了 6 个更狠的招到 LIULIAN_REUSE_MAP §14.3：
 
 1. 状态用**排版**（Fraunces italic "running" / 粗 roman "failed" / Switzer regular "completed"）而非彩色 pill
 2. 科学新闻报眉每页：`LIULIAN · Studio · timestamp · run-coordinates`
@@ -68,7 +68,7 @@ parent: AUDIT_REPORT_2026-05-12.md
 | 比例？| 过度声明；"sprint 省 2 天" 是先验猜测 |
 | 替代排除？| 否；hybrid (Python 多仓 + JS Turborepo 单仓) 未考虑 |
 
-**诚实重述**：*我们选多仓三个可辩护理由：(a) neobanker 操作肌肉记忆，(b) OSS 贡献者更小 per-repo 表面，(c) mobile / web / Python core 真正发散的发布节奏。我们**不**声称 CI 更快；那需要测量。决策可逆：若 M3 时跨仓协调变痛，可把 JS 三仓塌缩成 Turborepo，保 Python 多仓。*
+**诚实重述**：*我们选多仓三个可辩护理由：(a) liulian 操作肌肉记忆，(b) OSS 贡献者更小 per-repo 表面，(c) mobile / web / Python core 真正发散的发布节奏。我们**不**声称 CI 更快；那需要测量。决策可逆：若 M3 时跨仓协调变痛，可把 JS 三仓塌缩成 Turborepo，保 Python 多仓。*
 
 → `PLATFORM_BLUEPRINT.md §4.2` 已在第三轮 commit 修正。
 
@@ -94,13 +94,13 @@ parent: AUDIT_REPORT_2026-05-12.md
 | 可证伪？| yes（fork 后可测）|
 | 设计测假设？| 否；比例是猜测；还没 fork |
 | 公平？| 部分；假设 domain swap (finance → TS/ST) 只触 `bank_matcher.py` 类表面，但银行域假设可能更深 (prompt 模板 / context cache 结构 / intent 词汇 / demo 场景)|
-| 泄露？| 可能；tool I/O 形状不同 (预测有 time + station + quantile 结构 vs neobanker 表格数据)|
+| 泄露？| 可能；tool I/O 形状不同 (预测有 time + station + quantile 结构 vs liulian 表格数据)|
 | 比例？| 假精度。70 / 80 / 85 读起来像实测；其实估计 |
 | 替代排除？| 绿地考虑且拒绝，OK |
 
 **诚实重述**：*估计 reuse 比例（Sprint Day 1 spike 后定）：agent ~50-70%、crawler ~50-80%、neoctl ~70-85%、frontend canvas-orchestrator ~40-60%。完整审计在 Day 1 fork 时发生。平台成功**不**依赖打中这些数字；只依赖出 M1 demo end-to-end。*
 
-→ `NEOBANKER_REUSE_MAP.md §2.6 / §3.4 / §4.6 / §5.4 / §14.7` 全部已在第三轮 commit 改为范围 + "(TBD Day 1)" 备注。
+→ `LIULIAN_REUSE_MAP.md §2.6 / §3.4 / §4.6 / §5.4 / §14.7` 全部已在第三轮 commit 改为范围 + "(TBD Day 1)" 备注。
 
 ### B.4 "/studio 手卷 3 周但 week-1 pitch 回本"
 
@@ -115,7 +115,7 @@ parent: AUDIT_REPORT_2026-05-12.md
 
 **诚实重述**：*手卷 /studio 比 Refine.dev 模板多 ~2-3 周。边际收益是品牌差异化，这是评估的**一**条轴，很少是**决定**轴。投资的合理理由是不同的：品牌**就是**融资级独特性的产品定位。M2 评估的反向投资：(a) Chronos 对 Time-Series-Library leaderboard 的深度 benchmark、(b) swisstopo / Eawag pilot 对话、(c) SwissRiver 数据集技术博客。*
 
-→ `NEOBANKER_REUSE_MAP.md §14.3` 已在第三轮 commit 修正（最被过度声明的段落）。
+→ `LIULIAN_REUSE_MAP.md §14.3` 已在第三轮 commit 修正（最被过度声明的段落）。
 
 ### B.5 兼职博士后 6 月达 pre-seed
 
@@ -142,14 +142,14 @@ parent: AUDIT_REPORT_2026-05-12.md
 
 | 修 | 状态 | 位置 |
 |---|---|---|
-| 侧条违规 | DONE | NEOBANKER_REUSE_MAP §14.3 (6×6 点替 2px 条) |
-| 6 个更狠的 /studio move | DONE | NEOBANKER_REUSE_MAP §14.3 |
+| 侧条违规 | DONE | LIULIAN_REUSE_MAP §14.3 (6×6 点替 2px 条) |
+| 6 个更狠的 /studio move | DONE | LIULIAN_REUSE_MAP §14.3 |
 | /(marketing) 具体规定 | DONE 完整 | PLATFORM_DESIGN.md §6 |
 | UI 审计 checklist 形式化 | DONE | conventions/UI_AUDIT_CHECKLIST.md |
 | 多仓诚实理由 | DONE | PLATFORM_BLUEPRINT.md §4.2 |
 | TimescaleDB 去标语化 | DONE | PLATFORM_BLUEPRINT.md §5.1 |
-| reuse 比例改为范围 + "(TBD Day 1)" | DONE | NEOBANKER_REUSE_MAP §2.6 / §3.4 / §4.6 / §5.4 / §14.7 |
-| 3 周 /studio 过度声明软化 | DONE | NEOBANKER_REUSE_MAP §14.3 末段 |
+| reuse 比例改为范围 + "(TBD Day 1)" | DONE | LIULIAN_REUSE_MAP §2.6 / §3.4 / §4.6 / §5.4 / §14.7 |
+| 3 周 /studio 过度声明软化 | DONE | LIULIAN_REUSE_MAP §14.3 末段 |
 | M1-M6 三档时间线 | DONE | PLATFORM_BLUEPRINT.md §15 |
 | em-dash 扫描 | 延后到 Sprint Day 7 polish | 全部文档 |
 
@@ -157,7 +157,7 @@ parent: AUDIT_REPORT_2026-05-12.md
 
 两条审计发现立刻影响 Day 1：
 
-1. **reuse-fraction spike**：Day 1 第一个 90 分钟（在 workspace 骨架后）做结构化的 "fork-and-measure" — clone neobanker-agent、剥银行域代码、count 剩余 LOC、重算 reuse 比例。**用数据替换猜测**，sprint 估值落地前。
+1. **reuse-fraction spike**：Day 1 第一个 90 分钟（在 workspace 骨架后）做结构化的 "fork-and-measure" — clone liulian-agent、剥银行域代码、count 剩余 LOC、重算 reuse 比例。**用数据替换猜测**，sprint 估值落地前。
 2. **纯 Postgres 优先**：Day 1 docker-compose 用纯 Postgres（不用 TimescaleDB-HA image）。TimescaleDB extension 在 M1 demo 上线**后**开启。从 sprint 移除一个风险向量。
 
 两改已反映在第三轮 ONE_WEEK_SPRINT.md commit。

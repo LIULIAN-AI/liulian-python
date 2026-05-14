@@ -532,6 +532,7 @@ def run_matrix(args: argparse.Namespace) -> dict[str, Any]:
             hpo_storage_path=hpo_storage,
             hpo_max_concurrent=args.hpo_max_concurrent,
             hpo_resources_gpu=args.hpo_resources_gpu,
+            hpo_resume=bool(args.resume),
         )
         config = resolve_config(project_root=PROJECT_ROOT, job=job, overrides=overrides)
         tsl_hparams = validate_tsl_hparam_coverage(config, job)

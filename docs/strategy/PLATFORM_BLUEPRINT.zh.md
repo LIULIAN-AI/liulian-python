@@ -17,8 +17,8 @@ parent: PLATFORM_BLUEPRINT.md
 
 相比第一轮蓝图，本轮调整：
 
-1. **多仓而非单仓** — 仿照 neobanker（backend + frontend + agent 三个仓 + neoctl 编排），LIULIAN 拆成八个仓：`liulian-python`（核心）+ `liulian-api` + `liulian-web` + `liulian-mobile` + `liulian-agent` + `liulian-ingest` + `liulian-design-system` + `liulian-ops`。见 §4。
-2. **自研 agent，不用 LangGraph** — 基于 `liulian-agent` 仓的自定义编排（~300 行），底层 GLM-4.6 / DeepSeek-V4 / Gemini-3.1 / Claude / Ollama / Mock 多 provider 抽象（继承 neobanker-agent）。见 §7、ADR 0002。
+1. **多仓而非单仓** — 仿照 liulian（backend + frontend + agent 三个仓 + neoctl 编排），LIULIAN 拆成八个仓：`liulian-python`（核心）+ `liulian-api` + `liulian-web` + `liulian-mobile` + `liulian-agent` + `liulian-ingest` + `liulian-design-system` + `liulian-ops`。见 §4。
+2. **自研 agent，不用 LangGraph** — 基于 `liulian-agent` 仓的自定义编排（~300 行），底层 GLM-4.6 / DeepSeek-V4 / Gemini-3.1 / Claude / Ollama / Mock 多 provider 抽象（继承 liulian-agent）。见 §7、ADR 0002。
 3. **Tracker 统一覆盖 task + experiment + agent** 三种实体类型，单一 `run` 表 + `parent_kind` 鉴别。见 §8、ADR 0005。
 4. **品牌定锚 UniBe 红 `#E20613`**（匹配 `feat/gui-demo` 分支已确认的视觉），暖纸面板上的编辑级 Swiss 美学，非黑底 SaaS 默认。见 §11、PLATFORM_DESIGN.md。
 5. **分支策略**：所有平台工作在 `feat/platform-upgrade-2026-05` 上，完成后并回 `main`。
@@ -39,7 +39,7 @@ parent: PLATFORM_BLUEPRINT.md
 | Power BI / FineBI | 通用 BI 跑在关系型数据上；我们是 TS/ST 原生 BI，预测带、预测区间、在线再训内置。 |
 | HydroForecast | 闭源单垂直 SaaS；我们是开源核心 + 垂直插件（水文 / 医疗 / 能源）。 |
 | Ultralytics HUB | 视觉专属；我们时序优先。 |
-| neobanker | 金融垂直、Java 后端、业务分析师受众；我们是科学垂直、Python 后端、研究工程师受众。借**操作模式**（多仓、neoctl 风格 CLI），不借**领域**。 |
+| liulian | 金融垂直、Java 后端、业务分析师受众；我们是科学垂直、Python 后端、研究工程师受众。借**操作模式**（多仓、neoctl 风格 CLI），不借**领域**。 |
 
 ## 2. 受众（L1）
 
@@ -67,14 +67,14 @@ parent: PLATFORM_BLUEPRINT.md
 |---|---|---|
 | **`liulian-python`** (本仓) | Python 3.10+, numpy, pyyaml, torch (extra) | **仅研究核心**：tasks · data · models · adapters · runtime · optim · viz · plugins。保持 `pip install liulian` 干净。 |
 | **`liulian-api`** | Python, FastAPI, Pydantic v2, SQLModel, Postgres-TimescaleDB, Redis, arq | HTTP 网关层 |
-| **`liulian-agent`** | Python, 自研 orchestrator, DeepSeek/GLM/Gemini, pgvector | 独立 LLM agent 服务（端口 8000，FastAPI，`/health`，仿 neobanker-agent） |
+| **`liulian-agent`** | Python, 自研 orchestrator, DeepSeek/GLM/Gemini, pgvector | 独立 LLM agent 服务（端口 8000，FastAPI，`/health`，仿 liulian-agent） |
 | **`liulian-ingest`** | Python, async httpx, playwright | 数据爬取（swisstopo BAFU 水文、SwissGrid 能源、PhysioNet 医疗等） |
 | **`liulian-web`** | Next.js 14 (App Router), tRPC, Tailwind, shadcn/ui, Tremor, ECharts, MapLibre, @ant-design/x | BI 画布 + Studio + Marketing |
 | **`liulian-mobile`** | Expo SDK 51, RN, Expo Router, Victory Native XL | 移动伴侣 |
 | **`liulian-design-system`** | 设计 tokens（JSON + CSS vars + Tailwind 预设 + RN StyleSheet + antd ConfigProvider） | npm `@liulian/design-tokens` |
 | **`liulian-ops`** | Python CLI（仿 neoctl）+ Helm + Terraform + 复用 GH Actions | 部署编排（`liulianctl`） |
 
-详细文件级 fork 计划见 `NEOBANKER_REUSE_MAP.md`；多仓诚实理由见 §4.2（已经过 research-critic 审查）。
+详细文件级 fork 计划见 `LIULIAN_REUSE_MAP.md`；多仓诚实理由见 §4.2（已经过 research-critic 审查）。
 
 ### 分支工作流
 
@@ -119,7 +119,7 @@ parent: PLATFORM_BLUEPRINT.md
 - shadcn/ui 主，@ant-design/x 仅用于聊天侧边栏，Tremor 用于 KPI（ADR 0010 hybrid 栈）
 - ECharts（大数据 + brush + geo）
 - MapLibre GL + swisstopo 瓦片
-- react-mosaic-component（仿 neobanker 的 BI 画布平铺）
+- react-mosaic-component（仿 liulian 的 BI 画布平铺）
 - Clerk 鉴权，next-intl 国际化（en · zh-CN · de-CH）
 - Vitest + Playwright 测试
 
@@ -145,7 +145,7 @@ parent: PLATFORM_BLUEPRINT.md
 
 详见 §9 + ADR 0002。
 
-3 个 persona：data / model / bi。每个 persona 有专属工具集（Pydantic 类型）。Orchestrator 是手写的 ~300 行状态机（PLAN → CALL_TOOL → REFLECT），仿 neobanker-agent 的 `agent/loop.py`。
+3 个 persona：data / model / bi。每个 persona 有专属工具集（Pydantic 类型）。Orchestrator 是手写的 ~300 行状态机（PLAN → CALL_TOOL → REFLECT），仿 liulian-agent 的 `agent/loop.py`。
 
 LLM provider 矩阵（用户已有 token）：
 
@@ -158,13 +158,13 @@ LLM provider 矩阵（用户已有 token）：
 | **Gemini 3.1 Flash-Lite** | 工具调用路由 | $0.10 / $0.40 |
 | **Ollama + qwen2.5-7b** | 主权 / 离线部署 | $0 + 硬件 |
 
-provider 抽象：仿 neobanker `llm/gateway.py` 的多区域 chain；同样的 `Gemini blocked in CN` fallback 模式。
+provider 抽象：仿 liulian `llm/gateway.py` 的多区域 chain；同样的 `Gemini blocked in CN` fallback 模式。
 
 安全：默认 provider 在 `LIULIAN_OFFLINE=1` 时切到 Ollama；原始 signal 数组绝不发给云 LLM（只发摘要统计）；每次运行有 USD 上限。
 
 ## 10. 数据接入（`liulian-ingest`）
 
-详见 §10。仿 `neobanker-crawler`。
+详见 §10。仿 `liulian-ingest`。
 
 源适配器：swisstopo-bafu / meteoswiss-precip / swissgrid / physionet-mit-bih / caltrans-pems / electricity-uci。
 
@@ -218,14 +218,14 @@ provider 抽象：仿 neobanker `llm/gateway.py` 的多区域 chain；同样的 
 
 ## 14. 文档结构（4 层）
 
-详见 §14、`NEOBANKER_REUSE_MAP.md §11`。
+详见 §14、`LIULIAN_REUSE_MAP.md §11`。
 
 ```
 docs/strategy/
 ├── PLATFORM_BLUEPRINT.md       L1-L2: 愿景 + 架构
 ├── PLATFORM_DESIGN.md           L3: 视觉表面（品牌、BI 8 面板、agent 流、mobile UX）
 ├── ONE_WEEK_SPRINT.md           L4: 一周执行
-├── NEOBANKER_REUSE_MAP.md       具体 fork-and-adapt 计划
+├── LIULIAN_REUSE_MAP.md       具体 fork-and-adapt 计划
 ├── REFERENCE_DESIGNS.md         12 平台调研档案
 ├── AUDIT_REPORT_<date>.md       审计记录（impeccable + research-critic）
 ├── adr/                          独立决策记录 0001-0010
@@ -285,7 +285,7 @@ M6：12-slide deck + 18 月财务模型 + 第一份 LOI
 - 0003 TimescaleDB（M3 再考虑 TDengine）
 - 0004 UniBe 红作锚
 - 0005 tracker 三实体单表
-- 0006 fork-and-adapt from neobanker
+- 0006 fork-and-adapt from liulian
 - 0007 拒绝 Refine.dev UI；手卷 /studio
 - 0008 canvas-orchestrator 复用
 - 0009 Spring Boot → FastAPI 模式翻译
@@ -299,4 +299,4 @@ M6：12-slide deck + 18 月财务模型 + 第一份 LOI
 
 ---
 
-*详细英文权威版：`PLATFORM_BLUEPRINT.md`。L3 视觉深度：`PLATFORM_DESIGN.md`。一周执行：`ONE_WEEK_SPRINT.md`。具体 fork 计划：`NEOBANKER_REUSE_MAP.md`。12 平台调研：`REFERENCE_DESIGNS.md`。独立决策记录：`adr/`。*
+*详细英文权威版：`PLATFORM_BLUEPRINT.md`。L3 视觉深度：`PLATFORM_DESIGN.md`。一周执行：`ONE_WEEK_SPRINT.md`。具体 fork 计划：`LIULIAN_REUSE_MAP.md`。12 平台调研：`REFERENCE_DESIGNS.md`。独立决策记录：`adr/`。*
