@@ -127,7 +127,7 @@ def test_max_train_samples_override_is_forwarded() -> None:
     assert overrides['max_train_samples'] == 128
 
 
-@pytest.mark.skip(reason="pre-existing: HPO default count is 50 not 10; TODO: align spec or default")
+@pytest.mark.skip(reason='pre-existing: HPO default count is 50 not 10; TODO: align spec or default')
 def test_full_phase_defaults_to_10_hpo_trials() -> None:
     full = _phase_defaults('full')
     assert full['hpo'] is True
