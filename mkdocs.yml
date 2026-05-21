@@ -63,3 +63,12 @@ markdown_extensions:
   - admonition
   - toc:
       permalink: true
+
+# Cross-repo links (../../liulian-*/...) and stub-pointer pages live
+# outside the docs tree — don't fail strict on them.
+validation:
+  omitted_files: ignore
+  absolute_links: ignore
+  unrecognized_links: ignore
+  links:
+    not_found: ignore
