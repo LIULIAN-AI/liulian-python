@@ -120,6 +120,27 @@ Models are wrapped via the `ExecutableModel` interface. Key rules:
 
 See the [Adapter Guide](docs/adapter_guide.md) for the full contract specification.
 
+## Where the rest of the docs live
+
+`liulian-python` holds the ML library proper. **Cross-cutting platform
+docs** (blueprint, ADRs, user stories, agile templates, advisor
+briefings) live in a separate federation hub:
+[**`liulian-docs`**](../liulian-docs/) — browse via `mkdocs serve`.
+
+Per-domain docs live with the repo that owns them. The relocation
+index is at [`docs/strategy/MOVED.md`](docs/strategy/MOVED.md).
+
+In short:
+
+- **Federation hub — blueprint, ADRs, user stories, agile, advisor briefings** → `liulian-docs/docs/`
+- **UI / web redesign / specs** → `liulian-web/docs/`
+- **Design system, tokens, references** → `liulian-design-system/docs/`
+- **Dev environment & cluster setup** → `liulian-dev-env/docs/`
+- **Ops / deploy / cost ledger** → `liulian-ops/docs/`
+- **Agent / LLM gateway** → `liulian-agent/docs/`
+- **Mobile (iOS / Android / HarmonyOS)** → `liulian-mobile/`
+- **Ingest pipelines** → `liulian-ingest/`
+
 ## Project Structure
 
 ```
