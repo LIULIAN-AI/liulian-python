@@ -44,7 +44,10 @@ jobs:
         run: pip install uv
 
       - name: Install dependencies
-        run: uv pip install -e ".[dev,logging]" --system
+        # torch extra is required because liulian.data.ts.timeseriesdataset
+        # imports torch at module load (the framework uses torch tensors as
+        # the primary array type).
+        run: uv pip install -e ".[dev,logging,torch]" --system
 
       - name: Run core tests
         run: pytest -v --cov=liulian --cov-report=term-missing tests/ --ignore=tests/test_integration.py
