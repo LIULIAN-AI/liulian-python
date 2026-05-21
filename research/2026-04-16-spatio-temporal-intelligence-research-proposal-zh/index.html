@@ -1,0 +1,4312 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Research OS for spatiotemporal model experimentation">
+      
+      
+      
+        <link rel="canonical" href="https://jajupmochi.github.io/liulian-python/research/2026-04-16-spatio-temporal-intelligence-research-proposal-zh/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>LIULIAN：从实体感知预测到通用时空智能——综合研究计划 - LIULIAN</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#liulian" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="LIULIAN" class="md-header__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LIULIAN
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              LIULIAN：从实体感知预测到通用时空智能——综合研究计划
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cli/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../demo_gallery/" class="md-tabs__link">
+          
+  
+  
+  Demo Gallery
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../models/torch_models/" class="md-tabs__link">
+          
+  
+  
+  Models
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../data_loaders/" class="md-tabs__link">
+          
+  
+  
+  Data
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tsl_comparison/" class="md-tabs__link">
+          
+  
+  
+  Benchmarks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="LIULIAN" class="md-nav__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LIULIAN
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../forecasting_pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adapter_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adapter Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../manifest_spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifest Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo Gallery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demo Gallery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demo_gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demo_patchtst_swiss1990/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PatchTST Swiss River 1990
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/torch_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyTorch Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entity_identifiers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Entity Identifiers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../search_spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Spaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Data
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_loaders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Loaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Benchmarks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tsl_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TSL Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../training_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results_json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dataset_config_audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset Config Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../breakpoint_bridge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Breakpoint Bridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        摘要
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 问题陈述与研究动机
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. 问题陈述与研究动机">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 时空数据挑战
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 愿景
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 文献综述与相关工作
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 文献综述与相关工作">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 通道独立与通道混合在时间序列中的争论
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 显式实体/节点嵌入
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 时空图神经网络
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.3 时空图神经网络">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#231-st-gnn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.1 经典与基础性ST-GNN
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#232" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.2 自适应图学习（超越固定拓扑）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#233-st-gnn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.3 可扩展ST-GNN
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#234-transformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.4 时空Transformer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#235-mambassm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.5 Mamba/SSM用于时空数据
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 时空数据的预训练和基础模型
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 时间序列基础模型
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-llm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 基于LLM的时间序列预测
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-llm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.7 时空LLM
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#28-llm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.8 面向数据分析和科学发现的LLM智能体
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#29-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.9 AI驱动的商业智能与自然语言界面
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#210-mlai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.10 面向时间序列和图的ML/AI平台
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#211" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.11 跨域应用
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.11 跨域应用">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        医疗/临床时间序列
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        环境/水文
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        金融
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        灾害管理/地球科学
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        物联网/智慧建筑
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#212" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.12 时空数据的对比学习和自监督学习
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#213" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.13 时空模型中的分布偏移与鲁棒性
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#214" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.14 时空模型的可解释性
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#215-ml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.15 ML框架中的插件/适配器架构
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#216" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.16 动态和时序图网络
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#217" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.17 多模态时空数据
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#218" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.18 基准与公平评估
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#219-ml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.19 人在回路ML与报告生成
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#220-ml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.20 数字孪生与仿真 + ML
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 当前实现状态
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. 当前实现状态">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-liulian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 LIULIAN框架架构
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 已实现的实体标识符系统
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 已实现的空间模块
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 研究计划：多阶段规划
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 研究计划：多阶段规划">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#a153" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A阶段：实体感知预测（第1–5个月，3篇论文）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第一周期：系统性实体标识符消融研究（第1个月）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="第一周期：系统性实体标识符消融研究（第1个月）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        目标
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        实验设计
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        预期关键发现
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        新颖性验证
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        贡献
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第二周期：基于元学习的自适应实体标识符选择（第2–3个月）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="第二周期：基于元学习的自适应实体标识符选择（第2–3个月）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        技术方案
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        新颖性验证
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_14" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        贡献
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#35" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第三周期：统一实体标识符 + 时空图（第3–5个月）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="第三周期：统一实体标识符 + 时空图（第3–5个月）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_15" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        技术方案
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        新颖性验证
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#b5123" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        B阶段：时空基础模型（第5–12个月，3篇论文）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#llm58" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第四周期：LLM增强的时空智能（第5–8个月）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="第四周期：LLM增强的时空智能（第5–8个月）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_17" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        技术方案
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_18" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        新颖性验证
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#710" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第五周期：带实体感知的时空基础模型（第7–10个月）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="第五周期：带实体感知的时空基础模型（第7–10个月）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_19" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        技术方案
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_20" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        新颖性验证
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mambassm912" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第六周期：面向高效时空学习的Mamba/SSM架构（第9–12个月）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="第六周期：面向高效时空学习的Mamba/SSM架构（第9–12个月）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        技术方案
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_22" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        新颖性验证
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cliulian818" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C阶段：LIULIAN平台与领域应用（第8–18个月）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#liulian814" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第七周期：LIULIAN平台系统论文（第8–14个月）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="第七周期：LIULIAN平台系统论文（第8–14个月）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        平台作为贡献
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_24" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        新颖性验证（平台）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10183" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        领域应用论文（第10–18个月，3+篇论文）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="领域应用论文（第10–18个月，3+篇论文）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#d11012" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D1：瑞士河流水温预测（第10–12个月）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d21215" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D2：围手术期患者结局预测（第12–15个月）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d31418" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D3：多模态时空数据的灾害影响分析（第14–18个月）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 创新亮点与新颖性总结
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. 创新亮点与新颖性总结">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-a13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 近期创新（A阶段，第1–3周期）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-b46" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 中期创新（B阶段，第4–6周期）
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-c7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 长期创新（C阶段，第7周期+）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 评估协议
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 评估协议">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 数据集
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 评估指标
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 基线方法
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 资源需求
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 风险分析与缓解
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 合作网络
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. 第一周期详细执行计划（1个月）
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. 第一周期详细执行计划（1个月）">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第1周：基础设施与核心实验
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第2周：全面实验运行
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第3周：分析与图表
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        第4周：论文撰写
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. 全阶段研究贡献总结
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. 长期愿景（第2年+）
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_25" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        参考文献
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aliulian" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        附录A：LIULIAN实体标识符架构图
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#b" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        附录B：代码制品
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#c" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        附录C：新颖性验证总结
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="liulian">LIULIAN：从实体感知预测到通用时空智能——综合研究计划<a class="headerlink" href="#liulian" title="Permanent link">&para;</a></h1>
+<p><em>日期：2026-04-16（修订版）</em>
+<em>首席研究员：贾林林 (jajupmochi@gmail.com)</em>
+<em>框架：LIULIAN — Liquid Intelligence and Unified Logic for Interactive Adaptive Networks</em></p>
+<hr />
+<h2 id="_1">摘要<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>本提案概述了一项<strong>多年度、多阶段的研究计划</strong>，从时间序列预测中实体标识符的聚焦研究出发，逐步扩展为<strong>通用时空智能平台</strong>。该计划横跨三个阶段、七个研究周期：</p>
+<ul>
+<li><strong>A阶段（第1–5个月）：</strong> 实体感知预测——系统消融、自适应选择和空间图集成。三篇论文。</li>
+<li><strong>B阶段（第5–12个月）：</strong> 时空基础模型——LLM增强的时空建模、跨域时空基础模型以及面向时空数据的Mamba/SSM架构。三篇论文。</li>
+<li><strong>C阶段（第8–18个月）：</strong> LIULIAN平台本身——一个开源、智能体驱动、集成BI功能的时空智能平台，配备垂直领域插件。一篇系统论文 + 领域应用论文。</li>
+</ul>
+<p>每个研究周期产出一篇可发表的论文。平台本身作为独立的高影响力贡献，面向顶级系统会议。跨域应用（水文、医疗、灾害管理、金融、物联网、材料科学）作为验证，并产出额外的领域论文。</p>
+<p><strong>计划总产出：</strong> 7+篇核心论文，1篇平台/系统论文，3+篇领域应用论文。</p>
+<hr />
+<h2 id="1">1. 问题陈述与研究动机<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<h3 id="11">1.1 时空数据挑战<a class="headerlink" href="#11" title="Permanent link">&para;</a></h3>
+<p>时空数据——在时间和空间上分布的测量数据——是现代传感、基础设施监测和科学发现的基石。交通网络每小时产生数百万条传感器数据；医院ICU对各床位持续产生患者生命体征；河流监测站追踪整个流域的水质；卫星影像捕捉大陆尺度的土地利用变化。</p>
+<p>尽管时空数据无处不在，该领域在多个维度上存在<strong>碎片化</strong>：</p>
+<ol>
+<li>
+<p><strong>方法碎片化</strong>：时间序列模型（PatchTST、DLinear、iTransformer）忽视空间结构；图神经网络（DCRNN、Graph WaveNet、MTGNN）聚焦于固定拓扑；基于LLM的方法（Time-LLM、UrbanGPT）缺乏系统性的实体/空间感知。</p>
+</li>
+<li>
+<p><strong>领域碎片化</strong>：交通预测、空气质量预测、水文建模、临床时间序列和金融分析各有其数据集、指标、基线和规范——领域间的交叉借鉴极为有限。</p>
+</li>
+<li>
+<p><strong>基础设施碎片化</strong>：研究者需要拼凑TSLib [1]用于时序模型、PyG [2]用于图模型、GluonTS [3]用于概率预测，以及自定义脚本用于领域特定预处理。没有单一平台支持从原始时空数据到科学洞见的完整流程。</p>
+</li>
+<li>
+<p><strong>实体表示碎片化</strong>：一个基本设计决策——如何在多实体系统中表示实体身份——从未被系统研究过。不同的工作使用学习嵌入 [6]、独热编码、地理坐标、图节点特征 [10,11]或文本描述 [18]，却缺乏原则性比较。</p>
+</li>
+</ol>
+<h3 id="12">1.2 愿景<a class="headerlink" href="#12" title="Permanent link">&para;</a></h3>
+<p>本研究计划通过统一方法解决所有四种碎片化：</p>
+<ul>
+<li><strong>方法统一</strong>：无缝结合实体标识符、图结构、时序模型和LLM增强表示的框架。</li>
+<li><strong>领域统一</strong>：在15+个数据集上进行跨域评估，涵盖交通、能源、水文、医疗、物联网和金融。</li>
+<li><strong>基础设施统一</strong>：LIULIAN平台——一个开源、模块化、智能体驱动的时空智能系统，具备BI功能和垂直领域插件。</li>
+<li><strong>实体表示统一</strong>：首次系统性的实体表示策略研究，从消融到自适应选择，再到基础模型级别的实体感知。</li>
+</ul>
+<hr />
+<h2 id="2">2. 文献综述与相关工作<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<h3 id="21">2.1 通道独立与通道混合在时间序列中的争论<a class="headerlink" href="#21" title="Permanent link">&para;</a></h3>
+<p>多变量时间序列模型是否应独立处理各通道还是允许跨通道交互的争论是基础性的。</p>
+<ul>
+<li><strong>PatchTST</strong>（Nie等，ICLR 2023）[1]：通道独立（CI）补丁处理通常优于通道混合。</li>
+<li><strong>iTransformer</strong>（Liu等，ICLR 2024）[4]：反转Transformer范式——变量作为token——通过隐式实体表示取得优异结果。</li>
+<li><strong>CARD</strong>（Wang等，ICLR 2024）[5]：通道对齐鲁棒混合Transformer，添加通道特定token（可学习实体嵌入）。</li>
+<li><strong>CrossFormer</strong>（Zhang &amp; Yan，ICLR 2023）[6]：跨维度注意力与可学习维度/段嵌入。</li>
+<li><strong>TSMixer</strong>（Chen等，NeurIPS 2023）[7]：基于MLP的跨变量混合捕获实体间关系。</li>
+<li><strong>Client</strong>（Gao等，KDD 2024）[8]：整合跨变量线性组件与Transformer注意力。</li>
+</ul>
+<p><strong>研究空白</strong>：各自测试一种嵌入策略；没有一项跨架构系统比较标识符类型。</p>
+<h3 id="22">2.2 显式实体/节点嵌入<a class="headerlink" href="#22" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>STID</strong>（Shao等，CIKM 2022）[9]：简单MLP + 空间身份嵌入匹配复杂GNN。<strong>关键洞见：空间不可区分性，而非架构复杂性，才是瓶颈。</strong></li>
+<li><strong>TiDE</strong>（Das等，TMLR 2023）[10]：MLP编码器-解码器，逐变量静态协变量。</li>
+<li><strong>TimeXer</strong>（Wang等，NeurIPS 2024）[11]：外生变量token与内生补丁token并列。</li>
+<li><strong>UniTS</strong>（Gao等，NeurIPS 2024）[12]：统一多任务模型，使用数据集特定提示token。</li>
+<li><strong>TRA</strong>（Lin等，AAAI 2023）[13]：时间路由适配器，用于实体感知股票预测——逐股票的时间模式路由。</li>
+</ul>
+<h3 id="23">2.3 时空图神经网络<a class="headerlink" href="#23" title="Permanent link">&para;</a></h3>
+<h4 id="231-st-gnn">2.3.1 经典与基础性ST-GNN<a class="headerlink" href="#231-st-gnn" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>DCRNN</strong>（Li等，ICLR 2018）[14]：有向交通图上的扩散卷积循环神经网络。</li>
+<li><strong>Graph WaveNet</strong>（Wu等，IJCAI 2019）[15]：从数据中学习自适应邻接矩阵。</li>
+<li><strong>MTGNN</strong>（Wu等，KDD 2020）[16]：连接节点——通过学习图结构的多变量时序预测。</li>
+<li><strong>STEP</strong>（Shao等，KDD 2022）[17]：预训练时空嵌入，支持对未见节点的零样本预测。</li>
+<li><strong>STNorm</strong>（Deng等，KDD 2021）[18]：实体特定归一化作为显式标识符的替代。</li>
+<li><strong>MegaCRN</strong>（Jiang等，AAAI 2023）[19]：带元节点库的元图卷积循环网络。</li>
+<li><strong>PDFormer</strong>（Jiang等，AAAI 2023）[20]：传播延迟感知的动态长程Transformer。</li>
+<li><strong>STAEformer</strong>（Liu等，CIKM 2023）[21]：时空自适应嵌入Transformer，逐节点联合时空嵌入。</li>
+</ul>
+<h4 id="232">2.3.2 自适应图学习（超越固定拓扑）<a class="headerlink" href="#232" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>TESTAM</strong>（Lee等，ICLR 2024）[22]：混合专家（MoE），三个专家（无图、静态图、动态图）——将路由重新表述为分类问题。<strong>新颖性检查：最接近我们的AdaptID概念，但针对图结构而非标识符类型进行门控。</strong></li>
+<li><strong>STID</strong> [9]：证明仅标识符即可完全替代图。<strong>我们工作的关键基线。</strong></li>
+</ul>
+<h4 id="233-st-gnn">2.3.3 可扩展ST-GNN<a class="headerlink" href="#233-st-gnn" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>SGP</strong>（Cini等，AAAI 2023）[23]：随机化循环 + 邻接矩阵幂次实现节点级并行训练。</li>
+<li><strong>BigST</strong>（Han等，VLDB 2024）[24]：线性复杂度空间卷积，可扩展至100K+节点。</li>
+<li><strong>EasyST</strong>（Tang等，arXiv 2024）[25]：从教师STGNN到学生MLP的知识蒸馏。</li>
+</ul>
+<h4 id="234-transformer">2.3.4 时空Transformer<a class="headerlink" href="#234-transformer" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>AirFormer</strong>（Liang等，AAAI 2023）[26]：解耦ST学习，确定性+随机阶段，覆盖1,085个空气质量站点。</li>
+<li><strong>EarthFormer</strong>（Gao等，NeurIPS 2022）[27]：面向3D时空地球观测数据的立方体注意力。</li>
+</ul>
+<h4 id="235-mambassm">2.3.5 Mamba/SSM用于时空数据<a class="headerlink" href="#235-mambassm" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>SpoT-Mamba</strong>（Choi等，IJCAI 2024 Workshop）[28]：通过节点特定游走序列在ST图上应用选择性状态空间模型。</li>
+<li><strong>STG-Mamba</strong>（Li等，arXiv 2024）[29]：首次探索Mamba用于完整ST图学习的ST-S3M模块。</li>
+</ul>
+<p><strong>研究空白</strong>：GNN文献将实体嵌入视为节点特征，但从未比较嵌入策略或研究何时更简单的标识符即可满足需求。没有工作桥接实体标识符文献与GNN节点嵌入文献。</p>
+<h3 id="24">2.4 时空数据的预训练和基础模型<a class="headerlink" href="#24" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>GPT-ST</strong>（Li等，NeurIPS 2023）[30]：带自适应掩码的ST-GNN生成式预训练。</li>
+<li><strong>UniST</strong>（Yuan等，KDD 2024）[31]：通用ST模型，使用时空知识引导的提示，在20+城市场景中实现零样本泛化。</li>
+<li><strong>OpenCity</strong>（Li等，ACM TIST 2024）[32]：结合Transformer + GNN，在异构交通数据上预训练以实现零样本迁移。</li>
+</ul>
+<p><strong>研究空白</strong>：所有ST基础模型都以交通/城市为中心。没有一个支持跨域（水文、医疗、物联网、金融）的实体感知条件化。</p>
+<h3 id="25">2.5 时间序列基础模型<a class="headerlink" href="#25" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>TimesFM</strong>（Das等，ICML 2024）[33]：Google的decoder-only模型，在100B时间点上预训练。</li>
+<li><strong>Chronos</strong>（Ansari等，ICML 2024）[34]：Amazon的token化时序模型，使用T5架构。</li>
+<li><strong>Moirai</strong>（Woo等，ICML 2024）[35]：Salesforce的任意变量注意力与混合分布。</li>
+<li><strong>Timer</strong>（Liu等，ICML 2024）[36]：面向时序的GPT式生成预训练，S3格式。</li>
+<li><strong>MOMENT</strong>（Goswami等，ICML 2024）[37]：在Time Series Pile上的掩码预训练。</li>
+<li><strong>Lag-Llama</strong>（Rasul等，ICML 2024）[38]：LLaMA风格，使用滞后特征进行概率预测。</li>
+<li><strong>TTM</strong>（Ekambaram等，NeurIPS 2024）[39]：微型时间混合器——不到100万参数，零样本表现优异。</li>
+<li><strong>Time-MoE</strong>（Shi等，arXiv 2024）[40]：十亿参数级时序基础模型，稀疏MoE。</li>
+<li><strong>TimeGPT-1</strong>（Garza &amp; Mergenthaler-Canseco，arXiv 2023）[41]：首个生产级API时序基础模型。</li>
+</ul>
+<p><strong>研究空白</strong>：所有时序基础模型将序列视为匿名通道。没有一个具有显式实体身份条件化。<strong>这是本计划填补的核心空白。</strong></p>
+<h3 id="26-llm">2.6 基于LLM的时间序列预测<a class="headerlink" href="#26-llm" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>GPT4TS / One Fits All</strong>（Zhou等，NeurIPS 2023）[42]：冻结GPT-2，最小适配。</li>
+<li><strong>Time-LLM</strong>（Jin等，ICLR 2024）[43]：通过输入变换重编程冻结LLM。</li>
+<li><strong>TEST</strong>（Sun等，ICLR 2024）[44]：文本原型对齐嵌入用于时序。</li>
+<li><strong>UniTime</strong>（Liu等，WWW 2024）[45]：领域特定文本指令作为条件。</li>
+<li><strong>CALF</strong>（Liu等，NeurIPS 2024）[46]：跨模态微调对齐时序与文本。</li>
+<li><strong>S2IP-LLM</strong>（Pan等，ICML 2024）[47]：语义空间信息提示学习。</li>
+<li><strong>LLMTime</strong>（Gruver等，NeurIPS 2023）[48]：将数字编码为文本的零样本时序预测。</li>
+<li><strong>TEMPO</strong>（Cao等，ICLR 2024）[49]：趋势/季节/残差分解加每组件软提示。</li>
+<li><strong>AutoTimes</strong>（Liu等，NeurIPS 2024）[50]：基于LLM的自回归上下文学习。</li>
+<li><strong>"语言模型对时间序列预测真的有用吗？"</strong>（Tan等，NeurIPS 2024）[51]：<strong>关键论文</strong>——证明LLM骨干可被简单注意力或随机嵌入替代，质疑LLM预训练是否真正迁移。</li>
+</ul>
+<p><strong>研究空白</strong>：没有工作研究实体标识符作为文本提示与学习嵌入和位置编码的对比。没有工作将LLM实体描述与时空图结构结合。</p>
+<h3 id="27-llm">2.7 时空LLM<a class="headerlink" href="#27-llm" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>UrbanGPT</strong>（Li等，KDD 2024）[52]：ST依赖编码器 + 指令微调LLM用于城市计算，支持零样本跨城市迁移。</li>
+<li><strong>ST-LLM</strong>（Cao等，arXiv 2024）[53]：token化ST序列直接输入LLM，带空间位置嵌入。</li>
+<li><strong>TrafficGPT</strong>（Zhang等，Transport Policy 2024）[54]：ChatGPT + 交通基础模型用于对话式交通分析。</li>
+</ul>
+<p><strong>研究空白</strong>：ST-LLM聚焦于交通/城市。没有处理任意时空域或将实体元数据作为自然语言集成。</p>
+<h3 id="28-llm">2.8 面向数据分析和科学发现的LLM智能体<a class="headerlink" href="#28-llm" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Data-Copilot</strong>（Zhang等，arXiv 2023）[55]：自主数据查询、处理、可视化工作流。</li>
+<li><strong>InsightPilot</strong>（Ma等，VLDB 2024）[56]：通过LLM生成分析动作的迭代数据探索。</li>
+<li><strong>The AI Scientist</strong>（Lu等，arXiv 2024）[57]：端到端研究自动化——从想法生成到论文撰写。</li>
+<li><strong>DS-Agent</strong>（Guo等，ICML 2024）[58]：基于案例推理的Kaggle类ML问题求解。</li>
+<li><strong>MLAgentBench</strong>（Huang等，ICML 2024）[59]：LLM智能体ML实验基准。</li>
+<li><strong>AutoML-GPT</strong>（Zhang等，arXiv 2023）[60]：GPT-4用于自动模型选择和流水线组合。</li>
+<li><strong>MatPlotAgent</strong>（Li等，ACL 2024）[61]：面向出版级科学可视化的智能体。</li>
+<li><strong>ResearchAgent</strong>（Baek等，ACL 2024）[62]：通过审阅-优化循环的迭代研究假设生成。</li>
+<li><strong>ChemCrow</strong>（Bran等，Nature Machine Intelligence 2024）[63]：配备18个化学工具的LLM智能体。</li>
+<li><strong>Coscientist</strong>（Boiko等，Nature 2023）[64]：LLM驱动的自主化学实验与机器人实验室。</li>
+</ul>
+<p><strong>研究空白</strong>：没有LLM智能体系统专门面向时空预测流水线设计——自动决定实体表示、图构建、架构选择和HPO。<strong>这是我们提出的新颖贡献。</strong></p>
+<h3 id="29-ai">2.9 AI驱动的商业智能与自然语言界面<a class="headerlink" href="#29-ai" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>LIDA</strong>（Dibia，Microsoft Research，ACL 2023）[65]：多阶段LLM可视化生成流水线。</li>
+<li><strong>DIN-SQL</strong>（Pourreza &amp; Rafiei，NeurIPS 2023）[66]：分解式text-to-SQL与自校正。</li>
+<li><strong>DAIL-SQL</strong>（Gao等，VLDB 2024）[67]：高效少样本text-to-SQL。</li>
+<li><strong>NL4DV</strong>（Narechania等，IEEE VIS 2023）[68]：自然语言到Vega-Lite可视化规范。</li>
+<li><strong>Chat2VIS</strong>（Maddigan &amp; Susnjak，IEEE Access 2023）[69]：LLM从自然语言生成Python可视化代码。</li>
+<li><strong>TableGPT</strong>（Li等，arXiv 2023）[70]：面向整体表格理解的微调LLM。</li>
+<li><strong>Rath</strong>（Yu等，Kanaries，2022–2024）[71]：开源自动化数据探索与可视化。</li>
+<li><strong>Sheet2Report</strong>（Chen等，arXiv 2024）[72]：从电子表格生成专业分析报告的LLM流水线。</li>
+</ul>
+<p><strong>研究空白</strong>：没有BI平台与时空ML集成。现有BI工具缺乏图感知分析、空间可视化和领域特定ST模型集成。</p>
+<h3 id="210-mlai">2.10 面向时间序列和图的ML/AI平台<a class="headerlink" href="#210-mlai" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>平台</th>
+<th>空间</th>
+<th>缺失数据</th>
+<th>概率</th>
+<th>多任务</th>
+<th>插件架构</th>
+<th>实体感知</th>
+<th>LLM/智能体</th>
+<th>BI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>TSLib</strong> [73]</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+<td>是(5)</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td><strong>BasicTS</strong> [74]</td>
+<td>是</td>
+<td>否</td>
+<td>否</td>
+<td>预测</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td><strong>tsl</strong> [75]</td>
+<td>是</td>
+<td>是</td>
+<td>否</td>
+<td>预测+填补</td>
+<td>部分</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td><strong>GluonTS</strong> [3]</td>
+<td>否</td>
+<td>否</td>
+<td>是</td>
+<td>预测</td>
+<td>是</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td><strong>NeuralForecast</strong> [76]</td>
+<td>有限</td>
+<td>否</td>
+<td>是</td>
+<td>预测</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td><strong>Darts</strong> [77]</td>
+<td>否</td>
+<td>否</td>
+<td>是</td>
+<td>预测</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td><strong>PyPOTS</strong> [78]</td>
+<td>否</td>
+<td>是</td>
+<td>否</td>
+<td>是(4+)</td>
+<td>是</td>
+<td>否</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td><strong>LibCity</strong> [79]</td>
+<td>是</td>
+<td>否</td>
+<td>否</td>
+<td>城市任务</td>
+<td>部分</td>
+<td>隐式</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td><strong>PyG</strong> [2]</td>
+<td>是</td>
+<td>否</td>
+<td>否</td>
+<td>通用GNN</td>
+<td>是</td>
+<td>节点特征</td>
+<td>否</td>
+<td>否</td>
+</tr>
+<tr>
+<td><strong>LIULIAN（本文）</strong></td>
+<td><strong>是</strong></td>
+<td><strong>规划中</strong></td>
+<td><strong>规划中</strong></td>
+<td><strong>是</strong></td>
+<td><strong>是</strong></td>
+<td><strong>是</strong></td>
+<td><strong>是</strong></td>
+<td><strong>是</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>研究空白</strong>：没有现有平台同时结合(a)实体感知模块、(b)图+时序统一建模、(c)LLM智能体集成、(d)BI功能和(e)垂直领域插件。<strong>LIULIAN填补此空白。</strong></p>
+<h3 id="211">2.11 跨域应用<a class="headerlink" href="#211" title="Permanent link">&para;</a></h3>
+<h4 id="_2">医疗/临床时间序列<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>STraTS</strong>（Tipirneni &amp; Reddy，MLHC 2022）[80]：不规则采样临床时序上的稀疏注意力。</li>
+<li><strong>MedGTX</strong>（Kim等，CHIL 2023）[81]：结合患者关系图和时序EHR的图-Transformer。</li>
+<li><strong>MISTS</strong>（Li等，AAAI 2024）[82]：面向ICU的多输入多输出不规则采样时序预测。</li>
+<li><strong>MedTsLLM</strong>（Jiang等，arXiv 2024）[83]：临床时序 + 临床笔记的LLM多模态融合。</li>
+<li><strong>围手术期GNN</strong>（Gao等，npj Digital Medicine 2024）[84]：患者图用于术后并发症预测。</li>
+</ul>
+<h4 id="_3">环境/水文<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>AirFormer</strong> [26]：全国范围1,085个站点的空气质量预测。</li>
+<li><strong>GAGNN</strong>（ACM TKDD 2024）[85]：面向全国PM2.5预测的组感知图神经网络。</li>
+<li><strong>FloodCast</strong>（Xu等，arXiv 2023）[86]：河流网络拓扑GNN用于洪水预测。</li>
+<li><strong>ST水质GNN</strong>（Water Research 2025）[87]：面向溶解氧和氮的多尺度ST-GNN。</li>
+<li><strong>水分配网络GNN</strong>（Zanfei等，Water Research 2023）[88]：面向管网泄漏检测的GNN。</li>
+<li><strong>多尺度水需求STGNN</strong>（Water Research 2025）[89]：面向水基础设施的多尺度时空建模。</li>
+</ul>
+<h4 id="_4">金融<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>FinGPT</strong>（Yang等，NeurIPS 2023 Workshop）[90]：开源金融LLM，结合时序情感信号。</li>
+<li><strong>TRA</strong> [13]：面向实体感知股票预测的时间路由适配器。</li>
+<li><strong>MASTER</strong>（Li等，AAAI 2024）[91]：市场引导的股票Transformer，用于投资组合级预测。</li>
+</ul>
+<h4 id="_5">灾害管理/地球科学<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>EarthFormer</strong> [27]：面向降水、温度、海表的立方体注意力。</li>
+<li><strong>Prithvi</strong>（Jakubik等，IBM/NASA，arXiv 2023）[92]：地理空间AI基础模型。</li>
+<li><strong>GeoChat</strong>（Kuckreja等，CVPR 2024）[93]：面向遥感分析的视觉-语言模型。</li>
+<li><strong>SatCLIP / GeoCLIP</strong>（Klemmer等，NeurIPS 2023 Workshop / AAAI 2024）[94]：对齐卫星影像与地理元数据的位置感知嵌入。</li>
+<li><strong>HeatGNN</strong>（arXiv 2024）[95]：流行病学信息驱动的GNN用于疫情预测。</li>
+</ul>
+<h4 id="_6">物联网/智慧建筑<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Brick Schema + ML</strong>（Balaji等，BuildSys 2022）[96]：基于GNN的跨建筑迁移学习。</li>
+<li><strong>CityLearn</strong>（Vazquez-Canteli等，Applied Energy 2023）[97]：建筑能源数字孪生的强化学习环境。</li>
+</ul>
+<h3 id="212">2.12 时空数据的对比学习和自监督学习<a class="headerlink" href="#212" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>TS2Vec</strong>（Yue等，AAAI 2022）[98]：分层对比学习，用于通用时序表示。</li>
+<li><strong>TF-C</strong>（Zhang等，NeurIPS 2022）[99]：时频一致性对比预训练。</li>
+<li><strong>SimMTM</strong>（Dong等，NeurIPS 2023）[100]：基于邻居聚合的掩码时序建模。</li>
+<li><strong>AutoST</strong>（Zhang等，WWW 2023）[101]：自动化时空图对比学习。</li>
+<li><strong>STAG</strong>（Zhang等，ICML 2023）[102]：对抗性对比适应用于时空图学习。</li>
+<li><strong>CaST</strong>（Xia等，NeurIPS 2023）[103]：因果视角下的时空图预测。</li>
+<li><strong>STONE</strong>（Wang等，KDD 2024）[104]：同时处理空间和时间分布偏移。</li>
+</ul>
+<h3 id="213">2.13 时空模型中的分布偏移与鲁棒性<a class="headerlink" href="#213" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>ADATIME</strong>（Ragab等，ACM TKDD 2023）[105]：11种域适应方法在时序数据上的基准。</li>
+<li><strong>RAINCOAT</strong>（He等，ICML 2023）[106]：频域特征对齐的时序域适应。</li>
+</ul>
+<h3 id="214">2.14 时空模型的可解释性<a class="headerlink" href="#214" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>STExplainer</strong>（Zhang等，KDD 2023）[107]：基于互信息扰动的ST-GNN事后解释。</li>
+<li><strong>TimeSHAP</strong>（Bento等，KDD 2021）[108]：序列模型的SHAP——跨时间步的特征重要性。</li>
+<li><strong>TFT</strong>（Lim等，IJF 2021）[109]：通过变量选择网络的内置可解释性。</li>
+</ul>
+<h3 id="215-ml">2.15 ML框架中的插件/适配器架构<a class="headerlink" href="#215-ml" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>LoRA</strong>（Hu等，ICLR 2022）[110]：面向冻结模型的参数高效适配器层——我们领域适配器设计的基础。</li>
+<li><strong>Ludwig</strong>（Molino等，JMLR 2023）[111]：声明式YAML + 编码器-组合器-解码器插件架构。</li>
+<li><strong>MMEngine</strong>（OpenMMLab，2022）[112]：注册表 + 钩子 + 运行器架构模式。</li>
+<li><strong>Hydra</strong>（Yadan，Facebook Research，2020）[113]：可组合YAML配置与插件架构。</li>
+</ul>
+<h3 id="216">2.16 动态和时序图网络<a class="headerlink" href="#216" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>TGN</strong>（Rossi等，ICML 2020 Workshop）[114]：连续时间动态图上的记忆 + 图注意力 + 时间编码。</li>
+<li><strong>DyGFormer</strong>（Yu等，NeurIPS 2023）[115]：面向连续时间动态图的Transformer，带邻居共现编码。</li>
+<li><strong>ROLAND</strong>（You等，KDD 2022）[116]：面向动态社交网络的增量式GNN。</li>
+</ul>
+<h3 id="217">2.17 多模态时空数据<a class="headerlink" href="#217" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Time-MMD</strong>（Liu等，NeurIPS 2024 D&amp;B）[117]：跨9个领域配对时序与文本元数据的大规模基准。</li>
+<li><strong>ChatTS</strong>（Xie等，arXiv 2024）[118]：合成时序-文本对用于LLM时序推理。</li>
+<li><strong>UniST</strong> [31]：多模态提示（空间、时间、文本）用于城市ST预测。</li>
+<li><strong>TorchGeo</strong>（Stewart等，SIGSPATIAL 2022）[119]：桥接GIS数据格式与深度学习训练流水线。</li>
+</ul>
+<h3 id="218">2.18 基准与公平评估<a class="headerlink" href="#218" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>TSLib</strong>（Wu等，NeurIPS 2023 D&amp;B）[73]：公平重实现揭示许多SOTA结果是评估伪影。</li>
+<li><strong>BasicTS</strong>（Shao等，NeurIPS 2023 D&amp;B）[74]：公平评估下简单模型常可匹配复杂GNN。</li>
+<li><strong>TFB</strong>（Qiu等，ICML 2024）[120]：8,068个单变量 + 25个多变量数据集挑战声称的SOTA。</li>
+<li><strong>TOTEM</strong>（Talukder等，NeurIPS 2024）[121]：VQ-VAE离散token化创建跨域共享词表。</li>
+</ul>
+<h3 id="219-ml">2.19 人在回路ML与报告生成<a class="headerlink" href="#219-ml" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>HITL-TSF</strong>（Li等，Salesforce，arXiv 2024）[122]：将领域知识注入神经预测的框架。</li>
+<li><strong>Calliope</strong>（Shi等，IEEE TVCG 2023）[123]：从电子表格自动生成可视化数据故事。</li>
+<li><strong>DataTales</strong>（Sultan等，CHI 2024）[124]：LLM从数据集生成叙事文章。</li>
+</ul>
+<h3 id="220-ml">2.20 数字孪生与仿真 + ML<a class="headerlink" href="#220-ml" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>TwinGen</strong>（Thelen等，Nature Machine Intelligence 2023）[125]：物理信息神经网络用于数据高效数字孪生。</li>
+<li><strong>Transolver</strong>（Wu等，ICML 2024 Spotlight）[126]：通用几何上的快速Transformer PDE求解器。</li>
+<li><strong>PARCv2</strong>（Nguyen等，ICML 2024）[127]：物理感知循环卷积用于时空动力学。</li>
+</ul>
+<hr />
+<h2 id="3">3. 当前实现状态<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
+<h3 id="31-liulian">3.1 LIULIAN框架架构<a class="headerlink" href="#31-liulian" title="Permanent link">&para;</a></h3>
+<p>LIULIAN（Liquid Intelligence and Unified Logic for Interactive Adaptive Networks）提供模块化、任务驱动的时空智能流水线：</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                    ┌───────────────────────────────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                    │        LIULIAN 平台技术栈              │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                    │                                       │
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                    │  ┌─────────────────────────────────┐  │
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                    │  │   LLM智能体层（规划中）           │  │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                    │  │   • 流水线设计智能体              │  │
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                    │  │   • 数据摄入智能体                │  │
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                    │  │   • 报告生成智能体                │  │
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                    │  └───────────┬─────────────────────┘  │
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                    │              │                         │
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>                    │  ┌───────────▼─────────────────────┐  │
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>                    │  │   BI与可视化层                    │  │
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                    │  │   • 仪表盘（规划中）              │  │
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>                    │  │   • 自然语言查询界面（规划中）     │  │
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>                    │  │   • 自动化报告（规划中）           │  │
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>                    │  └───────────┬─────────────────────┘  │
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>                    │              │                         │
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                    │  ┌───────────▼─────────────────────┐  │
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>                    │  │   任务层                          │  │
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>                    │  │   • 预测（已实现）                │  │
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>                    │  │   • 分类（规划中）                │  │
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>                    │  │   • 异常检测（规划中）            │  │
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>                    │  │   • 数据填补（规划中）            │  │
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>                    │  └───────────┬─────────────────────┘  │
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>                    │              │                         │
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>                    │  ┌───────────▼─────────────────────┐  │
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>                    │  │   模型层                          │  │
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>                    │  │   • 时序: LSTM, PatchTST,        │  │
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>                    │  │     DLinear, iTransformer, ...    │  │
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>                    │  │   • 实体感知包装器                │  │
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>                    │  │   • 空间: GNN模块                 │  │
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>                    │  │   • 基于LLM: TimeLLM, GPT4TS     │  │
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>                    │  │   • 基础模型: Chronos, Moirai     │  │
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>                    │  └───────────┬─────────────────────┘  │
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>                    │              │                         │
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>                    │  ┌───────────▼─────────────────────┐  │
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>                    │  │   数据层                          │  │
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>                    │  │   • YAML清单 + 数据溯源           │  │
+<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>                    │  │   • 图拓扑支持                    │  │
+<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>                    │  │   • 多模态数据加载器              │  │
+<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>                    │  │   • 实体元数据管理                │  │
+<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>                    │  └───────────┬─────────────────────┘  │
+<a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>                    │              │                         │
+<a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>                    │  ┌───────────▼─────────────────────┐  │
+<a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>                    │  │   运行时层                        │  │
+<a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>                    │  │   • 状态机实验管理                │  │
+<a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>                    │  │   • Ray Tune超参优化              │  │
+<a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>                    │  │   • Slurm集群调度                 │  │
+<a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>                    │  │   • MLflow/W&amp;B日志                │  │
+<a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>                    │  └─────────────────────────────────┘  │
+<a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>                    │                                       │
+<a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>                    │  ┌─────────────────────────────────┐  │
+<a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a>                    │  │   插件层（垂直领域）              │  │
+<a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>                    │  │   • 智慧地球/水文                 │  │
+<a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a>                    │  │   • 医疗健康                      │  │
+<a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>                    │  │   • 金融                          │  │
+<a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a>                    │  │   • 智慧工程                      │  │
+<a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a>                    │  │   • 计算化学                      │  │
+<a id="__codelineno-0-59" name="__codelineno-0-59" href="#__codelineno-0-59"></a>                    │  └─────────────────────────────────┘  │
+<a id="__codelineno-0-60" name="__codelineno-0-60" href="#__codelineno-0-60"></a>                    └───────────────────────────────────────┘
+</code></pre></div>
+<h3 id="32">3.2 已实现的实体标识符系统<a class="headerlink" href="#32" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>模式</strong>：<code>none</code>、<code>embedding</code>、<code>onehot</code>、<code>coordinates</code>、<code>sinusoidal</code>、<code>random</code>、<code>numeric_id</code>、<code>descriptors</code></li>
+<li><strong>包装器</strong>：<code>EntityWrapper</code>（逐实体）、<code>ChannelEntityWrapper</code>（逐通道学习型）、<code>ChannelTransparentWrapper</code>（逐通道预计算型）</li>
+<li><strong>实验编排</strong>：48任务矩阵运行器、Ray Tune超参优化、Slurm调度、对比报告生成</li>
+</ul>
+<h3 id="33">3.3 已实现的空间模块<a class="headerlink" href="#33" title="Permanent link">&para;</a></h3>
+<ul>
+<li>可配置注入点的实体嵌入</li>
+<li>1-hop邻居聚合</li>
+<li>GNN模块（已集成至ICPR 2026关于瑞士河流水温预测的投稿）</li>
+</ul>
+<hr />
+<h2 id="4">4. 研究计划：多阶段规划<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
+<h3 id="a153">A阶段：实体感知预测（第1–5个月，3篇论文）<a class="headerlink" href="#a153" title="Permanent link">&para;</a></h3>
+<hr />
+<h3 id="1_1">第一周期：系统性实体标识符消融研究（第1个月）<a class="headerlink" href="#1_1" title="Permanent link">&para;</a></h3>
+<p><strong>论文标题</strong>："实体标识符何时以及如何发挥作用？多实体时间序列预测中跨架构的系统研究"</p>
+<p><strong>目标会议</strong>：NeurIPS 2026 D&amp;B / AAAI 2027</p>
+<h4 id="_7">目标<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h4>
+<ol>
+<li>首次在7+数据集上系统比较6+标识符类型和6+架构家族</li>
+<li>实证分析标识符何时有效（数据集特征、实体数量、相关结构）</li>
+<li>实用的标识符选择指导方针</li>
+<li>开源基准框架（LIULIAN）</li>
+</ol>
+<h4 id="_8">实验设计<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h4>
+<p><strong>阶段1A——核心消融（第1–2周）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>取值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据集</td>
+<td>swiss-river-1990, traffic, electricity, PEMS04, PEMS08</td>
+</tr>
+<tr>
+<td>模型</td>
+<td>LSTM, PatchTST, DLinear</td>
+</tr>
+<tr>
+<td>标识符模式</td>
+<td>none, embedding, onehot, sinusoidal, random, coordinates（仅Swiss）</td>
+</tr>
+<tr>
+<td>种子</td>
+<td>每组合3个</td>
+</tr>
+<tr>
+<td>预测长度</td>
+<td>96, 192, 336, 720</td>
+</tr>
+<tr>
+<td>指标</td>
+<td>MSE, MAE（主要）；RMSE, NSE（次要）</td>
+</tr>
+</tbody>
+</table>
+<p>总计约900次运行。</p>
+<p><strong>阶段1B——扩展架构（第2–3周）</strong>：
+新增：iTransformer、TimeMixer、TimeXer。
+新增负控制：Weather、ETTh1（异构通道——标识符不应有帮助）。</p>
+<p><strong>阶段1C——分析与撰写（第3–4周）</strong>：
+- Wilcoxon符号秩检验
+- 学习嵌入的t-SNE/UMAP可视化，以地理位置着色
+- 嵌入相似度与空间距离分析
+- 数据集特征化：实体间互信息、实体数量规模分析</p>
+<h4 id="_9">预期关键发现<a class="headerlink" href="#_9" title="Permanent link">&para;</a></h4>
+<ul>
+<li>学习嵌入在大规模同质数据集上占优（traffic N=862，electricity N=321）</li>
+<li>随机基线表现出令人惊讶的良好效果→<strong>实体区分 &gt;&gt; 表示质量</strong></li>
+<li>独热编码在大N时退化（862通道非常稀疏）</li>
+<li>负控制（Weather、ETT）无收益→通道是异构变量，非实体</li>
+</ul>
+<h4 id="_10">新颖性验证<a class="headerlink" href="#_10" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>跨架构的系统性标识符比较</strong>：未发表。STID [9]仅测试空间身份嵌入。CARD [5]仅测试通道token。iTransformer [4]仅测试变量即token。没有工作系统比较none/embedding/onehot/sinusoidal/random/coordinates跨LSTM/Transformer/Linear家族。<strong>新颖。</strong></li>
+<li><strong>随机嵌入基线</strong>：NLP中使用（随机词嵌入），但从未作为时序实体标识符的控制消融。<strong>时序领域新颖。</strong></li>
+<li><strong>ChannelTransparentWrapper</strong>：无先前工作在multi_channel模式下为TSLib模型注入预计算特征。<strong>新颖架构。</strong></li>
+<li><strong>负控制数据集</strong>：先前工作未区分同质实体 vs 异构特征数据集进行标识符分析。<strong>新颖框架。</strong></li>
+</ul>
+<h4 id="_11">贡献<a class="headerlink" href="#_11" title="Permanent link">&para;</a></h4>
+<ul>
+<li>C1：首个跨架构的实体标识符综合基准</li>
+<li>C2：基于数据集属性的标识符选择实证指南</li>
+<li>C3：开源LIULIAN实体标识符框架</li>
+<li>C4：新颖的瑞士河流水文数据集作为评估领域</li>
+</ul>
+<hr />
+<h3 id="23_1">第二周期：基于元学习的自适应实体标识符选择（第2–3个月）<a class="headerlink" href="#23_1" title="Permanent link">&para;</a></h3>
+<p><strong>论文标题</strong>："AdaptID：基于元学习的多实体时间序列预测自适应实体标识符选择"</p>
+<p><strong>目标会议</strong>：ICML 2027 / NeurIPS 2027</p>
+<h4 id="_12">技术方案<a class="headerlink" href="#_12" title="Permanent link">&para;</a></h4>
+<p><strong>多视图实体表示与门控</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>x_entity = Gate([emb(id), onehot(id), sinusoidal(id), random(id), coords(id)])
+</code></pre></div></p>
+<ul>
+<li><strong>Gate</strong>：标识符视图上的注意力机制，以数据集统计量（N_entities、实体间互信息、时间自相关）为条件</li>
+<li><strong>训练</strong>：与预测目标端到端训练 + 辅助标识符判别损失</li>
+<li><strong>架构</strong>：标识符编码器 → 数据集分析器 → 门控网络 → 预测骨干</li>
+</ul>
+<h4 id="_13">新颖性验证<a class="headerlink" href="#_13" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>TESTAM</strong> [22]使用MoE对图结构类型（无图、静态图、动态图）进行门控，而非标识符类型。输入和粒度不同。</li>
+<li><strong>TRA</strong> [13]对股票进行实体特定的时间模式路由，而非标识符类型选择。</li>
+<li><strong>CARD</strong> [5]使用固定通道token，无自适应选择。</li>
+<li><strong>以数据集统计量为条件的多标识符表示门控</strong>：<strong>未发表。新颖。</strong></li>
+</ul>
+<h4 id="_14">贡献<a class="headerlink" href="#_14" title="Permanent link">&para;</a></h4>
+<ul>
+<li>C1：首个面向时间序列的自适应标识符选择框架</li>
+<li>C2：元学习形式化，实现选择策略的跨数据集迁移</li>
+<li>C3：实体相关结构 ↔ 最优标识符类型的理论分析</li>
+<li>C4：标识符融合持续优于最佳单一标识符</li>
+</ul>
+<hr />
+<h3 id="35">第三周期：统一实体标识符 + 时空图（第3–5个月）<a class="headerlink" href="#35" title="Permanent link">&para;</a></h3>
+<p><strong>论文标题</strong>："超越节点嵌入：时空预测中实体标识与图神经网络的桥梁"</p>
+<p><strong>目标会议</strong>：KDD 2027 / AAAI 2027</p>
+<h4 id="_15">技术方案<a class="headerlink" href="#_15" title="Permanent link">&para;</a></h4>
+<p><strong>关键洞见</strong>：实体标识符（第一、二周期）是无边的GNN节点特征的特例。本工作将其统一：</p>
+<ol>
+<li><strong>标识符到图</strong>：从实体表示学习自适应邻接矩阵（参照Graph WaveNet [15]、MTGNN [16]）</li>
+<li><strong>图到标识符</strong>：从图结构提取实体级特征作为标识符</li>
+<li><strong>混合</strong>：标识符 + 自适应图 + 消息传递</li>
+</ol>
+<p><strong>实体关系构建</strong>：
+- 从数据：从时间模式学习成对实体相似度
+- 从元数据：地理坐标、网络拓扑
+- 从LLM：生成实体关系描述 → 图结构（<strong>新颖</strong>）</p>
+<p><strong>零样本实体预测</strong>（受STEP [17]启发）：
+- 在源实体上预训练实体嵌入
+- 通过空间插值、LLM描述映射或少样本适配迁移至未见实体</p>
+<h4 id="_16">新颖性验证<a class="headerlink" href="#_16" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>STID</strong> [9]证明标识符可替代图，但未研究两者组合。</li>
+<li><strong>STEP</strong> [17]进行零样本节点预训练，但仅限同一领域。</li>
+<li><strong>基于LLM的元数据实体图构建</strong>：<strong>未发表。新颖。</strong></li>
+<li><strong>连接实体标识符和GNN节点嵌入的统一框架</strong>：<strong>未发表为系统研究。新颖。</strong></li>
+</ul>
+<hr />
+<h3 id="b5123">B阶段：时空基础模型（第5–12个月，3篇论文）<a class="headerlink" href="#b5123" title="Permanent link">&para;</a></h3>
+<hr />
+<h3 id="llm58">第四周期：LLM增强的时空智能（第5–8个月）<a class="headerlink" href="#llm58" title="Permanent link">&para;</a></h3>
+<p><strong>论文标题</strong>："EntityLLM：面向通用时空预测的大语言模型增强实体表示"</p>
+<p><strong>目标会议</strong>：ICLR 2028 / NeurIPS 2027</p>
+<h4 id="_17">技术方案<a class="headerlink" href="#_17" title="Permanent link">&para;</a></h4>
+<p><strong>文本增强的实体标识符</strong>：
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>实体：&quot;Aare-Bern站：Aare河上的河流测量站，
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>       坐标(46.95, 7.45)，海拔502m，集水面积3000 km²，
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>       位于Thun湖上游，每小时测量水温。&quot;
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>→ LLM编码器 → entity_text_emb → 与entity_learned_emb对齐
+</code></pre></div></p>
+<p><strong>多模态实体表示</strong>：
+- 融合：时序模式 + 文本描述 + 空间坐标 + 卫星影像（水文领域）
+- 基于注意力的跨模态融合
+- 每种模态提供互补的实体信息</p>
+<p><strong>面向ST预测流水线的LLM智能体</strong>：
+- 分析数据集元数据 → 推荐标识符类型、架构、图结构
+- 迭代式：运行 → 分析 → 优化
+- 自然语言实体规范用于零样本适配</p>
+<h4 id="_18">新颖性验证<a class="headerlink" href="#_18" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Time-LLM</strong> [43]：为时序重编程LLM但无实体特定文本。</li>
+<li><strong>TEST</strong> [44]：对齐时序与文本原型，但非实体元数据描述。</li>
+<li><strong>UrbanGPT</strong> [52]：使用LLM进行ST但不使用实体元数据作为文本提示。</li>
+<li><strong>传感器实体的文本描述作为LLM提示进行标识符注入</strong>：<strong>未发表。新颖。</strong></li>
+<li><strong>面向ST流水线设计的LLM智能体</strong>：<strong>未发表。</strong> TrafficGPT [54]最接近但限于交通 + ChatGPT封装。<strong>ST领域新颖。</strong></li>
+<li><strong>多模态实体融合（时序 + 文本 + 坐标 + 卫星）</strong>：<strong>未以此组合发表。新颖。</strong></li>
+</ul>
+<hr />
+<h3 id="710">第五周期：带实体感知的时空基础模型（第7–10个月）<a class="headerlink" href="#710" title="Permanent link">&para;</a></h3>
+<p><strong>论文标题</strong>："UniEntity：面向跨域时空预测的实体感知基础模型"</p>
+<p><strong>目标会议</strong>：ICML 2028 / Nature Machine Intelligence</p>
+<h4 id="_19">技术方案<a class="headerlink" href="#_19" title="Permanent link">&para;</a></h4>
+<p><strong>领域无关的实体框架</strong>：
+- 实体类型本体：传感器、患者、金融工具、气象站、河流测量站……
+- 跨域共享的实体嵌入空间
+- 领域特定的实体适配器（LoRA风格 [110]）</p>
+<p><strong>预训练策略</strong>：
+- LOTSA风格 [35]多域ST语料：交通 + 电力 + 水文 + 空气质量 + 临床
+- 实体条件化掩码建模：根据实体身份预测掩码补丁
+- 空间感知注意力：结合时序自注意力与学习的空间注意力</p>
+<p><strong>跨域实体迁移</strong>：
+- 展示：交通传感器嵌入迁移到河流测量站嵌入（两者都是具有周期模式的空间传感器网络）
+- 患者作为实体：ICU时序以患者人口统计学作为实体元数据</p>
+<table>
+<thead>
+<tr>
+<th>领域</th>
+<th>实体类型</th>
+<th>实体元数据</th>
+<th>关键挑战</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>交通</td>
+<td>交通传感器</td>
+<td>位置、道路类型、限速</td>
+<td>周期模式、空间相关</td>
+</tr>
+<tr>
+<td>能源</td>
+<td>电力表</td>
+<td>客户类型、位置、容量</td>
+<td>多样消费、峰值需求</td>
+</tr>
+<tr>
+<td>水文</td>
+<td>河流测量站</td>
+<td>坐标、集水面积、海拔</td>
+<td>网络拓扑、极端事件</td>
+</tr>
+<tr>
+<td>医疗</td>
+<td>ICU患者</td>
+<td>人口统计、诊断、用药</td>
+<td>高变异、缺失数据、不规则采样</td>
+</tr>
+<tr>
+<td>物联网</td>
+<td>建筑传感器</td>
+<td>楼层、房间、传感器类型</td>
+<td>异构类型、边缘部署</td>
+</tr>
+<tr>
+<td>金融</td>
+<td>股票/金融工具</td>
+<td>行业、市值、国家</td>
+<td>非平稳、体制变化</td>
+</tr>
+<tr>
+<td>环境</td>
+<td>空气质量监测器</td>
+<td>位置、与道路/工业的距离</td>
+<td>空间扩散、气象耦合</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_20">新颖性验证<a class="headerlink" href="#_20" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Moirai</strong> [35]：任意变量但无实体条件化或空间感知。</li>
+<li><strong>UniST</strong> [31]：ST基础模型但仅限交通/城市。</li>
+<li><strong>OpenCity</strong> [32]：ST预训练但仅限交通。</li>
+<li><strong>实体条件化的跨域ST基础模型</strong>：<strong>未发表。新颖。</strong> 最接近：UniTS [12]使用数据集特定提示token，但非实体身份条件化。</li>
+<li><strong>面向ST基础模型的LoRA风格领域适配器</strong>：<strong>在ST语境中未发表。新颖。</strong></li>
+</ul>
+<hr />
+<h3 id="mambassm912">第六周期：面向高效时空学习的Mamba/SSM架构（第9–12个月）<a class="headerlink" href="#mambassm912" title="Permanent link">&para;</a></h3>
+<p><strong>论文标题</strong>："ST-Mamba：基于选择性状态空间模型和实体感知条件化的高效时空预测"</p>
+<p><strong>目标会议</strong>：ICLR 2028 / ICML 2028</p>
+<h4 id="_21">技术方案<a class="headerlink" href="#_21" title="Permanent link">&para;</a></h4>
+<p>基于SpoT-Mamba [28]和STG-Mamba [29]，开发完整的ST-Mamba架构：</p>
+<ol>
+<li><strong>空间Mamba</strong>：沿空间邻域的选择性扫描（图引导游走序列）</li>
+<li><strong>时间Mamba</strong>：沿时间维度的选择性扫描，支持变长上下文</li>
+<li><strong>实体条件化</strong>：将实体标识符注入Mamba的选择机制（Δ, B, C矩阵）</li>
+<li><strong>线性复杂度</strong>：O(N·T) vs 全注意力的O(N²·T²)——对1000+实体网络扩展至关重要</li>
+</ol>
+<h4 id="_22">新颖性验证<a class="headerlink" href="#_22" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>SpoT-Mamba</strong> [28]：用Mamba处理ST但为研讨会论文，范围有限。</li>
+<li><strong>STG-Mamba</strong> [29]：arXiv预印本，首次探索但无实体条件化。</li>
+<li><strong>带完整空间+时间扫描的实体条件化Mamba</strong>：<strong>未发表。新颖。</strong></li>
+<li><strong>Mamba vs Transformer vs GNN面向ST预测的系统比较</strong>：<strong>未发表为系统研究。新颖。</strong></li>
+</ul>
+<hr />
+<h3 id="cliulian818">C阶段：LIULIAN平台与领域应用（第8–18个月）<a class="headerlink" href="#cliulian818" title="Permanent link">&para;</a></h3>
+<hr />
+<h3 id="liulian814">第七周期：LIULIAN平台系统论文（第8–14个月）<a class="headerlink" href="#liulian814" title="Permanent link">&para;</a></h3>
+<p><strong>论文标题</strong>："LIULIAN：面向时空智能的开源智能体驱动平台，配备垂直领域插件"</p>
+<p><strong>目标会议</strong>：VLDB 2028 / KDD 2028 (Demo) / JMLR MLOSS / NeurIPS 2027 D&amp;B</p>
+<h4 id="_23">平台作为贡献<a class="headerlink" href="#_23" title="Permanent link">&para;</a></h4>
+<p>LIULIAN不仅仅是一个模型库——它是一个<strong>全栈时空智能平台</strong>，结合：</p>
+<ol>
+<li><strong>模块化ML流水线</strong>：</li>
+<li>任务驱动设计，将任务语义与模型逻辑分离</li>
+<li>ExecutableModel抽象基类与轻量级适配器模式</li>
+<li>状态机实验编排（训练 → 评估 → 推理 → 分析 → 可视化）</li>
+<li>
+<p>YAML清单，带语义模式、拓扑、完整性哈希</p>
+</li>
+<li>
+<p><strong>实体感知和空间模块</strong>（来自A–B阶段）：</p>
+</li>
+<li>跨所有模型家族的实体标识符注入</li>
+<li>自适应图构建</li>
+<li>GNN空间模块</li>
+<li>
+<p>跨域实体迁移</p>
+</li>
+<li>
+<p><strong>LLM智能体层</strong>：</p>
+</li>
+<li><strong>流水线设计智能体</strong>：分析数据集元数据，推荐模型/标识符/图结构</li>
+<li><strong>数据摄入智能体</strong>：基于自然语言的自适应数据映射（"一键图数据摄入"）</li>
+<li><strong>报告生成智能体</strong>：从实验结果自动生成分析报告</li>
+<li>
+<p><strong>人在回路交互</strong>：领域专家用自然语言描述问题，系统推荐解决方案</p>
+</li>
+<li>
+<p><strong>BI与可视化层</strong>：</p>
+</li>
+<li>交互式仪表盘（Power BI集成 + 自定义扩展）</li>
+<li>面向时空数据的自然语言查询界面</li>
+<li>自动化报告生成，含图表和洞见</li>
+<li>
+<p>图可解释性可视化</p>
+</li>
+<li>
+<p><strong>垂直领域插件</strong>：</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>领域</th>
+<th>插件</th>
+<th>状态</th>
+<th>关键特性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>智慧地球/水文</strong></td>
+<td><code>plugins/hydrology/</code></td>
+<td>部分实现</td>
+<td>瑞士河流数据库、站点坐标、流域拓扑、GIS可视化</td>
+</tr>
+<tr>
+<td><strong>医疗健康</strong></td>
+<td><code>plugins/healthcare/</code></td>
+<td>规划中</td>
+<td>MIMIC-III/IV集成、患者作为实体、围手术期预测</td>
+</tr>
+<tr>
+<td><strong>金融</strong></td>
+<td><code>plugins/finance/</code></td>
+<td>规划中（N-Banker合作）</td>
+<td>金融时序分析、实体感知股票预测、AI智能体聊天机器人</td>
+</tr>
+<tr>
+<td><strong>智慧工程</strong></td>
+<td><code>plugins/engineering/</code></td>
+<td>规划中（DeepSchemata）</td>
+<td>工程图纸拓扑提取、自动化分析</td>
+</tr>
+<tr>
+<td><strong>计算化学</strong></td>
+<td><code>plugins/chemistry/</code></td>
+<td>规划中</td>
+<td>分子属性预测、反应分析</td>
+</tr>
+<tr>
+<td><strong>灾害管理</strong></td>
+<td><code>plugins/disaster/</code></td>
+<td>规划中（人大合作）</td>
+<td>多模态（卫星+人口）、疏散路径规划</td>
+</tr>
+<tr>
+<td><strong>数字人文</strong></td>
+<td><code>plugins/humanities/</code></td>
+<td>规划中</td>
+<td>文档结构分析、手写识别</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>部署与MLOps</strong>：</li>
+<li>Docker容器化</li>
+<li>云部署（AWS规划中）</li>
+<li>通过GitHub Actions的CI/CD</li>
+<li>Ray Tune + Slurm集成</li>
+<li>实验追踪（MLflow/W&amp;B）</li>
+</ol>
+<h4 id="_24">新颖性验证（平台）<a class="headerlink" href="#_24" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>TSLib</strong> [73]、<strong>BasicTS</strong> [74]、<strong>tsl</strong> [75]：仅模型库——无智能体、无BI、无插件、无实体感知。</li>
+<li><strong>LibCity</strong> [79]：仅城市计算——无跨域、无智能体、无BI。</li>
+<li><strong>GluonTS</strong> [3]、<strong>NeuralForecast</strong> [76]：仅时序——无空间、无图、无实体。</li>
+<li><strong>Ludwig</strong> [111]：声明式ML但非ST专用。</li>
+<li><strong>集成实体感知模型 + LLM智能体 + BI + 垂直领域插件的全栈ST平台</strong>：<strong>未发表。新颖。</strong></li>
+</ul>
+<hr />
+<h3 id="10183">领域应用论文（第10–18个月，3+篇论文）<a class="headerlink" href="#10183" title="Permanent link">&para;</a></h3>
+<p>这些论文将LIULIAN应用于特定领域，各产出一项领域贡献：</p>
+<h4 id="d11012">D1：瑞士河流水温预测（第10–12个月）<a class="headerlink" href="#d11012" title="Permanent link">&para;</a></h4>
+<ul>
+<li>扩展ICPR 2026投稿，加入实体标识符消融 + 图模块</li>
+<li>使用NSE指标和水文基线的领域特定评估</li>
+<li><strong>目标</strong>：Environmental Data Science / Water Resources Research</li>
+</ul>
+<h4 id="d21215">D2：围手术期患者结局预测（第12–15个月）<a class="headerlink" href="#d21215" title="Permanent link">&para;</a></h4>
+<ul>
+<li>与中国药科大学和伯尔尼大学医院合作</li>
+<li>患者作为实体，以人口统计学、手术类型、合并症作为实体元数据</li>
+<li>实体聚类揭示具有不同结局轨迹的患者表型</li>
+<li><strong>目标</strong>：npj Digital Medicine / CHIL / ML4H</li>
+</ul>
+<h4 id="d31418">D3：多模态时空数据的灾害影响分析（第14–18个月）<a class="headerlink" href="#d31418" title="Permanent link">&para;</a></h4>
+<ul>
+<li>与中国人民大学合作</li>
+<li>多模态：卫星影像 + 人口分布 + 时间序列</li>
+<li>任务：人口分布预测、损害评估、疏散规划</li>
+<li><strong>目标</strong>：Nature Communications / KDD Applied Data Science</li>
+</ul>
+<hr />
+<h2 id="5">5. 创新亮点与新颖性总结<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
+<h3 id="51-a13">5.1 近期创新（A阶段，第1–3周期）<a class="headerlink" href="#51-a13" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>创新</th>
+<th>新颖性状态</th>
+<th>最接近的先前工作</th>
+<th>新在何处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>跨架构的系统性标识符消融</td>
+<td><strong>新颖</strong></td>
+<td>STID [9]（仅一种类型）</td>
+<td>首次多类型、多架构比较</td>
+</tr>
+<tr>
+<td>用于实体区分的随机嵌入基线</td>
+<td><strong>时序领域新颖</strong></td>
+<td>NLP随机基线</td>
+<td>隔离"区分"与"表示质量"</td>
+</tr>
+<tr>
+<td>ChannelTransparentWrapper</td>
+<td><strong>新颖架构</strong></td>
+<td>无</td>
+<td>multi-channel TSLib模型中的预计算特征</td>
+</tr>
+<tr>
+<td>标识符研究的负控制数据集</td>
+<td><strong>新颖框架</strong></td>
+<td>无</td>
+<td>首次明确测试标识符不应有帮助的场景</td>
+</tr>
+<tr>
+<td>AdaptID标识符类型元学习</td>
+<td><strong>新颖</strong></td>
+<td>TESTAM [22]（图类型）</td>
+<td>对标识符类型而非图结构进行门控</td>
+</tr>
+<tr>
+<td>基于LLM的实体图构建</td>
+<td><strong>新颖</strong></td>
+<td>NLP中的LLM知识图谱</td>
+<td>应用于ST传感器网络拓扑</td>
+</tr>
+<tr>
+<td>统一标识符 + GNN框架</td>
+<td><strong>新颖</strong></td>
+<td>STID [9]、GWN [15]各自独立</td>
+<td>系统性桥接两个研究社区</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-b46">5.2 中期创新（B阶段，第4–6周期）<a class="headerlink" href="#52-b46" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>创新</th>
+<th>新颖性状态</th>
+<th>最接近的先前工作</th>
+<th>新在何处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>通过LLM的文本增强实体标识符</td>
+<td><strong>新颖</strong></td>
+<td>TEST [44]（文本原型）</td>
+<td>实体特定的元数据描述作为标识符</td>
+</tr>
+<tr>
+<td>面向ST流水线设计的LLM智能体</td>
+<td><strong>新颖</strong></td>
+<td>TrafficGPT [54]、AI Scientist [57]</td>
+<td>领域特定的ST流水线自动化</td>
+</tr>
+<tr>
+<td>多模态实体融合（时序+文本+坐标+卫星）</td>
+<td><strong>新颖</strong></td>
+<td>Time-MMD [117]（仅时序+文本）</td>
+<td>完整的四模态实体表示融合</td>
+</tr>
+<tr>
+<td>实体感知的跨域ST基础模型</td>
+<td><strong>新颖</strong></td>
+<td>UniST [31]（仅城市）、Moirai [35]（无实体）</td>
+<td>实体条件化 + 跨域预训练</td>
+</tr>
+<tr>
+<td>面向ST的实体条件化Mamba</td>
+<td><strong>新颖</strong></td>
+<td>SpoT-Mamba [28]（无实体条件化）</td>
+<td>在SSM选择机制中注入实体标识符</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-c7">5.3 长期创新（C阶段，第7周期+）<a class="headerlink" href="#53-c7" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>创新</th>
+<th>新颖性状态</th>
+<th>最接近的先前工作</th>
+<th>新在何处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全栈ST智能平台</td>
+<td><strong>新颖</strong></td>
+<td>TSLib [73]、LibCity [79]（仅模型库）</td>
+<td>智能体 + BI + 实体感知 + 插件架构</td>
+</tr>
+<tr>
+<td>面向ST数据的LLM驱动自适应数据摄入</td>
+<td><strong>新颖</strong></td>
+<td>Data-Copilot [55]（仅表格）</td>
+<td>基于NL的ST数据映射，含图拓扑</td>
+</tr>
+<tr>
+<td>带领域特定GUI的垂直领域插件</td>
+<td><strong>ST领域新颖</strong></td>
+<td>Hugging Face Spaces（仅NLP）</td>
+<td>水文、医疗等领域特定GUI</td>
+</tr>
+<tr>
+<td>通过实体感知ST模型的围手术期患者聚类</td>
+<td><strong>新颖应用</strong></td>
+<td>围手术期GNN [84]（单任务）</td>
+<td>实体标识符框架应用于临床时序</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6">6. 评估协议<a class="headerlink" href="#6" title="Permanent link">&para;</a></h2>
+<h3 id="61">6.1 数据集<a class="headerlink" href="#61" title="Permanent link">&para;</a></h3>
+<p><strong>主要——同质多实体（A–B阶段）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>实体数</th>
+<th>长度</th>
+<th>领域</th>
+<th>来源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Traffic</td>
+<td>862</td>
+<td>17,544</td>
+<td>道路传感器</td>
+<td>TSLib / Caltrans PEMS</td>
+</tr>
+<tr>
+<td>Electricity</td>
+<td>321</td>
+<td>26,304</td>
+<td>电力客户</td>
+<td>TSLib / UCI</td>
+</tr>
+<tr>
+<td>Swiss-River-1990</td>
+<td>~50</td>
+<td>~10,000</td>
+<td>测量站</td>
+<td>LIULIAN（新颖）</td>
+</tr>
+<tr>
+<td>PEMS03/04/07/08</td>
+<td>170–883</td>
+<td>16,992–26,208</td>
+<td>交通传感器</td>
+<td>STGNN基准</td>
+</tr>
+<tr>
+<td>Solar-Energy</td>
+<td>137</td>
+<td>~52,000</td>
+<td>光伏电站</td>
+<td>NREL</td>
+</tr>
+<tr>
+<td>METR-LA</td>
+<td>207</td>
+<td>~34,272</td>
+<td>交通速度</td>
+<td>DCRNN基准</td>
+</tr>
+<tr>
+<td>PEMS-BAY</td>
+<td>325</td>
+<td>~52,116</td>
+<td>交通速度</td>
+<td>DCRNN基准</td>
+</tr>
+</tbody>
+</table>
+<p><strong>负控制——异构通道</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>通道数</th>
+<th>为何为负控制</th>
+<th>来源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Weather</td>
+<td>21</td>
+<td>不同物理变量</td>
+<td>TSLib / Max Planck</td>
+</tr>
+<tr>
+<td>ETTh1/ETTm1</td>
+<td>7</td>
+<td>异构测量</td>
+<td>TSLib</td>
+</tr>
+<tr>
+<td>ILI</td>
+<td>7</td>
+<td>不同统计指标</td>
+<td>CDC</td>
+</tr>
+</tbody>
+</table>
+<p><strong>扩展领域（B–C阶段）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>数据集</th>
+<th>领域</th>
+<th>实体类型</th>
+<th>来源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MIMIC-III/IV</td>
+<td>ICU患者</td>
+<td>患者</td>
+<td>PhysioNet</td>
+</tr>
+<tr>
+<td>北京空气质量</td>
+<td>环境</td>
+<td>监测站</td>
+<td>UCI</td>
+</tr>
+<tr>
+<td>纽约出租车/共享单车</td>
+<td>城市出行</td>
+<td>区域/站点</td>
+<td>NYC TLC / Citi Bike</td>
+</tr>
+<tr>
+<td>伦敦智能电表</td>
+<td>能源</td>
+<td>家庭</td>
+<td>UK Power Networks</td>
+</tr>
+<tr>
+<td>围手术期（私有）</td>
+<td>医疗</td>
+<td>患者</td>
+<td>中国药科大学 / Inselspital</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62">6.2 评估指标<a class="headerlink" href="#62" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>主要</strong>：MSE、MAE（标准TSLib协议）</li>
+<li><strong>次要</strong>：RMSE、MAPE、NSE（水文特定）</li>
+<li><strong>统计</strong>：3+种子的均值 ± 标准差；Wilcoxon符号秩检验；Nemenyi CD图</li>
+<li><strong>概率</strong>（适用时）：CRPS、校准、区间覆盖</li>
+</ul>
+<h3 id="63">6.3 基线方法<a class="headerlink" href="#63" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>无标识符</td>
+<td>共享模型，所有架构</td>
+</tr>
+<tr>
+<td>各标识符类型</td>
+<td>embedding, onehot, sinusoidal, random, coordinates</td>
+</tr>
+<tr>
+<td>隐式实体</td>
+<td>iTransformer [4]（变量即token）</td>
+</tr>
+<tr>
+<td>显式实体（简单）</td>
+<td>STID [9]（MLP + 空间ID）</td>
+</tr>
+<tr>
+<td>通道token</td>
+<td>CARD [5]</td>
+</tr>
+<tr>
+<td>基于图</td>
+<td>Graph WaveNet [15]、MTGNN [16]、DCRNN [14]</td>
+</tr>
+<tr>
+<td>基础模型</td>
+<td>Chronos [34]、Moirai [35]、TimesFM [33]</td>
+</tr>
+<tr>
+<td>基于LLM</td>
+<td>Time-LLM [43]、GPT4TS [42]</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7">7. 资源需求<a class="headerlink" href="#7" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>资源</th>
+<th>A阶段（第1–5月）</th>
+<th>B阶段（第5–12月）</th>
+<th>C阶段（第8–18月）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPU小时</td>
+<td>~1,500</td>
+<td>~5,000</td>
+<td>~3,000</td>
+</tr>
+<tr>
+<td>存储</td>
+<td>100 GB</td>
+<td>500 GB</td>
+<td>1 TB</td>
+</tr>
+<tr>
+<td>人力投入</td>
+<td>5个月（AI辅助）</td>
+<td>7个月</td>
+<td>10个月</td>
+</tr>
+<tr>
+<td>计算资源</td>
+<td>RTX 4090集群</td>
+<td>A100集群</td>
+<td>A100/H100集群</td>
+</tr>
+<tr>
+<td>LLM API费用</td>
+<td>最少</td>
+<td>~$500/月</td>
+<td>~$1,000/月</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8">8. 风险分析与缓解<a class="headerlink" href="#8" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>风险</th>
+<th>可能性</th>
+<th>影响</th>
+<th>缓解措施</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>实体标识符在大多数数据集上收益甚微</td>
+<td>中</td>
+<td>高</td>
+<td>定位为负面结果；聚焦"何时"而非"是否"</td>
+</tr>
+<tr>
+<td>随机基线匹配学习嵌入</td>
+<td>中</td>
+<td>中</td>
+<td>重要发现——实体区分 &gt;&gt; 表示质量</td>
+</tr>
+<tr>
+<td>LLM实体描述未能优于数值嵌入</td>
+<td>中</td>
+<td>中</td>
+<td>聚焦零样本/迁移场景，文本在此有独特价值</td>
+</tr>
+<tr>
+<td>ST基础模型无法跨域泛化</td>
+<td>中</td>
+<td>高</td>
+<td>从相似领域开始（交通→水文）；使用领域适配器</td>
+</tr>
+<tr>
+<td>平台开发耗时超预期</td>
+<td>高</td>
+<td>中</td>
+<td>优先研究论文；平台增量开发</td>
+</tr>
+<tr>
+<td>合作方数据集未能按时获取</td>
+<td>中</td>
+<td>中</td>
+<td>使用公开数据集作为备选；领域论文调整时间线</td>
+</tr>
+<tr>
+<td>Tan等 [51]的批评适用于我们的LLM方法</td>
+<td>中</td>
+<td>中</td>
+<td>设计控制消融；聚焦实体特定贡献</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9">9. 合作网络<a class="headerlink" href="#9" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>合作方</th>
+<th>领域</th>
+<th>状态</th>
+<th>角色</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>伯尔尼大学（PRG）</td>
+<td>水文、图ML</td>
+<td>活跃</td>
+<td>瑞士河流数据、图匹配</td>
+</tr>
+<tr>
+<td>伯尔尼应用科学大学（BFH）</td>
+<td>水文、泥石流检测</td>
+<td>活跃</td>
+<td>领域专长、私有数据</td>
+</tr>
+<tr>
+<td>中国药科大学</td>
+<td>医疗（围手术期）</td>
+<td>建立联系中</td>
+<td>临床数据集、领域专长</td>
+</tr>
+<tr>
+<td>伯尔尼大学医院（Inselspital）</td>
+<td>医疗（围手术期）</td>
+<td>建立联系中</td>
+<td>临床数据、验证</td>
+</tr>
+<tr>
+<td>中国人民大学</td>
+<td>灾害管理</td>
+<td>已建立联系</td>
+<td>多模态地震数据集</td>
+</tr>
+<tr>
+<td>数字金融服务研究中心</td>
+<td>金融（N-Banker）</td>
+<td>紧密联系</td>
+<td>金融AI智能体系统</td>
+</tr>
+<tr>
+<td>西瑞士应用科学大学（HES-SO）</td>
+<td>文档分析、工程</td>
+<td>前工作机构</td>
+<td>历史文档、工程图纸</td>
+</tr>
+<tr>
+<td>中国科学院工程热物理研究所</td>
+<td>材料科学</td>
+<td>已建立联系</td>
+<td>熔池动力学数据</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-1">10. 第一周期详细执行计划（1个月）<a class="headerlink" href="#10-1" title="Permanent link">&para;</a></h2>
+<h3 id="1_2">第1周：基础设施与核心实验<a class="headerlink" href="#1_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] 验证所有48个矩阵任务通过空运行</li>
+<li>[ ] 将iTransformer、TimeMixer、TimeXer添加到实验矩阵</li>
+<li>[ ] 添加PEMS04、PEMS08和负控制数据集</li>
+<li>[ ] 将默认种子数增加到3个（2024、2025、2026）</li>
+<li>[ ] 设置预测长度扫描（96、192、336、720）</li>
+<li>[ ] 向集群提交阶段1A核心矩阵</li>
+<li>[ ] 监控并修复流水线问题</li>
+</ul>
+<h3 id="2_1">第2周：全面实验运行<a class="headerlink" href="#2_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] 验证阶段1A结果；重新运行失败实验</li>
+<li>[ ] 提交扩展模型实验</li>
+<li>[ ] 提交负控制（Weather、ETTh1 × 所有模型 × none+embedding）</li>
+<li>[ ] 计算实体间相关矩阵</li>
+<li>[ ] 运行学习嵌入的t-SNE/UMAP可视化</li>
+</ul>
+<h3 id="3_1">第3周：分析与图表<a class="headerlink" href="#3_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] 计算跨种子的均值 ± 标准差</li>
+<li>[ ] Wilcoxon符号秩检验：每种模式 vs none</li>
+<li>[ ] 性能提升热图（数据集 × 模型 × 模式）</li>
+<li>[ ] 实体数量对标识符收益的影响</li>
+<li>[ ] 标识符类型推荐流程图</li>
+</ul>
+<h3 id="4_1">第4周：论文撰写<a class="headerlink" href="#4_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] 引言，对标PatchTST CI争论的定位</li>
+<li>[ ] 相关工作（综合版，源自第2节）</li>
+<li>[ ] 方法论（LIULIAN框架、标识符类型、注入机制）</li>
+<li>[ ] 结果，含表格、图表、消融研究</li>
+<li>[ ] 实用指导方针部分</li>
+<li>[ ] 摘要、结论、补充材料</li>
+<li>[ ] 提交至arXiv；准备特定会议投稿</li>
+</ul>
+<hr />
+<h2 id="11_1">11. 全阶段研究贡献总结<a class="headerlink" href="#11_1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>周期</th>
+<th>标题</th>
+<th>类型</th>
+<th>创新度</th>
+<th>目标会议</th>
+<th>时间线</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong></td>
+<td>实体标识符系统消融</td>
+<td>基准</td>
+<td><strong>高</strong></td>
+<td>NeurIPS D&amp;B / AAAI</td>
+<td>第1月</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>AdaptID：自适应标识符选择</td>
+<td>方法</td>
+<td><strong>非常高</strong></td>
+<td>ICML / NeurIPS</td>
+<td>第2–3月</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>统一标识符 + GNN框架</td>
+<td>框架</td>
+<td><strong>高</strong></td>
+<td>KDD / AAAI</td>
+<td>第3–5月</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>EntityLLM：LLM增强实体表示</td>
+<td>愿景+方法</td>
+<td><strong>非常高</strong></td>
+<td>ICLR / NeurIPS</td>
+<td>第5–8月</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td>UniEntity：实体感知ST基础模型</td>
+<td>基础</td>
+<td><strong>极高</strong></td>
+<td>ICML / Nature MI</td>
+<td>第7–10月</td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td>带实体条件化的ST-Mamba</td>
+<td>方法</td>
+<td><strong>高</strong></td>
+<td>ICLR / ICML</td>
+<td>第9–12月</td>
+</tr>
+<tr>
+<td><strong>7</strong></td>
+<td>LIULIAN平台系统论文</td>
+<td>系统</td>
+<td><strong>非常高</strong></td>
+<td>VLDB / KDD Demo</td>
+<td>第8–14月</td>
+</tr>
+<tr>
+<td><strong>D1</strong></td>
+<td>瑞士河流水温</td>
+<td>领域</td>
+<td>中高</td>
+<td>Env. Data Science</td>
+<td>第10–12月</td>
+</tr>
+<tr>
+<td><strong>D2</strong></td>
+<td>围手术期患者预测</td>
+<td>领域</td>
+<td>高</td>
+<td>npj Digital Med.</td>
+<td>第12–15月</td>
+</tr>
+<tr>
+<td><strong>D3</strong></td>
+<td>灾害多模态ST分析</td>
+<td>领域</td>
+<td>高</td>
+<td>Nature Comms. / KDD</td>
+<td>第14–18月</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="12-2">12. 长期愿景（第2年+）<a class="headerlink" href="#12-2" title="Permanent link">&para;</a></h2>
+<p>在核心18个月计划之后，LIULIAN旨在成为<strong>时空智能的标准开源平台</strong>，类似于Hugging Face Transformers之于NLP：</p>
+<ol>
+<li><strong>社区驱动的模型库</strong>：研究者通过适配器模式贡献ST模型</li>
+<li><strong>基准即服务</strong>：跨域标准化评估（回应TSLib [73] / TFB [120]的批评）</li>
+<li><strong>智能体市场</strong>：面向不同垂直领域的领域特定LLM智能体</li>
+<li><strong>Innosuisse创新项目</strong>：面向产业化部署的资助申请</li>
+<li><strong>教育工具</strong>：面向时空ML的交互式教程（基于MkDocs，已部分实现）</li>
+</ol>
+<hr />
+<h2 id="_25">参考文献<a class="headerlink" href="#_25" title="Permanent link">&para;</a></h2>
+<p>[1] Nie, Y., et al. "A Time Series is Worth 64 Words: Long-term Forecasting with Transformers." ICLR 2023.
+[2] Fey, M. &amp; Lenssen, J.E. "Fast Graph Representation Learning with PyTorch Geometric." ICLR 2019 Workshop.
+[3] Alexandrov, A., et al. "GluonTS: Probabilistic and Neural Time Series Modeling in Python." JMLR 2020.
+[4] Liu, Y., et al. "iTransformer: Inverted Transformers Are Effective for Time Series Forecasting." ICLR 2024.
+[5] Wang, X., et al. "CARD: Channel Aligned Robust Blend Transformer for Time Series Forecasting." ICLR 2024.
+[6] Zhang, Y. &amp; Yan, J. "Crossformer: Transformer Utilizing Cross-Dimension Dependency for Multivariate Time Series Forecasting." ICLR 2023.
+[7] Chen, S., et al. "TSMixer: An All-MLP Architecture for Time Series Forecasting." NeurIPS 2023.
+[8] Gao, S., et al. "Client: Cross-variable Linear Integrated Enhanced Transformer for Multivariate Long-Term Time Series Forecasting." KDD 2024.
+[9] Shao, Z., et al. "Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate Time Series Forecasting." CIKM 2022.
+[10] Das, A., et al. "Long-term Forecasting with TiDE: Time-series Dense Encoder." TMLR 2023.
+[11] Wang, Y., et al. "TimeXer: Empowering Transformers for Time Series Forecasting with Exogenous Variables." NeurIPS 2024.
+[12] Gao, S., et al. "UniTS: Building a Unified Time Series Model." NeurIPS 2024.
+[13] Lin, H., et al. "TRA: Temporal Routing Adaptor for Entity-Aware Stock Forecasting." AAAI 2023.
+[14] Li, Y., et al. "Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic Forecasting." ICLR 2018.
+[15] Wu, Z., et al. "Graph WaveNet for Deep Spatial-Temporal Graph Modeling." IJCAI 2019.
+[16] Wu, Z., et al. "Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks." KDD 2020.
+[17] Shao, Z., et al. "Pre-training Enhanced Spatial-Temporal Graph Neural Network for Multivariate Time Series Forecasting." KDD 2022.
+[18] Deng, J., et al. "ST-Norm: Spatial and Temporal Normalization for Multi-variate Time Series Forecasting." KDD 2021.
+[19] Jiang, R., et al. "Spatio-Temporal Meta-Graph Learning for Traffic Forecasting." AAAI 2023.
+[20] Jiang, J., et al. "PDFormer: Propagation Delay-Aware Dynamic Long-Range Transformer for Traffic Flow Prediction." AAAI 2023.
+[21] Liu, H., et al. "Spatio-Temporal Adaptive Embedding Makes Vanilla Transformer SOTA for Traffic Forecasting." CIKM 2023.
+[22] Lee, H., et al. "TESTAM: A Time-Enhanced Spatio-Temporal Attention Model with Mixture of Experts." ICLR 2024.
+[23] Cini, A., et al. "Scalable Spatiotemporal Graph Neural Networks." AAAI 2023.
+[24] Han, J., et al. "BigST: Linear Complexity Spatio-Temporal Graph Neural Network for Traffic Forecasting on Large-Scale Road Networks." VLDB 2024.
+[25] Tang, J., et al. "EasyST: A Simple Framework for Spatio-Temporal Prediction." arXiv 2024.
+[26] Liang, Y., et al. "AirFormer: Predicting Nationwide Air Quality in China with Transformers." AAAI 2023.
+[27] Gao, Z., et al. "EarthFormer: Exploring Space-Time Transformers for Earth System Forecasting." NeurIPS 2022.
+[28] Choi, J., et al. "SpoT-Mamba: Learning Long-Range Dependency on Spatio-Temporal Graphs with Selective State Spaces." IJCAI 2024 Workshop.
+[29] Li, L., et al. "STG-Mamba: Spatial-Temporal Graph Learning via Selective State Space Model." arXiv 2024.
+[30] Li, Z., et al. "GPT-ST: Generative Pre-Training of Spatio-Temporal Graph Neural Networks." NeurIPS 2023.
+[31] Yuan, Y., et al. "UniST: A Prompt-Empowered Universal Model for Urban Spatio-Temporal Prediction." KDD 2024.
+[32] Li, Z., et al. "OpenCity: Open Spatio-Temporal Foundation Models for Traffic Prediction." ACM TIST 2024.
+[33] Das, A., et al. "A Decoder-Only Foundation Model for Time-Series Forecasting." ICML 2024.
+[34] Ansari, A., et al. "Chronos: Learning the Language of Time Series." ICML 2024.
+[35] Woo, G., et al. "Unified Training of Universal Time Series Forecasting Transformers." ICML 2024.
+[36] Liu, Y., et al. "Timer: Generative Pre-trained Transformers Are Large Time Series Models." ICML 2024.
+[37] Goswami, M., et al. "MOMENT: A Family of Open Time-Series Foundation Models." ICML 2024.
+[38] Rasul, K., et al. "Lag-Llama: Towards Foundation Models for Probabilistic Time Series Forecasting." ICML 2024.
+[39] Ekambaram, V., et al. "TTM: Fast Pre-trained Models for Enhanced Zero/Few-Shot Forecasting." NeurIPS 2024.
+[40] Shi, X., et al. "Time-MoE: Billion-Scale Time Series Foundation Models with Mixture of Experts." arXiv 2024.
+[41] Garza, A. &amp; Mergenthaler-Canseco, M. "TimeGPT-1." arXiv 2023.
+[42] Zhou, T., et al. "One Fits All: Power General Time Series Analysis by Pretrained LM." NeurIPS 2023.
+[43] Jin, M., et al. "Time-LLM: Time Series Forecasting by Reprogramming Large Language Models." ICLR 2024.
+[44] Sun, C., et al. "TEST: Text Prototype Aligned Embedding to Activate LLM's Ability for Time Series." ICLR 2024.
+[45] Liu, X., et al. "UniTime: A Language-Empowered Unified Model for Cross-Domain Time Series Forecasting." WWW 2024.
+[46] Liu, C., et al. "CALF: Aligning LLMs for Time Series Forecasting via Cross-Modal Fine-Tuning." NeurIPS 2024.
+[47] Pan, S., et al. "S2IP-LLM: Semantic Space Informed Prompt Learning with LLM for Time Series Forecasting." ICML 2024.
+[48] Gruver, N., et al. "Large Language Models Are Zero-Shot Time Series Forecasters." NeurIPS 2023.
+[49] Cao, D., et al. "TEMPO: Prompt-based Generative Pre-trained Transformer for Time Series Forecasting." ICLR 2024.
+[50] Liu, Y., et al. "AutoTimes: Autoregressive Time Series Forecasting via Large Language Models." NeurIPS 2024.
+[51] Tan, M., et al. "Are Language Models Actually Useful for Time Series Forecasting?" NeurIPS 2024.
+[52] Li, Z., et al. "UrbanGPT: Spatio-Temporal Large Language Models." KDD 2024.
+[53] Cao, D., et al. "ST-LLM: Large Language Models Are Effective Temporal Learners for Spatio-Temporal Forecasting." arXiv 2024.
+[54] Zhang, S., et al. "TrafficGPT: Viewing, Processing and Interacting with Traffic Foundation Models." Transport Policy 2024.
+[55] Zhang, W., et al. "Data-Copilot: Bridging Billions of Data and Humans with Autonomous Workflow." arXiv 2023.
+[56] Ma, P., et al. "InsightPilot: An LLM-Empowered Automated Data Exploration System." VLDB 2024.
+[57] Lu, C., et al. "The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery." arXiv 2024.
+[58] Guo, S., et al. "DS-Agent: Automated Data Science by Empowering Large Language Models with Case-Based Reasoning." ICML 2024.
+[59] Huang, Q., et al. "MLAgentBench: Evaluating Language Agents on Machine Learning Experimentation." ICML 2024.
+[60] Zhang, S., et al. "AutoML-GPT: Automatic Machine Learning with GPT." arXiv 2023.
+[61] Li, Z., et al. "MatPlotAgent: Method and Evaluation for LLM-Based Agentic Scientific Data Visualization." ACL 2024.
+[62] Baek, J., et al. "ResearchAgent: Iterative Research Idea Generation over Scientific Literature with Large Language Models." ACL 2024.
+[63] Bran, A.M., et al. "ChemCrow: Augmenting Large Language Models with Chemistry Tools." Nature Machine Intelligence 2024.
+[64] Boiko, D.A., et al. "An Autonomous Agent for Scientific Discovery." Nature 2023.
+[65] Dibia, V. "LIDA: A Tool for Automatic Generation of Grammar-Agnostic Visualizations and Infographics using Large Language Models." ACL 2023.
+[66] Pourreza, M. &amp; Rafiei, D. "DIN-SQL: Decomposed In-Context Learning of Text-to-SQL with Self-Correction." NeurIPS 2023.
+[67] Gao, D., et al. "DAIL-SQL: Efficient and Effective Few-Shot Text-to-SQL." VLDB 2024.
+[68] Narechania, A., et al. "NL4DV: A Toolkit for Generating Analytic Specifications from Natural Language." IEEE VIS 2023.
+[69] Maddigan, P. &amp; Susnjak, T. "Chat2VIS: Generating Data Visualizations via Natural Language." IEEE Access 2023.
+[70] Li, Z., et al. "TableGPT: Towards Unifying Tables, Nature Language and Commands into One GPT." arXiv 2023.
+[71] Yu, K., et al. "Rath: Augmented Analytics with Automated Insight Discovery." GitHub / Kanaries 2022–2024.
+[72] Chen, Y., et al. "Sheet2Report: Automated Report Generation from Spreadsheets using LLMs." arXiv 2024.
+[73] Wu, H., et al. "TimesNet / TSLib: A Unified Library for Time Series Analysis." NeurIPS 2023 D&amp;B.
+[74] Shao, Z., et al. "BasicTS: An Open-Source Fair Benchmark for Time Series Prediction." NeurIPS 2023 D&amp;B.
+[75] Cini, A., et al. "Torch Spatiotemporal (tsl)." JMLR MLOSS 2024.
+[76] Olivares, K., et al. "NeuralForecast: User-Friendly State-of-the-Art Neural Forecasting Models." arXiv 2022.
+[77] Herzen, J., et al. "Darts: User-Friendly Modern Machine Learning for Time Series." JMLR 2022.
+[78] Du, W. "PyPOTS: A Python Toolbox for Data Mining on Partially-Observed Time Series." ICLR 2024.
+[79] Wang, J., et al. "LibCity: An Open Library for Traffic Flow Prediction." SIGSPATIAL 2021.
+[80] Tipirneni, S. &amp; Reddy, C.K. "STraTS: Self-Supervised Sparse Transformer for Clinical Time Series." MLHC 2022.
+[81] Kim, Y., et al. "MedGTX: Multimodal Graph-Transformer for Patient Outcome Prediction." CHIL 2023.
+[82] Li, C., et al. "MISTS: Multi-Input Multi-Output Irregular Sampled Time Series Forecasting for ICU." AAAI 2024.
+[83] Jiang, Z., et al. "MedTsLLM: Leveraging LLMs for Multimodal Medical Time Series Analysis." arXiv 2024.
+[84] Gao, Y., et al. "Perioperative Outcome Prediction with Graph Neural Networks." npj Digital Medicine 2024.
+[85] Various. "GAGNN: Group-Aware Graph Neural Network for Nationwide City Air Quality Forecasting." ACM TKDD 2024.
+[86] Xu, Z., et al. "FloodCast: Flood Forecasting with Spatio-Temporal Graph Neural Networks." arXiv 2023.
+[87] Various. "Spatio-Temporal Feature Graph Neural Network for River Water Quality." Water Research 2025.
+[88] Zanfei, A., et al. "Spatio-Temporal Graph Neural Networks for Water Distribution Network Monitoring." Water Research 2023.
+[89] Various. "Multi-scale Spatio-Temporal Graph Neural Network for Water Demand Forecasting." Water Research 2025.
+[90] Yang, H., et al. "FinGPT: Open-Source Financial Large Language Models." NeurIPS 2023 Workshop.
+[91] Li, Y., et al. "MASTER: Market-Guided Stock Transformer for Stock Price Forecasting." AAAI 2024.
+[92] Jakubik, J., et al. "Prithvi: A Foundation Model for Geospatial AI." arXiv 2023.
+[93] Kuckreja, K., et al. "GeoChat: Grounded Large Language Model for Remote Sensing." CVPR 2024.
+[94] Klemmer, K., et al. "SatCLIP: Global, General-Purpose Location Embeddings with Satellite Imagery." NeurIPS 2023 Workshop.
+[95] Various. "HeatGNN: Heterogeneous Epidemic-Aware Transmission Graph Neural Network." arXiv 2024.
+[96] Balaji, B., et al. "Brick Schema + ML for Smart Building Analytics." BuildSys 2022.
+[97] Vazquez-Canteli, J., et al. "CityLearn: A Gym Environment for Building Energy Coordination." Applied Energy 2023.
+[98] Yue, Z., et al. "TS2Vec: Towards Universal Representation of Time Series." AAAI 2022.
+[99] Zhang, X., et al. "Self-Supervised Contrastive Pre-Training for Time Series via Time-Frequency Consistency." NeurIPS 2022.
+[100] Dong, J., et al. "SimMTM: A Simple Pre-Training Framework for Masked Time-Series Modeling." NeurIPS 2023.
+[101] Zhang, Q., et al. "AutoST: Automated Spatio-Temporal Graph Contrastive Learning." WWW 2023.
+[102] Zhang, Q., et al. "STAG: Spatial-Temporal Graph Learning with Adversarial Contrastive Adaptation." ICML 2023.
+[103] Xia, Y., et al. "CaST: Deciphering Spatio-Temporal Graph Forecasting: A Causal Lens and Treatment." NeurIPS 2023.
+[104] Wang, B., et al. "STONE: A Spatio-temporal OOD Learning Framework." KDD 2024.
+[105] Ragab, M., et al. "ADATIME: A Benchmarking Suite for Domain Adaptation on Time Series Data." ACM TKDD 2023.
+[106] He, X., et al. "RAINCOAT: An Adaptive Framework for Robust Domain Adaptation in Time Series." ICML 2023.
+[107] Zhang, J., et al. "STExplainer: A Framework for Explaining Spatio-Temporal Graph Neural Networks." KDD 2023.
+[108] Bento, J., et al. "TimeSHAP: Explaining Recurrent Models through Sequence Perturbations." KDD 2021.
+[109] Lim, B., et al. "Temporal Fusion Transformers for Interpretable Multi-horizon Time Series Forecasting." IJF 2021.
+[110] Hu, E.J., et al. "LoRA: Low-Rank Adaptation of Large Language Models." ICLR 2022.
+[111] Molino, P., et al. "Ludwig: A Type-Based Declarative Deep Learning Framework." JMLR 2023.
+[112] Contributors, OpenMMLab. "MMEngine: OpenMMLab Foundational Library for Training Deep Learning Models." 2022.
+[113] Yadan, O. "Hydra: A Framework for Elegantly Configuring Complex Applications." Facebook Research 2020.
+[114] Rossi, E., et al. "Temporal Graph Networks for Deep Learning on Dynamic Graphs." ICML 2020 Workshop.
+[115] Yu, L., et al. "DyGFormer: Towards Better Dynamic Graph Learning." NeurIPS 2023.
+[116] You, J., et al. "ROLAND: Graph Learning Framework for Dynamic Social Networks." KDD 2022.
+[117] Liu, H., et al. "Time-MMD: A New Multi-Domain Multimodal Dataset for Time Series Analysis." NeurIPS 2024 D&amp;B.
+[118] Xie, Z., et al. "ChatTS: Aligning Time Series with LLMs via Synthetic Data." arXiv 2024.
+[119] Stewart, A., et al. "TorchGeo: Deep Learning with Geospatial Data." SIGSPATIAL 2022.
+[120] Qiu, X., et al. "TFB: Towards Comprehensive and Fair Benchmarking of Time Series Forecasting Methods." ICML 2024.
+[121] Talukder, S., et al. "TOTEM: TOkenized Time Series EMbeddings for General Time Series Analysis." NeurIPS 2024.
+[122] Li, Y., et al. "HITL-TSF: Human-in-the-Loop Time Series Forecasting." arXiv 2024.
+[123] Shi, D., et al. "Calliope: Automatic Visual Data Stories from Spreadsheets." IEEE TVCG 2023.
+[124] Sultan, M., et al. "DataTales: Investigating the Use of Large Language Models for Authoring Data-Driven Articles." CHI 2024.
+[125] Thelen, A., et al. "TwinGen: Generative Digital Twins with Physics-Informed Neural Networks." Nature Machine Intelligence 2023.
+[126] Wu, H., et al. "Transolver: A Fast Transformer Solver for PDEs on General Geometries." ICML 2024.
+[127] Nguyen, P.C.H., et al. "PARCv2: Physics-aware Recurrent Convolutional Neural Networks for Spatiotemporal Dynamics." ICML 2024.</p>
+<hr />
+<h2 id="aliulian">附录A：LIULIAN实体标识符架构图<a class="headerlink" href="#aliulian" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>                    ┌─────────────────────────────────────┐
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>                    │         实体标识符层                   │
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>                    │                                       │
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>                    │  none ──── 直通                       │
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>                    │  embedding ── nn.Embedding → 投影     │
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>                    │  onehot ──── I_N矩阵 → 投影           │
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>                    │  sinusoidal ─ PE(idx) → 投影          │
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>                    │  random ──── hash(seed:name) → 投影   │
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>                    │  coordinates ─ (lat,lon) → 投影       │
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>                    │  text ─────── LLM(描述) → 投影        │
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>                    └──────────┬────────────────────────────┘
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>                               │
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>              ┌────────────────┼────────────────┐
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>              │                │                │
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    ┌─────────▼──────┐  ┌─────▼──────┐  ┌──────▼─────────┐
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    │  EntityWrapper  │  │ Channel    │  │ Channel        │
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    │  (逐实体)       │  │ Entity     │  │ Transparent    │
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    │                 │  │ Wrapper    │  │ Wrapper        │
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>    │  emb → 拼接     │  │ (学习型)   │  │ (预计算)       │
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    │  → 投影         │  │            │  │                │
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>    │  → 内部模型     │  │ 逐通道emb  │  │ 逐通道特征     │
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>    └─────────────────┘  │ → 拼接     │  │ → 拼接         │
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>                         │ → 投影     │  │ → 投影         │
+<a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>                         │ → 内部     │  │ → 内部         │
+<a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>                         └────────────┘  └────────────────┘
+<a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>                                ↓
+<a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>              ┌──────────────────────────────────┐
+<a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>              │       空间模块（可选）             │
+<a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a>              │  • 1-hop邻居聚合                  │
+<a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a>              │  • GNN消息传递                     │
+<a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a>              │  • 自适应图学习                    │
+<a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a>              │  • Mamba空间扫描                   │
+<a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a>              └──────────┬───────────────────────┘
+<a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a>                         ↓
+<a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a>              ┌──────────────────────────────────┐
+<a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a>              │          预测模型                  │
+<a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a>              │  LSTM / PatchTST / DLinear /       │
+<a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a>              │  iTransformer / TimeMixer / Mamba / │
+<a id="__codelineno-3-39" name="__codelineno-3-39" href="#__codelineno-3-39"></a>              │  Time-LLM / Chronos / Moirai       │
+<a id="__codelineno-3-40" name="__codelineno-3-40" href="#__codelineno-3-40"></a>              └────────────────────────────────────┘
+</code></pre></div>
+<h2 id="b">附录B：代码制品<a class="headerlink" href="#b" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>文件</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>experiments/entity_identifier/run.py</code></td>
+<td>矩阵实验运行器</td>
+</tr>
+<tr>
+<td><code>experiments/entity_identifier/matrix.py</code></td>
+<td>矩阵定义和任务扩展</td>
+</tr>
+<tr>
+<td><code>experiments/entity_identifier/compare.py</code></td>
+<td>对比报告生成器</td>
+</tr>
+<tr>
+<td><code>experiments/entity_identifier/submit_slurm.py</code></td>
+<td>Slurm集群调度器</td>
+</tr>
+<tr>
+<td><code>liulian/models/torch/entity_mixin.py</code></td>
+<td>EntityWrapper, ChannelEntityWrapper, ChannelTransparentWrapper</td>
+</tr>
+<tr>
+<td><code>liulian/data/ts/timeseriesdataset.py</code></td>
+<td>实体特征和透明模式数据层</td>
+</tr>
+<tr>
+<td><code>experiments/run.py</code></td>
+<td>统一实验入口点</td>
+</tr>
+<tr>
+<td><code>tests/runtime/test_entity_identifier_pipeline.py</code></td>
+<td>流水线测试（15个测试）</td>
+</tr>
+</tbody>
+</table>
+<h2 id="c">附录C：新颖性验证总结<a class="headerlink" href="#c" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>提议的想法</th>
+<th>是否已发表？</th>
+<th>最接近的工作</th>
+<th>新在何处</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>跨架构的系统性多类型标识符消融</td>
+<td><strong>否</strong></td>
+<td>STID [9]</td>
+<td>多类型、多架构系统研究</td>
+</tr>
+<tr>
+<td>2</td>
+<td>时序实体标识的随机嵌入基线</td>
+<td><strong>否（时序领域）</strong></td>
+<td>NLP随机基线</td>
+<td>时序领域首次控制消融</td>
+</tr>
+<tr>
+<td>3</td>
+<td>ChannelTransparentWrapper架构</td>
+<td><strong>否</strong></td>
+<td>—</td>
+<td>multi-channel TSLib中的预计算特征</td>
+</tr>
+<tr>
+<td>4</td>
+<td>标识符分析的负控制数据集</td>
+<td><strong>否</strong></td>
+<td>—</td>
+<td>明确测试标识符不应有效的场景</td>
+</tr>
+<tr>
+<td>5</td>
+<td>AdaptID：标识符类型门控</td>
+<td><strong>否</strong></td>
+<td>TESTAM [22]（图类型）</td>
+<td>对标识符类型而非图结构门控</td>
+</tr>
+<tr>
+<td>6</td>
+<td>基于LLM的元数据实体图构建</td>
+<td><strong>否</strong></td>
+<td>NLP的LLM知识图谱</td>
+<td>应用于ST传感器网络拓扑</td>
+</tr>
+<tr>
+<td>7</td>
+<td>统一标识符 + GNN框架</td>
+<td><strong>否</strong></td>
+<td>STID [9]、GWN [15]各自独立</td>
+<td>系统桥接两个研究社区</td>
+</tr>
+<tr>
+<td>8</td>
+<td>实体文本描述作为LLM提示</td>
+<td><strong>否</strong></td>
+<td>TEST [44]（原型）</td>
+<td>实体特定元数据，非通用原型</td>
+</tr>
+<tr>
+<td>9</td>
+<td>面向ST流水线设计的LLM智能体</td>
+<td><strong>否</strong></td>
+<td>TrafficGPT [54]、AI Scientist [57]</td>
+<td>ST领域特定的流水线自动化</td>
+</tr>
+<tr>
+<td>10</td>
+<td>多模态实体融合（时序+文本+坐标+卫星）</td>
+<td><strong>否</strong></td>
+<td>Time-MMD [117]（时序+文本）</td>
+<td>完整四模态实体表示融合</td>
+</tr>
+<tr>
+<td>11</td>
+<td>实体感知的跨域ST基础模型</td>
+<td><strong>否</strong></td>
+<td>UniST [31]（城市）、Moirai [35]（无实体）</td>
+<td>实体条件化 + 跨域</td>
+</tr>
+<tr>
+<td>12</td>
+<td>面向ST的实体条件化Mamba</td>
+<td><strong>否</strong></td>
+<td>SpoT-Mamba [28]（无实体条件化）</td>
+<td>SSM选择机制中的实体标识符</td>
+</tr>
+<tr>
+<td>13</td>
+<td>全栈ST平台（智能体+BI+实体+插件）</td>
+<td><strong>否</strong></td>
+<td>TSLib [73]、LibCity [79]</td>
+<td>完整平台含所有组件</td>
+</tr>
+<tr>
+<td>14</td>
+<td>通过实体感知ST的围手术期患者聚类</td>
+<td><strong>否（此框架）</strong></td>
+<td>围手术期GNN [84]</td>
+<td>实体标识符框架用于临床时序</td>
+</tr>
+<tr>
+<td>15</td>
+<td>ST平台的领域特定垂直插件</td>
+<td><strong>否</strong></td>
+<td>HuggingFace Spaces（仅NLP）</td>
+<td>ST特定的领域插件</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

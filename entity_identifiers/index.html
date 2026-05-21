@@ -1,0 +1,2275 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Research OS for spatiotemporal model experimentation">
+      
+      
+      
+        <link rel="canonical" href="https://jajupmochi.github.io/liulian-python/entity_identifiers/">
+      
+      
+        <link rel="prev" href="../models/torch_models/">
+      
+      
+        <link rel="next" href="../search_spaces/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Entity Identifiers - LIULIAN</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#entity-identifiers" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="LIULIAN" class="md-header__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LIULIAN
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Entity Identifiers
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../cli/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../demo_gallery/" class="md-tabs__link">
+          
+  
+  
+  Demo Gallery
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../models/torch_models/" class="md-tabs__link">
+          
+  
+  
+  Models
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../data_loaders/" class="md-tabs__link">
+          
+  
+  
+  Data
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../tsl_comparison/" class="md-tabs__link">
+          
+  
+  
+  Benchmarks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="LIULIAN" class="md-nav__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LIULIAN
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../forecasting_pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adapter_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adapter Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../manifest_spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifest Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo Gallery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demo Gallery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../demo_gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../demo_patchtst_swiss1990/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PatchTST Swiss River 1990
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/torch_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyTorch Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Entity Identifiers
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Entity Identifiers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-entity-identifiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Entity Identifiers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When to Use Entity Identifiers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#beneficial-homogeneous-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Beneficial (homogeneous entities)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Beneficial (homogeneous entities)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tslib-standard-forecasting-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TSLib / Standard Forecasting Benchmarks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pems-traffic-sensor-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PEMS Traffic Sensor Datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spatial-temporal-graph-forecasting-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spatial-Temporal Graph Forecasting Datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domain-specific-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domain-Specific Datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#not-beneficial-heterogeneous-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not Beneficial (heterogeneous features)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported Modes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#with-tsl-models-via-entityawaremixin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With TSL Models (via EntityAwareMixin)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with-custom-models-lstmadapter-transformerencoderadapter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With Custom Models (LSTMAdapter, TransformerEncoderAdapter)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How It Works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#embedding-mode-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Embedding Mode (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transparent-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transparent Modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-include-sinusoidal-and-random-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why include sinusoidal and random baselines?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matrix-experiment-integration-experimentsentity_identifier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Matrix Experiment Integration (experiments/entity_identifier)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmark-experiments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmark Experiments
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../search_spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Spaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Data
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_loaders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Loaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Benchmarks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tsl_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TSL Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results_json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset_config_audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset Config Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../breakpoint_bridge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Breakpoint Bridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#when-to-use-entity-identifiers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        When to Use Entity Identifiers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="When to Use Entity Identifiers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#beneficial-homogeneous-entities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Beneficial (homogeneous entities)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Beneficial (homogeneous entities)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tslib-standard-forecasting-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TSLib / Standard Forecasting Benchmarks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pems-traffic-sensor-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PEMS Traffic Sensor Datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spatial-temporal-graph-forecasting-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Spatial-Temporal Graph Forecasting Datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domain-specific-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domain-Specific Datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#not-beneficial-heterogeneous-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Not Beneficial (heterogeneous features)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported Modes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#with-tsl-models-via-entityawaremixin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With TSL Models (via EntityAwareMixin)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#with-custom-models-lstmadapter-transformerencoderadapter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        With Custom Models (LSTMAdapter, TransformerEncoderAdapter)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How It Works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#embedding-mode-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Embedding Mode (Recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transparent-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transparent Modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-include-sinusoidal-and-random-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why include sinusoidal and random baselines?
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matrix-experiment-integration-experimentsentity_identifier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Matrix Experiment Integration (experiments/entity_identifier)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmark-experiments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmark Experiments
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="entity-identifiers">Entity Identifiers<a class="headerlink" href="#entity-identifiers" title="Permanent link">&para;</a></h1>
+<p>Entity identifiers allow models to distinguish between different entities (sensors, stations, clients) in multi-entity time series datasets.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Many real-world time-series datasets contain multiple independent entities measuring the same quantity:
+- <strong>Traffic</strong>: 862 road occupancy sensors
+- <strong>Electricity</strong>: 321 household meters
+- <strong>PEMS</strong>: 170–883 traffic flow sensors
+- <strong>Solar-Energy</strong>: 137 PV plant power output sensors
+- <strong>Swiss-river</strong>: river monitoring stations with coordinates</p>
+<p>Entity identifiers inject per-entity information into the model, enabling it to learn entity-specific biases, spatial relationships, and distributional differences.</p>
+<h2 id="when-to-use-entity-identifiers">When to Use Entity Identifiers<a class="headerlink" href="#when-to-use-entity-identifiers" title="Permanent link">&para;</a></h2>
+<h3 id="beneficial-homogeneous-entities">Beneficial (homogeneous entities)<a class="headerlink" href="#beneficial-homogeneous-entities" title="Permanent link">&para;</a></h3>
+<p>Entity identifiers help when features <strong>are</strong> entities — interchangeable channels measuring the same physical quantity.</p>
+<h4 id="tslib-standard-forecasting-benchmarks">TSLib / Standard Forecasting Benchmarks<a class="headerlink" href="#tslib-standard-forecasting-benchmarks" title="Permanent link">&para;</a></h4>
+<p>These datasets are from the <a href="https://github.com/thuml/Time-Series-Library">Time-Series-Library</a> (TSLib) and are used by most long-term forecasting papers including PatchTST, iTransformer, TimesNet, DLinear, Autoformer, FEDformer, Informer, etc.</p>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th style="text-align: right;">#Entities</th>
+<th>Freq</th>
+<th>Why beneficial</th>
+<th>Source &amp; References</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Traffic</strong></td>
+<td style="text-align: right;">862</td>
+<td>Hourly</td>
+<td>Road occupancy % sensors on San Francisco Bay area freeways; all channels measure the same quantity</td>
+<td><a href="http://pems.dot.ca.gov">Caltrans PEMS</a>, introduced by <a href="https://arxiv.org/abs/1703.07015">LSTNet (Lai et al., SIGIR 2018)</a>. Used by Autoformer, FEDformer, PatchTST, iTransformer, TimesNet, DLinear, TimeMixer, etc.</td>
+</tr>
+<tr>
+<td><strong>Electricity</strong> (ECL)</td>
+<td style="text-align: right;">321</td>
+<td>Hourly</td>
+<td>Household electricity consumption in kWh; all channels are interchangeable clients</td>
+<td><a href="https://archive.ics.uci.edu/ml/datasets/ElectricityLoadDiagrams20112014">UCI ML Repository</a>, introduced by <a href="https://arxiv.org/abs/1703.07015">LSTNet (Lai et al., SIGIR 2018)</a>. Used by Autoformer, Informer, PatchTST, iTransformer, Time-LLM, OneFitsAll, CALF, etc.</td>
+</tr>
+<tr>
+<td><strong>Solar-Energy</strong></td>
+<td style="text-align: right;">137</td>
+<td>10-min</td>
+<td>Solar power output from 137 PV plants in Alabama; all channels measure the same quantity (kW)</td>
+<td><a href="http://www.nrel.gov/grid/solar-power-data.html">NREL Solar Data</a>, introduced by <a href="https://arxiv.org/abs/1703.07015">LSTNet (Lai et al., SIGIR 2018)</a>. Used by AutoTimes, iTransformer, Crossformer, etc.</td>
+</tr>
+<tr>
+<td><strong>Exchange Rate</strong></td>
+<td style="text-align: right;">8</td>
+<td>Daily</td>
+<td>Daily exchange rates of 8 countries; borderline — few entities, semi-heterogeneous</td>
+<td><a href="https://arxiv.org/abs/1703.07015">Lai et al., SIGIR 2018</a>. Used by Autoformer, Informer, PatchTST, Time-LLM, OneFitsAll, CALF, etc.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="pems-traffic-sensor-datasets">PEMS Traffic Sensor Datasets<a class="headerlink" href="#pems-traffic-sensor-datasets" title="Permanent link">&para;</a></h4>
+<p>From the California DOT Performance Measurement System.  Used extensively in spatial-temporal GNN papers.</p>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>#Sensors</th>
+<th>Features</th>
+<th>Freq</th>
+<th>Why beneficial</th>
+<th>Source &amp; References</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PEMS03</strong></td>
+<td>358</td>
+<td>Flow</td>
+<td>5-min</td>
+<td>Traffic flow sensors with adjacency graph</td>
+<td><a href="https://ojs.aaai.org/index.php/AAAI/article/view/5438">Song et al., STSGCN (AAAI 2020)</a></td>
+</tr>
+<tr>
+<td><strong>PEMS04</strong></td>
+<td>307</td>
+<td>Flow, Occupy, Speed</td>
+<td>5-min</td>
+<td>Traffic sensors with 3 features each; channels are interchangeable sensors</td>
+<td><a href="https://ojs.aaai.org/index.php/AAAI/article/view/5438">Song et al., STSGCN (AAAI 2020)</a></td>
+</tr>
+<tr>
+<td><strong>PEMS07</strong></td>
+<td>883</td>
+<td>Flow</td>
+<td>5-min</td>
+<td>Large-scale traffic flow network</td>
+<td><a href="https://ojs.aaai.org/index.php/AAAI/article/view/5438">Song et al., STSGCN (AAAI 2020)</a></td>
+</tr>
+<tr>
+<td><strong>PEMS08</strong></td>
+<td>170</td>
+<td>Flow, Occupy, Speed</td>
+<td>5-min</td>
+<td>Smaller traffic sensor network</td>
+<td><a href="https://ojs.aaai.org/index.php/AAAI/article/view/5438">Song et al., STSGCN (AAAI 2020)</a></td>
+</tr>
+</tbody>
+</table>
+<h4 id="spatial-temporal-graph-forecasting-datasets">Spatial-Temporal Graph Forecasting Datasets<a class="headerlink" href="#spatial-temporal-graph-forecasting-datasets" title="Permanent link">&para;</a></h4>
+<p>These are from the GNN / spatial-temporal forecasting literature (DCRNN, STGCN, Graph WaveNet, AGCRN, MTGNN, etc.):</p>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th style="text-align: right;">#Entities</th>
+<th>Freq</th>
+<th>Why beneficial</th>
+<th>Source &amp; References</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>METR-LA</strong></td>
+<td style="text-align: right;">207</td>
+<td>5-min</td>
+<td>Loop detector speed sensors in Los Angeles highways; all channels measure traffic speed (mph)</td>
+<td><a href="https://arxiv.org/abs/1707.01926">Li et al., DCRNN (ICLR 2018)</a>. Used by STGCN, Graph WaveNet, AGCRN, MTGNN, StemGNN, etc.</td>
+</tr>
+<tr>
+<td><strong>PEMS-BAY</strong></td>
+<td style="text-align: right;">325</td>
+<td>5-min</td>
+<td>Traffic speed sensors in San Francisco Bay Area; same quantity across all sensors</td>
+<td><a href="https://arxiv.org/abs/1707.01926">Li et al., DCRNN (ICLR 2018)</a>. Used by STGCN, Graph WaveNet, AGCRN, MTGNN, etc.</td>
+</tr>
+<tr>
+<td><strong>NYC Taxi</strong></td>
+<td style="text-align: right;">75 zones</td>
+<td>30-min</td>
+<td>Taxi trip demand per zone; homogeneous count data across pickup zones</td>
+<td><a href="https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page">NYC TLC</a>. Used by <a href="https://arxiv.org/abs/1610.00081">STResNet (Zhang et al., AAAI 2017)</a>, AGCRN, etc.</td>
+</tr>
+<tr>
+<td><strong>NYC Bike</strong></td>
+<td style="text-align: right;">250+ stations</td>
+<td>Hourly</td>
+<td>Bike-sharing trip counts per station; homogeneous demand count</td>
+<td><a href="https://citibikenyc.com/system-data">Citi Bike</a>. Used by STGCN, STResNet, AGCRN, etc.</td>
+</tr>
+<tr>
+<td><strong>Beijing Air Quality</strong></td>
+<td style="text-align: right;">12 stations</td>
+<td>Hourly</td>
+<td>PM2.5 concentration across monitoring stations; same pollutant measurement</td>
+<td><a href="https://archive.ics.uci.edu/dataset/501/beijing+multi+site+air+quality+data+set">UCI AQ Dataset</a>. Used by <a href="https://dl.acm.org/doi/10.1145/2939672.2939679">Yi et al. (KDD 2016)</a>, MTGNN, etc.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="domain-specific-datasets">Domain-Specific Datasets<a class="headerlink" href="#domain-specific-datasets" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th style="text-align: right;">#Entities</th>
+<th>Freq</th>
+<th>Why beneficial</th>
+<th>Source &amp; References</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Swiss-river</strong></td>
+<td style="text-align: right;">10–50 stations</td>
+<td>Daily</td>
+<td>River monitoring stations with coordinates and graph topology; per-station water temperature</td>
+<td><a href="https://www.bafu.admin.ch/bafu/en/home.html">Swiss FOEN</a>. Used in this project.</td>
+</tr>
+<tr>
+<td><strong>NN5</strong></td>
+<td style="text-align: right;">111 ATMs</td>
+<td>Daily</td>
+<td>Cash withdrawal time series from 111 ATMs in England; homogeneous demand data</td>
+<td><a href="http://www.neural-forecasting-competition.com/NN5/">NN5 Competition (Crone, 2008)</a>. Used by <a href="https://arxiv.org/abs/2406.16964">Tan et al. (NeurIPS 2024)</a>.</td>
+</tr>
+<tr>
+<td><strong>London Smart Meters</strong></td>
+<td style="text-align: right;">5,567 meters</td>
+<td>30-min</td>
+<td>Household energy consumption; all channels are interchangeable meters measuring kWh</td>
+<td><a href="https://www.kaggle.com/datasets/jeanmidev/smart-meters-in-london">UK Power Networks / Kaggle</a>.</td>
+</tr>
+<tr>
+<td><strong>Kaggle Store Sales</strong></td>
+<td style="text-align: right;">54 stores×33 families</td>
+<td>Daily</td>
+<td>Store-level product sales; same metric (units sold) across stores</td>
+<td><a href="https://www.kaggle.com/competitions/store-sales-time-series-forecasting">Kaggle</a>.</td>
+</tr>
+<tr>
+<td><strong>Kaggle Web Traffic</strong></td>
+<td style="text-align: right;">145K pages</td>
+<td>Daily</td>
+<td>Daily page views for Wikipedia articles; each channel is one page</td>
+<td><a href="https://www.kaggle.com/competitions/web-traffic-time-series-forecasting">Kaggle</a>.</td>
+</tr>
+<tr>
+<td><strong>FRED-MD</strong></td>
+<td style="text-align: right;">~130 series</td>
+<td>Monthly</td>
+<td>Macroeconomic indicators; each channel is one economic variable — borderline heterogeneous</td>
+<td><a href="https://doi.org/10.20955/r.2016.31-56">McCracken &amp; Ng (2016)</a>. Used by <a href="https://arxiv.org/abs/2406.16964">Tan et al. (NeurIPS 2024)</a>.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note on the "Are Language Models Actually Useful for Time Series Forecasting?" paper</strong>
+(<a href="https://arxiv.org/abs/2406.16964">Tan et al., NeurIPS 2024 Spotlight</a>,
+<a href="https://github.com/BennyTMT/LLMsForTimeSeries">code</a>,
+<a href="https://openreview.net/forum?id=DV15UbHCY1">OpenReview</a>):</p>
+<p>This paper benchmarks on 8 core datasets: <strong>ETTh1, ETTh2, ETTm1, ETTm2,
+Weather, Electricity, Traffic, ILI</strong>, plus 5 extended datasets from the
+rebuttal: <strong>Exchange Rate, Covid Deaths, NYC Taxi, NN5, FRED-MD</strong>.
+Of these, <strong>Electricity</strong> (321 clients), <strong>Traffic</strong> (862 sensors), and
+<strong>NN5</strong> (111 ATMs) are homogeneous-entity datasets that benefit from entity
+identifiers.  The rest (ETT, Weather, ILI, Covid Deaths) have heterogeneous
+features and do not benefit.</p>
+<p><strong>Note on AutoTimes</strong> (<a href="https://arxiv.org/abs/2402.02370">Liu et al., NeurIPS 2024</a>,
+<a href="https://github.com/thuml/AutoTimes">code</a>):</p>
+<p>AutoTimes benchmarks on <strong>ECL</strong> (321 clients), <strong>ETTh1</strong> (7 features),
+<strong>Solar-Energy</strong> (137 PV plants), <strong>Traffic</strong> (862 sensors), and
+<strong>Weather</strong> (21 features).  Entity identifiers are beneficial for
+<strong>ECL</strong>, <strong>Solar-Energy</strong>, and <strong>Traffic</strong> (homogeneous entities);
+they are not beneficial for <strong>ETTh1</strong> and <strong>Weather</strong> (heterogeneous features).</p>
+</blockquote>
+<h3 id="not-beneficial-heterogeneous-features">Not Beneficial (heterogeneous features)<a class="headerlink" href="#not-beneficial-heterogeneous-features" title="Permanent link">&para;</a></h3>
+<p>Entity identifiers <strong>do not</strong> help when features are heterogeneous — they measure different physical quantities and interact semantically:</p>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th style="text-align: center;">Entities?</th>
+<th style="text-align: right;">#Channels</th>
+<th>Why not beneficial</th>
+<th>Source &amp; References</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ETT</strong> (h1/h2/m1/m2)</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: right;">7</td>
+<td>Columns are load (MW) and temperature (°C) from one transformer — different physical units</td>
+<td><a href="https://arxiv.org/abs/2012.07436">Zhou et al., Informer (AAAI 2021)</a>. Used by virtually all TSF papers.</td>
+</tr>
+<tr>
+<td><strong>Weather</strong></td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: right;">21</td>
+<td>Pressure (mbar), temperature (°C), humidity (%) — semantically distinct meteorological variables</td>
+<td><a href="https://www.bgc-jena.mpg.de/wetter/">Wetterstation (Max Planck Biogeochemistry)</a>. Used by Autoformer, PatchTST, iTransformer, etc.</td>
+</tr>
+<tr>
+<td><strong>ILI</strong> (Illness)</td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: right;">7</td>
+<td>Weighted ILI %, unweighted %, age group breakdowns — different statistical measures</td>
+<td><a href="https://gis.cdc.gov/grasp/fluview/fluportaldashboard.html">CDC ILINet</a>. Used by Autoformer, TimesNet, Time-LLM, CALF, etc.</td>
+</tr>
+<tr>
+<td><strong>M4</strong></td>
+<td style="text-align: center;">❌</td>
+<td style="text-align: right;">1 each</td>
+<td>Univariate competition dataset — 100K individual series with no multi-entity structure</td>
+<td><a href="https://doi.org/10.1016/j.ijforecast.2019.04.014">M4 Competition (Makridakis et al., 2020)</a>.</td>
+</tr>
+<tr>
+<td><strong>Covid Deaths</strong></td>
+<td style="text-align: center;">⚠️</td>
+<td style="text-align: right;">varies</td>
+<td>Regional death counts; could be treated as entities but series are short and policy-driven</td>
+<td>Used by <a href="https://arxiv.org/abs/2406.16964">Tan et al. (NeurIPS 2024)</a>.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="supported-modes">Supported Modes<a class="headerlink" href="#supported-modes" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Key</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>None</td>
+<td><code>'none'</code></td>
+<td>No entity features (default)</td>
+</tr>
+<tr>
+<td>Embedding</td>
+<td><code>'embedding'</code></td>
+<td>Learned <code>nn.Embedding</code> per entity; projected back to original dimension</td>
+</tr>
+<tr>
+<td>One-hot</td>
+<td><code>'onehot'</code></td>
+<td>Binary one-hot vector concatenated to input features</td>
+</tr>
+<tr>
+<td>Numeric ID</td>
+<td><code>'numeric_id'</code></td>
+<td>Raw integer ID as an additional feature</td>
+</tr>
+<tr>
+<td>Sinusoidal</td>
+<td><code>'sinusoidal'</code></td>
+<td>Positional-encoding-style features from entity ID</td>
+</tr>
+<tr>
+<td>Random</td>
+<td><code>'random'</code></td>
+<td>Deterministic random vector baseline per entity</td>
+</tr>
+<tr>
+<td>Coordinates</td>
+<td><code>'coordinates'</code></td>
+<td>Geographic lat/lon (Swiss-river only)</td>
+</tr>
+<tr>
+<td>Descriptors</td>
+<td><code>'descriptors'</code></td>
+<td>Custom descriptor vector per entity</td>
+</tr>
+</tbody>
+</table>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<h3 id="with-tsl-models-via-entityawaremixin">With TSL Models (via EntityAwareMixin)<a class="headerlink" href="#with-tsl-models-via-entityawaremixin" title="Permanent link">&para;</a></h3>
+<p>All 11 Time-Series-Library model adapters support entity identifiers through the <code>EntityAwareMixin</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">liulian.models.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">DLinearAdapter</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    <span class="s1">&#39;enc_in&#39;</span><span class="p">:</span> <span class="mi">862</span><span class="p">,</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="s1">&#39;seq_len&#39;</span><span class="p">:</span> <span class="mi">96</span><span class="p">,</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    <span class="s1">&#39;pred_len&#39;</span><span class="p">:</span> <span class="mi">96</span><span class="p">,</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    <span class="s1">&#39;identifier_mode&#39;</span><span class="p">:</span> <span class="s1">&#39;embedding&#39;</span><span class="p">,</span>   <span class="c1"># Enable entity embedding</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="s1">&#39;num_embeddings&#39;</span><span class="p">:</span> <span class="mi">862</span><span class="p">,</span>            <span class="c1"># Number of entities</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="s1">&#39;embedding_size&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>             <span class="c1"># Embedding dimension</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    <span class="s1">&#39;entity_id_col&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>              <span class="c1"># Column index in x_mark for entity IDs</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="c1"># ... other model config</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="p">}</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="n">adapter</span> <span class="o">=</span> <span class="n">DLinearAdapter</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="c1"># The model automatically wraps in EntityWrapper for &#39;embedding&#39; mode</span>
+</code></pre></div>
+<p>For transparent modes (<code>'onehot'</code>, <code>'numeric_id'</code>, <code>'sinusoidal'</code>, <code>'random'</code>, <code>'coordinates'</code>), the entity features are concatenated to <code>x_enc</code> by the data layer. Set <code>enc_in</code> to include the extra dimensions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="s1">&#39;enc_in&#39;</span><span class="p">:</span> <span class="mi">862</span> <span class="o">+</span> <span class="mi">862</span><span class="p">,</span>  <span class="c1"># original features + one-hot entity features</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="s1">&#39;identifier_mode&#39;</span><span class="p">:</span> <span class="s1">&#39;onehot&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="c1"># ...</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">}</span>
+</code></pre></div>
+<h3 id="with-custom-models-lstmadapter-transformerencoderadapter">With Custom Models (LSTMAdapter, TransformerEncoderAdapter)<a class="headerlink" href="#with-custom-models-lstmadapter-transformerencoderadapter" title="Permanent link">&para;</a></h3>
+<p>These models have built-in entity support with all listed modes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">liulian.models.torch</span><span class="w"> </span><span class="kn">import</span> <span class="n">LSTMAdapter</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    <span class="s1">&#39;enc_in&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>       <span class="c1"># features per station (water_temp, air_temp)</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    <span class="s1">&#39;c_out&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>        <span class="c1"># predict water temperature</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    <span class="s1">&#39;seq_len&#39;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    <span class="s1">&#39;pred_len&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    <span class="s1">&#39;identifier_mode&#39;</span><span class="p">:</span> <span class="s1">&#39;embedding&#39;</span><span class="p">,</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    <span class="s1">&#39;num_embeddings&#39;</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>    <span class="s1">&#39;embedding_size&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    <span class="c1"># ...</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="p">}</span>
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a><span class="n">adapter</span> <span class="o">=</span> <span class="n">LSTMAdapter</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<h3 id="embedding-mode-recommended">Embedding Mode (Recommended)<a class="headerlink" href="#embedding-mode-recommended" title="Permanent link">&para;</a></h3>
+<p>The <code>EntityWrapper</code> wraps the inner model and:
+1. Extracts entity IDs from <code>x_mark_enc[:, :, entity_id_col]</code>
+2. Looks up embeddings via <code>nn.Embedding(num_embeddings, embedding_size)</code>
+3. Concatenates embeddings to <code>x_enc</code> → shape <code>(B, T, enc_in + emb_size)</code>
+4. Projects back to <code>enc_in</code> via a learned <code>nn.Linear</code> layer
+5. The inner model sees the original dimensions — no architecture changes needed</p>
+<p>For encoder-decoder models, the decoder input <code>x_dec</code> is also augmented.</p>
+<h3 id="transparent-modes">Transparent Modes<a class="headerlink" href="#transparent-modes" title="Permanent link">&para;</a></h3>
+<p>For <code>'onehot'</code>, <code>'numeric_id'</code>, <code>'sinusoidal'</code>, <code>'random'</code>, and <code>'coordinates'</code>, the data layer (<code>TimeSeriesDataset.make_entity_features()</code>) appends entity features directly to the input tensor. The model's <code>enc_in</code> parameter must account for the additional dimensions.</p>
+<blockquote>
+<p><strong>Current caveat (important):</strong> In this repository's default matrix setup, transparent modes are currently applied only to <code>swiss-river-1990 + lstm</code> (per-entity split). For <code>traffic</code>, <code>electricity</code>, and most other multi-channel CSV/PEMS setups, transparent modes are not enabled in the matrix runner because those paths do not currently construct per-entity transparent features.</p>
+</blockquote>
+<h3 id="why-include-sinusoidal-and-random-baselines">Why include sinusoidal and random baselines?<a class="headerlink" href="#why-include-sinusoidal-and-random-baselines" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Sinusoidal</strong> is a non-learnable structured baseline: it injects a smooth, index-aware entity code without extra trainable parameters.</li>
+<li><strong>Random</strong> is a non-semantic control baseline: if random IDs perform close to learned embeddings, gains may come from extra capacity only; if embeddings clearly win, gains are likely entity-structure-aware.</li>
+</ul>
+<h2 id="matrix-experiment-integration-experimentsentity_identifier">Matrix Experiment Integration (<code>experiments/entity_identifier</code>)<a class="headerlink" href="#matrix-experiment-integration-experimentsentity_identifier" title="Permanent link">&para;</a></h2>
+<p>The matrix runner (<code>experiments/entity_identifier/run.py</code>) now supports:</p>
+<ul>
+<li>Global modes: <code>none</code>, <code>embedding</code></li>
+<li>Additional competitor modes (applicable subset): <code>onehot</code>, <code>coordinates</code>, <code>sinusoidal</code>, <code>random</code></li>
+</ul>
+<p>By default, the runner auto-filters inapplicable dataset-model-mode combinations.
+For random/sinusoidal transparent baselines, you can tune:</p>
+<ul>
+<li><code>random_identifier_dim</code> (default <code>16</code>)</li>
+<li><code>random_identifier_seed</code> (default <code>2026</code>)</li>
+<li><code>sinusoidal_dim</code> (default <code>16</code>)</li>
+</ul>
+<p>Examples:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Local dry run with extra identifier competitors</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>python<span class="w"> </span>experiments/entity_identifier/run.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span>--phase<span class="w"> </span>dry<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span>--modes<span class="w"> </span>none<span class="w"> </span>embedding<span class="w"> </span>onehot<span class="w"> </span>coordinates<span class="w"> </span>sinusoidal<span class="w"> </span>random
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="c1"># Slurm: recommended one job per experiment (better GPU parallelism + fault isolation)</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>python<span class="w"> </span>experiments/entity_identifier/submit_slurm.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="w">  </span>--dispatch-mode<span class="w"> </span>per-experiment<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span>--run-tag<span class="w"> </span>eid_competitors<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span>--modes<span class="w"> </span>none<span class="w"> </span>embedding<span class="w"> </span>onehot<span class="w"> </span>coordinates<span class="w"> </span>sinusoidal<span class="w"> </span>random
+</code></pre></div>
+<h2 id="benchmark-experiments">Benchmark Experiments<a class="headerlink" href="#benchmark-experiments" title="Permanent link">&para;</a></h2>
+<p>The entity identifier ablation (Experiment E.2.2) tests all 15 models × 10 entity datasets × 5 modes. Run:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Generate configs</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>python<span class="w"> </span>tools/generate_configs.py<span class="w"> </span>--group<span class="w"> </span>entity
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Run experiments</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>python<span class="w"> </span>tools/run_benchmark.py<span class="w"> </span>--config-dir<span class="w"> </span>experiments/configs/entity/<span class="w"> </span>--seeds<span class="w"> </span><span class="m">1</span>,2,3
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Aggregate results</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>python<span class="w"> </span>tools/aggregate_results.py<span class="w"> </span>--results-dir<span class="w"> </span>experiments/results/
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

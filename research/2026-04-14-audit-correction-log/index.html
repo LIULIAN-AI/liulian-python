@@ -1,0 +1,1895 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Research OS for spatiotemporal model experimentation">
+      
+      
+      
+        <link rel="canonical" href="https://jajupmochi.github.io/liulian-python/research/2026-04-14-audit-correction-log/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Audit Correction Log — Entity-Identifier Forecasting Report - LIULIAN</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#audit-correction-log-entity-identifier-forecasting-report" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="LIULIAN" class="md-header__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LIULIAN
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Audit Correction Log — Entity-Identifier Forecasting Report
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cli/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../demo_gallery/" class="md-tabs__link">
+          
+  
+  
+  Demo Gallery
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../models/torch_models/" class="md-tabs__link">
+          
+  
+  
+  Models
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../data_loaders/" class="md-tabs__link">
+          
+  
+  
+  Data
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tsl_comparison/" class="md-tabs__link">
+          
+  
+  
+  Benchmarks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="LIULIAN" class="md-nav__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LIULIAN
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../forecasting_pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adapter_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adapter Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../manifest_spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifest Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo Gallery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demo Gallery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demo_gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demo_patchtst_swiss1990/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PatchTST Swiss River 1990
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/torch_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyTorch Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entity_identifiers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Entity Identifiers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../search_spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Spaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Data
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_loaders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Loaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Benchmarks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tsl_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TSL Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../training_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results_json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dataset_config_audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset Config Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../breakpoint_bridge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Breakpoint Bridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0-verdict-legend" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. Verdict legend
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-dataset-matrix-claims-report-1-code-anchors-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Dataset matrix claims (report §1 + code anchors §0)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-plumbing-path-claims-report-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Plumbing path claims (report §3)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-model-surface-claims-report-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Model surface claims (report §2)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-swiss-multi-channel-identifier-args-omission-report-32" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Swiss multi-channel identifier-args omission (report §3.2)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-timemoe-task-name-caveat-report-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. TimeMoE task-name caveat (report §2.3)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-csv-pems-set-station_ids-but-not-station_name" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. CSV / PEMS set station_ids but not station_name
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-cross-check-docsentity_identifiersmd-user-facing-vs-refined-report-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Cross-check: docs/entity_identifiers.md (user-facing) vs refined report + code
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-line-anchor-quality-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Line-anchor quality summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-summary-of-proposed-corrections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Summary of proposed corrections
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-gate-stop-here-phase-1-g3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Gate — stop here (Phase 1 G3)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="audit-correction-log-entity-identifier-forecasting-report">Audit Correction Log — Entity-Identifier Forecasting Report<a class="headerlink" href="#audit-correction-log-entity-identifier-forecasting-report" title="Permanent link">&para;</a></h1>
+<p><em>Date: 2026-04-14</em>
+<em>Audited document: <code>docs/research/2026-04-10-entity-id-forecasting-report-refined.md</code></em>
+<em>Cross-checked document: <code>docs/entity_identifiers.md</code></em>
+<em>Auditor method: read each cited file, verify line anchors, check claim content.</em></p>
+<h2 id="0-verdict-legend">0. Verdict legend<a class="headerlink" href="#0-verdict-legend" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Verdict</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CONFIRMED</strong></td>
+<td>Claim is true; line anchor matches or is within ±2 lines</td>
+</tr>
+<tr>
+<td><strong>CONFIRMED-ADJ</strong></td>
+<td>Claim is true, but line anchor needs a minor adjustment</td>
+</tr>
+<tr>
+<td><strong>STALE</strong></td>
+<td>Claim was likely true at write-time but no longer matches the code</td>
+</tr>
+<tr>
+<td><strong>WRONG</strong></td>
+<td>Claim contradicts the current code</td>
+</tr>
+<tr>
+<td><strong>UNVERIFIED</strong></td>
+<td>Cannot be mechanically verified from code alone</td>
+</tr>
+</tbody>
+</table>
+<h2 id="1-dataset-matrix-claims-report-1-code-anchors-0">1. Dataset matrix claims (report §1 + code anchors §0)<a class="headerlink" href="#1-dataset-matrix-claims-report-1-code-anchors-0" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Claim (abbrev.)</th>
+<th>Anchor given</th>
+<th>Verdict</th>
+<th>Evidence / correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.1</td>
+<td>Runtime <code>pipeline.build_dataset</code> wires CSV/PEMS/Swiss datasets</td>
+<td><code>pipeline.py:135-271</code></td>
+<td><strong>CONFIRMED-ADJ</strong></td>
+<td><code>_CSV_DATASET_MAP</code> starts at L135. <code>build_dataset</code> body is L155–272 (not 135–271). Anchor is slightly misleading: L135–152 are the path maps, L155–272 is the function. No content error.</td>
+</tr>
+<tr>
+<td>1.2</td>
+<td><code>data_factory</code> registry covers ETT / weather / electricity / traffic / exchange_rate / illness / solar / m4 / custom / PEMS{03,04,07,08}</td>
+<td><code>data_factory.py:32-54</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td>Exact match at L32–54 of <code>data_factory.py</code> (verified; <code>solar</code>, <code>m4</code>, <code>custom</code> present as registry-only).</td>
+</tr>
+<tr>
+<td>1.3</td>
+<td>Downloader auto-supports traffic/electricity/exchange_rate/weather/illness/ETT<em>/PEMS</em>; Swiss is manual</td>
+<td><code>download.py:61-80</code>, <code>208-271</code></td>
+<td><strong>CONFIRMED-ADJ</strong></td>
+<td><code>_DATASET_FILES</code> at L61–76 (not 61–80). <code>_MANUAL_DATASETS</code> set at L79. <code>ensure_dataset</code> body at L208–271 ✓. Content correct.</td>
+</tr>
+<tr>
+<td>1.4</td>
+<td><code>solar/m4/custom</code> are registry-only, not runtime-ready via <code>pipeline.build_dataset</code></td>
+<td>Implied by §1.1</td>
+<td><strong>CONFIRMED</strong></td>
+<td><code>pipeline._CSV_DATASET_MAP</code> (L135-145) does <strong>not</strong> contain <code>solar</code>, <code>m4</code>, <code>custom</code>. <code>pipeline.build_dataset</code> raises <code>ValueError</code> for these unless handled by the <code>swiss-river</code> branch.</td>
+</tr>
+<tr>
+<td>1.5</td>
+<td><code>swiss-river-*</code> runs via <code>SwissRiverDataset</code>, not via <code>data_factory</code></td>
+<td>§1.1</td>
+<td><strong>CONFIRMED</strong></td>
+<td><code>pipeline.py:176-201</code> (<code>data_name.startswith('swiss-river')</code> branch) imports <code>SwissRiverDataset</code>. No entry in <code>data_factory.DATASET_REGISTRY</code>.</td>
+</tr>
+<tr>
+<td>1.6</td>
+<td>Plugin adapters (<code>SwissRiverDatasetAdapter</code>, <code>TrafficDatasetAdapter</code>) are synthetic stubs</td>
+<td><code>plugins/hydrology/…:7-9</code>, <code>plugins/traffic/…:17-19</code></td>
+<td><strong>UNVERIFIED</strong></td>
+<td>Not re-verified this pass — deferred to Phase 2; file paths exist per <code>plugins/</code> tree shown in project root listing. If incorrect, correction will be logged in Phase 2 cross-check.</td>
+</tr>
+<tr>
+<td>1.7</td>
+<td>Weather channels are heterogeneous (table §1.2)</td>
+<td>Claim-only</td>
+<td><strong>CONFIRMED</strong></td>
+<td>Matches content of <code>manifests</code> / csv column semantics; no code contradiction.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-plumbing-path-claims-report-3">2. Plumbing path claims (report §3)<a class="headerlink" href="#2-plumbing-path-claims-report-3" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Claim (abbrev.)</th>
+<th>Anchor given</th>
+<th>Verdict</th>
+<th>Evidence / correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2.1</td>
+<td><code>make_entity_features</code> returns <code>None</code> when <code>mode='none'</code> or <code>'embedding'</code>, otherwise builds a tiled vector</td>
+<td><code>timeseriesdataset.py:78-116</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td>L87–88 returns <code>None</code> for <code>none</code>/<code>embedding</code>; modes handled at L93–116; tiling <code>seq_len × D</code> at L118–119.</td>
+</tr>
+<tr>
+<td>2.2</td>
+<td>Entity features only appended when <code>self.station_name is not None</code></td>
+<td><code>timeseriesdataset.py:1103-1126</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td>Exact: <code>if self.identifier_mode != 'none' and self.station_name is not None:</code> at L1103. Full block L1103–1126 ✓.</td>
+</tr>
+<tr>
+<td>2.3</td>
+<td>Collate returns 6-tuple with <code>entity_id_strs, entity_idx</code> when IDs are present</td>
+<td><code>timeseriesdataset.py:1211-1224</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td>Exact match: L1211 <code>if entity_id_strs is not None:</code> → L1217–1224 returns the 6-tuple.</td>
+</tr>
+<tr>
+<td>2.4</td>
+<td>Trainer forwards <code>fwd_kwargs['entity_ids']=batch_entity_idx</code> in embedding mode</td>
+<td><code>trainer.py:474-479</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td>Exact match at L474–479: <code>if self.use_entity_embedding and batch_entity_idx is not None: fwd_kwargs['entity_ids']=batch_entity_idx</code>.</td>
+</tr>
+<tr>
+<td>2.5</td>
+<td><code>pipeline.build_model</code> wraps with <code>EntityWrapper</code> / <code>ChannelEntityWrapper</code> for embedding mode, skipping PatchTST+<code>add_after_patch</code></td>
+<td><code>pipeline.py:441-477</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td>L441–444 condition on <code>identifier_mode=='embedding'</code> and <code>id_integration != 'add_after_patch'</code>. L454–467 <code>ChannelEntityWrapper</code> when <code>split_mode=='multi_channel'</code>. L468–482 <code>EntityWrapper</code> otherwise.</td>
+</tr>
+<tr>
+<td>2.6</td>
+<td>PatchTST has native <code>add_after_patch</code> path</td>
+<td><code>patchtst.py:73-89</code>, <code>142-153</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td>Gate at L73–80 (with <code>split_mode!='multi_channel'</code> ValueError); embedding creation L86–88; <code>_inject_entity_after_patch</code> at L142–153; uses <code>torch.arange(n_vars)</code> channel-order assumption at L151.</td>
+</tr>
+<tr>
+<td>2.7</td>
+<td>Channel wrapper uses fixed station buffer <code>[0..N-1]</code>, ignores per-sample IDs</td>
+<td>Implied</td>
+<td><strong>UNVERIFIED</strong></td>
+<td>Requires separate read of <code>liulian/models/torch/entity_mixin.py</code>. Deferred — Phase 2 will verify when writing per-model files for each model using this wrapper.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-model-surface-claims-report-2">3. Model surface claims (report §2)<a class="headerlink" href="#3-model-surface-claims-report-2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Claim (abbrev.)</th>
+<th>Anchor given</th>
+<th>Verdict</th>
+<th>Evidence / correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3.1</td>
+<td>Runtime keys: <code>dlinear, transformer, informer, autoformer, fedformer, itransformer, patchtst, timesnet, timemixer, timexer, mamba, lstm, etsformer, lightts, reformer, gpt4ts, nonstationary_transformer, timellm, timemoe</code></td>
+<td>Dynamic import in <code>pipeline.build_model</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td><code>pipeline.py:427-432</code> uses <code>importlib.import_module(f'liulian.models.torch.{model_name}')</code>. All 19 module names exist as files in <code>liulian/models/torch/</code>.</td>
+</tr>
+<tr>
+<td>3.2</td>
+<td>Benchmark tool adapter map (<code>tools/run_benchmark.py</code>)</td>
+<td><code>run_benchmark.py:183-217</code></td>
+<td><strong>CONFIRMED-ADJ</strong></td>
+<td>Core <code>adapter_map</code> dict at L183–198 (14 entries). Optional TimeLLM/TimeMoE appended at L201–212. Anchor 183–217 is slightly wide, but content matches.</td>
+</tr>
+<tr>
+<td>3.3</td>
+<td><code>LSTMAdapter</code> exported from <code>swiss_lstm.py</code> (not vanilla <code>lstm</code> module)</td>
+<td><code>__init__.py:68-80</code>, <code>87-115</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td><code>from .swiss_lstm import LSTMAdapter, …</code> at L68–75. Listed in <code>__all__</code> at L104. Vanilla <code>lstm.py</code> module is imported dynamically by runtime only; there is <strong>no</strong> <code>VanillaLSTMAdapter</code> class.</td>
+</tr>
+<tr>
+<td>3.4</td>
+<td>Runtime-only models (etsformer / lightts / reformer / gpt4ts / nonstationary_transformer) not in benchmark adapter map</td>
+<td>Derived</td>
+<td><strong>CONFIRMED</strong></td>
+<td>Not present in the <code>run_benchmark.py</code> adapter_map (verified).</td>
+</tr>
+<tr>
+<td>3.5</td>
+<td><code>mamba</code> runtime key resolved via shim re-exporting <code>mamba_model.Model</code></td>
+<td>Not specified</td>
+<td><strong>UNVERIFIED</strong></td>
+<td>Needs <code>liulian/models/torch/mamba.py</code> file read — deferred to Phase 2 B3 batch.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-swiss-multi-channel-identifier-args-omission-report-32">4. Swiss multi-channel identifier-args omission (report §3.2)<a class="headerlink" href="#4-swiss-multi-channel-identifier-args-omission-report-32" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Claim</th>
+<th>Anchor given</th>
+<th>Verdict</th>
+<th>Evidence / correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.1</td>
+<td>Per-entity split passes <code>station_ids, identifier_mode, id_integration, coordinates, station_name</code></td>
+<td><code>swiss_river.py:443-467</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td>All five args present in <code>TimeSeriesDataset(...)</code> constructor call at L443–466: <code>station_ids=self.station_ids</code> (L461), <code>identifier_mode=self.identifier_mode</code> (L462), <code>id_integration=self.id_integration</code> (L463), <code>coordinates=...</code> (L464), <code>station_name=station</code> (L465).</td>
+</tr>
+<tr>
+<td>4.2</td>
+<td>Multi-channel split (<code>_build_mc_split</code>) omits identifier args</td>
+<td><code>swiss_river.py:492-509</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td><code>TimeSeriesDataset(...)</code> at L492–509 passes only data-shape/gap/noise args. No <code>station_ids</code>, no <code>identifier_mode</code>, no <code>id_integration</code>, no <code>station_name</code>. → <code>make_entity_features</code> path cannot activate for Swiss multi-channel regardless of config, because the child <code>TimeSeriesDataset</code> does not know it is entity-aware.</td>
+</tr>
+</tbody>
+</table>
+<p>This is a bona-fide bug with user-facing consequence: a user who sets <code>identifier_mode='onehot'</code> (or any transparent mode) together with <code>split_mode='multi_channel'</code> for Swiss data will see the config silently have <strong>no effect</strong>. Only the <code>embedding</code> mode (which uses the model-side <code>ChannelEntityWrapper</code>) still works.</p>
+<h2 id="5-timemoe-task-name-caveat-report-23">5. TimeMoE task-name caveat (report §2.3)<a class="headerlink" href="#5-timemoe-task-name-caveat-report-23" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Claim</th>
+<th>Anchor given</th>
+<th>Verdict</th>
+<th>Evidence / correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5.1</td>
+<td>Adapter defaults <code>task_name='zero_shot_forecast'</code></td>
+<td><code>timemoe.py:53-56, 73-80</code></td>
+<td><strong>CONFIRMED-ADJ</strong></td>
+<td>Default set at L74 inside <code>TimeMoEAdapter.__init__</code>'s <code>default_config</code> dict. Model's forward-pass check at L53: <code>if self.task_name == 'zero_shot_forecast':</code> → else returns <code>None</code> (L56). Anchor <code>53-56</code> is the check (correct); <code>73-80</code> is the adapter init (correct). Content is fine; just note the <strong>default</strong> line is L74 specifically.</td>
+</tr>
+<tr>
+<td>5.2</td>
+<td>If task is mismatched, model forward may be inactive for standard long-term task names</td>
+<td>L53-56</td>
+<td><strong>CONFIRMED</strong></td>
+<td><code>forward(...)</code> at L52–56 explicitly returns <code>None</code> unless <code>task_name=='zero_shot_forecast'</code>. No other task handled. → Any standard TSL task name (<code>long_term_forecast</code> etc.) will silently yield <code>None</code> predictions.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-csv-pems-set-station_ids-but-not-station_name">6. CSV / PEMS set <code>station_ids</code> but not <code>station_name</code><a class="headerlink" href="#6-csv-pems-set-station_ids-but-not-station_name" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Claim</th>
+<th>Anchor given</th>
+<th>Verdict</th>
+<th>Evidence / correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>6.1</td>
+<td>CSV loader sets <code>kwargs['station_ids'] = feature_cols</code> when &gt;1 feature but never <code>station_name</code></td>
+<td><code>csv_dataset.py:289-307</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td>L289–291: <code>if 'station_ids' not in kwargs: if len(feature_cols) &gt; 1: kwargs['station_ids'] = feature_cols</code>. No <code>station_name</code> assignment anywhere in the vicinity.</td>
+</tr>
+<tr>
+<td>6.2</td>
+<td>PEMS loader sets <code>kwargs['station_ids'] = feature_cols</code> but never <code>station_name</code></td>
+<td><code>pems_dataset.py:140-157</code></td>
+<td><strong>CONFIRMED</strong></td>
+<td>L140–143: <code>if 'station_ids' not in kwargs: kwargs['station_ids'] = feature_cols</code>. No <code>station_name</code> assignment.</td>
+</tr>
+</tbody>
+</table>
+<p>Combined with finding 4.2: transparent ID modes (<code>onehot</code>, <code>numeric_id</code>, <code>sinusoidal</code>, <code>coordinates</code>, <code>descriptors</code>, <code>embedding_idx</code>) are effectively <strong>no-ops</strong> on standard multi-channel CSV (<code>traffic</code>, <code>electricity</code>, <code>weather</code>, <code>exchange_rate</code>, <code>illness</code>, ETT<em>) and PEMS datasets under current code, because neither path sets <code>station_name</code>, and <code>make_entity_features</code> at <code>timeseriesdataset.py:1103</code> is gated on <code>self.station_name is not None</code>. Only </em><em><code>embedding</code></em>* mode continues to work for these datasets because it is handled by the model-side <code>ChannelEntityWrapper</code> which uses a separate code path (<code>pipeline.py:454-467</code>).</p>
+<h2 id="7-cross-check-docsentity_identifiersmd-user-facing-vs-refined-report-code">7. Cross-check: <code>docs/entity_identifiers.md</code> (user-facing) vs refined report + code<a class="headerlink" href="#7-cross-check-docsentity_identifiersmd-user-facing-vs-refined-report-code" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Location in user-facing doc</th>
+<th>Claim</th>
+<th>Verdict</th>
+<th>Evidence / correction</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>7.1</td>
+<td>L117</td>
+<td>"All 11 Time-Series-Library model adapters support entity identifiers through the <code>EntityAwareMixin</code>"</td>
+<td><strong>CONFIRMED</strong></td>
+<td>Exactly 11 TSL adapters are directly imported at <code>__init__.py:45-55</code>: DLinear, PatchTST, iTransformer, Informer, Autoformer, TimesNet, FEDformer, Transformer, TimeMixer, TimeXer, Mamba.</td>
+</tr>
+<tr>
+<td>7.2</td>
+<td>L117</td>
+<td>"through the <code>EntityAwareMixin</code>"</td>
+<td><strong>WRONG / MISLEADING</strong></td>
+<td>The mixin alone does not make these adapters entity-aware. The actual wrapping happens in <code>pipeline.build_model</code> via <code>EntityWrapper</code> / <code>ChannelEntityWrapper</code> (<code>pipeline.py:441-477</code>). PatchTST has a <strong>native</strong> path via <code>_inject_entity_after_patch</code>, not via the mixin. User-facing doc overstates the mixin's role.</td>
+</tr>
+<tr>
+<td>7.3</td>
+<td>L132–137</td>
+<td>Example config: <code>'entity_id_col': 0, # Column index in x_mark for entity IDs</code></td>
+<td><strong>STALE / CONFUSING</strong></td>
+<td>Current plumbing does not consume <code>entity_id_col</code> from config. <code>TimeSeriesDataset</code> collate computes <code>entity_idx</code> from <code>entity_id_strs</code> via the dataset-level <code>station_ids</code> mapping (<code>timeseriesdataset.py:1213-1216</code>). The <code>entity_id_col</code> example key in the doc has no runtime consumer.</td>
+</tr>
+<tr>
+<td>7.4</td>
+<td>L186</td>
+<td>"ablation E.2.2 tests all 15 models × 10 entity datasets × 5 modes"</td>
+<td><strong>UNVERIFIED</strong></td>
+<td>Benchmark adapter_map has 14 entries (+2 optional = 16 max). "15" doesn't match an exact current count. Either <code>E.2.2</code> is an outdated plan number, or it is a forward-looking spec; either way not derivable from code.</td>
+</tr>
+<tr>
+<td>7.5</td>
+<td>L188–197</td>
+<td>Referenced CLI tools (<code>tools/generate_configs.py</code>, <code>tools/run_benchmark.py</code>, <code>tools/aggregate_results.py</code>)</td>
+<td><strong>CONFIRMED</strong></td>
+<td>All three files exist under <code>tools/</code>.</td>
+</tr>
+<tr>
+<td>7.6</td>
+<td>L102–110</td>
+<td>Mode table lists 7 modes</td>
+<td><strong>PARTIAL</strong></td>
+<td>7 modes listed: none, embedding, onehot, numeric_id, sinusoidal, coordinates, descriptors. Missing from user-facing doc: <code>embedding_idx</code> (defined in <code>timeseriesdataset.py:78, 93-94</code>) and <code>feature_concat</code> (Swiss adapters). Refined report §3.3 correctly includes these two.</td>
+</tr>
+<tr>
+<td>7.7</td>
+<td>L16–65</td>
+<td>Dataset suitability tables</td>
+<td><strong>CONFIRMED</strong></td>
+<td>Matches refined report §1.1 content.</td>
+</tr>
+<tr>
+<td>7.8</td>
+<td>(Absent)</td>
+<td>No warning about Swiss multi-channel silent no-op</td>
+<td><strong>MISSING</strong></td>
+<td>The finding in 4.2 is not documented in the user-facing doc. A user picking Swiss + multi_channel + any transparent mode will see no effect without explanation.</td>
+</tr>
+<tr>
+<td>7.9</td>
+<td>(Absent)</td>
+<td>No warning about transparent modes being no-ops on standard CSV/PEMS</td>
+<td><strong>MISSING</strong></td>
+<td>The finding from 6.1 + 6.2 + 4.2 combined: transparent modes do nothing on traffic/electricity/weather/ETT<em>/PEMS</em> because <code>station_name</code> is never set. Not documented.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-line-anchor-quality-summary">8. Line-anchor quality summary<a class="headerlink" href="#8-line-anchor-quality-summary" title="Permanent link">&para;</a></h2>
+<p>Overall, the refined report's line anchors are tight:</p>
+<table>
+<thead>
+<tr>
+<th>Anchor quality</th>
+<th>Count</th>
+<th>Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Exact</td>
+<td>9</td>
+<td>§1.1 <code>data_factory:32-54</code>, §3 <code>timeseriesdataset:1211-1224</code>, <code>trainer:474-479</code>, <code>patchtst:142-153</code>, <code>swiss_river:443-467</code>, <code>swiss_river:492-509</code>, <code>timeseriesdataset:1103-1126</code>, <code>patchtst:73-89</code>, <code>pipeline:441-477</code></td>
+</tr>
+<tr>
+<td>±2 lines</td>
+<td>2</td>
+<td><code>download:61-80</code> (actual 61–76 + 79), <code>run_benchmark:183-217</code> (actual 183–198 core + 201–212 optional)</td>
+</tr>
+<tr>
+<td>Misleading (function-wide vs feature)</td>
+<td>1</td>
+<td><code>pipeline:135-271</code> (the contents of interest are 135–152 map + 155–272 function)</td>
+</tr>
+<tr>
+<td>Unverified in this audit</td>
+<td>3</td>
+<td>Plugin adapters, <code>channel_entity_wrapper</code> buffer, <code>mamba</code> shim</td>
+</tr>
+</tbody>
+</table>
+<h2 id="9-summary-of-proposed-corrections">9. Summary of proposed corrections<a class="headerlink" href="#9-summary-of-proposed-corrections" title="Permanent link">&para;</a></h2>
+<p>To be merged into <code>2026-04-10-entity-id-forecasting-report-refined.md</code> as dated inline notes in Phase 3:</p>
+<ol>
+<li><strong>§1.1 anchor clarification</strong> — change <code>pipeline.py:135-271</code> to <code>pipeline.py:135-152 (maps) + 155-272 (build_dataset)</code>.</li>
+<li><strong>§0 anchor #3 clarification</strong> — change <code>download.py:61-80</code> to <code>download.py:61-76 (_DATASET_FILES) + 79 (_MANUAL_DATASETS)</code>.</li>
+<li><strong>§2.2 anchor clarification</strong> — <code>run_benchmark.py:183-198 (core map) + 201-212 (optional)</code> instead of <code>183-217</code>.</li>
+<li><strong>§2.3 anchor precision</strong> — note that TimeMoE default comes from <code>default_config = {'task_name': 'zero_shot_forecast'}</code> at <code>timemoe.py:74</code>, checked against <code>self.task_name</code> at L53, returns <code>None</code> otherwise at L56.</li>
+</ol>
+<p>To be added to <code>docs/entity_identifiers.md</code> in Phase 3:</p>
+<p>A. <strong>Warning block on silent no-ops</strong> — add a "⚠️ Known limitations" section covering:
+   - Transparent ID modes (onehot / numeric_id / sinusoidal / coordinates / descriptors / embedding_idx) currently have no effect on <code>traffic</code>, <code>electricity</code>, <code>weather</code>, <code>exchange_rate</code>, <code>illness</code>, <code>ETT*</code>, <code>PEMS0{3,4,7,8}</code> because CSV/PEMS loaders do not set <code>station_name</code> (see <code>csv_dataset.py:289-291</code>, <code>pems_dataset.py:140-143</code>, <code>timeseriesdataset.py:1103</code>).
+   - The Swiss multi-channel split (<code>swiss_river.py:472-511</code>) does not propagate <code>identifier_mode</code> / <code>id_integration</code> / <code>station_ids</code> / <code>station_name</code> into its internal <code>TimeSeriesDataset</code>, so the same no-op risk applies.
+   - Embedding mode is unaffected — it flows through <code>ChannelEntityWrapper</code> / <code>EntityWrapper</code> / <code>PatchTST.add_after_patch</code>.
+B. <strong>Correct the <code>EntityAwareMixin</code> attribution</strong> at L117 — mechanism is <code>EntityWrapper</code> / <code>ChannelEntityWrapper</code> wrapping in <code>pipeline.build_model</code>, not the mixin.
+C. <strong>Remove or clarify <code>entity_id_col</code></strong> at L132–137 — no runtime consumer; <code>entity_idx</code> is computed from <code>station_ids</code> + <code>entity_id_strs</code> in the collate.
+D. <strong>Document the two extra modes</strong> <code>embedding_idx</code> and <code>feature_concat</code> in the mode table.</p>
+<h2 id="10-gate-stop-here-phase-1-g3">10. Gate — stop here (Phase 1 G3)<a class="headerlink" href="#10-gate-stop-here-phase-1-g3" title="Permanent link">&para;</a></h2>
+<p>Phase 1 complete. <strong>Awaiting user approval before starting Phase 2 (per-model deep dives)</strong>.</p>
+<p>Open items deferred to Phase 2:
+- 1.6 Plugin adapters stubs (will check <code>plugins/hydrology/…</code> and <code>plugins/traffic/…</code>).
+- 2.7 <code>ChannelEntityWrapper</code> / <code>EntityWrapper</code> fixed-buffer behavior (will read <code>entity_mixin.py</code> when writing transformer / dlinear / autoformer files).
+- 3.5 <code>mamba.py</code> shim (will read when writing <code>mamba.md</code>).</p>
+<p>No substantive claim in the refined report was found to be <strong>WRONG</strong> on the code side. The user-facing <code>docs/entity_identifiers.md</code> has several inaccuracies (7.2, 7.3) and gaps (7.8, 7.9) that Phase 3 will fix.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

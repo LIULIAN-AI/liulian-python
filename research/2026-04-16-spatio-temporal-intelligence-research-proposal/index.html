@@ -1,0 +1,4312 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Research OS for spatiotemporal model experimentation">
+      
+      
+      
+        <link rel="canonical" href="https://jajupmochi.github.io/liulian-python/research/2026-04-16-spatio-temporal-intelligence-research-proposal/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>LIULIAN: From Entity-Aware Forecasting to Universal Spatio-Temporal Intelligence — A Comprehensive Research Program - LIULIAN</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#liulian-from-entity-aware-forecasting-to-universal-spatio-temporal-intelligence-a-comprehensive-research-program" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="LIULIAN" class="md-header__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LIULIAN
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              LIULIAN: From Entity-Aware Forecasting to Universal Spatio-Temporal Intelligence — A Comprehensive Research Program
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cli/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../demo_gallery/" class="md-tabs__link">
+          
+  
+  
+  Demo Gallery
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../models/torch_models/" class="md-tabs__link">
+          
+  
+  
+  Models
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../data_loaders/" class="md-tabs__link">
+          
+  
+  
+  Data
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tsl_comparison/" class="md-tabs__link">
+          
+  
+  
+  Benchmarks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="LIULIAN" class="md-nav__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LIULIAN
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../forecasting_pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adapter_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adapter Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../manifest_spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifest Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo Gallery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demo Gallery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demo_gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demo_patchtst_swiss1990/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PatchTST Swiss River 1990
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/torch_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyTorch Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entity_identifiers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Entity Identifiers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../search_spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Spaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Data
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_loaders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Loaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Benchmarks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tsl_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TSL Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../training_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results_json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dataset_config_audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset Config Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../breakpoint_bridge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Breakpoint Bridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-problem-statement-and-motivation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Problem Statement and Motivation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Problem Statement and Motivation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-the-spatio-temporal-data-challenge" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 The Spatio-Temporal Data Challenge
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-vision" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Vision
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-literature-review-and-related-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Literature Review and Related Work
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Literature Review and Related Work">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-channel-independence-vs-channel-mixing-in-time-series" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Channel-Independence vs Channel-Mixing in Time Series
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-explicit-entitynode-embeddings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Explicit Entity/Node Embeddings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-spatio-temporal-graph-neural-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Spatio-Temporal Graph Neural Networks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.3 Spatio-Temporal Graph Neural Networks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#231-classic-and-foundational-st-gnns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.1 Classic and Foundational ST-GNNs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#232-adaptive-graph-learning-beyond-fixed-topologies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.2 Adaptive Graph Learning (Beyond Fixed Topologies)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#233-scalable-st-gnns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.3 Scalable ST-GNNs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#234-spatio-temporal-transformers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.4 Spatio-Temporal Transformers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#235-mambassm-for-spatio-temporal-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3.5 Mamba/SSM for Spatio-Temporal Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-pre-training-and-foundation-models-for-spatio-temporal-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.4 Pre-Training and Foundation Models for Spatio-Temporal Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#25-time-series-foundation-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.5 Time Series Foundation Models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#26-llm-based-time-series-forecasting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.6 LLM-Based Time Series Forecasting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#27-spatio-temporal-llms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.7 Spatio-Temporal LLMs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#28-llm-agents-for-data-analysis-and-scientific-discovery" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.8 LLM Agents for Data Analysis and Scientific Discovery
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#29-ai-powered-business-intelligence-and-natural-language-interfaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.9 AI-Powered Business Intelligence and Natural Language Interfaces
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#210-mlai-platforms-for-time-series-and-graphs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.10 ML/AI Platforms for Time Series and Graphs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#211-cross-domain-applications" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.11 Cross-Domain Applications
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2.11 Cross-Domain Applications">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#healthcare-clinical-time-series" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Healthcare / Clinical Time Series
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#environmental-hydrology" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Environmental / Hydrology
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#finance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Finance
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#disaster-management-earth-science" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Disaster Management / Earth Science
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#iot-smart-buildings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        IoT / Smart Buildings
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#212-contrastive-and-self-supervised-learning-for-st-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.12 Contrastive and Self-Supervised Learning for ST Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#213-distribution-shift-and-robustness-in-st-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.13 Distribution Shift and Robustness in ST Models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#214-explainability-in-spatio-temporal-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.14 Explainability in Spatio-Temporal Models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#215-pluginadapter-architectures-in-ml-frameworks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.15 Plugin/Adapter Architectures in ML Frameworks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#216-dynamic-and-temporal-graph-networks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.16 Dynamic and Temporal Graph Networks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#217-multi-modal-spatio-temporal-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.17 Multi-Modal Spatio-Temporal Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#218-benchmarking-and-fair-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.18 Benchmarking and Fair Evaluation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#219-human-in-the-loop-ml-and-report-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.19 Human-in-the-Loop ML and Report Generation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#220-digital-twins-and-simulation-ml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.20 Digital Twins and Simulation + ML
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-current-implementation-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Current Implementation Status
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Current Implementation Status">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-liulian-framework-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 LIULIAN Framework Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-implemented-entity-identifier-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Implemented Entity Identifier System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-implemented-spatial-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Implemented Spatial Modules
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-research-program-multi-period-plan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Research Program: Multi-Period Plan
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Research Program: Multi-Period Plan">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#phase-a-entity-aware-forecasting-months-15-3-papers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase A: Entity-Aware Forecasting (Months 1–5, 3 Papers)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#period-1-systematic-entity-identifier-ablation-study-month-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Period 1: Systematic Entity Identifier Ablation Study (Month 1)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Period 1: Systematic Entity Identifier Ablation Study (Month 1)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#objectives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Objectives
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#experiment-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Experiment Design
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-key-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected Key Findings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#novelty-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Novelty Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contributions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contributions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#period-2-adaptive-entity-identifier-selection-via-meta-learning-month-23" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Period 2: Adaptive Entity Identifier Selection via Meta-Learning (Month 2–3)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Period 2: Adaptive Entity Identifier Selection via Meta-Learning (Month 2–3)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-approach" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#novelty-verification_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Novelty Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contributions_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Contributions
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#period-3-unified-entity-identifiers-spatio-temporal-graphs-month-35" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Period 3: Unified Entity Identifiers + Spatio-Temporal Graphs (Month 3–5)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Period 3: Unified Entity Identifiers + Spatio-Temporal Graphs (Month 3–5)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-approach_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#novelty-verification_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Novelty Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-b-spatio-temporal-foundation-models-months-512-3-papers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase B: Spatio-Temporal Foundation Models (Months 5–12, 3 Papers)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#period-4-llm-enhanced-spatio-temporal-intelligence-month-58" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Period 4: LLM-Enhanced Spatio-Temporal Intelligence (Month 5–8)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Period 4: LLM-Enhanced Spatio-Temporal Intelligence (Month 5–8)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-approach_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#novelty-verification_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Novelty Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#period-5-spatio-temporal-foundation-model-with-entity-awareness-month-710" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Period 5: Spatio-Temporal Foundation Model with Entity Awareness (Month 7–10)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Period 5: Spatio-Temporal Foundation Model with Entity Awareness (Month 7–10)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-approach_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#novelty-verification_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Novelty Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#period-6-mambassm-architectures-for-efficient-spatio-temporal-learning-month-912" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Period 6: Mamba/SSM Architectures for Efficient Spatio-Temporal Learning (Month 9–12)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Period 6: Mamba/SSM Architectures for Efficient Spatio-Temporal Learning (Month 9–12)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#technical-approach_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Technical Approach
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#novelty-verification_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Novelty Verification
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#phase-c-liulian-platform-and-domain-applications-months-818" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Phase C: LIULIAN Platform and Domain Applications (Months 8–18)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#period-7-liulian-platform-system-paper-month-814" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Period 7: LIULIAN Platform System Paper (Month 8–14)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Period 7: LIULIAN Platform System Paper (Month 8–14)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-platform-as-contribution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The Platform as Contribution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#novelty-verification-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Novelty Verification (Platform)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#domain-application-papers-months-1018-3-papers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Domain Application Papers (Months 10–18, 3+ Papers)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Domain Application Papers (Months 10–18, 3+ Papers)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#d1-swiss-river-water-temperature-prediction-month-1012" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D1: Swiss River Water Temperature Prediction (Month 10–12)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d2-perioperative-patient-outcome-prediction-month-1215" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D2: Perioperative Patient Outcome Prediction (Month 12–15)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#d3-disaster-impact-analysis-from-multi-modal-st-data-month-1418" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        D3: Disaster Impact Analysis from Multi-Modal ST Data (Month 14–18)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-innovation-highlights-and-novelty-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Innovation Highlights and Novelty Summary
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Innovation Highlights and Novelty Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#51-near-term-innovations-phase-a-periods-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.1 Near-Term Innovations (Phase A, Periods 1–3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#52-medium-term-innovations-phase-b-periods-46" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.2 Medium-Term Innovations (Phase B, Periods 4–6)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#53-long-term-innovations-phase-c-period-7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5.3 Long-Term Innovations (Phase C, Period 7+)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-evaluation-protocol" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Evaluation Protocol
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Evaluation Protocol">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#61-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.1 Datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#62-metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.2 Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#63-baselines" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6.3 Baselines
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-resource-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Resource Requirements
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-risk-analysis-and-mitigation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Risk Analysis and Mitigation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-collaboration-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Collaboration Network
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-detailed-period-1-execution-plan-1-month" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Detailed Period 1 Execution Plan (1 Month)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. Detailed Period 1 Execution Plan (1 Month)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#week-1-infrastructure-and-core-experiments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 1: Infrastructure and Core Experiments
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-2-full-experimental-campaign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 2: Full Experimental Campaign
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-3-analysis-and-figures" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 3: Analysis and Figures
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#week-4-paper-writing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Week 4: Paper Writing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-summary-research-contributions-across-all-periods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11. Summary: Research Contributions Across All Periods
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-long-term-vision-year-2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12. Long-Term Vision (Year 2+)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-a-liulian-entity-identifier-architecture-diagram" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix A: LIULIAN Entity Identifier Architecture Diagram
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-b-code-artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix B: Code Artifacts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#appendix-c-novelty-verification-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Appendix C: Novelty Verification Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="liulian-from-entity-aware-forecasting-to-universal-spatio-temporal-intelligence-a-comprehensive-research-program">LIULIAN: From Entity-Aware Forecasting to Universal Spatio-Temporal Intelligence — A Comprehensive Research Program<a class="headerlink" href="#liulian-from-entity-aware-forecasting-to-universal-spatio-temporal-intelligence-a-comprehensive-research-program" title="Permanent link">&para;</a></h1>
+<p><em>Date: 2026-04-16 (revised)</em>
+<em>Principal Investigator: Linlin Jia (jajupmochi@gmail.com)</em>
+<em>Framework: LIULIAN — Liquid Intelligence and Unified Logic for Interactive Adaptive Networks</em></p>
+<hr />
+<h2 id="executive-summary">Executive Summary<a class="headerlink" href="#executive-summary" title="Permanent link">&para;</a></h2>
+<p>This proposal outlines a <strong>multi-year, multi-period research program</strong> that starts from a focused study on entity identifiers in time series forecasting and progressively expands into a <strong>universal spatio-temporal intelligence platform</strong>. The program spans seven research periods across three phases:</p>
+<ul>
+<li><strong>Phase A (Months 1–5):</strong> Entity-aware forecasting — systematic ablation, adaptive selection, and spatial graph integration. Three papers.</li>
+<li><strong>Phase B (Months 5–12):</strong> Spatio-temporal foundation models — LLM-enhanced ST modeling, cross-domain ST foundation models, and Mamba/SSM architectures for ST data. Three papers.</li>
+<li><strong>Phase C (Months 8–18):</strong> The LIULIAN platform itself — an open-source, agent-powered, BI-integrated spatio-temporal intelligence platform with vertical domain plugins. One system paper + domain application papers.</li>
+</ul>
+<p>Each period produces a publishable paper. The platform itself is a separate, high-impact contribution targeting top-tier systems venues. Cross-domain applications (hydrology, healthcare, disaster management, finance, IoT, materials science) serve as validation and generate additional domain-specific publications.</p>
+<p><strong>Total planned outputs:</strong> 7+ core papers, 1 platform/system paper, 3+ domain application papers.</p>
+<hr />
+<h2 id="1-problem-statement-and-motivation">1. Problem Statement and Motivation<a class="headerlink" href="#1-problem-statement-and-motivation" title="Permanent link">&para;</a></h2>
+<h3 id="11-the-spatio-temporal-data-challenge">1.1 The Spatio-Temporal Data Challenge<a class="headerlink" href="#11-the-spatio-temporal-data-challenge" title="Permanent link">&para;</a></h3>
+<p>Spatio-temporal data — measurements distributed across both space and time — is the backbone of modern sensing, infrastructure monitoring, and scientific discovery. Transportation networks generate millions of sensor readings per hour; hospital ICUs produce continuous patient vitals across beds; river monitoring stations track water quality across watersheds; satellite imagery captures land-use change across continents.</p>
+<p>Despite the ubiquity of spatio-temporal data, the field suffers from <strong>fragmentation</strong> along multiple axes:</p>
+<ol>
+<li>
+<p><strong>Methodological fragmentation</strong>: Time series models (PatchTST, DLinear, iTransformer) ignore spatial structure; graph neural networks (DCRNN, Graph WaveNet, MTGNN) focus on fixed topologies; LLM-based methods (Time-LLM, UrbanGPT) lack systematic entity/spatial awareness.</p>
+</li>
+<li>
+<p><strong>Domain fragmentation</strong>: Traffic forecasting, air quality prediction, hydrological modeling, clinical time series, and financial analysis each have their own datasets, metrics, baselines, and conventions — with minimal cross-pollination.</p>
+</li>
+<li>
+<p><strong>Infrastructure fragmentation</strong>: Researchers must cobble together TSLib [1] for temporal models, PyG [2] for graph models, GluonTS [3] for probabilistic forecasting, and custom scripts for domain-specific preprocessing. No single platform supports the full spectrum from raw spatio-temporal data to scientific insight.</p>
+</li>
+<li>
+<p><strong>Entity representation fragmentation</strong>: A fundamental design choice — how to represent entity identity in multi-entity systems — has never been systematically studied. Different works use learned embeddings [6], one-hot encoding, geographic coordinates, graph node features [10,11], or text descriptions [18] without principled comparison.</p>
+</li>
+</ol>
+<h3 id="12-vision">1.2 Vision<a class="headerlink" href="#12-vision" title="Permanent link">&para;</a></h3>
+<p>This research program addresses all four forms of fragmentation through a unified approach:</p>
+<ul>
+<li><strong>Methodological unification</strong>: A framework that seamlessly combines entity identifiers, graph structure, temporal models, and LLM-enhanced representations.</li>
+<li><strong>Domain unification</strong>: Cross-domain evaluation on 15+ datasets spanning transportation, energy, hydrology, healthcare, IoT, and finance.</li>
+<li><strong>Infrastructure unification</strong>: The LIULIAN platform — an open-source, modular, agent-powered spatio-temporal intelligence system with BI capabilities and vertical domain plugins.</li>
+<li><strong>Entity representation unification</strong>: The first systematic study of entity representation strategies, progressing from ablation to adaptive selection to foundation-model-level entity awareness.</li>
+</ul>
+<hr />
+<h2 id="2-literature-review-and-related-work">2. Literature Review and Related Work<a class="headerlink" href="#2-literature-review-and-related-work" title="Permanent link">&para;</a></h2>
+<h3 id="21-channel-independence-vs-channel-mixing-in-time-series">2.1 Channel-Independence vs Channel-Mixing in Time Series<a class="headerlink" href="#21-channel-independence-vs-channel-mixing-in-time-series" title="Permanent link">&para;</a></h3>
+<p>The debate over whether multivariate time series models should treat channels independently or allow cross-channel interaction is foundational.</p>
+<ul>
+<li><strong>PatchTST</strong> (Nie et al., ICLR 2023) [1]: Channel-independent (CI) patching often outperforms channel-mixing, challenging the assumption that cross-variate information always helps.</li>
+<li><strong>iTransformer</strong> (Liu et al., ICLR 2024) [4]: Inverts the Transformer paradigm — variates as tokens — achieving strong results through implicit entity representation.</li>
+<li><strong>CARD</strong> (Wang et al., ICLR 2024) [5]: Channel-Aligned Robust Blend Transformer adds channel-specific tokens (learnable entity embeddings).</li>
+<li><strong>CrossFormer</strong> (Zhang &amp; Yan, ICLR 2023) [6]: Cross-dimension attention with learnable dimension/segment embeddings.</li>
+<li><strong>TSMixer</strong> (Chen et al., NeurIPS 2023) [7]: MLP-based cross-variate mixing captures inter-entity relationships.</li>
+<li><strong>Client</strong> (Gao et al., KDD 2024) [8]: Integrates cross-variable linear components with transformer attention to balance CI with cross-variate sharing.</li>
+</ul>
+<p><strong>Gap</strong>: Each tests one embedding strategy; none systematically compares identifier types across architectures.</p>
+<h3 id="22-explicit-entitynode-embeddings">2.2 Explicit Entity/Node Embeddings<a class="headerlink" href="#22-explicit-entitynode-embeddings" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>STID</strong> (Shao et al., CIKM 2022) [9]: Simple MLP + spatial identity embedding matches complex GNNs — directly validates learnable entity embeddings. <strong>Key insight: spatial indistinguishability, not architecture complexity, is the bottleneck.</strong></li>
+<li><strong>TiDE</strong> (Das et al., TMLR 2023) [10]: MLP encoder-decoder with per-variate static covariates (attribute embeddings).</li>
+<li><strong>TimeXer</strong> (Wang et al., NeurIPS 2024) [11]: Exogenous variable tokens alongside endogenous patch tokens.</li>
+<li><strong>UniTS</strong> (Gao et al., NeurIPS 2024) [12]: Unified multi-task model with dataset-specific prompt tokens — entity/domain identifiers at a higher level.</li>
+<li><strong>TRA</strong> (Lin et al., AAAI 2023) [13]: Temporal Routing Adaptor for entity-aware stock forecasting — entity-specific routing to select temporal patterns per stock.</li>
+</ul>
+<h3 id="23-spatio-temporal-graph-neural-networks">2.3 Spatio-Temporal Graph Neural Networks<a class="headerlink" href="#23-spatio-temporal-graph-neural-networks" title="Permanent link">&para;</a></h3>
+<h4 id="231-classic-and-foundational-st-gnns">2.3.1 Classic and Foundational ST-GNNs<a class="headerlink" href="#231-classic-and-foundational-st-gnns" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>DCRNN</strong> (Li et al., ICLR 2018) [14]: Diffusion convolutional recurrent NN on directed traffic graphs.</li>
+<li><strong>Graph WaveNet</strong> (Wu et al., IJCAI 2019) [15]: Learns adaptive adjacency matrices from data.</li>
+<li><strong>MTGNN</strong> (Wu et al., KDD 2020) [16]: Connecting the dots — multivariate TS forecasting with learned graph structures.</li>
+<li><strong>STEP</strong> (Shao et al., KDD 2022) [17]: Pre-trains spatial-temporal embeddings, enables zero-shot prediction for unseen nodes.</li>
+<li><strong>STNorm</strong> (Deng et al., KDD 2021) [18]: Entity-specific normalization as alternative to explicit identifiers.</li>
+<li><strong>MegaCRN</strong> (Jiang et al., AAAI 2023) [19]: Meta-graph convolutional recurrent network with a Meta-Node Bank.</li>
+<li><strong>PDFormer</strong> (Jiang et al., AAAI 2023) [20]: Propagation delay-aware dynamic long-range transformer.</li>
+<li><strong>STAEformer</strong> (Liu et al., CIKM 2023) [21]: Spatio-temporal adaptive embedding transformer, joint spatial-temporal embeddings per node.</li>
+</ul>
+<h4 id="232-adaptive-graph-learning-beyond-fixed-topologies">2.3.2 Adaptive Graph Learning (Beyond Fixed Topologies)<a class="headerlink" href="#232-adaptive-graph-learning-beyond-fixed-topologies" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>TESTAM</strong> (Lee et al., ICLR 2024) [22]: MoE with three experts (no graph, static graph, dynamic graph) — reformulates routing as classification. <strong>Novelty check: closest to our AdaptID concept, but gates over graph structures, not identifier types.</strong></li>
+<li><strong>STID</strong> [9]: Proves identifiers alone can replace graphs entirely. <strong>Critical baseline for our work.</strong></li>
+</ul>
+<h4 id="233-scalable-st-gnns">2.3.3 Scalable ST-GNNs<a class="headerlink" href="#233-scalable-st-gnns" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>SGP</strong> (Cini et al., AAAI 2023) [23]: Randomized recurrent + adjacency powers enables node-wise parallel training.</li>
+<li><strong>BigST</strong> (Han et al., VLDB 2024) [24]: Linear-complexity spatial convolution, scales to 100K+ nodes.</li>
+<li><strong>EasyST</strong> (Tang et al., arXiv 2024) [25]: Knowledge distillation from teacher STGNN into student MLP.</li>
+</ul>
+<h4 id="234-spatio-temporal-transformers">2.3.4 Spatio-Temporal Transformers<a class="headerlink" href="#234-spatio-temporal-transformers" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>AirFormer</strong> (Liang et al., AAAI 2023) [26]: Decoupled ST learning with deterministic + stochastic stages for 1,085 air quality stations.</li>
+<li><strong>EarthFormer</strong> (Gao et al., NeurIPS 2022) [27]: Cuboid Attention for 3D spatio-temporal Earth observation data.</li>
+</ul>
+<h4 id="235-mambassm-for-spatio-temporal-data">2.3.5 Mamba/SSM for Spatio-Temporal Data<a class="headerlink" href="#235-mambassm-for-spatio-temporal-data" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>SpoT-Mamba</strong> (Choi et al., IJCAI 2024 Workshop) [28]: Selective state space models on ST graphs via node-specific walk sequences.</li>
+<li><strong>STG-Mamba</strong> (Li et al., arXiv 2024) [29]: First exploration of Mamba for full ST graph learning with ST-S3M module.</li>
+</ul>
+<p><strong>Gap</strong>: GNN literature treats entity embeddings as node features but never compares embedding strategies or studies when simpler identifiers suffice. No work bridges the entity-identifier literature with the GNN node-embedding literature.</p>
+<h3 id="24-pre-training-and-foundation-models-for-spatio-temporal-data">2.4 Pre-Training and Foundation Models for Spatio-Temporal Data<a class="headerlink" href="#24-pre-training-and-foundation-models-for-spatio-temporal-data" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>GPT-ST</strong> (Li et al., NeurIPS 2023) [30]: Generative pre-training for ST-GNNs with adaptive masking.</li>
+<li><strong>UniST</strong> (Yuan et al., KDD 2024) [31]: Universal ST model with spatio-temporal knowledge-guided prompts, zero-shot generalization across 20+ urban scenarios.</li>
+<li><strong>OpenCity</strong> (Li et al., ACM TIST 2024) [32]: Combines Transformers + GNNs, pre-trains on heterogeneous traffic data for zero-shot transfer.</li>
+</ul>
+<p><strong>Gap</strong>: All ST foundation models are traffic/urban-centric. None supports entity-aware conditioning across domains (hydrology, healthcare, IoT, finance).</p>
+<h3 id="25-time-series-foundation-models">2.5 Time Series Foundation Models<a class="headerlink" href="#25-time-series-foundation-models" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>TimesFM</strong> (Das et al., ICML 2024) [33]: Google's decoder-only model pre-trained on 100B time points.</li>
+<li><strong>Chronos</strong> (Ansari et al., ICML 2024) [34]: Amazon's tokenized TS model using T5 architecture.</li>
+<li><strong>Moirai</strong> (Woo et al., ICML 2024) [35]: Salesforce's any-variate attention with mixture distributions.</li>
+<li><strong>Timer</strong> (Liu et al., ICML 2024) [36]: GPT-style generative pre-training for TS in S3 format.</li>
+<li><strong>MOMENT</strong> (Goswami et al., ICML 2024) [37]: Masked pre-training on the Time Series Pile.</li>
+<li><strong>Lag-Llama</strong> (Rasul et al., ICML 2024) [38]: LLaMA-inspired with lag features for probabilistic forecasting.</li>
+<li><strong>TTM</strong> (Ekambaram et al., NeurIPS 2024) [39]: Tiny Time Mixers — &lt;1M params, competitive zero-shot.</li>
+<li><strong>Time-MoE</strong> (Shi et al., arXiv 2024) [40]: Billion-scale TS foundation model with sparse MoE.</li>
+<li><strong>TimeGPT-1</strong> (Garza &amp; Mergenthaler-Canseco, arXiv 2023) [41]: First production API TS foundation model.</li>
+</ul>
+<p><strong>Gap</strong>: All TS foundation models treat series as anonymous channels. None has explicit entity-identity conditioning. <strong>This is the central gap our program fills.</strong></p>
+<h3 id="26-llm-based-time-series-forecasting">2.6 LLM-Based Time Series Forecasting<a class="headerlink" href="#26-llm-based-time-series-forecasting" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>GPT4TS / One Fits All</strong> (Zhou et al., NeurIPS 2023) [42]: Frozen GPT-2 with minimal adaptation.</li>
+<li><strong>Time-LLM</strong> (Jin et al., ICLR 2024) [43]: Reprograms frozen LLMs via input transformations.</li>
+<li><strong>TEST</strong> (Sun et al., ICLR 2024) [44]: Text-prototype-aligned embeddings for TS.</li>
+<li><strong>UniTime</strong> (Liu et al., WWW 2024) [45]: Domain-specific text instructions as conditioning.</li>
+<li><strong>CALF</strong> (Liu et al., NeurIPS 2024) [46]: Cross-modal fine-tuning aligning TS with text.</li>
+<li><strong>S2IP-LLM</strong> (Pan et al., ICML 2024) [47]: Semantic space-informed prompt learning.</li>
+<li><strong>LLMTime</strong> (Gruver et al., NeurIPS 2023) [48]: Zero-shot TS forecasting by encoding numbers as text.</li>
+<li><strong>TEMPO</strong> (Cao et al., ICLR 2024) [49]: Trend/seasonal/residual decomposition with soft prompts per component.</li>
+<li><strong>AutoTimes</strong> (Liu et al., NeurIPS 2024) [50]: Autoregressive in-context learning with LLMs.</li>
+<li><strong>"Are Language Models Actually Useful for Time Series Forecasting?"</strong> (Tan et al., NeurIPS 2024) [51]: <strong>Critical paper</strong> — shows LLM backbone can be replaced by simple attention or random embeddings. Questions whether LLM pre-training truly transfers.</li>
+</ul>
+<p><strong>Gap</strong>: No work investigates entity identifiers as text prompts vs learned embeddings vs positional encodings. No work combines LLM entity descriptions with spatio-temporal graph structure.</p>
+<h3 id="27-spatio-temporal-llms">2.7 Spatio-Temporal LLMs<a class="headerlink" href="#27-spatio-temporal-llms" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>UrbanGPT</strong> (Li et al., KDD 2024) [52]: ST dependency encoder + instruction-tuned LLM for urban computing with zero-shot cross-city transfer.</li>
+<li><strong>ST-LLM</strong> (Cao et al., arXiv 2024) [53]: Tokenized ST sequences fed directly to LLMs with spatial positional embeddings.</li>
+<li><strong>TrafficGPT</strong> (Zhang et al., Transport Policy 2024) [54]: ChatGPT + traffic foundation models for conversational traffic analysis.</li>
+</ul>
+<p><strong>Gap</strong>: ST-LLMs focus on traffic/urban. None handles arbitrary spatio-temporal domains or integrates entity metadata as natural language.</p>
+<h3 id="28-llm-agents-for-data-analysis-and-scientific-discovery">2.8 LLM Agents for Data Analysis and Scientific Discovery<a class="headerlink" href="#28-llm-agents-for-data-analysis-and-scientific-discovery" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Data-Copilot</strong> (Zhang et al., arXiv 2023) [55]: Autonomous data querying, processing, visualization workflows.</li>
+<li><strong>InsightPilot</strong> (Ma et al., VLDB 2024) [56]: Iterative data exploration via LLM-generated analysis actions.</li>
+<li><strong>The AI Scientist</strong> (Lu et al., arXiv 2024) [57]: End-to-end research automation — idea generation through paper writing.</li>
+<li><strong>DS-Agent</strong> (Guo et al., ICML 2024) [58]: Case-based reasoning for Kaggle-style ML problems.</li>
+<li><strong>MLAgentBench</strong> (Huang et al., ICML 2024) [59]: Benchmark for LLM agents on ML experimentation.</li>
+<li><strong>AutoML-GPT</strong> (Zhang et al., arXiv 2023) [60]: GPT-4 for automatic model selection and pipeline composition.</li>
+<li><strong>MatPlotAgent</strong> (Li et al., ACL 2024) [61]: Agent for publication-quality scientific visualization.</li>
+<li><strong>ResearchAgent</strong> (Baek et al., ACL 2024) [62]: Iterative research hypothesis generation with review-refine loop.</li>
+<li><strong>ChemCrow</strong> (Bran et al., Nature Machine Intelligence 2024) [63]: LLM agent with 18 chemistry tools for synthesis planning.</li>
+<li><strong>Coscientist</strong> (Boiko et al., Nature 2023) [64]: LLM-driven autonomous chemistry experiments with robotic labs.</li>
+</ul>
+<p><strong>Gap</strong>: No LLM agent system targets spatio-temporal forecasting pipeline design — automatically deciding entity representation, graph construction, architecture selection, and HPO based on dataset properties. <strong>This is a novel contribution we propose.</strong></p>
+<h3 id="29-ai-powered-business-intelligence-and-natural-language-interfaces">2.9 AI-Powered Business Intelligence and Natural Language Interfaces<a class="headerlink" href="#29-ai-powered-business-intelligence-and-natural-language-interfaces" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>LIDA</strong> (Dibia, Microsoft Research, ACL 2023) [65]: Multi-stage LLM pipeline for grammar-agnostic visualization.</li>
+<li><strong>DIN-SQL</strong> (Pourreza &amp; Rafiei, NeurIPS 2023) [66]: Decomposed text-to-SQL with self-correction.</li>
+<li><strong>DAIL-SQL</strong> (Gao et al., VLDB 2024) [67]: Efficient few-shot text-to-SQL.</li>
+<li><strong>NL4DV</strong> (Narechania et al., IEEE VIS 2023) [68]: Natural language to Vega-Lite visualization specs.</li>
+<li><strong>Chat2VIS</strong> (Maddigan &amp; Susnjak, IEEE Access 2023) [69]: LLM-generated Python visualization code from natural language.</li>
+<li><strong>TableGPT</strong> (Li et al., arXiv 2023) [70]: LLM fine-tuned for holistic table understanding.</li>
+<li><strong>Rath</strong> (Yu et al., Kanaries, 2022–2024) [71]: Open-source automated data exploration and visualization.</li>
+<li><strong>Sheet2Report</strong> (Chen et al., arXiv 2024) [72]: LLM pipeline for professional analyst-style reports from spreadsheet data.</li>
+</ul>
+<p><strong>Gap</strong>: No BI platform is integrated with spatio-temporal ML. Current BI tools lack graph-aware analytics, spatial visualization, and domain-specific ST model integration.</p>
+<h3 id="210-mlai-platforms-for-time-series-and-graphs">2.10 ML/AI Platforms for Time Series and Graphs<a class="headerlink" href="#210-mlai-platforms-for-time-series-and-graphs" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>Spatial</th>
+<th>Missing Data</th>
+<th>Probabilistic</th>
+<th>Multi-Task</th>
+<th>Plugin Arch</th>
+<th>Entity-Aware</th>
+<th>LLM/Agent</th>
+<th>BI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>TSLib</strong> [73]</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>Yes (5)</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>BasicTS</strong> [74]</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>Forecasting</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>tsl</strong> [75]</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+<td>Forecast+Impute</td>
+<td>Partial</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>GluonTS</strong> [3]</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+<td>Forecasting</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>NeuralForecast</strong> [76]</td>
+<td>Limited</td>
+<td>No</td>
+<td>Yes</td>
+<td>Forecasting</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>Darts</strong> [77]</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+<td>Forecasting</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>PyPOTS</strong> [78]</td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>Yes (4+)</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>LibCity</strong> [79]</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>Urban tasks</td>
+<td>Partial</td>
+<td>Implicit</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>PyG</strong> [2]</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td>General GNN</td>
+<td>Yes</td>
+<td>Node features</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td><strong>LIULIAN (ours)</strong></td>
+<td><strong>Yes</strong></td>
+<td><strong>Planned</strong></td>
+<td><strong>Planned</strong></td>
+<td><strong>Yes</strong></td>
+<td><strong>Yes</strong></td>
+<td><strong>Yes</strong></td>
+<td><strong>Yes</strong></td>
+<td><strong>Yes</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Gap</strong>: No existing platform combines (a) entity-aware modules, (b) graph+TS unified modeling, (c) LLM agent integration, (d) BI features, and (e) vertical domain plugins. <strong>LIULIAN fills this gap.</strong></p>
+<h3 id="211-cross-domain-applications">2.11 Cross-Domain Applications<a class="headerlink" href="#211-cross-domain-applications" title="Permanent link">&para;</a></h3>
+<h4 id="healthcare-clinical-time-series">Healthcare / Clinical Time Series<a class="headerlink" href="#healthcare-clinical-time-series" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>STraTS</strong> (Tipirneni &amp; Reddy, MLHC 2022) [80]: Sparse attention on irregularly-sampled clinical TS with self-supervised pretraining on MIMIC-III.</li>
+<li><strong>MedGTX</strong> (Kim et al., CHIL 2023) [81]: Graph-Transformer for patient outcome prediction combining patient relationship graphs with temporal EHR.</li>
+<li><strong>MISTS</strong> (Li et al., AAAI 2024) [82]: Multi-input multi-output irregular sampled TS for ICU forecasting.</li>
+<li><strong>MedTsLLM</strong> (Jiang et al., arXiv 2024) [83]: Clinical TS + clinical notes via LLM multimodal fusion.</li>
+<li><strong>Perioperative GNN</strong> (Gao et al., npj Digital Medicine 2024) [84]: Patient graphs for post-operative complication prediction.</li>
+</ul>
+<h4 id="environmental-hydrology">Environmental / Hydrology<a class="headerlink" href="#environmental-hydrology" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>AirFormer</strong> [26]: Nationwide air quality prediction across 1,085 stations.</li>
+<li><strong>GAGNN</strong> (various, ACM TKDD 2024) [85]: Group-aware GNN for nationwide PM2.5 forecasting.</li>
+<li><strong>FloodCast</strong> (Xu et al., arXiv 2023) [86]: River network topology GNN for flood prediction.</li>
+<li><strong>ST water quality GNN</strong> (various, Water Research 2025) [87]: Multi-scale ST-GNN for dissolved oxygen and nitrogen.</li>
+<li><strong>Water distribution GNN</strong> (Zanfei et al., Water Research 2023) [88]: GNN for pipe network leak detection.</li>
+<li><strong>Multi-scale water demand STGNN</strong> (various, Water Research 2025) [89]: Multi-scale temporal+spatial for water infrastructure.</li>
+</ul>
+<h4 id="finance">Finance<a class="headerlink" href="#finance" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>FinGPT</strong> (Yang et al., NeurIPS 2023 Workshop) [90]: Open-source financial LLMs with TS sentiment.</li>
+<li><strong>TRA</strong> [13]: Temporal Routing Adaptor for entity-aware stock forecasting.</li>
+<li><strong>MASTER</strong> (Li et al., AAAI 2024) [91]: Market-guided Stock Transformer for portfolio-level forecasting.</li>
+</ul>
+<h4 id="disaster-management-earth-science">Disaster Management / Earth Science<a class="headerlink" href="#disaster-management-earth-science" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>EarthFormer</strong> [27]: Cuboid Attention for precipitation, temperature, sea surface forecasting.</li>
+<li><strong>Prithvi</strong> (Jakubik et al., IBM/NASA, arXiv 2023) [92]: Foundation model for geospatial AI.</li>
+<li><strong>GeoChat</strong> (Kuckreja et al., CVPR 2024) [93]: Vision-language model for remote sensing analysis.</li>
+<li><strong>SatCLIP / GeoCLIP</strong> (Klemmer et al., NeurIPS 2023 Workshop / AAAI 2024) [94]: Location-aware embeddings aligning satellite imagery with geographic metadata.</li>
+<li><strong>HeatGNN</strong> (various, arXiv 2024) [95]: Epidemiology-informed GNN for pandemic forecasting.</li>
+</ul>
+<h4 id="iot-smart-buildings">IoT / Smart Buildings<a class="headerlink" href="#iot-smart-buildings" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Brick Schema + ML</strong> (Balaji et al., BuildSys 2022) [96]: GNN-based cross-building transfer learning.</li>
+<li><strong>CityLearn</strong> (Vazquez-Canteli et al., Applied Energy 2023) [97]: RL with building energy digital twins.</li>
+</ul>
+<h3 id="212-contrastive-and-self-supervised-learning-for-st-data">2.12 Contrastive and Self-Supervised Learning for ST Data<a class="headerlink" href="#212-contrastive-and-self-supervised-learning-for-st-data" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>TS2Vec</strong> (Yue et al., AAAI 2022) [98]: Hierarchical contrastive learning for universal TS representations.</li>
+<li><strong>TF-C</strong> (Zhang et al., NeurIPS 2022) [99]: Time-frequency consistency contrastive pre-training.</li>
+<li><strong>SimMTM</strong> (Dong et al., NeurIPS 2023) [100]: Masked TS modeling with neighbor aggregation.</li>
+<li><strong>AutoST</strong> (Zhang et al., WWW 2023) [101]: Automated ST graph contrastive learning.</li>
+<li><strong>STAG</strong> (Zhang et al., ICML 2023) [102]: Adversarial contrastive adaptation for ST graph learning.</li>
+<li><strong>CaST</strong> (Xia et al., NeurIPS 2023) [103]: Causal lens for ST graph forecasting with back-door and front-door adjustment.</li>
+<li><strong>STONE</strong> (Wang et al., KDD 2024) [104]: Handles both spatial and temporal distribution shifts.</li>
+</ul>
+<h3 id="213-distribution-shift-and-robustness-in-st-models">2.13 Distribution Shift and Robustness in ST Models<a class="headerlink" href="#213-distribution-shift-and-robustness-in-st-models" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>ADATIME</strong> (Ragab et al., ACM TKDD 2023) [105]: Benchmark of 11 domain adaptation methods on TS.</li>
+<li><strong>RAINCOAT</strong> (He et al., ICML 2023) [106]: Frequency-based feature alignment for TS domain adaptation.</li>
+</ul>
+<h3 id="214-explainability-in-spatio-temporal-models">2.14 Explainability in Spatio-Temporal Models<a class="headerlink" href="#214-explainability-in-spatio-temporal-models" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>STExplainer</strong> (Zhang et al., KDD 2023) [107]: Post-hoc explanations for ST-GNN via mutual information perturbation.</li>
+<li><strong>TimeSHAP</strong> (Bento et al., KDD 2021) [108]: SHAP for sequential models — feature importance over time steps.</li>
+<li><strong>TFT</strong> (Lim et al., IJF 2021) [109]: Built-in interpretability via variable selection networks.</li>
+</ul>
+<h3 id="215-pluginadapter-architectures-in-ml-frameworks">2.15 Plugin/Adapter Architectures in ML Frameworks<a class="headerlink" href="#215-pluginadapter-architectures-in-ml-frameworks" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>LoRA</strong> (Hu et al., ICLR 2022) [110]: Parameter-efficient adapter layers for frozen models — foundational for our domain adapter design.</li>
+<li><strong>Ludwig</strong> (Molino et al., JMLR 2023) [111]: Declarative YAML + encoder-combiner-decoder plugin architecture.</li>
+<li><strong>MMEngine</strong> (OpenMMLab, 2022) [112]: Registry + hook + runner architecture pattern.</li>
+<li><strong>Hydra</strong> (Yadan, Facebook Research, 2020) [113]: Composable YAML configs with plugin architecture.</li>
+</ul>
+<h3 id="216-dynamic-and-temporal-graph-networks">2.16 Dynamic and Temporal Graph Networks<a class="headerlink" href="#216-dynamic-and-temporal-graph-networks" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>TGN</strong> (Rossi et al., ICML 2020 Workshop) [114]: Memory + graph attention + temporal encoding on continuous-time dynamic graphs.</li>
+<li><strong>DyGFormer</strong> (Yu et al., NeurIPS 2023) [115]: Transformer for continuous-time dynamic graphs with neighbor co-occurrence encoding.</li>
+<li><strong>ROLAND</strong> (You et al., KDD 2022) [116]: Incremental GNN for dynamic social networks.</li>
+</ul>
+<h3 id="217-multi-modal-spatio-temporal-data">2.17 Multi-Modal Spatio-Temporal Data<a class="headerlink" href="#217-multi-modal-spatio-temporal-data" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Time-MMD</strong> (Liu et al., NeurIPS 2024 D&amp;B) [117]: Large-scale benchmark pairing TS with text metadata across 9 domains.</li>
+<li><strong>ChatTS</strong> (Xie et al., arXiv 2024) [118]: Synthetic TS-text pairs for LLM temporal reasoning.</li>
+<li><strong>UniST</strong> [31]: Multi-modal prompts (spatial, temporal, textual) for urban ST prediction.</li>
+<li><strong>TorchGeo</strong> (Stewart et al., SIGSPATIAL 2022) [119]: Bridges GIS data formats with DL training pipelines.</li>
+</ul>
+<h3 id="218-benchmarking-and-fair-evaluation">2.18 Benchmarking and Fair Evaluation<a class="headerlink" href="#218-benchmarking-and-fair-evaluation" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>TSLib</strong> (Wu et al., NeurIPS 2023 D&amp;B) [73]: Fair re-implementation revealed many SOTA results were evaluation artifacts.</li>
+<li><strong>BasicTS</strong> (Shao et al., NeurIPS 2023 D&amp;B) [74]: Simpler models often match complex GNNs under fair evaluation.</li>
+<li><strong>TFB</strong> (Qiu et al., ICML 2024) [120]: 8,068 univariate + 25 multivariate datasets challenge claimed SOTA.</li>
+<li><strong>TOTEM</strong> (Talukder et al., NeurIPS 2024) [121]: Discrete tokenization via VQ-VAE creating shared vocabulary across domains.</li>
+</ul>
+<h3 id="219-human-in-the-loop-ml-and-report-generation">2.19 Human-in-the-Loop ML and Report Generation<a class="headerlink" href="#219-human-in-the-loop-ml-and-report-generation" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>HITL-TSF</strong> (Li et al., Salesforce, arXiv 2024) [122]: Framework for injecting domain knowledge into neural forecasting.</li>
+<li><strong>Calliope</strong> (Shi et al., IEEE TVCG 2023) [123]: Automatic visual data stories from spreadsheets.</li>
+<li><strong>DataTales</strong> (Sultan et al., CHI 2024) [124]: LLM-generated narrative articles from datasets.</li>
+</ul>
+<h3 id="220-digital-twins-and-simulation-ml">2.20 Digital Twins and Simulation + ML<a class="headerlink" href="#220-digital-twins-and-simulation-ml" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>TwinGen</strong> (Thelen et al., Nature Machine Intelligence 2023) [125]: Physics-informed neural networks for data-efficient digital twins.</li>
+<li><strong>Transolver</strong> (Wu et al., ICML 2024 Spotlight) [126]: Fast transformer PDE solver on general geometries.</li>
+<li><strong>PARCv2</strong> (Nguyen et al., ICML 2024) [127]: Physics-aware recurrent convolutions for spatiotemporal dynamics.</li>
+</ul>
+<hr />
+<h2 id="3-current-implementation-status">3. Current Implementation Status<a class="headerlink" href="#3-current-implementation-status" title="Permanent link">&para;</a></h2>
+<h3 id="31-liulian-framework-architecture">3.1 LIULIAN Framework Architecture<a class="headerlink" href="#31-liulian-framework-architecture" title="Permanent link">&para;</a></h3>
+<p>LIULIAN (Liquid Intelligence and Unified Logic for Interactive Adaptive Networks) provides a modular, task-driven spatio-temporal intelligence pipeline:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>                    ┌───────────────────────────────────────┐
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                    │        LIULIAN Platform Stack          │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                    │                                       │
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                    │  ┌─────────────────────────────────┐  │
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                    │  │   LLM Agent Layer (planned)      │  │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                    │  │   • Pipeline design agent        │  │
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                    │  │   • Data ingestion agent         │  │
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>                    │  │   • Report generation agent      │  │
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>                    │  └───────────┬─────────────────────┘  │
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>                    │              │                         │
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>                    │  ┌───────────▼─────────────────────┐  │
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>                    │  │   BI &amp; Visualization Layer       │  │
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                    │  │   • Dashboards (planned)         │  │
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>                    │  │   • NL query interface (planned) │  │
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>                    │  │   • Automated reports (planned)  │  │
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>                    │  └───────────┬─────────────────────┘  │
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>                    │              │                         │
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                    │  ┌───────────▼─────────────────────┐  │
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>                    │  │   Task Layer                     │  │
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>                    │  │   • Forecasting (implemented)    │  │
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>                    │  │   • Classification (planned)     │  │
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>                    │  │   • Anomaly detection (planned)  │  │
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>                    │  │   • Imputation (planned)         │  │
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>                    │  └───────────┬─────────────────────┘  │
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>                    │              │                         │
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>                    │  ┌───────────▼─────────────────────┐  │
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>                    │  │   Model Layer                    │  │
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>                    │  │   • Temporal: LSTM, PatchTST,    │  │
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>                    │  │     DLinear, iTransformer, ...   │  │
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>                    │  │   • Entity-aware wrappers        │  │
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>                    │  │   • Spatial: GNN modules         │  │
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>                    │  │   • LLM-based: TimeLLM, GPT4TS  │  │
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>                    │  │   • Foundation: Chronos, Moirai  │  │
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>                    │  └───────────┬─────────────────────┘  │
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>                    │              │                         │
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>                    │  ┌───────────▼─────────────────────┐  │
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>                    │  │   Data Layer                     │  │
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>                    │  │   • YAML manifests + provenance  │  │
+<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>                    │  │   • Graph topology support       │  │
+<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>                    │  │   • Multi-modal data loaders     │  │
+<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>                    │  │   • Entity metadata management   │  │
+<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>                    │  └───────────┬─────────────────────┘  │
+<a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>                    │              │                         │
+<a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>                    │  ┌───────────▼─────────────────────┐  │
+<a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>                    │  │   Runtime Layer                  │  │
+<a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>                    │  │   • State machine experiment     │  │
+<a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>                    │  │   • Ray Tune HPO                 │  │
+<a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>                    │  │   • Slurm cluster dispatch       │  │
+<a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>                    │  │   • MLflow/W&amp;B logging           │  │
+<a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>                    │  └─────────────────────────────────┘  │
+<a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>                    │                                       │
+<a id="__codelineno-0-52" name="__codelineno-0-52" href="#__codelineno-0-52"></a>                    │  ┌─────────────────────────────────┐  │
+<a id="__codelineno-0-53" name="__codelineno-0-53" href="#__codelineno-0-53"></a>                    │  │   Plugin Layer (vertical domains)│  │
+<a id="__codelineno-0-54" name="__codelineno-0-54" href="#__codelineno-0-54"></a>                    │  │   • Smart Earth / Hydrology      │  │
+<a id="__codelineno-0-55" name="__codelineno-0-55" href="#__codelineno-0-55"></a>                    │  │   • Healthcare                   │  │
+<a id="__codelineno-0-56" name="__codelineno-0-56" href="#__codelineno-0-56"></a>                    │  │   • Finance                      │  │
+<a id="__codelineno-0-57" name="__codelineno-0-57" href="#__codelineno-0-57"></a>                    │  │   • Smart Engineering            │  │
+<a id="__codelineno-0-58" name="__codelineno-0-58" href="#__codelineno-0-58"></a>                    │  │   • Computational Chemistry      │  │
+<a id="__codelineno-0-59" name="__codelineno-0-59" href="#__codelineno-0-59"></a>                    │  └─────────────────────────────────┘  │
+<a id="__codelineno-0-60" name="__codelineno-0-60" href="#__codelineno-0-60"></a>                    └───────────────────────────────────────┘
+</code></pre></div>
+<h3 id="32-implemented-entity-identifier-system">3.2 Implemented Entity Identifier System<a class="headerlink" href="#32-implemented-entity-identifier-system" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Modes</strong>: <code>none</code>, <code>embedding</code>, <code>onehot</code>, <code>coordinates</code>, <code>sinusoidal</code>, <code>random</code>, <code>numeric_id</code>, <code>descriptors</code></li>
+<li><strong>Wrappers</strong>: <code>EntityWrapper</code> (per-entity), <code>ChannelEntityWrapper</code> (learned per-channel), <code>ChannelTransparentWrapper</code> (pre-computed per-channel)</li>
+<li><strong>Experiment orchestration</strong>: 48-job matrix runner, Ray Tune HPO, Slurm dispatch, comparison reporting</li>
+</ul>
+<h3 id="33-implemented-spatial-modules">3.3 Implemented Spatial Modules<a class="headerlink" href="#33-implemented-spatial-modules" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Entity embeddings with configurable injection points</li>
+<li>1-hop neighbor aggregation</li>
+<li>GNN modules (integrated with ICPR 2026 submission on Swiss river water temperature prediction)</li>
+</ul>
+<hr />
+<h2 id="4-research-program-multi-period-plan">4. Research Program: Multi-Period Plan<a class="headerlink" href="#4-research-program-multi-period-plan" title="Permanent link">&para;</a></h2>
+<h3 id="phase-a-entity-aware-forecasting-months-15-3-papers">Phase A: Entity-Aware Forecasting (Months 1–5, 3 Papers)<a class="headerlink" href="#phase-a-entity-aware-forecasting-months-15-3-papers" title="Permanent link">&para;</a></h3>
+<hr />
+<h3 id="period-1-systematic-entity-identifier-ablation-study-month-1">Period 1: Systematic Entity Identifier Ablation Study (Month 1)<a class="headerlink" href="#period-1-systematic-entity-identifier-ablation-study-month-1" title="Permanent link">&para;</a></h3>
+<p><strong>Paper Title</strong>: "When and How Do Entity Identifiers Help? A Systematic Study Across Architectures for Multi-Entity Time Series Forecasting"</p>
+<p><strong>Target Venue</strong>: NeurIPS 2026 D&amp;B / AAAI 2027</p>
+<h4 id="objectives">Objectives<a class="headerlink" href="#objectives" title="Permanent link">&para;</a></h4>
+<ol>
+<li>First systematic comparison of 6+ identifier types across 6+ architecture families on 7+ datasets</li>
+<li>Empirical analysis of when identifiers help (dataset characteristics, entity count, correlation structure)</li>
+<li>Practical guidelines for identifier selection</li>
+<li>Open-source benchmark framework (LIULIAN)</li>
+</ol>
+<h4 id="experiment-design">Experiment Design<a class="headerlink" href="#experiment-design" title="Permanent link">&para;</a></h4>
+<p><strong>Phase 1A — Core ablation (Week 1–2)</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Dimension</th>
+<th>Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Datasets</td>
+<td>swiss-river-1990, traffic, electricity, PEMS04, PEMS08</td>
+</tr>
+<tr>
+<td>Models</td>
+<td>LSTM, PatchTST, DLinear</td>
+</tr>
+<tr>
+<td>Identifier modes</td>
+<td>none, embedding, onehot, sinusoidal, random, coordinates (Swiss only)</td>
+</tr>
+<tr>
+<td>Seeds</td>
+<td>3 per combination</td>
+</tr>
+<tr>
+<td>Prediction lengths</td>
+<td>96, 192, 336, 720</td>
+</tr>
+<tr>
+<td>Metrics</td>
+<td>MSE, MAE (primary); RMSE, NSE (secondary)</td>
+</tr>
+</tbody>
+</table>
+<p>~900 runs total.</p>
+<p><strong>Phase 1B — Extended architectures (Week 2–3)</strong>:
+Add: iTransformer, TimeMixer, TimeXer.
+Add negative controls: Weather, ETTh1 (heterogeneous channels — identifiers should NOT help).</p>
+<p><strong>Phase 1C — Analysis and writing (Week 3–4)</strong>:
+- Wilcoxon signed-rank tests
+- t-SNE/UMAP of learned embeddings colored by geography
+- Embedding similarity vs spatial distance analysis
+- Dataset characterization: inter-entity MI, entity count regime analysis</p>
+<h4 id="expected-key-findings">Expected Key Findings<a class="headerlink" href="#expected-key-findings" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Learned embeddings dominate on large homogeneous datasets (traffic N=862, electricity N=321)</li>
+<li>Random baselines perform surprisingly well → <strong>entity distinction &gt;&gt; representation quality</strong></li>
+<li>One-hot degrades with large N (very sparse at 862 channels)</li>
+<li>Negative controls (Weather, ETT) show no benefit → channels are heterogeneous variables, not entities</li>
+</ul>
+<h4 id="novelty-verification">Novelty Verification<a class="headerlink" href="#novelty-verification" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Systematic identifier comparison across architectures</strong>: NOT published. STID [9] only tests spatial identity embeddings. CARD [5] only tests channel tokens. iTransformer [4] only tests variate-as-token. No work systematically compares none/embedding/onehot/sinusoidal/random/coordinates across LSTM/Transformer/Linear families. <strong>NOVEL.</strong></li>
+<li><strong>Random embedding baseline</strong>: Used in NLP (random word embeddings) but never as a controlled ablation for entity identifiers in TS. <strong>NOVEL for TS.</strong></li>
+<li><strong>ChannelTransparentWrapper</strong>: No prior work injects pre-computed features in multi-channel mode for TSLib models. <strong>NOVEL architecture.</strong></li>
+<li><strong>Negative control datasets</strong>: Previous works don't distinguish homogeneous-entity vs heterogeneous-feature datasets for identifier analysis. <strong>NOVEL framing.</strong></li>
+</ul>
+<h4 id="contributions">Contributions<a class="headerlink" href="#contributions" title="Permanent link">&para;</a></h4>
+<ul>
+<li>C1: First comprehensive entity identifier benchmark across architectures</li>
+<li>C2: Empirical guidelines for identifier selection based on dataset properties</li>
+<li>C3: Open-source LIULIAN entity identifier framework</li>
+<li>C4: Novel Swiss River hydrological dataset as evaluation domain</li>
+</ul>
+<hr />
+<h3 id="period-2-adaptive-entity-identifier-selection-via-meta-learning-month-23">Period 2: Adaptive Entity Identifier Selection via Meta-Learning (Month 2–3)<a class="headerlink" href="#period-2-adaptive-entity-identifier-selection-via-meta-learning-month-23" title="Permanent link">&para;</a></h3>
+<p><strong>Paper Title</strong>: "AdaptID: Adaptive Entity Identifier Selection for Multi-Entity Time Series Forecasting via Meta-Learning"</p>
+<p><strong>Target Venue</strong>: ICML 2027 / NeurIPS 2027</p>
+<h4 id="technical-approach">Technical Approach<a class="headerlink" href="#technical-approach" title="Permanent link">&para;</a></h4>
+<p><strong>Multi-View Entity Representation with Gating</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>x_entity = Gate([emb(id), onehot(id), sinusoidal(id), random(id), coords(id)])
+</code></pre></div></p>
+<ul>
+<li><strong>Gate</strong>: Attention mechanism over identifier views, conditioned on dataset statistics (N_entities, inter-entity MI, temporal autocorrelation)</li>
+<li><strong>Training</strong>: End-to-end with forecasting objective + auxiliary identifier discrimination loss</li>
+<li><strong>Architecture</strong>: Identifier Encoder → Dataset Profiler → Gating Network → Forecasting Backbone</li>
+</ul>
+<h4 id="novelty-verification_1">Novelty Verification<a class="headerlink" href="#novelty-verification_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>TESTAM</strong> [22] uses MoE to gate over graph structure types (none, static, dynamic), NOT identifier types. Different input and granularity.</li>
+<li><strong>TRA</strong> [13] does entity-specific routing for temporal patterns in stocks, NOT identifier type selection.</li>
+<li><strong>CARD</strong> [5] uses fixed channel tokens, no adaptive selection.</li>
+<li><strong>Gating over multiple identifier representations conditioned on dataset statistics</strong>: <strong>NOT PUBLISHED. NOVEL.</strong></li>
+</ul>
+<h4 id="contributions_1">Contributions<a class="headerlink" href="#contributions_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li>C1: First adaptive identifier selection framework for time series</li>
+<li>C2: Meta-learning formulation enabling cross-dataset transfer of selection strategy</li>
+<li>C3: Theoretical analysis connecting entity correlation structure ↔ optimal identifier type</li>
+<li>C4: Identifier fusion consistently outperforms best single identifier</li>
+</ul>
+<hr />
+<h3 id="period-3-unified-entity-identifiers-spatio-temporal-graphs-month-35">Period 3: Unified Entity Identifiers + Spatio-Temporal Graphs (Month 3–5)<a class="headerlink" href="#period-3-unified-entity-identifiers-spatio-temporal-graphs-month-35" title="Permanent link">&para;</a></h3>
+<p><strong>Paper Title</strong>: "Beyond Node Embeddings: Bridging Entity Identifiers and Graph Neural Networks for Spatio-Temporal Forecasting"</p>
+<p><strong>Target Venue</strong>: KDD 2027 / AAAI 2027</p>
+<h4 id="technical-approach_1">Technical Approach<a class="headerlink" href="#technical-approach_1" title="Permanent link">&para;</a></h4>
+<p><strong>Key Insight</strong>: Entity identifiers (Period 1–2) are a special case of GNN node features without edges. This work unifies them:</p>
+<ol>
+<li><strong>Identifier-to-Graph</strong>: Learn adaptive adjacency from entity representations (cf. Graph WaveNet [15], MTGNN [16])</li>
+<li><strong>Graph-to-Identifier</strong>: Extract entity-level features from graph structure as identifier</li>
+<li><strong>Hybrid</strong>: Identifiers + adaptive graph + message passing</li>
+</ol>
+<p><strong>Entity Relationship Construction</strong>:
+- From data: Pairwise entity similarity from temporal patterns
+- From metadata: Geographic coordinates, network topology
+- From LLMs: Generate entity relationship descriptions → graph structure (<strong>novel</strong>)</p>
+<p><strong>Zero-Shot Entity Prediction</strong> (STEP-inspired [17]):
+- Pre-train entity embeddings on source entities
+- Transfer via spatial interpolation, LLM-generated description mapping, or few-shot adaptation</p>
+<h4 id="novelty-verification_2">Novelty Verification<a class="headerlink" href="#novelty-verification_2" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>STID</strong> [9] shows identifiers can replace graphs, but doesn't study the combination.</li>
+<li><strong>STEP</strong> [17] does pre-training for zero-shot nodes, but within same domain only.</li>
+<li><strong>LLM-based entity graph construction from metadata descriptions</strong>: <strong>NOT PUBLISHED. NOVEL.</strong> (Closest: LLM-based knowledge graphs in NLP, but not applied to ST sensor networks.)</li>
+<li><strong>Unified framework connecting entity identifiers and GNN node embeddings</strong>: <strong>NOT PUBLISHED as a systematic study. NOVEL.</strong></li>
+</ul>
+<hr />
+<h3 id="phase-b-spatio-temporal-foundation-models-months-512-3-papers">Phase B: Spatio-Temporal Foundation Models (Months 5–12, 3 Papers)<a class="headerlink" href="#phase-b-spatio-temporal-foundation-models-months-512-3-papers" title="Permanent link">&para;</a></h3>
+<hr />
+<h3 id="period-4-llm-enhanced-spatio-temporal-intelligence-month-58">Period 4: LLM-Enhanced Spatio-Temporal Intelligence (Month 5–8)<a class="headerlink" href="#period-4-llm-enhanced-spatio-temporal-intelligence-month-58" title="Permanent link">&para;</a></h3>
+<p><strong>Paper Title</strong>: "EntityLLM: Large Language Model-Enhanced Entity Representation for Universal Spatio-Temporal Forecasting"</p>
+<p><strong>Target Venue</strong>: ICLR 2028 / NeurIPS 2027</p>
+<h4 id="technical-approach_2">Technical Approach<a class="headerlink" href="#technical-approach_2" title="Permanent link">&para;</a></h4>
+<p><strong>Text-Enhanced Entity Identifiers</strong>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Entity: &quot;Station Aare-Bern: river gauging station on the Aare river,
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>         coordinates (46.95, 7.45), elevation 502m, catchment area 3000 km²,
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>         upstream of Lake Thun, measures water temperature hourly.&quot;
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>→ LLM encoder → entity_text_emb → align with entity_learned_emb
+</code></pre></div></p>
+<p><strong>Multi-Modal Entity Representation</strong>:
+- Combine: TS patterns + text descriptions + spatial coordinates + satellite imagery (for hydrology)
+- Attention-based cross-modal fusion
+- Each modality provides complementary entity information</p>
+<p><strong>LLM Agent for ST Forecasting Pipeline</strong>:
+- Analyzes dataset metadata → recommends identifier type, architecture, graph structure
+- Iterative: run → analyze → refine
+- Natural language entity specification for zero-shot adaptation</p>
+<h4 id="novelty-verification_3">Novelty Verification<a class="headerlink" href="#novelty-verification_3" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Time-LLM</strong> [43]: Reprograms LLMs for TS but without entity-specific text.</li>
+<li><strong>TEST</strong> [44]: Aligns TS with text prototypes but not entity metadata descriptions.</li>
+<li><strong>UrbanGPT</strong> [52]: Uses LLMs for ST but doesn't use entity metadata as text prompts.</li>
+<li><strong>Text descriptions of sensor entities as LLM prompts for identifier injection</strong>: <strong>NOT PUBLISHED. NOVEL.</strong></li>
+<li><strong>LLM agent for automated ST pipeline design</strong>: <strong>NOT PUBLISHED.</strong> TrafficGPT [54] is closest but limited to traffic + ChatGPT wrapper, not pipeline design automation. DS-Agent [58] and AI Scientist [57] are domain-general. <strong>NOVEL for ST domain.</strong></li>
+<li><strong>Multi-modal entity fusion (TS + text + coordinates + satellite)</strong>: <strong>NOT PUBLISHED in this combination. NOVEL.</strong></li>
+</ul>
+<hr />
+<h3 id="period-5-spatio-temporal-foundation-model-with-entity-awareness-month-710">Period 5: Spatio-Temporal Foundation Model with Entity Awareness (Month 7–10)<a class="headerlink" href="#period-5-spatio-temporal-foundation-model-with-entity-awareness-month-710" title="Permanent link">&para;</a></h3>
+<p><strong>Paper Title</strong>: "UniEntity: An Entity-Aware Foundation Model for Cross-Domain Spatio-Temporal Forecasting"</p>
+<p><strong>Target Venue</strong>: ICML 2028 / Nature Machine Intelligence</p>
+<h4 id="technical-approach_3">Technical Approach<a class="headerlink" href="#technical-approach_3" title="Permanent link">&para;</a></h4>
+<p><strong>Domain-Agnostic Entity Framework</strong>:
+- Entity type ontology: sensor, patient, financial instrument, weather station, river gauge, ...
+- Shared entity embedding space across domains
+- Domain-specific entity adapters (LoRA-style [110])</p>
+<p><strong>Pre-Training Strategy</strong>:
+- LOTSA-style [35] multi-domain ST corpus: traffic + electricity + hydrology + air quality + clinical
+- Entity-conditioned masked modeling: predict masked patches conditioned on entity identity
+- Spatial-aware attention: combine temporal self-attention with learned spatial attention</p>
+<p><strong>Cross-Domain Entity Transfer</strong>:
+- Demonstrate: traffic sensor embeddings transfer to river gauging station embeddings (both are spatial sensor networks with periodic patterns)
+- Patient-as-entity: ICU time series with patient demographics as entity metadata</p>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Entity Type</th>
+<th>Entity Metadata</th>
+<th>Key Challenge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Transportation</td>
+<td>Traffic sensors</td>
+<td>Location, road type, speed limit</td>
+<td>Periodic patterns, spatial correlation</td>
+</tr>
+<tr>
+<td>Energy</td>
+<td>Power meters</td>
+<td>Customer type, location, capacity</td>
+<td>Diverse consumption, peak demand</td>
+</tr>
+<tr>
+<td>Hydrology</td>
+<td>River gauging stations</td>
+<td>Coordinates, catchment area, elevation</td>
+<td>Network topology, extreme events</td>
+</tr>
+<tr>
+<td>Healthcare</td>
+<td>ICU patients</td>
+<td>Demographics, diagnoses, medications</td>
+<td>High variability, missing data, irregular sampling</td>
+</tr>
+<tr>
+<td>IoT</td>
+<td>Building sensors</td>
+<td>Floor, room, sensor type</td>
+<td>Heterogeneous types, edge deployment</td>
+</tr>
+<tr>
+<td>Finance</td>
+<td>Stocks/instruments</td>
+<td>Sector, market cap, country</td>
+<td>Non-stationary, regime changes</td>
+</tr>
+<tr>
+<td>Environment</td>
+<td>Air quality monitors</td>
+<td>Location, proximity to roads/industry</td>
+<td>Spatial dispersion, meteorological coupling</td>
+</tr>
+</tbody>
+</table>
+<h4 id="novelty-verification_4">Novelty Verification<a class="headerlink" href="#novelty-verification_4" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>Moirai</strong> [35]: Any-variate but no entity conditioning or spatial awareness.</li>
+<li><strong>UniST</strong> [31]: ST foundation model but traffic/urban-only.</li>
+<li><strong>OpenCity</strong> [32]: ST pre-training but traffic-only.</li>
+<li><strong>Entity-conditioned cross-domain ST foundation model</strong>: <strong>NOT PUBLISHED. NOVEL.</strong> Closest: UniTS [12] uses dataset-specific prompt tokens but not entity identity conditioning.</li>
+<li><strong>LoRA-style domain adapters for ST foundation model</strong>: <strong>NOT PUBLISHED in ST context. NOVEL.</strong></li>
+</ul>
+<hr />
+<h3 id="period-6-mambassm-architectures-for-efficient-spatio-temporal-learning-month-912">Period 6: Mamba/SSM Architectures for Efficient Spatio-Temporal Learning (Month 9–12)<a class="headerlink" href="#period-6-mambassm-architectures-for-efficient-spatio-temporal-learning-month-912" title="Permanent link">&para;</a></h3>
+<p><strong>Paper Title</strong>: "ST-Mamba: Efficient Spatio-Temporal Forecasting with Selective State Space Models and Entity-Aware Conditioning"</p>
+<p><strong>Target Venue</strong>: ICLR 2028 / ICML 2028</p>
+<h4 id="technical-approach_4">Technical Approach<a class="headerlink" href="#technical-approach_4" title="Permanent link">&para;</a></h4>
+<p>Building on SpoT-Mamba [28] and STG-Mamba [29], develop a full ST-Mamba architecture with:</p>
+<ol>
+<li><strong>Spatial Mamba</strong>: Selective scan along spatial neighborhoods (graph-guided walk sequences)</li>
+<li><strong>Temporal Mamba</strong>: Selective scan along time dimension with variable-length context</li>
+<li><strong>Entity conditioning</strong>: Inject entity identifiers into Mamba's selection mechanism (∆, B, C matrices)</li>
+<li><strong>Linear complexity</strong>: O(N·T) vs O(N²·T²) for full attention — critical for scaling to 1000+ entity networks</li>
+</ol>
+<h4 id="novelty-verification_5">Novelty Verification<a class="headerlink" href="#novelty-verification_5" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>SpoT-Mamba</strong> [28]: Uses Mamba for ST but in a workshop paper, limited scope.</li>
+<li><strong>STG-Mamba</strong> [29]: ArXiv preprint, first exploration but no entity conditioning.</li>
+<li><strong>Entity-conditioned Mamba with full spatial+temporal scanning</strong>: <strong>NOT PUBLISHED. NOVEL.</strong></li>
+<li><strong>Systematic comparison of Mamba vs Transformer vs GNN for ST forecasting</strong>: <strong>NOT PUBLISHED as a systematic study. NOVEL.</strong></li>
+</ul>
+<hr />
+<h3 id="phase-c-liulian-platform-and-domain-applications-months-818">Phase C: LIULIAN Platform and Domain Applications (Months 8–18)<a class="headerlink" href="#phase-c-liulian-platform-and-domain-applications-months-818" title="Permanent link">&para;</a></h3>
+<hr />
+<h3 id="period-7-liulian-platform-system-paper-month-814">Period 7: LIULIAN Platform System Paper (Month 8–14)<a class="headerlink" href="#period-7-liulian-platform-system-paper-month-814" title="Permanent link">&para;</a></h3>
+<p><strong>Paper Title</strong>: "LIULIAN: An Open-Source Agent-Powered Platform for Spatio-Temporal Intelligence with Vertical Domain Plugins"</p>
+<p><strong>Target Venue</strong>: VLDB 2028 / KDD 2028 (Demo) / JMLR MLOSS / NeurIPS 2027 D&amp;B</p>
+<h4 id="the-platform-as-contribution">The Platform as Contribution<a class="headerlink" href="#the-platform-as-contribution" title="Permanent link">&para;</a></h4>
+<p>LIULIAN is not just a model library — it is a <strong>full-stack spatio-temporal intelligence platform</strong> combining:</p>
+<ol>
+<li><strong>Modular ML Pipeline</strong>:</li>
+<li>Task-driven design separating task semantics from model logic</li>
+<li>ExecutableModel ABC with lightweight adapter pattern</li>
+<li>State machine experiment orchestration (train → eval → infer → analyze → visualize)</li>
+<li>
+<p>YAML manifests with semantic schemas, topology, integrity hashing</p>
+</li>
+<li>
+<p><strong>Entity-Aware and Spatial Modules</strong> (from Phases A–B):</p>
+</li>
+<li>Entity identifier injection across all model families</li>
+<li>Adaptive graph construction</li>
+<li>GNN spatial modules</li>
+<li>
+<p>Cross-domain entity transfer</p>
+</li>
+<li>
+<p><strong>LLM Agent Layer</strong>:</p>
+</li>
+<li><strong>Pipeline Design Agent</strong>: Analyzes dataset metadata, recommends models/identifiers/graphs</li>
+<li><strong>Data Ingestion Agent</strong>: Natural language-based adaptive data mapping ("one-click graph ingestion")</li>
+<li><strong>Report Generation Agent</strong>: Automated analysis reports from experiment results</li>
+<li>
+<p><strong>Human-in-the-loop interaction</strong>: Domain experts describe problems in NL, system recommends solutions</p>
+</li>
+<li>
+<p><strong>BI and Visualization Layer</strong>:</p>
+</li>
+<li>Interactive dashboards (Power BI integration + custom extensions)</li>
+<li>Natural language query interface for spatio-temporal data</li>
+<li>Automated report generation with charts and insights</li>
+<li>
+<p>Graph explainability visualizations</p>
+</li>
+<li>
+<p><strong>Vertical Domain Plugins</strong>:</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>Domain</th>
+<th>Plugin</th>
+<th>Status</th>
+<th>Key Features</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Smart Earth / Hydrology</strong></td>
+<td><code>plugins/hydrology/</code></td>
+<td>Partially implemented</td>
+<td>Swiss river database, station coordinates, watershed topology, GIS visualization</td>
+</tr>
+<tr>
+<td><strong>Healthcare</strong></td>
+<td><code>plugins/healthcare/</code></td>
+<td>Planned</td>
+<td>MIMIC-III/IV integration, patient-as-entity, perioperative prediction</td>
+</tr>
+<tr>
+<td><strong>Finance</strong></td>
+<td><code>plugins/finance/</code></td>
+<td>Planned (N-Banker collaboration)</td>
+<td>Financial TS analysis, entity-aware stock prediction, AI agent chatbot</td>
+</tr>
+<tr>
+<td><strong>Smart Engineering</strong></td>
+<td><code>plugins/engineering/</code></td>
+<td>Planned (DeepSchemata)</td>
+<td>Topology extraction from drawings, automated analysis</td>
+</tr>
+<tr>
+<td><strong>Computational Chemistry</strong></td>
+<td><code>plugins/chemistry/</code></td>
+<td>Planned</td>
+<td>Molecular property prediction, reaction analysis</td>
+</tr>
+<tr>
+<td><strong>Disaster Management</strong></td>
+<td><code>plugins/disaster/</code></td>
+<td>Planned (Renmin Univ. collaboration)</td>
+<td>Multi-modal (satellite + population), evacuation routing</td>
+</tr>
+<tr>
+<td><strong>Digital Humanities</strong></td>
+<td><code>plugins/humanities/</code></td>
+<td>Planned</td>
+<td>Document structure analysis, handwriting recognition</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><strong>Deployment and MLOps</strong>:</li>
+<li>Docker containerization</li>
+<li>Cloud deployment (AWS planned)</li>
+<li>CI/CD via GitHub Actions</li>
+<li>Ray Tune + Slurm integration</li>
+<li>Experiment tracking (MLflow/W&amp;B)</li>
+</ol>
+<h4 id="novelty-verification-platform">Novelty Verification (Platform)<a class="headerlink" href="#novelty-verification-platform" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>TSLib</strong> [73], <strong>BasicTS</strong> [74], <strong>tsl</strong> [75]: Model libraries only — no agents, no BI, no plugins, no entity awareness.</li>
+<li><strong>LibCity</strong> [79]: Urban computing only — no cross-domain, no agents, no BI.</li>
+<li><strong>GluonTS</strong> [3], <strong>NeuralForecast</strong> [76]: Temporal only — no spatial, no graphs, no entities.</li>
+<li><strong>Ludwig</strong> [111]: Declarative ML but not ST-specific.</li>
+<li><strong>Full-stack ST platform with entity-aware models + LLM agents + BI + vertical domain plugins</strong>: <strong>NOT PUBLISHED. NOVEL.</strong></li>
+</ul>
+<hr />
+<h3 id="domain-application-papers-months-1018-3-papers">Domain Application Papers (Months 10–18, 3+ Papers)<a class="headerlink" href="#domain-application-papers-months-1018-3-papers" title="Permanent link">&para;</a></h3>
+<p>These papers apply LIULIAN to specific domains, each producing a domain contribution:</p>
+<h4 id="d1-swiss-river-water-temperature-prediction-month-1012">D1: Swiss River Water Temperature Prediction (Month 10–12)<a class="headerlink" href="#d1-swiss-river-water-temperature-prediction-month-1012" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Extends ICPR 2026 submission with entity identifier ablation + graph modules</li>
+<li>Domain-specific evaluation with NSE metric and hydrological baselines</li>
+<li><strong>Target</strong>: Environmental Data Science / Water Resources Research</li>
+</ul>
+<h4 id="d2-perioperative-patient-outcome-prediction-month-1215">D2: Perioperative Patient Outcome Prediction (Month 12–15)<a class="headerlink" href="#d2-perioperative-patient-outcome-prediction-month-1215" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Collaboration with China Pharmaceutical University and Inselspital Bern</li>
+<li>Patient-as-entity with demographics, surgical type, comorbidities as entity metadata</li>
+<li>Entity clustering reveals patient phenotypes with distinct outcome trajectories</li>
+<li><strong>Target</strong>: npj Digital Medicine / CHIL / ML4H</li>
+</ul>
+<h4 id="d3-disaster-impact-analysis-from-multi-modal-st-data-month-1418">D3: Disaster Impact Analysis from Multi-Modal ST Data (Month 14–18)<a class="headerlink" href="#d3-disaster-impact-analysis-from-multi-modal-st-data-month-1418" title="Permanent link">&para;</a></h4>
+<ul>
+<li>Collaboration with Renmin University of China</li>
+<li>Multi-modal: satellite imagery + population distribution + time series</li>
+<li>Tasks: population distribution prediction, damage assessment, evacuation planning</li>
+<li><strong>Target</strong>: Nature Communications / KDD Applied Data Science</li>
+</ul>
+<hr />
+<h2 id="5-innovation-highlights-and-novelty-summary">5. Innovation Highlights and Novelty Summary<a class="headerlink" href="#5-innovation-highlights-and-novelty-summary" title="Permanent link">&para;</a></h2>
+<h3 id="51-near-term-innovations-phase-a-periods-13">5.1 Near-Term Innovations (Phase A, Periods 1–3)<a class="headerlink" href="#51-near-term-innovations-phase-a-periods-13" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Innovation</th>
+<th>Novelty Status</th>
+<th>Closest Prior Work</th>
+<th>What's New</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Systematic identifier ablation across architectures</td>
+<td><strong>Novel</strong></td>
+<td>STID [9] (one type only)</td>
+<td>First multi-type, multi-architecture comparison</td>
+</tr>
+<tr>
+<td>Random embedding baseline for entity distinction</td>
+<td><strong>Novel for TS</strong></td>
+<td>Random word embeddings in NLP</td>
+<td>Isolates "distinction" from "representation quality"</td>
+</tr>
+<tr>
+<td>ChannelTransparentWrapper</td>
+<td><strong>Novel architecture</strong></td>
+<td>None</td>
+<td>Pre-computed features in multi-channel TSLib models</td>
+</tr>
+<tr>
+<td>Negative control datasets for identifier study</td>
+<td><strong>Novel framing</strong></td>
+<td>None</td>
+<td>First to explicitly test where IDs should NOT help</td>
+</tr>
+<tr>
+<td>AdaptID meta-learning over identifier types</td>
+<td><strong>Novel</strong></td>
+<td>TESTAM [22] (graph types)</td>
+<td>Gating over identifier types, not graph structures</td>
+</tr>
+<tr>
+<td>LLM-based entity graph construction</td>
+<td><strong>Novel</strong></td>
+<td>LLM knowledge graphs in NLP</td>
+<td>Applied to ST sensor networks from metadata</td>
+</tr>
+<tr>
+<td>Unified identifier + GNN framework</td>
+<td><strong>Novel</strong></td>
+<td>STID [9], Graph WaveNet [15] separately</td>
+<td>Systematic bridge between two research communities</td>
+</tr>
+</tbody>
+</table>
+<h3 id="52-medium-term-innovations-phase-b-periods-46">5.2 Medium-Term Innovations (Phase B, Periods 4–6)<a class="headerlink" href="#52-medium-term-innovations-phase-b-periods-46" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Innovation</th>
+<th>Novelty Status</th>
+<th>Closest Prior Work</th>
+<th>What's New</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Text-enhanced entity identifiers via LLM</td>
+<td><strong>Novel</strong></td>
+<td>TEST [44] (text prototypes)</td>
+<td>Entity-specific metadata descriptions as identifiers</td>
+</tr>
+<tr>
+<td>LLM agent for ST pipeline design</td>
+<td><strong>Novel</strong></td>
+<td>TrafficGPT [54], AI Scientist [57]</td>
+<td>Domain-specific ST pipeline automation</td>
+</tr>
+<tr>
+<td>Multi-modal entity fusion (TS+text+coords+satellite)</td>
+<td><strong>Novel</strong></td>
+<td>Time-MMD [117] (TS+text only)</td>
+<td>Full multi-modal fusion for entity representation</td>
+</tr>
+<tr>
+<td>Entity-aware cross-domain ST foundation model</td>
+<td><strong>Novel</strong></td>
+<td>UniST [31] (urban only), Moirai [35] (no entities)</td>
+<td>Entity conditioning + cross-domain pre-training</td>
+</tr>
+<tr>
+<td>Entity-conditioned Mamba for ST</td>
+<td><strong>Novel</strong></td>
+<td>SpoT-Mamba [28] (no entity conditioning)</td>
+<td>Entity identifiers in SSM selection mechanism</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-long-term-innovations-phase-c-period-7">5.3 Long-Term Innovations (Phase C, Period 7+)<a class="headerlink" href="#53-long-term-innovations-phase-c-period-7" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Innovation</th>
+<th>Novelty Status</th>
+<th>Closest Prior Work</th>
+<th>What's New</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Full-stack ST intelligence platform</td>
+<td><strong>Novel</strong></td>
+<td>TSLib [73], LibCity [79] (model libraries only)</td>
+<td>Agent + BI + entity-aware + plugin architecture</td>
+</tr>
+<tr>
+<td>LLM-driven adaptive data ingestion for ST data</td>
+<td><strong>Novel</strong></td>
+<td>Data-Copilot [55] (tabular only)</td>
+<td>NL-based ST data mapping with graph topology</td>
+</tr>
+<tr>
+<td>Vertical domain plugins with domain-specific GUIs</td>
+<td><strong>Novel for ST</strong></td>
+<td>Hugging Face spaces (NLP)</td>
+<td>Domain-specific GUIs for hydrology, healthcare, etc.</td>
+</tr>
+<tr>
+<td>Perioperative patient clustering via entity-aware ST models</td>
+<td><strong>Novel application</strong></td>
+<td>Perioperative GNN [84] (single task)</td>
+<td>Entity identifier framework applied to clinical TS</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-evaluation-protocol">6. Evaluation Protocol<a class="headerlink" href="#6-evaluation-protocol" title="Permanent link">&para;</a></h2>
+<h3 id="61-datasets">6.1 Datasets<a class="headerlink" href="#61-datasets" title="Permanent link">&para;</a></h3>
+<p><strong>Primary — Homogeneous multi-entity (Phases A–B)</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Entities</th>
+<th>Length</th>
+<th>Domain</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Traffic</td>
+<td>862</td>
+<td>17,544</td>
+<td>Road sensors</td>
+<td>TSLib / Caltrans PEMS</td>
+</tr>
+<tr>
+<td>Electricity</td>
+<td>321</td>
+<td>26,304</td>
+<td>Power clients</td>
+<td>TSLib / UCI</td>
+</tr>
+<tr>
+<td>Swiss-River-1990</td>
+<td>~50</td>
+<td>~10,000</td>
+<td>Gauging stations</td>
+<td>LIULIAN (novel)</td>
+</tr>
+<tr>
+<td>PEMS03/04/07/08</td>
+<td>170–883</td>
+<td>16,992–26,208</td>
+<td>Traffic sensors</td>
+<td>STGNN benchmark</td>
+</tr>
+<tr>
+<td>Solar-Energy</td>
+<td>137</td>
+<td>~52,000</td>
+<td>PV plants</td>
+<td>NREL</td>
+</tr>
+<tr>
+<td>METR-LA</td>
+<td>207</td>
+<td>~34,272</td>
+<td>Traffic speed</td>
+<td>DCRNN benchmark</td>
+</tr>
+<tr>
+<td>PEMS-BAY</td>
+<td>325</td>
+<td>~52,116</td>
+<td>Traffic speed</td>
+<td>DCRNN benchmark</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Negative controls — Heterogeneous channels</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Channels</th>
+<th>Why Negative</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Weather</td>
+<td>21</td>
+<td>Different physical variables</td>
+<td>TSLib / Max Planck</td>
+</tr>
+<tr>
+<td>ETTh1/ETTm1</td>
+<td>7</td>
+<td>Heterogeneous measurements</td>
+<td>TSLib</td>
+</tr>
+<tr>
+<td>ILI</td>
+<td>7</td>
+<td>Different statistical measures</td>
+<td>CDC</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Extended domains (Phases B–C)</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Domain</th>
+<th>Entity Type</th>
+<th>Source</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MIMIC-III/IV</td>
+<td>ICU patients</td>
+<td>Patient</td>
+<td>PhysioNet</td>
+</tr>
+<tr>
+<td>Beijing Air Quality</td>
+<td>Environmental</td>
+<td>Monitoring station</td>
+<td>UCI</td>
+</tr>
+<tr>
+<td>NYC Taxi/Bike</td>
+<td>Urban mobility</td>
+<td>Zone/station</td>
+<td>NYC TLC / Citi Bike</td>
+</tr>
+<tr>
+<td>London Smart Meters</td>
+<td>Energy</td>
+<td>Household</td>
+<td>UK Power Networks</td>
+</tr>
+<tr>
+<td>Perioperative (private)</td>
+<td>Healthcare</td>
+<td>Patient</td>
+<td>China Pharm. Univ. / Inselspital</td>
+</tr>
+</tbody>
+</table>
+<h3 id="62-metrics">6.2 Metrics<a class="headerlink" href="#62-metrics" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Primary</strong>: MSE, MAE (standard TSLib protocol)</li>
+<li><strong>Secondary</strong>: RMSE, MAPE, NSE (hydrology-specific)</li>
+<li><strong>Statistical</strong>: Mean ± std over 3+ seeds; Wilcoxon signed-rank test; Nemenyi CD diagrams</li>
+<li><strong>Probabilistic</strong> (when applicable): CRPS, calibration, interval coverage</li>
+</ul>
+<h3 id="63-baselines">6.3 Baselines<a class="headerlink" href="#63-baselines" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Methods</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No identifier</td>
+<td>Shared model, all architectures</td>
+</tr>
+<tr>
+<td>Each identifier type</td>
+<td>embedding, onehot, sinusoidal, random, coordinates</td>
+</tr>
+<tr>
+<td>Implicit entity</td>
+<td>iTransformer [4] (variate-as-token)</td>
+</tr>
+<tr>
+<td>Explicit entity (simple)</td>
+<td>STID [9] (MLP + spatial ID)</td>
+</tr>
+<tr>
+<td>Channel tokens</td>
+<td>CARD [5]</td>
+</tr>
+<tr>
+<td>Graph-based</td>
+<td>Graph WaveNet [15], MTGNN [16], DCRNN [14]</td>
+</tr>
+<tr>
+<td>Foundation models</td>
+<td>Chronos [34], Moirai [35], TimesFM [33]</td>
+</tr>
+<tr>
+<td>LLM-based</td>
+<td>Time-LLM [43], GPT4TS [42]</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-resource-requirements">7. Resource Requirements<a class="headerlink" href="#7-resource-requirements" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Phase A (Mo 1–5)</th>
+<th>Phase B (Mo 5–12)</th>
+<th>Phase C (Mo 8–18)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPU hours</td>
+<td>~1,500</td>
+<td>~5,000</td>
+<td>~3,000</td>
+</tr>
+<tr>
+<td>Storage</td>
+<td>100 GB</td>
+<td>500 GB</td>
+<td>1 TB</td>
+</tr>
+<tr>
+<td>Human effort</td>
+<td>5 months (AI-assisted)</td>
+<td>7 months</td>
+<td>10 months</td>
+</tr>
+<tr>
+<td>Compute</td>
+<td>RTX 4090 cluster</td>
+<td>A100 cluster</td>
+<td>A100/H100 cluster</td>
+</tr>
+<tr>
+<td>LLM API costs</td>
+<td>Minimal</td>
+<td>~$500/month</td>
+<td>~$1,000/month</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-risk-analysis-and-mitigation">8. Risk Analysis and Mitigation<a class="headerlink" href="#8-risk-analysis-and-mitigation" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Risk</th>
+<th>Likelihood</th>
+<th>Impact</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Entity identifiers show minimal benefit on most datasets</td>
+<td>Medium</td>
+<td>High</td>
+<td>Frame as negative result; focus on "when" not "whether"</td>
+</tr>
+<tr>
+<td>Random baselines match learned embeddings</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Important finding — entity distinction &gt;&gt; representation quality</td>
+</tr>
+<tr>
+<td>LLM entity descriptions don't improve over numerical embeddings</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Focus on zero-shot/transfer scenarios where text is uniquely valuable</td>
+</tr>
+<tr>
+<td>ST foundation model can't generalize across domains</td>
+<td>Medium</td>
+<td>High</td>
+<td>Start with similar domains (traffic → hydrology); use domain adapters</td>
+</tr>
+<tr>
+<td>Platform development takes longer than expected</td>
+<td>High</td>
+<td>Medium</td>
+<td>Prioritize research papers; platform is incremental</td>
+</tr>
+<tr>
+<td>Collaborator datasets not available on time</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Use public datasets as fallback; domain papers shift timeline</td>
+</tr>
+<tr>
+<td>Tan et al. [51] criticism applies to our LLM-based methods</td>
+<td>Medium</td>
+<td>Medium</td>
+<td>Design controlled ablations; focus on entity-specific contributions</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-collaboration-network">9. Collaboration Network<a class="headerlink" href="#9-collaboration-network" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Partner</th>
+<th>Domain</th>
+<th>Status</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>University of Bern (PRG)</td>
+<td>Hydrology, graph ML</td>
+<td>Active</td>
+<td>Swiss river data, graph matching</td>
+</tr>
+<tr>
+<td>BFH (Bern Univ. Applied Sciences)</td>
+<td>Hydrology, mudslide detection</td>
+<td>Active</td>
+<td>Domain expertise, private data</td>
+</tr>
+<tr>
+<td>China Pharmaceutical University</td>
+<td>Healthcare (perioperative)</td>
+<td>Under connection</td>
+<td>Clinical datasets, domain expertise</td>
+</tr>
+<tr>
+<td>Inselspital Bern</td>
+<td>Healthcare (perioperative)</td>
+<td>Building connection</td>
+<td>Clinical data, validation</td>
+</tr>
+<tr>
+<td>Renmin University of China</td>
+<td>Disaster management</td>
+<td>Built connection</td>
+<td>Multi-modal earthquake datasets</td>
+</tr>
+<tr>
+<td>Digital Financial Services Research Center</td>
+<td>Finance (N-Banker)</td>
+<td>Strong connection</td>
+<td>Financial AI agent system</td>
+</tr>
+<tr>
+<td>HES-SO Fribourg</td>
+<td>Document analysis, engineering</td>
+<td>Previous institution</td>
+<td>Historical docs, engineering drawings</td>
+</tr>
+<tr>
+<td>Chinese Academy of Sciences</td>
+<td>Materials science</td>
+<td>Built connection</td>
+<td>Molten pool dynamics data</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-detailed-period-1-execution-plan-1-month">10. Detailed Period 1 Execution Plan (1 Month)<a class="headerlink" href="#10-detailed-period-1-execution-plan-1-month" title="Permanent link">&para;</a></h2>
+<h3 id="week-1-infrastructure-and-core-experiments">Week 1: Infrastructure and Core Experiments<a class="headerlink" href="#week-1-infrastructure-and-core-experiments" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] Verify all 48 matrix jobs pass dry-run</li>
+<li>[ ] Add iTransformer, TimeMixer, TimeXer to experiment matrix</li>
+<li>[ ] Add PEMS04, PEMS08, and negative control datasets</li>
+<li>[ ] Increase default seeds to 3 (2024, 2025, 2026)</li>
+<li>[ ] Set up prediction length sweep (96, 192, 336, 720)</li>
+<li>[ ] Submit Phase 1A core matrix to cluster</li>
+<li>[ ] Monitor and fix pipeline issues</li>
+</ul>
+<h3 id="week-2-full-experimental-campaign">Week 2: Full Experimental Campaign<a class="headerlink" href="#week-2-full-experimental-campaign" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] Verify Phase 1A results; re-run failures</li>
+<li>[ ] Submit extended model experiments</li>
+<li>[ ] Submit negative controls (Weather, ETTh1 × all models × none+embedding)</li>
+<li>[ ] Compute inter-entity correlation matrices</li>
+<li>[ ] Run t-SNE/UMAP visualization of learned embeddings</li>
+</ul>
+<h3 id="week-3-analysis-and-figures">Week 3: Analysis and Figures<a class="headerlink" href="#week-3-analysis-and-figures" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] Compute mean ± std across seeds</li>
+<li>[ ] Wilcoxon signed-rank tests: each mode vs none</li>
+<li>[ ] Performance improvement heatmaps (dataset × model × mode)</li>
+<li>[ ] Effect of entity count on identifier benefit</li>
+<li>[ ] Identifier type recommendation flowchart</li>
+</ul>
+<h3 id="week-4-paper-writing">Week 4: Paper Writing<a class="headerlink" href="#week-4-paper-writing" title="Permanent link">&para;</a></h3>
+<ul>
+<li>[ ] Introduction positioning vs PatchTST CI debate</li>
+<li>[ ] Related work (comprehensive, from Section 2)</li>
+<li>[ ] Methodology (LIULIAN framework, identifier types, injection mechanisms)</li>
+<li>[ ] Results with tables, figures, ablation studies</li>
+<li>[ ] Practical guidelines section</li>
+<li>[ ] Abstract, conclusion, supplementary</li>
+<li>[ ] Submit to arXiv; prepare venue-specific submission</li>
+</ul>
+<hr />
+<h2 id="11-summary-research-contributions-across-all-periods">11. Summary: Research Contributions Across All Periods<a class="headerlink" href="#11-summary-research-contributions-across-all-periods" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Period</th>
+<th>Title</th>
+<th>Type</th>
+<th>Novelty</th>
+<th>Target Venue</th>
+<th>Timeline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1</strong></td>
+<td>Entity identifier systematic ablation</td>
+<td>Benchmark</td>
+<td><strong>High</strong></td>
+<td>NeurIPS D&amp;B / AAAI</td>
+<td>Month 1</td>
+</tr>
+<tr>
+<td><strong>2</strong></td>
+<td>AdaptID: Adaptive identifier selection</td>
+<td>Method</td>
+<td><strong>Very High</strong></td>
+<td>ICML / NeurIPS</td>
+<td>Month 2–3</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>Unified identifiers + GNN framework</td>
+<td>Framework</td>
+<td><strong>High</strong></td>
+<td>KDD / AAAI</td>
+<td>Month 3–5</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>EntityLLM: LLM-enhanced entity representation</td>
+<td>Vision+Method</td>
+<td><strong>Very High</strong></td>
+<td>ICLR / NeurIPS</td>
+<td>Month 5–8</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td>UniEntity: Entity-aware ST foundation model</td>
+<td>Foundation</td>
+<td><strong>Extremely High</strong></td>
+<td>ICML / Nature MI</td>
+<td>Month 7–10</td>
+</tr>
+<tr>
+<td><strong>6</strong></td>
+<td>ST-Mamba with entity conditioning</td>
+<td>Method</td>
+<td><strong>High</strong></td>
+<td>ICLR / ICML</td>
+<td>Month 9–12</td>
+</tr>
+<tr>
+<td><strong>7</strong></td>
+<td>LIULIAN platform system paper</td>
+<td>System</td>
+<td><strong>Very High</strong></td>
+<td>VLDB / KDD Demo</td>
+<td>Month 8–14</td>
+</tr>
+<tr>
+<td><strong>D1</strong></td>
+<td>Swiss river water temperature</td>
+<td>Domain</td>
+<td>Medium-High</td>
+<td>Env. Data Science</td>
+<td>Month 10–12</td>
+</tr>
+<tr>
+<td><strong>D2</strong></td>
+<td>Perioperative patient prediction</td>
+<td>Domain</td>
+<td>High</td>
+<td>npj Digital Med.</td>
+<td>Month 12–15</td>
+</tr>
+<tr>
+<td><strong>D3</strong></td>
+<td>Disaster multi-modal ST analysis</td>
+<td>Domain</td>
+<td>High</td>
+<td>Nature Comms. / KDD</td>
+<td>Month 14–18</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="12-long-term-vision-year-2">12. Long-Term Vision (Year 2+)<a class="headerlink" href="#12-long-term-vision-year-2" title="Permanent link">&para;</a></h2>
+<p>Beyond the core 18-month program, LIULIAN aims to become the <strong>standard open-source platform for spatio-temporal intelligence</strong>, analogous to what Hugging Face Transformers is for NLP:</p>
+<ol>
+<li><strong>Community-driven model hub</strong>: Researchers contribute ST models via the adapter pattern</li>
+<li><strong>Benchmark-as-a-service</strong>: Standardized evaluation across domains (addressing the TSLib [73] / TFB [120] critique)</li>
+<li><strong>Agent marketplace</strong>: Domain-specific LLM agents for different verticals</li>
+<li><strong>Innosuisse Innovation Project</strong>: Funding application for industry deployment</li>
+<li><strong>Educational tools</strong>: Interactive tutorials for spatio-temporal ML (MkDocs-based, already partially implemented)</li>
+</ol>
+<hr />
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<p>[1] Nie, Y., et al. "A Time Series is Worth 64 Words: Long-term Forecasting with Transformers." ICLR 2023.
+[2] Fey, M. &amp; Lenssen, J.E. "Fast Graph Representation Learning with PyTorch Geometric." ICLR 2019 Workshop.
+[3] Alexandrov, A., et al. "GluonTS: Probabilistic and Neural Time Series Modeling in Python." JMLR 2020.
+[4] Liu, Y., et al. "iTransformer: Inverted Transformers Are Effective for Time Series Forecasting." ICLR 2024.
+[5] Wang, X., et al. "CARD: Channel Aligned Robust Blend Transformer for Time Series Forecasting." ICLR 2024.
+[6] Zhang, Y. &amp; Yan, J. "Crossformer: Transformer Utilizing Cross-Dimension Dependency for Multivariate Time Series Forecasting." ICLR 2023.
+[7] Chen, S., et al. "TSMixer: An All-MLP Architecture for Time Series Forecasting." NeurIPS 2023.
+[8] Gao, S., et al. "Client: Cross-variable Linear Integrated Enhanced Transformer for Multivariate Long-Term Time Series Forecasting." KDD 2024.
+[9] Shao, Z., et al. "Spatial-Temporal Identity: A Simple yet Effective Baseline for Multivariate Time Series Forecasting." CIKM 2022.
+[10] Das, A., et al. "Long-term Forecasting with TiDE: Time-series Dense Encoder." TMLR 2023.
+[11] Wang, Y., et al. "TimeXer: Empowering Transformers for Time Series Forecasting with Exogenous Variables." NeurIPS 2024.
+[12] Gao, S., et al. "UniTS: Building a Unified Time Series Model." NeurIPS 2024.
+[13] Lin, H., et al. "TRA: Temporal Routing Adaptor for Entity-Aware Stock Forecasting." AAAI 2023.
+[14] Li, Y., et al. "Diffusion Convolutional Recurrent Neural Network: Data-Driven Traffic Forecasting." ICLR 2018.
+[15] Wu, Z., et al. "Graph WaveNet for Deep Spatial-Temporal Graph Modeling." IJCAI 2019.
+[16] Wu, Z., et al. "Connecting the Dots: Multivariate Time Series Forecasting with Graph Neural Networks." KDD 2020.
+[17] Shao, Z., et al. "Pre-training Enhanced Spatial-Temporal Graph Neural Network for Multivariate Time Series Forecasting." KDD 2022.
+[18] Deng, J., et al. "ST-Norm: Spatial and Temporal Normalization for Multi-variate Time Series Forecasting." KDD 2021.
+[19] Jiang, R., et al. "Spatio-Temporal Meta-Graph Learning for Traffic Forecasting." AAAI 2023.
+[20] Jiang, J., et al. "PDFormer: Propagation Delay-Aware Dynamic Long-Range Transformer for Traffic Flow Prediction." AAAI 2023.
+[21] Liu, H., et al. "Spatio-Temporal Adaptive Embedding Makes Vanilla Transformer SOTA for Traffic Forecasting." CIKM 2023.
+[22] Lee, H., et al. "TESTAM: A Time-Enhanced Spatio-Temporal Attention Model with Mixture of Experts." ICLR 2024.
+[23] Cini, A., et al. "Scalable Spatiotemporal Graph Neural Networks." AAAI 2023.
+[24] Han, J., et al. "BigST: Linear Complexity Spatio-Temporal Graph Neural Network for Traffic Forecasting on Large-Scale Road Networks." VLDB 2024.
+[25] Tang, J., et al. "EasyST: A Simple Framework for Spatio-Temporal Prediction." arXiv 2024.
+[26] Liang, Y., et al. "AirFormer: Predicting Nationwide Air Quality in China with Transformers." AAAI 2023.
+[27] Gao, Z., et al. "EarthFormer: Exploring Space-Time Transformers for Earth System Forecasting." NeurIPS 2022.
+[28] Choi, J., et al. "SpoT-Mamba: Learning Long-Range Dependency on Spatio-Temporal Graphs with Selective State Spaces." IJCAI 2024 Workshop.
+[29] Li, L., et al. "STG-Mamba: Spatial-Temporal Graph Learning via Selective State Space Model." arXiv 2024.
+[30] Li, Z., et al. "GPT-ST: Generative Pre-Training of Spatio-Temporal Graph Neural Networks." NeurIPS 2023.
+[31] Yuan, Y., et al. "UniST: A Prompt-Empowered Universal Model for Urban Spatio-Temporal Prediction." KDD 2024.
+[32] Li, Z., et al. "OpenCity: Open Spatio-Temporal Foundation Models for Traffic Prediction." ACM TIST 2024.
+[33] Das, A., et al. "A Decoder-Only Foundation Model for Time-Series Forecasting." ICML 2024.
+[34] Ansari, A., et al. "Chronos: Learning the Language of Time Series." ICML 2024.
+[35] Woo, G., et al. "Unified Training of Universal Time Series Forecasting Transformers." ICML 2024.
+[36] Liu, Y., et al. "Timer: Generative Pre-trained Transformers Are Large Time Series Models." ICML 2024.
+[37] Goswami, M., et al. "MOMENT: A Family of Open Time-Series Foundation Models." ICML 2024.
+[38] Rasul, K., et al. "Lag-Llama: Towards Foundation Models for Probabilistic Time Series Forecasting." ICML 2024.
+[39] Ekambaram, V., et al. "TTM: Fast Pre-trained Models for Enhanced Zero/Few-Shot Forecasting." NeurIPS 2024.
+[40] Shi, X., et al. "Time-MoE: Billion-Scale Time Series Foundation Models with Mixture of Experts." arXiv 2024.
+[41] Garza, A. &amp; Mergenthaler-Canseco, M. "TimeGPT-1." arXiv 2023.
+[42] Zhou, T., et al. "One Fits All: Power General Time Series Analysis by Pretrained LM." NeurIPS 2023.
+[43] Jin, M., et al. "Time-LLM: Time Series Forecasting by Reprogramming Large Language Models." ICLR 2024.
+[44] Sun, C., et al. "TEST: Text Prototype Aligned Embedding to Activate LLM's Ability for Time Series." ICLR 2024.
+[45] Liu, X., et al. "UniTime: A Language-Empowered Unified Model for Cross-Domain Time Series Forecasting." WWW 2024.
+[46] Liu, C., et al. "CALF: Aligning LLMs for Time Series Forecasting via Cross-Modal Fine-Tuning." NeurIPS 2024.
+[47] Pan, S., et al. "S2IP-LLM: Semantic Space Informed Prompt Learning with LLM for Time Series Forecasting." ICML 2024.
+[48] Gruver, N., et al. "Large Language Models Are Zero-Shot Time Series Forecasters." NeurIPS 2023.
+[49] Cao, D., et al. "TEMPO: Prompt-based Generative Pre-trained Transformer for Time Series Forecasting." ICLR 2024.
+[50] Liu, Y., et al. "AutoTimes: Autoregressive Time Series Forecasting via Large Language Models." NeurIPS 2024.
+[51] Tan, M., et al. "Are Language Models Actually Useful for Time Series Forecasting?" NeurIPS 2024.
+[52] Li, Z., et al. "UrbanGPT: Spatio-Temporal Large Language Models." KDD 2024.
+[53] Cao, D., et al. "ST-LLM: Large Language Models Are Effective Temporal Learners for Spatio-Temporal Forecasting." arXiv 2024.
+[54] Zhang, S., et al. "TrafficGPT: Viewing, Processing and Interacting with Traffic Foundation Models." Transport Policy 2024.
+[55] Zhang, W., et al. "Data-Copilot: Bridging Billions of Data and Humans with Autonomous Workflow." arXiv 2023.
+[56] Ma, P., et al. "InsightPilot: An LLM-Empowered Automated Data Exploration System." VLDB 2024.
+[57] Lu, C., et al. "The AI Scientist: Towards Fully Automated Open-Ended Scientific Discovery." arXiv 2024.
+[58] Guo, S., et al. "DS-Agent: Automated Data Science by Empowering Large Language Models with Case-Based Reasoning." ICML 2024.
+[59] Huang, Q., et al. "MLAgentBench: Evaluating Language Agents on Machine Learning Experimentation." ICML 2024.
+[60] Zhang, S., et al. "AutoML-GPT: Automatic Machine Learning with GPT." arXiv 2023.
+[61] Li, Z., et al. "MatPlotAgent: Method and Evaluation for LLM-Based Agentic Scientific Data Visualization." ACL 2024.
+[62] Baek, J., et al. "ResearchAgent: Iterative Research Idea Generation over Scientific Literature with Large Language Models." ACL 2024.
+[63] Bran, A.M., et al. "ChemCrow: Augmenting Large Language Models with Chemistry Tools." Nature Machine Intelligence 2024.
+[64] Boiko, D.A., et al. "An Autonomous Agent for Scientific Discovery." Nature 2023.
+[65] Dibia, V. "LIDA: A Tool for Automatic Generation of Grammar-Agnostic Visualizations and Infographics using Large Language Models." ACL 2023.
+[66] Pourreza, M. &amp; Rafiei, D. "DIN-SQL: Decomposed In-Context Learning of Text-to-SQL with Self-Correction." NeurIPS 2023.
+[67] Gao, D., et al. "DAIL-SQL: Efficient and Effective Few-Shot Text-to-SQL." VLDB 2024.
+[68] Narechania, A., et al. "NL4DV: A Toolkit for Generating Analytic Specifications from Natural Language." IEEE VIS 2023.
+[69] Maddigan, P. &amp; Susnjak, T. "Chat2VIS: Generating Data Visualizations via Natural Language." IEEE Access 2023.
+[70] Li, Z., et al. "TableGPT: Towards Unifying Tables, Nature Language and Commands into One GPT." arXiv 2023.
+[71] Yu, K., et al. "Rath: Augmented Analytics with Automated Insight Discovery." GitHub / Kanaries 2022–2024.
+[72] Chen, Y., et al. "Sheet2Report: Automated Report Generation from Spreadsheets using LLMs." arXiv 2024.
+[73] Wu, H., et al. "TimesNet / TSLib: A Unified Library for Time Series Analysis." NeurIPS 2023 D&amp;B.
+[74] Shao, Z., et al. "BasicTS: An Open-Source Fair Benchmark for Time Series Prediction." NeurIPS 2023 D&amp;B.
+[75] Cini, A., et al. "Torch Spatiotemporal (tsl)." JMLR MLOSS 2024.
+[76] Olivares, K., et al. "NeuralForecast: User-Friendly State-of-the-Art Neural Forecasting Models." arXiv 2022.
+[77] Herzen, J., et al. "Darts: User-Friendly Modern Machine Learning for Time Series." JMLR 2022.
+[78] Du, W. "PyPOTS: A Python Toolbox for Data Mining on Partially-Observed Time Series." ICLR 2024.
+[79] Wang, J., et al. "LibCity: An Open Library for Traffic Flow Prediction." SIGSPATIAL 2021.
+[80] Tipirneni, S. &amp; Reddy, C.K. "STraTS: Self-Supervised Sparse Transformer for Clinical Time Series." MLHC 2022.
+[81] Kim, Y., et al. "MedGTX: Multimodal Graph-Transformer for Patient Outcome Prediction." CHIL 2023.
+[82] Li, C., et al. "MISTS: Multi-Input Multi-Output Irregular Sampled Time Series Forecasting for ICU." AAAI 2024.
+[83] Jiang, Z., et al. "MedTsLLM: Leveraging LLMs for Multimodal Medical Time Series Analysis." arXiv 2024.
+[84] Gao, Y., et al. "Perioperative Outcome Prediction with Graph Neural Networks." npj Digital Medicine 2024.
+[85] Various. "GAGNN: Group-Aware Graph Neural Network for Nationwide City Air Quality Forecasting." ACM TKDD 2024.
+[86] Xu, Z., et al. "FloodCast: Flood Forecasting with Spatio-Temporal Graph Neural Networks." arXiv 2023.
+[87] Various. "Spatio-Temporal Feature Graph Neural Network for River Water Quality." Water Research 2025.
+[88] Zanfei, A., et al. "Spatio-Temporal Graph Neural Networks for Water Distribution Network Monitoring." Water Research 2023.
+[89] Various. "Multi-scale Spatio-Temporal Graph Neural Network for Water Demand Forecasting." Water Research 2025.
+[90] Yang, H., et al. "FinGPT: Open-Source Financial Large Language Models." NeurIPS 2023 Workshop.
+[91] Li, Y., et al. "MASTER: Market-Guided Stock Transformer for Stock Price Forecasting." AAAI 2024.
+[92] Jakubik, J., et al. "Prithvi: A Foundation Model for Geospatial AI." arXiv 2023.
+[93] Kuckreja, K., et al. "GeoChat: Grounded Large Language Model for Remote Sensing." CVPR 2024.
+[94] Klemmer, K., et al. "SatCLIP: Global, General-Purpose Location Embeddings with Satellite Imagery." NeurIPS 2023 Workshop.
+[95] Various. "HeatGNN: Heterogeneous Epidemic-Aware Transmission Graph Neural Network." arXiv 2024.
+[96] Balaji, B., et al. "Brick Schema + ML for Smart Building Analytics." BuildSys 2022.
+[97] Vazquez-Canteli, J., et al. "CityLearn: A Gym Environment for Building Energy Coordination." Applied Energy 2023.
+[98] Yue, Z., et al. "TS2Vec: Towards Universal Representation of Time Series." AAAI 2022.
+[99] Zhang, X., et al. "Self-Supervised Contrastive Pre-Training for Time Series via Time-Frequency Consistency." NeurIPS 2022.
+[100] Dong, J., et al. "SimMTM: A Simple Pre-Training Framework for Masked Time-Series Modeling." NeurIPS 2023.
+[101] Zhang, Q., et al. "AutoST: Automated Spatio-Temporal Graph Contrastive Learning." WWW 2023.
+[102] Zhang, Q., et al. "STAG: Spatial-Temporal Graph Learning with Adversarial Contrastive Adaptation." ICML 2023.
+[103] Xia, Y., et al. "CaST: Deciphering Spatio-Temporal Graph Forecasting: A Causal Lens and Treatment." NeurIPS 2023.
+[104] Wang, B., et al. "STONE: A Spatio-temporal OOD Learning Framework." KDD 2024.
+[105] Ragab, M., et al. "ADATIME: A Benchmarking Suite for Domain Adaptation on Time Series Data." ACM TKDD 2023.
+[106] He, X., et al. "RAINCOAT: An Adaptive Framework for Robust Domain Adaptation in Time Series." ICML 2023.
+[107] Zhang, J., et al. "STExplainer: A Framework for Explaining Spatio-Temporal Graph Neural Networks." KDD 2023.
+[108] Bento, J., et al. "TimeSHAP: Explaining Recurrent Models through Sequence Perturbations." KDD 2021.
+[109] Lim, B., et al. "Temporal Fusion Transformers for Interpretable Multi-horizon Time Series Forecasting." IJF 2021.
+[110] Hu, E.J., et al. "LoRA: Low-Rank Adaptation of Large Language Models." ICLR 2022.
+[111] Molino, P., et al. "Ludwig: A Type-Based Declarative Deep Learning Framework." JMLR 2023.
+[112] Contributors, OpenMMLab. "MMEngine: OpenMMLab Foundational Library for Training Deep Learning Models." 2022.
+[113] Yadan, O. "Hydra: A Framework for Elegantly Configuring Complex Applications." Facebook Research 2020.
+[114] Rossi, E., et al. "Temporal Graph Networks for Deep Learning on Dynamic Graphs." ICML 2020 Workshop.
+[115] Yu, L., et al. "DyGFormer: Towards Better Dynamic Graph Learning." NeurIPS 2023.
+[116] You, J., et al. "ROLAND: Graph Learning Framework for Dynamic Social Networks." KDD 2022.
+[117] Liu, H., et al. "Time-MMD: A New Multi-Domain Multimodal Dataset for Time Series Analysis." NeurIPS 2024 D&amp;B.
+[118] Xie, Z., et al. "ChatTS: Aligning Time Series with LLMs via Synthetic Data." arXiv 2024.
+[119] Stewart, A., et al. "TorchGeo: Deep Learning with Geospatial Data." SIGSPATIAL 2022.
+[120] Qiu, X., et al. "TFB: Towards Comprehensive and Fair Benchmarking of Time Series Forecasting Methods." ICML 2024.
+[121] Talukder, S., et al. "TOTEM: TOkenized Time Series EMbeddings for General Time Series Analysis." NeurIPS 2024.
+[122] Li, Y., et al. "HITL-TSF: Human-in-the-Loop Time Series Forecasting." arXiv 2024.
+[123] Shi, D., et al. "Calliope: Automatic Visual Data Stories from Spreadsheets." IEEE TVCG 2023.
+[124] Sultan, M., et al. "DataTales: Investigating the Use of Large Language Models for Authoring Data-Driven Articles." CHI 2024.
+[125] Thelen, A., et al. "TwinGen: Generative Digital Twins with Physics-Informed Neural Networks." Nature Machine Intelligence 2023.
+[126] Wu, H., et al. "Transolver: A Fast Transformer Solver for PDEs on General Geometries." ICML 2024.
+[127] Jiang, R., et al. "Spatio-Temporal Meta-Graph Learning for Traffic Forecasting (MegaCRN)." AAAI 2023.</p>
+<hr />
+<h2 id="appendix-a-liulian-entity-identifier-architecture-diagram">Appendix A: LIULIAN Entity Identifier Architecture Diagram<a class="headerlink" href="#appendix-a-liulian-entity-identifier-architecture-diagram" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>                    ┌─────────────────────────────────────┐
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>                    │         Entity Identifier Layer       │
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>                    │                                       │
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>                    │  none ──── pass-through                │
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>                    │  embedding ── nn.Embedding → project   │
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>                    │  onehot ──── I_N matrix → project      │
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>                    │  sinusoidal ─ PE(idx) → project        │
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>                    │  random ──── hash(seed:name) → project │
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>                    │  coordinates ─ (lat,lon) → project     │
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>                    │  text ─────── LLM(description) → proj  │
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>                    └──────────┬────────────────────────────┘
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>                               │
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>              ┌────────────────┼────────────────┐
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>              │                │                │
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    ┌─────────▼──────┐  ┌─────▼──────┐  ┌──────▼─────────┐
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    │  EntityWrapper  │  │ Channel    │  │ Channel        │
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    │  (per_entity)   │  │ Entity     │  │ Transparent    │
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    │                 │  │ Wrapper    │  │ Wrapper        │
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>    │  emb → concat   │  │ (learned)  │  │ (pre-computed) │
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    │  → project      │  │            │  │                │
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>    │  → inner model  │  │ emb per ch │  │ feat per ch    │
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>    └─────────────────┘  │ → concat   │  │ → concat       │
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>                         │ → project  │  │ → project      │
+<a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>                         │ → inner    │  │ → inner        │
+<a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>                         └────────────┘  └────────────────┘
+<a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>                                ↓
+<a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>              ┌──────────────────────────────────┐
+<a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>              │       Spatial Module (optional)    │
+<a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a>              │  • 1-hop neighbor aggregation      │
+<a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a>              │  • GNN message passing             │
+<a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a>              │  • Adaptive graph learning          │
+<a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a>              │  • Mamba spatial scan               │
+<a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a>              └──────────┬───────────────────────┘
+<a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a>                         ↓
+<a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a>              ┌──────────────────────────────────┐
+<a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a>              │        Forecasting Model           │
+<a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a>              │  LSTM / PatchTST / DLinear /       │
+<a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a>              │  iTransformer / TimeMixer / Mamba / │
+<a id="__codelineno-3-39" name="__codelineno-3-39" href="#__codelineno-3-39"></a>              │  Time-LLM / Chronos / Moirai       │
+<a id="__codelineno-3-40" name="__codelineno-3-40" href="#__codelineno-3-40"></a>              └────────────────────────────────────┘
+</code></pre></div>
+<h2 id="appendix-b-code-artifacts">Appendix B: Code Artifacts<a class="headerlink" href="#appendix-b-code-artifacts" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>experiments/entity_identifier/run.py</code></td>
+<td>Matrix experiment runner</td>
+</tr>
+<tr>
+<td><code>experiments/entity_identifier/matrix.py</code></td>
+<td>Matrix definition and job expansion</td>
+</tr>
+<tr>
+<td><code>experiments/entity_identifier/compare.py</code></td>
+<td>Comparison report generator</td>
+</tr>
+<tr>
+<td><code>experiments/entity_identifier/submit_slurm.py</code></td>
+<td>Slurm cluster dispatcher</td>
+</tr>
+<tr>
+<td><code>liulian/models/torch/entity_mixin.py</code></td>
+<td>EntityWrapper, ChannelEntityWrapper, ChannelTransparentWrapper</td>
+</tr>
+<tr>
+<td><code>liulian/data/ts/timeseriesdataset.py</code></td>
+<td>Entity features and transparent mode data layer</td>
+</tr>
+<tr>
+<td><code>experiments/run.py</code></td>
+<td>Unified experiment entry point</td>
+</tr>
+<tr>
+<td><code>tests/runtime/test_entity_identifier_pipeline.py</code></td>
+<td>Pipeline tests (15 tests)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="appendix-c-novelty-verification-summary">Appendix C: Novelty Verification Summary<a class="headerlink" href="#appendix-c-novelty-verification-summary" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Proposed Idea</th>
+<th>Already Published?</th>
+<th>Closest Work</th>
+<th>What's New</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Systematic multi-type identifier ablation across architectures</td>
+<td><strong>No</strong></td>
+<td>STID [9]</td>
+<td>Multi-type, multi-arch systematic study</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Random embedding baseline for TS entity identification</td>
+<td><strong>No (for TS)</strong></td>
+<td>NLP random baselines</td>
+<td>First controlled ablation in TS domain</td>
+</tr>
+<tr>
+<td>3</td>
+<td>ChannelTransparentWrapper architecture</td>
+<td><strong>No</strong></td>
+<td>—</td>
+<td>Pre-computed features in multi-channel TSLib</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Negative control datasets for identifier analysis</td>
+<td><strong>No</strong></td>
+<td>—</td>
+<td>Explicit where-IDs-shouldn't-help testing</td>
+</tr>
+<tr>
+<td>5</td>
+<td>AdaptID: gating over identifier types</td>
+<td><strong>No</strong></td>
+<td>TESTAM [22] (graph types)</td>
+<td>Gates over identifier types, not graph structures</td>
+</tr>
+<tr>
+<td>6</td>
+<td>LLM-based entity graph construction from metadata</td>
+<td><strong>No</strong></td>
+<td>LLM knowledge graphs (NLP)</td>
+<td>Applied to ST sensor network topology</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Unified identifier + GNN framework</td>
+<td><strong>No</strong></td>
+<td>STID [9], GWN [15] separately</td>
+<td>Systematic bridge between communities</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Entity text descriptions as LLM prompts</td>
+<td><strong>No</strong></td>
+<td>TEST [44] (prototypes)</td>
+<td>Entity-specific metadata, not generic prototypes</td>
+</tr>
+<tr>
+<td>9</td>
+<td>LLM agent for ST pipeline design</td>
+<td><strong>No</strong></td>
+<td>TrafficGPT [54], AI Scientist [57]</td>
+<td>ST-domain-specific pipeline automation</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Multi-modal entity fusion (TS+text+coords+satellite)</td>
+<td><strong>No</strong></td>
+<td>Time-MMD [117] (TS+text)</td>
+<td>Full 4-modal fusion for entity representation</td>
+</tr>
+<tr>
+<td>11</td>
+<td>Entity-aware cross-domain ST foundation model</td>
+<td><strong>No</strong></td>
+<td>UniST [31] (urban), Moirai [35] (no entity)</td>
+<td>Entity conditioning + cross-domain</td>
+</tr>
+<tr>
+<td>12</td>
+<td>Entity-conditioned Mamba for ST</td>
+<td><strong>No</strong></td>
+<td>SpoT-Mamba [28] (no entity cond.)</td>
+<td>Entity IDs in SSM selection mechanism</td>
+</tr>
+<tr>
+<td>13</td>
+<td>Full-stack ST platform (agent+BI+entity+plugins)</td>
+<td><strong>No</strong></td>
+<td>TSLib [73], LibCity [79]</td>
+<td>Complete platform with all components</td>
+</tr>
+<tr>
+<td>14</td>
+<td>Perioperative patient clustering via entity-aware ST</td>
+<td><strong>No (this framing)</strong></td>
+<td>Perioperative GNN [84]</td>
+<td>Entity identifier framework for clinical TS</td>
+</tr>
+<tr>
+<td>15</td>
+<td>Domain-specific vertical plugins for ST platform</td>
+<td><strong>No</strong></td>
+<td>HuggingFace Spaces (NLP only)</td>
+<td>ST-specific domain plugins</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1678 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Research OS for spatiotemporal model experimentation">
+      
+      
+      
+        <link rel="canonical" href="https://jajupmochi.github.io/liulian-python/research/entity-id-deep/gpt4ts/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>GPT4TS — Entity-Identifier Deep Dive - LIULIAN</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#gpt4ts-entity-identifier-deep-dive" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="LIULIAN" class="md-header__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LIULIAN
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GPT4TS — Entity-Identifier Deep Dive
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../cli/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../demo_gallery/" class="md-tabs__link">
+          
+  
+  
+  Demo Gallery
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../models/torch_models/" class="md-tabs__link">
+          
+  
+  
+  Models
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../data_loaders/" class="md-tabs__link">
+          
+  
+  
+  Data
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../tsl_comparison/" class="md-tabs__link">
+          
+  
+  
+  Benchmarks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="LIULIAN" class="md-nav__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LIULIAN
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../forecasting_pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../adapter_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adapter Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../manifest_spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifest Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo Gallery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demo Gallery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../demo_gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../demo_patchtst_swiss1990/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PatchTST Swiss River 1990
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../models/torch_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyTorch Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../entity_identifiers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Entity Identifiers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../search_spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Spaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Data
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../data_loaders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Loaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Benchmarks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tsl_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TSL Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../training_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../results_json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../dataset_config_audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset Config Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../breakpoint_bridge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Breakpoint Bridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-identity-provenance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Identity &amp; provenance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-architecture-primer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Architecture primer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-this-repo-audit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. This-repo audit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-upstream-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Upstream reference
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-proposed-id-injection-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Proposed ID injection design
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-concrete-code-change-sketch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Concrete code change sketch
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-feasibility-risks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Feasibility &amp; risks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-citations-uncertainty" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Citations &amp; uncertainty
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="gpt4ts-entity-identifier-deep-dive">GPT4TS — Entity-Identifier Deep Dive<a class="headerlink" href="#gpt4ts-entity-identifier-deep-dive" title="Permanent link">&para;</a></h1>
+<h2 id="1-identity-provenance">1. Identity &amp; provenance<a class="headerlink" href="#1-identity-provenance" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Canonical name</td>
+<td>GPT4TS (One Fits All)</td>
+</tr>
+<tr>
+<td>Paper URL</td>
+<td>https://arxiv.org/abs/2302.11939</td>
+</tr>
+<tr>
+<td>Year / venue</td>
+<td>NeurIPS 2023 — Zhou et al., <em>One Fits All: Power General Time Series Analysis by Pretrained LM</em></td>
+</tr>
+<tr>
+<td>Official repo</td>
+<td>https://github.com/DAMO-DI-ML/NeurIPS2023-One-Fits-All</td>
+</tr>
+<tr>
+<td>Canonical TSL impl</td>
+<td>https://github.com/thuml/Time-Series-Library/blob/main/models/GPT4TS.py</td>
+</tr>
+<tr>
+<td>This-repo adapter</td>
+<td><code>liulian/models/torch/gpt4ts.py</code></td>
+</tr>
+<tr>
+<td>Runtime key</td>
+<td><code>gpt4ts</code></td>
+</tr>
+<tr>
+<td>Benchmark key</td>
+<td><code>GPT4TS</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-architecture-primer">2. Architecture primer<a class="headerlink" href="#2-architecture-primer" title="Permanent link">&para;</a></h2>
+<p>GPT4TS fine-tunes <strong>only LayerNorm and positional embedding</strong> of a frozen GPT-2 backbone. Channel-independent: each channel is processed as a separate sample.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>x_enc (B, L, C)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>     │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>     ├── _patchify:                                                  # L113-129
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>     │   RevIN normalize → permute (B, C, L) → unfold
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>     │   → (B*C, num_patches, patch_size)
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>     │
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>     ▼
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a> in_layer: Linear(patch_size → gpt2_dim=768)                        # L96, L134
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>     │
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>     ▼
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a> Frozen GPT-2 backbone (gpt_layers):                                # L59-74, L135
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    • only ln_1, ln_2 (per-layer LayerNorm) + ln_f (final) + wpe are trainable
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>    • all attention + MLP weights frozen
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>     │
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>     ▼
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a> last_hidden_state (B*C, num_patches, gpt2_dim)
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>     │
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>     ▼
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a> reshape → out_layer: Linear(gpt2_dim * num_patches → pred_len)      # L99-101, L138-139
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>     │
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>     ▼
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a> reshape (B, C, pred_len) → permute (B, pred_len, C) → de-normalize  # L140-143
+</code></pre></div>
+<p>Complexity: GPT-2's <code>O(num_patches² · gpt2_dim)</code> attention, repeated per channel. <strong>Channel-independent</strong> like PatchTST — each of the <code>C</code> channels is an independent sample in the <code>B*C</code> batch.</p>
+<h2 id="3-this-repo-audit">3. This-repo audit<a class="headerlink" href="#3-this-repo-audit" title="Permanent link">&para;</a></h2>
+<ul>
+<li><code>Model</code> (<code>gpt4ts.py:23-196</code>) — TSL-inspired port.</li>
+<li><strong>No Adapter class</strong> — accessed via <code>importlib.import_module('liulian.models.torch.gpt4ts')</code> at <code>pipeline.build_model:442</code>.</li>
+<li><strong>Audit findings:</strong></li>
+<li><strong>Critical gap</strong>: no adapter → no <code>EntityAwareMixin</code> → entity plumbing does not work. Same situation as LightTS/Reformer.</li>
+<li>Channel-independence via <code>_patchify</code> (L113-129): <code>(B, L, C) → (B*C, num_patches, patch_size)</code>. Same implications as PatchTST: entity signal must be per-channel within the <code>B*C</code> batch.</li>
+<li>Frozen GPT-2 backbone — injecting entity embeddings <strong>before</strong> GPT-2's frozen layers means the entity signal modulates LayerNorm activations (since only LN is trainable). This is actually well-suited: LN's gain/bias, if conditioned on entity, learns per-station scale/shift at every layer.</li>
+<li><code>_patchify</code> returns <code>(means, stdev)</code> for de-normalization — entity bias should be injected after patching but before GPT-2, so de-norm is unaffected.</li>
+</ul>
+<h2 id="4-upstream-reference">4. Upstream reference<a class="headerlink" href="#4-upstream-reference" title="Permanent link">&para;</a></h2>
+<p>Official repo matches TSL. Candidate hooks:</p>
+<table>
+<thead>
+<tr>
+<th>Hook</th>
+<th>Location (this repo)</th>
+<th>Tensors in scope</th>
+<th>GPT4TS-specific note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H1 pre-patchify</td>
+<td>before L132</td>
+<td><code>x_enc (B, L, C)</code></td>
+<td>Gets patchified + normalized; attenuated.</td>
+</tr>
+<tr>
+<td>H2 post-in_layer</td>
+<td>after L134</td>
+<td><code>(B*C, num_patches, gpt2_dim)</code></td>
+<td><strong>Natural</strong>: pre-GPT-2. Entity bias enters frozen attention + trainable LN.</td>
+</tr>
+<tr>
+<td>H3 post-GPT-2</td>
+<td>after L135</td>
+<td><code>(B*C, num_patches, gpt2_dim)</code></td>
+<td>Post-backbone; entity never reaches attention/LN.</td>
+</tr>
+<tr>
+<td>H4 post-out_layer</td>
+<td>after L139</td>
+<td><code>(B*C, pred_len)</code></td>
+<td>DLinear-style.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-proposed-id-injection-design">5. Proposed ID injection design<a class="headerlink" href="#5-proposed-id-injection-design" title="Permanent link">&para;</a></h2>
+<p><strong>Prerequisite: create <code>GPT4TSAdapter(EntityAwareMixin, TorchModelAdapter)</code>.</strong></p>
+<p><strong>Primary: H2 <code>add_to_patch_embed</code> — per-entity additive <code>nn.Embedding(num_stations, gpt2_dim)</code> on <code>(B*C, num_patches, gpt2_dim)</code> after <code>in_layer</code>, before GPT-2.</strong></p>
+<p>Rationale:</p>
+<ol>
+<li>Channel-independent processing makes each channel a separate sample. Entity identity is lost unless explicitly injected — same STID motivation as PatchTST.</li>
+<li>GPT-2's frozen attention weights compute fixed attention patterns. The entity bias shifts the input representation into a different region of GPT-2's latent space — equivalent to selecting a different "semantic context" for each station. The trainable LayerNorm then adapts the conditioning for each station.</li>
+<li>This is architecturally analogous to PatchTST's <code>add_after_patch</code> — both inject identity into <code>(B*C, num_tokens, d_model)</code> layout. GPT4TS's "tokens" are patches, same as PatchTST.</li>
+</ol>
+<p><strong>Secondary: H4 <code>post_output_affine</code> — <code>(num_stations, pred_len)</code> bias on <code>(B*C, pred_len)</code> output.</strong></p>
+<ul>
+<li>Cheap; skips GPT-2 backbone.</li>
+</ul>
+<p>Alternatives considered and rejected:</p>
+<table>
+<thead>
+<tr>
+<th>Alternative</th>
+<th>Why rejected</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>H1 pre-patchify</td>
+<td>RevIN normalization absorbs additive bias; patchify breaks it into uncontrolled chunks.</td>
+</tr>
+<tr>
+<td>H3 post-GPT-2</td>
+<td>Entity signal never reaches attention or LayerNorm — defeats the purpose of using a pretrained backbone for contextual conditioning.</td>
+</tr>
+<tr>
+<td>Modifying GPT-2's positional embedding per-entity</td>
+<td>Invasive; <code>wpe</code> is shared across all channels in <code>B*C</code>; would require per-sample position bias — technically possible but breaks frozen-weight design.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-concrete-code-change-sketch">6. Concrete code change sketch<a class="headerlink" href="#6-concrete-code-change-sketch" title="Permanent link">&para;</a></h2>
+<p>File: <code>liulian/models/torch/gpt4ts.py</code>
+Functions: <code>Model.__init__</code> (L35-111), <code>Model.forecast</code> (L131-144), new <code>GPT4TSAdapter</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">liulian.models.torch.base_adapter</span><span class="w"> </span><span class="kn">import</span> <span class="n">TorchModelAdapter</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">liulian.models.torch.entity_mixin</span><span class="w"> </span><span class="kn">import</span> <span class="n">EntityAwareMixin</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="k">class</span><span class="w"> </span><span class="nc">Model</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">configs</span><span class="p">):</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        <span class="o">...</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_use_entity_embed</span> <span class="o">=</span> <span class="p">(</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>            <span class="nb">getattr</span><span class="p">(</span><span class="n">configs</span><span class="p">,</span> <span class="s1">&#39;identifier_mode&#39;</span><span class="p">,</span> <span class="s1">&#39;none&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;embedding&#39;</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>            <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">configs</span><span class="p">,</span> <span class="s1">&#39;id_integration&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;add_to_patch_embed&#39;</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>        <span class="p">)</span>
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_entity_embed</span><span class="p">:</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>            <span class="n">num_stations</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">configs</span><span class="p">,</span> <span class="s1">&#39;num_stations&#39;</span><span class="p">,</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>                                    <span class="nb">getattr</span><span class="p">(</span><span class="n">configs</span><span class="p">,</span> <span class="s1">&#39;enc_in&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">entity_embed</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">num_stations</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpt2_dim</span><span class="p">)</span>
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forecast</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_enc</span><span class="p">,</span> <span class="n">x_mark_enc</span><span class="p">,</span> <span class="n">x_dec</span><span class="p">,</span> <span class="n">x_mark_dec</span><span class="p">,</span> <span class="n">entity_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>        <span class="n">x</span><span class="p">,</span> <span class="n">means</span><span class="p">,</span> <span class="n">stdev</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_patchify</span><span class="p">(</span><span class="n">x_enc</span><span class="p">)</span>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                              <span class="c1"># (B*C, num_patches, gpt2_dim)</span>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_entity_embed</span><span class="p">:</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>            <span class="k">if</span> <span class="n">entity_ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>                <span class="n">ids</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">x</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>            <span class="k">else</span><span class="p">:</span>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>                <span class="n">ids</span> <span class="o">=</span> <span class="n">entity_ids</span>                           <span class="c1"># must be (B*C,)</span>
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>            <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_embed</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>   <span class="c1"># broadcast over patches</span>
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gpt2</span><span class="p">(</span><span class="n">inputs_embeds</span><span class="o">=</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">last_hidden_state</span>
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>        <span class="o">...</span>
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>
+<a id="__codelineno-1-30" name="__codelineno-1-30" href="#__codelineno-1-30"></a>
+<a id="__codelineno-1-31" name="__codelineno-1-31" href="#__codelineno-1-31"></a><span class="k">class</span><span class="w"> </span><span class="nc">GPT4TSAdapter</span><span class="p">(</span><span class="n">EntityAwareMixin</span><span class="p">,</span> <span class="n">TorchModelAdapter</span><span class="p">):</span>
+<a id="__codelineno-1-32" name="__codelineno-1-32" href="#__codelineno-1-32"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+<a id="__codelineno-1-33" name="__codelineno-1-33" href="#__codelineno-1-33"></a>        <span class="n">default_config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;task_name&#39;</span><span class="p">:</span> <span class="s1">&#39;long_term_forecast&#39;</span><span class="p">,</span> <span class="s1">&#39;d_model&#39;</span><span class="p">:</span> <span class="mi">768</span><span class="p">,</span>
+<a id="__codelineno-1-34" name="__codelineno-1-34" href="#__codelineno-1-34"></a>                          <span class="s1">&#39;d_ff&#39;</span><span class="p">:</span> <span class="mi">768</span><span class="p">,</span> <span class="s1">&#39;patch_len&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s1">&#39;gpt_layers&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+<a id="__codelineno-1-35" name="__codelineno-1-35" href="#__codelineno-1-35"></a>                          <span class="s1">&#39;dropout&#39;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">}</span>
+<a id="__codelineno-1-36" name="__codelineno-1-36" href="#__codelineno-1-36"></a>        <span class="n">default_config</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-1-37" name="__codelineno-1-37" href="#__codelineno-1-37"></a>        <span class="k">if</span> <span class="s1">&#39;c_out&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">default_config</span><span class="p">:</span>
+<a id="__codelineno-1-38" name="__codelineno-1-38" href="#__codelineno-1-38"></a>            <span class="n">default_config</span><span class="p">[</span><span class="s1">&#39;c_out&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">default_config</span><span class="p">[</span><span class="s1">&#39;enc_in&#39;</span><span class="p">]</span>
+<a id="__codelineno-1-39" name="__codelineno-1-39" href="#__codelineno-1-39"></a>        <span class="n">model_cfg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entity_model_config</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
+<a id="__codelineno-1-40" name="__codelineno-1-40" href="#__codelineno-1-40"></a>        <span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dict_to_namespace</span><span class="p">(</span><span class="n">model_cfg</span><span class="p">))</span>
+<a id="__codelineno-1-41" name="__codelineno-1-41" href="#__codelineno-1-41"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">default_config</span><span class="p">)</span>
+<a id="__codelineno-1-42" name="__codelineno-1-42" href="#__codelineno-1-42"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_init_entity_support</span><span class="p">(</span><span class="n">default_config</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="7-feasibility-risks">7. Feasibility &amp; risks<a class="headerlink" href="#7-feasibility-risks" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Supports after revision?</td>
+<td><strong>Requires adapter creation</strong>. Then natural PatchTST-style injection.</td>
+</tr>
+<tr>
+<td>Parameter overhead</td>
+<td><code>num_stations × gpt2_dim</code> — e.g. 862 × 768 = 662K. Modest but notable (GPT-2 has ~125M params, most frozen; trainable params are few).</td>
+</tr>
+<tr>
+<td>Parity test</td>
+<td>Zero-init <code>entity_embed</code> ⇒ bit-exact baseline.</td>
+</tr>
+<tr>
+<td>Frozen-backbone interaction</td>
+<td>Entity bias enters via <code>inputs_embeds</code>; frozen attention processes it as shifted input. LN (trainable) adapts — per-station information flows through LN gain/bias. Natural and intended.</td>
+</tr>
+<tr>
+<td>Channel-independence</td>
+<td>Same <code>arange(C)</code> pattern as PatchTST. Per-sample <code>entity_ids</code> as <code>(B*C,)</code> when available.</td>
+</tr>
+<tr>
+<td>External-dep (transformers)</td>
+<td>GPT-2 download required; existing code handles local-first with fallback (L58-74).</td>
+</tr>
+</tbody>
+</table>
+<h2 id="8-citations-uncertainty">8. Citations &amp; uncertainty<a class="headerlink" href="#8-citations-uncertainty" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Paper: https://arxiv.org/abs/2302.11939</li>
+<li>Official repo: https://github.com/DAMO-DI-ML/NeurIPS2023-One-Fits-All</li>
+<li>TSL port: https://github.com/thuml/Time-Series-Library/blob/main/models/GPT4TS.py</li>
+<li>This repo: <code>liulian/models/torch/gpt4ts.py:23-196</code> (Model — <strong>no adapter class</strong>). Dynamic import.</li>
+<li>Related: PatchTST (<code>add_after_patch</code>) — identical channel-independent patching layout; GPT4TS simply replaces the Transformer encoder with a frozen GPT-2.</li>
+</ul>
+<p><strong>Uncertainties:</strong>
+- Whether frozen GPT-2 layers can meaningfully condition on entity identity through LN alone. The entity bias shifts the distribution of activations; LN then re-centers/re-scales. If LN capacity is insufficient, the entity signal may be partially washed out. Ablation: compare trainable-LN-only baseline to trainable-LN + entity embedding.
+- <code>gpt2_dim=768</code> is large for entity embedding — may overparameterize for small station counts. Consider a smaller entity embedding projected up: <code>nn.Embedding(N, 64) → Linear(64, 768)</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

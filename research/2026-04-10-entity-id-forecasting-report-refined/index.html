@@ -1,0 +1,3223 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Research OS for spatiotemporal model experimentation">
+      
+      
+      
+        <link rel="canonical" href="https://jajupmochi.github.io/liulian-python/research/2026-04-10-entity-id-forecasting-report-refined/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Entity Identifier Forecasting Research Report (Refined, All-Surface Audit) - LIULIAN</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#entity-identifier-forecasting-research-report-refined-all-surface-audit" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="LIULIAN" class="md-header__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LIULIAN
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Entity Identifier Forecasting Research Report (Refined, All-Surface Audit)
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../cli/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../demo_gallery/" class="md-tabs__link">
+          
+  
+  
+  Demo Gallery
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../models/torch_models/" class="md-tabs__link">
+          
+  
+  
+  Models
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../data_loaders/" class="md-tabs__link">
+          
+  
+  
+  Data
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tsl_comparison/" class="md-tabs__link">
+          
+  
+  
+  Benchmarks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="LIULIAN" class="md-nav__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LIULIAN
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../forecasting_pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../adapter_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adapter Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../manifest_spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifest Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo Gallery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demo Gallery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demo_gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demo_patchtst_swiss1990/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PatchTST Swiss River 1990
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/torch_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyTorch Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../entity_identifiers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Entity Identifiers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../search_spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Spaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Data
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_loaders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Loaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Benchmarks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tsl_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TSL Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../training_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../results_json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dataset_config_audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset Config Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../breakpoint_bridge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Breakpoint Bridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#0-scope-expansion-and-correction-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        0. Scope expansion and correction summary
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="0. Scope expansion and correction summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-evidence-anchors-used-in-this-refinement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core evidence anchors used in this refinement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#1-full-dataset-inventory-all-repository-surfaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Full dataset inventory (all repository surfaces)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Full dataset inventory (all repository surfaces)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#11-canonical-dataset-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.1 Canonical dataset matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#12-weather-variable-level-audit-why-ids-are-semantically-weak-here" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1.2 Weather variable-level audit (why IDs are semantically weak here)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-full-forecasting-model-inventory-naming-reconciliation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Full forecasting model inventory + naming reconciliation
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Full forecasting model inventory + naming reconciliation">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-runtime-module-models-dynamic-import-surface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.1 Runtime module models (dynamic import surface)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-benchmarkconfig-surfaces-and-alias-reconciliation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.2 Benchmark/config surfaces and alias reconciliation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-important-practical-caveat" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2.3 Important practical caveat
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-corrected-entity-plumbing-path-data-trainer-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Corrected entity plumbing path (data -&gt; trainer -&gt; model)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Corrected entity plumbing path (data -&gt; trainer -&gt; model)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-where-it-currently-works-best" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 Where it currently works best
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-where-behavior-is-fragile" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 Where behavior is fragile
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#33-entity-identifier-forms-currently-considered-in-the-codebase" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.3 Entity identifier forms currently considered in the codebase
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-per-model-feasibility-and-architecture-specific-entity-id-design-all-forecasting-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Per-model feasibility and architecture-specific entity-ID design (all forecasting models)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Per-model feasibility and architecture-specific entity-ID design (all forecasting models)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-feasibility-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 Feasibility matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-step-by-step-revision-plan-model-by-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Step-by-step revision plan (model-by-model)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-discrepancy-log-vs-prior-report" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Discrepancy log vs prior report
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-critical-self-critique-and-uncertainty-register" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Critical self-critique and uncertainty register
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-prioritized-implementation-roadmap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Prioritized implementation roadmap
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-final-completion-verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Final completion verification
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Final completion verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-requirement-to-deliverable-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 Requirement-to-deliverable mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#82-no-miss-dataset-coverage-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.2 No-miss dataset coverage table
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#83-no-miss-forecasting-model-coverage-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.3 No-miss forecasting model coverage table
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#84-citation-completeness-check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.4 Citation completeness check
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-online-references-used-in-this-refined-pass" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Online references used in this refined pass
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. Online references used in this refined pass">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#91-model-papers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.1 Model papers
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-deep-dive-corrections-and-refinements-2026-04-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10. Deep-dive corrections and refinements (2026-04-16)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="10. Deep-dive corrections and refinements (2026-04-16)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#101-corrections-to-section-41-feasibility-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.1 Corrections to Section 4.1 feasibility matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#102-corrections-to-section-22-adapter-status" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.2 Corrections to Section 2.2 adapter status
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#103-new-architectural-taxonomy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.3 New architectural taxonomy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#104-models-requiring-prerequisite-work-before-entity-injection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10.4 Models requiring prerequisite work before entity injection
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#92-entity-identity-specific-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.2 Entity-identity-specific evidence
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#93-dataset-context-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9.3 Dataset-context references
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="entity-identifier-forecasting-research-report-refined-all-surface-audit">Entity Identifier Forecasting Research Report (Refined, All-Surface Audit)<a class="headerlink" href="#entity-identifier-forecasting-research-report-refined-all-surface-audit" title="Permanent link">&para;</a></h1>
+<p><em>Date: 2026-04-10 (refined pass)</em></p>
+<p>This refined report extends and corrects the prior report by auditing <strong>all possible dataset/model surfaces in this repository</strong>, not only the active runtime subset.</p>
+<hr />
+<h2 id="0-scope-expansion-and-correction-summary">0. Scope expansion and correction summary<a class="headerlink" href="#0-scope-expansion-and-correction-summary" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Area</th>
+<th>Prior report</th>
+<th>Refined report</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dataset surfaces</td>
+<td>Runtime <code>pipeline.build_dataset</code> + <code>data_factory</code></td>
+<td>Runtime + <code>data_factory</code> + downloader surface + experiment usage + plugin adapters</td>
+</tr>
+<tr>
+<td>Model surfaces</td>
+<td>Runtime module models + Swiss adapters</td>
+<td>Runtime modules + benchmark adapter map + export aliases + config generator naming</td>
+</tr>
+<tr>
+<td>Naming reconciliation</td>
+<td>Partial</td>
+<td>Full lower-case runtime key ↔ CamelCase benchmark key map</td>
+</tr>
+<tr>
+<td>Gap log</td>
+<td>Limited</td>
+<td>Explicit discrepancy table with omission / semantics / naming mismatches</td>
+</tr>
+<tr>
+<td>Completion verification</td>
+<td>Requirement-level</td>
+<td>Requirement-level + no-miss dataset/model coverage tables</td>
+</tr>
+</tbody>
+</table>
+<h3 id="core-evidence-anchors-used-in-this-refinement">Core evidence anchors used in this refinement<a class="headerlink" href="#core-evidence-anchors-used-in-this-refinement" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Runtime dataset/model wiring: <code>liulian/pipeline.py:135-271</code>, <code>liulian/pipeline.py:342-487</code>  </li>
+<li>Data-factory-only datasets: <code>liulian/data/data_factory.py:32-54</code>  </li>
+<li>Downloader-supported dataset list/manual Swiss list: <code>liulian/data/download.py:61-80</code>, <code>liulian/data/download.py:208-271</code>  </li>
+<li>Plugin adapters are synthetic stubs: <code>plugins/hydrology/swissriver_adapter.py:7-9</code>, <code>plugins/traffic/adapter.py:17-19</code>  </li>
+<li>Entity feature creation requires <code>station_name</code>: <code>liulian/data/ts/timeseriesdataset.py:1103-1126</code>  </li>
+<li>CSV/PEMS paths set <code>station_ids</code> but not <code>station_name</code>: <code>liulian/data/csv_dataset.py:289-307</code>, <code>liulian/data/pems_dataset.py:140-157</code>  </li>
+<li>Swiss per-entity path sets <code>station_name</code>; Swiss multi-channel path omits identifier args: <code>liulian/data/swiss_river.py:443-467</code>, <code>liulian/data/swiss_river.py:492-509</code>  </li>
+<li>Collate emits <code>entity_idx</code>; trainer forwards <code>entity_ids</code>: <code>liulian/data/ts/timeseriesdataset.py:1211-1224</code>, <code>liulian/runtime/trainer.py:474-479</code>  </li>
+<li>Wrapper paths and PatchTST exception: <code>liulian/pipeline.py:441-477</code>, <code>liulian/models/torch/patchtst.py:73-89</code>, <code>liulian/models/torch/patchtst.py:142-153</code>  </li>
+<li>Benchmark adapter surface and naming: <code>tools/run_benchmark.py:183-217</code>  </li>
+<li>Export aliasing (notably <code>LSTMAdapter</code> from Swiss file): <code>liulian/models/torch/__init__.py:68-80</code>, <code>liulian/models/torch/__init__.py:87-115</code>  </li>
+<li>Identifier mode definitions in data layer: <code>liulian/data/ts/timeseriesdataset.py:78-116</code>  </li>
+<li>Swiss <code>feature_concat</code> mode in adapters: <code>liulian/models/torch/swiss_lstm.py:307-330</code>, <code>liulian/models/torch/swiss_transformer.py:18-23</code>, <code>liulian/models/torch/swiss_transformer.py:87-96</code></li>
+</ol>
+<hr />
+<h2 id="1-full-dataset-inventory-all-repository-surfaces">1. Full dataset inventory (all repository surfaces)<a class="headerlink" href="#1-full-dataset-inventory-all-repository-surfaces" title="Permanent link">&para;</a></h2>
+<h3 id="11-canonical-dataset-matrix">1.1 Canonical dataset matrix<a class="headerlink" href="#11-canonical-dataset-matrix" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Dataset key / class</th>
+<th>Runtime <code>build_dataset</code></th>
+<th><code>data_factory</code></th>
+<th>Downloader</th>
+<th>Experiments YAML</th>
+<th>Entity suitability</th>
+<th>Current wiring verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>traffic</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>Yes</td>
+<td><strong>Strong</strong> (homogeneous sensors)</td>
+<td>Embedding path works; transparent modes in multi-channel are at risk of no-op unless <code>station_name</code> is set</td>
+</tr>
+<tr>
+<td><code>electricity</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>Yes</td>
+<td><strong>Strong</strong> (homogeneous clients/meters)</td>
+<td>Same as traffic</td>
+</tr>
+<tr>
+<td><code>PEMS03</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>Yes</td>
+<td><strong>Strong</strong> (sensor entities)</td>
+<td>Embedding path works; PEMS loader currently uses first feature channel only</td>
+</tr>
+<tr>
+<td><code>PEMS04</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>No</td>
+<td><strong>Strong</strong></td>
+<td>Same as PEMS03</td>
+</tr>
+<tr>
+<td><code>PEMS07</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>No</td>
+<td><strong>Strong</strong></td>
+<td>Same as PEMS03</td>
+</tr>
+<tr>
+<td><code>PEMS08</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>No</td>
+<td><strong>Strong</strong></td>
+<td>Same as PEMS03</td>
+</tr>
+<tr>
+<td><code>swiss-river-1990</code></td>
+<td>Yes</td>
+<td>No</td>
+<td>Manual</td>
+<td>Yes</td>
+<td><strong>Strong</strong> (station entities)</td>
+<td>Per-entity split supports full ID modes; multi-channel split does not pass identifier args at data layer</td>
+</tr>
+<tr>
+<td><code>swiss-river-2010</code></td>
+<td>Yes</td>
+<td>No</td>
+<td>Manual</td>
+<td>No</td>
+<td><strong>Strong</strong></td>
+<td>Same as swiss-river-1990</td>
+</tr>
+<tr>
+<td><code>swiss-river-zurich</code></td>
+<td>Yes</td>
+<td>No</td>
+<td>Manual</td>
+<td>No</td>
+<td><strong>Strong</strong></td>
+<td>Same as swiss-river-1990</td>
+</tr>
+<tr>
+<td><code>exchange_rate</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>Yes</td>
+<td><strong>Conditional</strong> (few channels, weakly homogeneous)</td>
+<td>Technically feasible; gains may be limited/unstable</td>
+</tr>
+<tr>
+<td><code>ETTh1</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>Yes</td>
+<td><strong>Not recommended</strong></td>
+<td>Channels are heterogeneous physical variables, not entities</td>
+</tr>
+<tr>
+<td><code>ETTh2</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>Yes</td>
+<td><strong>Not recommended</strong></td>
+<td>Same as ETTh1</td>
+</tr>
+<tr>
+<td><code>ETTm1</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>Yes</td>
+<td><strong>Not recommended</strong></td>
+<td>Same as ETTh1</td>
+</tr>
+<tr>
+<td><code>ETTm2</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>Yes</td>
+<td><strong>Not recommended</strong></td>
+<td>Same as ETTh1</td>
+</tr>
+<tr>
+<td><code>weather</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>Yes</td>
+<td><strong>Not recommended</strong></td>
+<td>Meteorological channels are heterogeneous variable dimensions</td>
+</tr>
+<tr>
+<td><code>illness</code></td>
+<td>Yes</td>
+<td>Yes</td>
+<td>Auto</td>
+<td>Yes</td>
+<td><strong>Not recommended</strong></td>
+<td>Epidemiology indicators are heterogeneous statistics</td>
+</tr>
+<tr>
+<td><code>solar</code></td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td><strong>Strong</strong> if configured as plant-wise homogeneous channels</td>
+<td>Not runnable through main runtime path until <code>pipeline.build_dataset</code> adds key</td>
+</tr>
+<tr>
+<td><code>m4</code></td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td><strong>No</strong> (mostly univariate competition series)</td>
+<td>Registry-only; no strong entity-ID case</td>
+</tr>
+<tr>
+<td><code>custom</code></td>
+<td>No</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+<td><strong>Depends on schema</strong></td>
+<td>Registry-only; suitability is user-schema dependent</td>
+</tr>
+<tr>
+<td><code>SwissRiverDatasetAdapter</code> (plugin)</td>
+<td>No</td>
+<td>No</td>
+<td>N/A</td>
+<td>No</td>
+<td><strong>Conceptually strong</strong></td>
+<td>Plugin adapter currently synthetic/stub, not a full real-data pipeline</td>
+</tr>
+<tr>
+<td><code>TrafficDatasetAdapter</code> (plugin)</td>
+<td>No</td>
+<td>No</td>
+<td>N/A</td>
+<td>No</td>
+<td><strong>Conceptually strong</strong></td>
+<td>Plugin adapter currently synthetic/stub</td>
+</tr>
+</tbody>
+</table>
+<h3 id="12-weather-variable-level-audit-why-ids-are-semantically-weak-here">1.2 Weather variable-level audit (why IDs are semantically weak here)<a class="headerlink" href="#12-weather-variable-level-audit-why-ids-are-semantically-weak-here" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Variable cluster</th>
+<th>Example columns</th>
+<th>Interchangeable entity channels?</th>
+<th>Verdict</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Thermodynamic</td>
+<td><code>T (degC)</code>, <code>Tpot (K)</code>, <code>Tdew (degC)</code></td>
+<td>No</td>
+<td>Feature semantics differ</td>
+</tr>
+<tr>
+<td>Moisture/pressure</td>
+<td><code>p (mbar)</code>, <code>rh (%)</code>, <code>VPmax</code>, <code>H2OC</code></td>
+<td>No</td>
+<td>Units and meanings differ</td>
+</tr>
+<tr>
+<td>Wind</td>
+<td><code>wv (m/s)</code>, <code>max. wv (m/s)</code>, <code>wd (deg)</code></td>
+<td>No</td>
+<td>Distinct physics</td>
+</tr>
+<tr>
+<td>Rain/radiation</td>
+<td><code>rain (mm)</code>, <code>SWDR</code>, <code>PAR</code></td>
+<td>No</td>
+<td>Distinct processes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Conclusion:</strong> Weather channels should remain typed features, not entity IDs.</p>
+<hr />
+<h2 id="2-full-forecasting-model-inventory-naming-reconciliation">2. Full forecasting model inventory + naming reconciliation<a class="headerlink" href="#2-full-forecasting-model-inventory-naming-reconciliation" title="Permanent link">&para;</a></h2>
+<h3 id="21-runtime-module-models-dynamic-import-surface">2.1 Runtime module models (dynamic import surface)<a class="headerlink" href="#21-runtime-module-models-dynamic-import-surface" title="Permanent link">&para;</a></h3>
+<p><code>pipeline.build_model</code> dynamically imports <code>liulian.models.torch.&lt;model&gt;</code>, so runtime keys are module names:<br />
+<code>dlinear, transformer, informer, autoformer, fedformer, itransformer, patchtst, timesnet, timemixer, timexer, mamba, lstm, etsformer, lightts, reformer, gpt4ts, nonstationary_transformer, timellm, timemoe</code><br />
+(with <code>mamba</code> resolved by shim <code>mamba.py</code> re-exporting <code>mamba_model.Model</code>).</p>
+<h3 id="22-benchmarkconfig-surfaces-and-alias-reconciliation">2.2 Benchmark/config surfaces and alias reconciliation<a class="headerlink" href="#22-benchmarkconfig-surfaces-and-alias-reconciliation" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Canonical architecture</th>
+<th>Runtime key</th>
+<th>Benchmark key (<code>run_benchmark.py</code>)</th>
+<th>Export/alias notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DLinear</td>
+<td><code>dlinear</code></td>
+<td><code>DLinear</code></td>
+<td>Direct map</td>
+</tr>
+<tr>
+<td>Transformer</td>
+<td><code>transformer</code></td>
+<td><code>Transformer</code></td>
+<td>Direct map</td>
+</tr>
+<tr>
+<td>Informer</td>
+<td><code>informer</code></td>
+<td><code>Informer</code></td>
+<td>Direct map</td>
+</tr>
+<tr>
+<td>Autoformer</td>
+<td><code>autoformer</code></td>
+<td><code>Autoformer</code></td>
+<td>Direct map</td>
+</tr>
+<tr>
+<td>FEDformer</td>
+<td><code>fedformer</code></td>
+<td><code>FEDformer</code></td>
+<td>Direct map</td>
+</tr>
+<tr>
+<td>iTransformer</td>
+<td><code>itransformer</code></td>
+<td><code>iTransformer</code></td>
+<td>Direct map</td>
+</tr>
+<tr>
+<td>PatchTST</td>
+<td><code>patchtst</code></td>
+<td><code>PatchTST</code></td>
+<td>Direct map</td>
+</tr>
+<tr>
+<td>TimesNet</td>
+<td><code>timesnet</code></td>
+<td><code>TimesNet</code></td>
+<td>Direct map</td>
+</tr>
+<tr>
+<td>TimeMixer</td>
+<td><code>timemixer</code></td>
+<td><code>TimeMixer</code></td>
+<td>Direct map</td>
+</tr>
+<tr>
+<td>TimeXer</td>
+<td><code>timexer</code></td>
+<td><code>TimeXer</code></td>
+<td>Direct map</td>
+</tr>
+<tr>
+<td>Mamba</td>
+<td><code>mamba</code></td>
+<td><code>Mamba</code></td>
+<td>Runtime via <code>mamba.py</code> shim</td>
+</tr>
+<tr>
+<td>TimeLLM</td>
+<td><code>timellm</code></td>
+<td><code>TimeLLM</code> (conditional add)</td>
+<td>Optional dependency path</td>
+</tr>
+<tr>
+<td>TimeMoE</td>
+<td><code>timemoe</code></td>
+<td><code>TimeMoE</code> (conditional add)</td>
+<td>Optional dependency path; task mode caveat (below)</td>
+</tr>
+<tr>
+<td>Vanilla LSTM module</td>
+<td><code>lstm</code></td>
+<td><em>(none)</em></td>
+<td>Runtime-only module</td>
+</tr>
+<tr>
+<td>ETSformer</td>
+<td><code>etsformer</code></td>
+<td><em>(none)</em></td>
+<td>Runtime-only module</td>
+</tr>
+<tr>
+<td>LightTS</td>
+<td><code>lightts</code></td>
+<td><em>(none)</em></td>
+<td>Runtime-only module</td>
+</tr>
+<tr>
+<td>Reformer</td>
+<td><code>reformer</code></td>
+<td><em>(none)</em></td>
+<td>Runtime-only module</td>
+</tr>
+<tr>
+<td>GPT4TS</td>
+<td><code>gpt4ts</code></td>
+<td><em>(none)</em></td>
+<td>Runtime-only module</td>
+</tr>
+<tr>
+<td>Nonstationary Transformer</td>
+<td><code>nonstationary_transformer</code></td>
+<td><em>(none)</em></td>
+<td>Runtime-only module</td>
+</tr>
+<tr>
+<td>Swiss LSTM family</td>
+<td><em>(not runtime key)</em></td>
+<td><code>LSTMAdapter</code>, <code>ExtrapoLSTMAdapter</code></td>
+<td><code>LSTMAdapter</code> exported from <code>swiss_lstm.py</code></td>
+</tr>
+<tr>
+<td>Swiss Transformer family</td>
+<td><em>(not runtime key)</em></td>
+<td><code>TransformerEncoderAdapter</code></td>
+<td>Alias exports include <code>SwissTransformerAdapter</code>, <code>SwissTransformerEmbeddingAdapter</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="23-important-practical-caveat">2.3 Important practical caveat<a class="headerlink" href="#23-important-practical-caveat" title="Permanent link">&para;</a></h3>
+<p><code>TimeMoE</code> adapter defaults to <code>task_name='zero_shot_forecast'</code>; if config does not align, model forward may be inactive for standard long-term task names (<code>liulian/models/torch/timemoe.py:53-56</code>, <code>liulian/models/torch/timemoe.py:73-80</code>).</p>
+<hr />
+<h2 id="3-corrected-entity-plumbing-path-data-trainer-model">3. Corrected entity plumbing path (data -&gt; trainer -&gt; model)<a class="headerlink" href="#3-corrected-entity-plumbing-path-data-trainer-model" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Stage</th>
+<th>What happens</th>
+<th>Key risk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Data feature build</td>
+<td><code>make_entity_features</code> only executes when <code>station_name</code> is set</td>
+<td>In many multi-channel CSV/PEMS paths, <code>station_name</code> is unset, so transparent modes can no-op</td>
+</tr>
+<tr>
+<td>Split/entity IDs</td>
+<td><code>seg_entity_ids</code> only set when <code>station_name</code> exists</td>
+<td>Batch-level <code>entity_idx</code> missing for many multi-channel datasets</td>
+</tr>
+<tr>
+<td>Collate</td>
+<td>Returns <code>(batch_x, batch_y, batch_x_mark, batch_y_mark, entity_id_strs, entity_idx)</code> when IDs exist</td>
+<td>Missing IDs reduce per-sample embedding path availability</td>
+</tr>
+<tr>
+<td>Trainer</td>
+<td>For embedding mode, forwards <code>entity_ids=batch_entity_idx</code> to model</td>
+<td>Works only when collate emits <code>entity_idx</code></td>
+</tr>
+<tr>
+<td>Model wrapping</td>
+<td><code>pipeline.build_model</code> wraps with <code>EntityWrapper</code> / <code>ChannelEntityWrapper</code> for embedding mode (except PatchTST add-after-patch)</td>
+<td>Generic wrappers may be less architecture-optimal than native injection</td>
+</tr>
+<tr>
+<td>PatchTST native path</td>
+<td><code>add_after_patch</code> adds station embeddings in patch-token space</td>
+<td>Assumes channel order via <code>arange(n_vars)</code></td>
+</tr>
+<tr>
+<td>Channel wrapper path</td>
+<td>Uses fixed station index buffer <code>[0..N-1]</code> and ignores per-sample IDs</td>
+<td>Channel permutation assumptions must stay consistent</td>
+</tr>
+</tbody>
+</table>
+<h3 id="31-where-it-currently-works-best">3.1 Where it currently works best<a class="headerlink" href="#31-where-it-currently-works-best" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Embedding mode + multi-channel homogeneous datasets</strong> (traffic/electricity/PEMS) via <code>ChannelEntityWrapper</code> or PatchTST post-patch embeddings.  </li>
+<li><strong>Swiss per-entity mode</strong> where <code>station_name</code> is explicitly set and entity strings/indices are emitted in collate.</li>
+</ol>
+<h3 id="32-where-behavior-is-fragile">3.2 Where behavior is fragile<a class="headerlink" href="#32-where-behavior-is-fragile" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Transparent modes on many multi-channel CSV/PEMS paths.  </li>
+<li>Swiss multi-channel split currently does not pass identifier args into the constructed internal <code>TimeSeriesDataset</code> object (<code>liulian/data/swiss_river.py:492-509</code>).</li>
+</ol>
+<h3 id="33-entity-identifier-forms-currently-considered-in-the-codebase">3.3 Entity identifier forms currently considered in the codebase<a class="headerlink" href="#33-entity-identifier-forms-currently-considered-in-the-codebase" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Identifier form</th>
+<th>Implementation surface</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>embedding</code></td>
+<td><code>TimeSeriesDataset</code> + wrappers/adapters</td>
+<td>Learned <code>nn.Embedding</code>; primary path for homogeneous multi-entity datasets</td>
+</tr>
+<tr>
+<td><code>onehot</code></td>
+<td><code>make_entity_features()</code></td>
+<td>Transparent feature concat mode</td>
+</tr>
+<tr>
+<td><code>numeric_id</code></td>
+<td><code>make_entity_features()</code></td>
+<td>Transparent scalar ID feature</td>
+</tr>
+<tr>
+<td><code>sinusoidal</code></td>
+<td><code>make_entity_features()</code></td>
+<td>Transparent positional-style encoding</td>
+</tr>
+<tr>
+<td><code>coordinates</code></td>
+<td><code>make_entity_features()</code></td>
+<td>Transparent geo feature (mainly Swiss/topology-aware datasets)</td>
+</tr>
+<tr>
+<td><code>descriptors</code></td>
+<td><code>make_entity_features()</code></td>
+<td>Transparent user-provided descriptor vectors</td>
+</tr>
+<tr>
+<td><code>embedding_idx</code></td>
+<td><code>make_entity_features()</code></td>
+<td>Explicit index feature variant (rarely used in configs)</td>
+</tr>
+<tr>
+<td><code>feature_concat</code></td>
+<td>Swiss adapters (<code>swiss_lstm.py</code>, <code>swiss_transformer.py</code>)</td>
+<td>Separate <code>entity_features</code> tensor path in adapter forward</td>
+</tr>
+<tr>
+<td><code>entity_id_strs</code> / <code>entity_idx</code> batch metadata</td>
+<td>DataLoader collate + trainer</td>
+<td>String IDs for inverse-scaling/reporting; integer IDs for model embedding lookup</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="4-per-model-feasibility-and-architecture-specific-entity-id-design-all-forecasting-models">4. Per-model feasibility and architecture-specific entity-ID design (all forecasting models)<a class="headerlink" href="#4-per-model-feasibility-and-architecture-specific-entity-id-design-all-forecasting-models" title="Permanent link">&para;</a></h2>
+<h3 id="41-feasibility-matrix">4.1 Feasibility matrix<a class="headerlink" href="#41-feasibility-matrix" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model (canonical)</th>
+<th>Current support route</th>
+<th>Support after revision?</th>
+<th>Architecture-specific ID design</th>
+<th>Why this design</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dlinear</td>
+<td>Adapter + mixin / runtime wrapper</td>
+<td><strong>Yes</strong></td>
+<td>Station-conditioned bias/affine on trend+season outputs (keep wrapper baseline)</td>
+<td>Linear decomposition benefits from low-cost per-entity offsets</td>
+</tr>
+<tr>
+<td>transformer</td>
+<td>Adapter + mixin</td>
+<td><strong>Yes</strong></td>
+<td>Additive entity embedding at token embedding or dedicated entity token</td>
+<td>Attention layers naturally absorb identity context</td>
+</tr>
+<tr>
+<td>informer</td>
+<td>Adapter + mixin</td>
+<td><strong>Yes</strong></td>
+<td>Same as Transformer before ProbSparse attention</td>
+<td>Preserves sparse complexity while adding identity</td>
+</tr>
+<tr>
+<td>autoformer</td>
+<td>Adapter + mixin</td>
+<td><strong>Yes</strong></td>
+<td>Inject IDs before decomposition/autocorrelation blocks</td>
+<td>Trend/season parts can be entity-conditioned</td>
+</tr>
+<tr>
+<td>fedformer</td>
+<td>Adapter + mixin</td>
+<td><strong>Yes</strong></td>
+<td>Entity-conditioned spectral gate/bias in Fourier/Wavelet components</td>
+<td>IDs modulate frequency-domain signatures</td>
+</tr>
+<tr>
+<td>itransformer</td>
+<td>Adapter + mixin</td>
+<td><strong>Yes</strong></td>
+<td>Variate-token identity embeddings</td>
+<td>Variates are attention tokens; identity is token metadata</td>
+</tr>
+<tr>
+<td>patchtst</td>
+<td>Adapter + native add-after-patch path</td>
+<td><strong>Yes</strong></td>
+<td>Prefer post-patch token-space station embedding (<code>add_after_patch</code>)</td>
+<td>Patch tokens are the model’s native representation</td>
+</tr>
+<tr>
+<td>timesnet</td>
+<td>Adapter + mixin</td>
+<td><strong>Yes</strong></td>
+<td>Entity conditioning before FFT period blocks; optional period-weight gating</td>
+<td>Period salience often differs by entity</td>
+</tr>
+<tr>
+<td>timemixer</td>
+<td>Adapter + mixin</td>
+<td><strong>Yes</strong></td>
+<td>Entity-conditioned multi-scale mixing gates</td>
+<td>Entity dynamics differ across scales</td>
+</tr>
+<tr>
+<td>timexer</td>
+<td>Adapter + mixin</td>
+<td><strong>Yes</strong></td>
+<td>Entity context on endogenous branch + cross-attn bias</td>
+<td>Endogenous/exogenous fusion should be entity-aware</td>
+</tr>
+<tr>
+<td>mamba</td>
+<td>Adapter + mixin</td>
+<td><strong>Yes</strong></td>
+<td>Input embedding + optional FiLM modulation of SSM blocks</td>
+<td>SSM transition behavior can be entity-dependent</td>
+</tr>
+<tr>
+<td>lstm (vanilla module)</td>
+<td>Runtime wrapper only</td>
+<td><strong>Yes</strong></td>
+<td>Native <code>nn.Embedding</code> concat path (or wrapper fallback)</td>
+<td>LSTM handles straightforward concatenative conditioning</td>
+</tr>
+<tr>
+<td>etsformer</td>
+<td>Runtime wrapper only</td>
+<td><strong>Yes</strong></td>
+<td>Inject IDs into level/growth/season components</td>
+<td>ETS terms are entity-specific by construction</td>
+</tr>
+<tr>
+<td>lightts</td>
+<td>Runtime wrapper only</td>
+<td><strong>Yes</strong></td>
+<td>Entity-conditioned channel projection in IEBlock</td>
+<td>Channel MLP mixing benefits from entity priors</td>
+</tr>
+<tr>
+<td>reformer</td>
+<td>Runtime wrapper only</td>
+<td><strong>Yes</strong></td>
+<td>Inject IDs before LSH projections / bucket assignment</td>
+<td>Identity can influence locality/hash grouping</td>
+</tr>
+<tr>
+<td>gpt4ts</td>
+<td>Runtime wrapper only</td>
+<td><strong>Yes</strong></td>
+<td>Entity token/prefix before GPT2 patch stream</td>
+<td>LLM token pipelines benefit from explicit identity tokens</td>
+</tr>
+<tr>
+<td>nonstationary_transformer</td>
+<td>Runtime wrapper only</td>
+<td><strong>Yes</strong></td>
+<td>Feed IDs into tau/delta projector and embedding stream</td>
+<td>Entity-level nonstationarity differs</td>
+</tr>
+<tr>
+<td>timellm</td>
+<td>Adapter + mixin</td>
+<td><strong>Yes</strong></td>
+<td>Numeric/entity embedding side channel + prompt tag template</td>
+<td>Prompt-only identity is brittle; numeric conditioning is stable</td>
+</tr>
+<tr>
+<td>timemoe</td>
+<td>Adapter + mixin (task caveat)</td>
+<td><strong>Yes</strong></td>
+<td>Entity-conditioned router prior/prefix expert token</td>
+<td>MoE routing is the natural locus for specialization</td>
+</tr>
+<tr>
+<td>LSTMAdapter (Swiss family)</td>
+<td>Native Swiss adapter logic</td>
+<td><strong>Yes</strong></td>
+<td>Keep native embedding/transparent/feature-concat modes</td>
+<td>Already mature and flexible</td>
+</tr>
+<tr>
+<td>ExtrapoLSTMAdapter</td>
+<td>Native Swiss adapter logic</td>
+<td><strong>Yes</strong></td>
+<td>Add ID-aware future-step embeddings in extrapolation heads</td>
+<td>Horizon-specific behavior can be entity-specific</td>
+</tr>
+<tr>
+<td>TransformerEncoderAdapter (Swiss family)</td>
+<td>Native Swiss adapter logic</td>
+<td><strong>Yes</strong></td>
+<td>Keep embedding + feature-concat + transparent paths; strengthen multi-channel handling</td>
+<td>Encoder-only path is already entity-capable</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-step-by-step-revision-plan-model-by-model">4.2 Step-by-step revision plan (model-by-model)<a class="headerlink" href="#42-step-by-step-revision-plan-model-by-model" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Step-by-step plan</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dlinear</td>
+<td>1) Add optional entity affine layer after trend+season sum. 2) Keep wrapper fallback for compatibility. 3) Add homogeneous-dataset ablations.</td>
+</tr>
+<tr>
+<td>transformer</td>
+<td>1) Add <code>entity_injection</code> mode (<code>add_to_embed</code>/<code>entity_token</code>). 2) Keep no-ID parity tests. 3) Benchmark traffic/electricity.</td>
+</tr>
+<tr>
+<td>informer</td>
+<td>1) Mirror transformer injection API. 2) Validate memory/runtime under long sequences. 3) Run entity ablations.</td>
+</tr>
+<tr>
+<td>autoformer</td>
+<td>1) Inject identity before decomposition/autocorrelation. 2) Add decomposition-consistency tests. 3) Benchmark traffic + swiss-river.</td>
+</tr>
+<tr>
+<td>fedformer</td>
+<td>1) Add optional entity spectral gate. 2) Add Fourier/Wavelet shape checks. 3) Compare with wrapper-only baseline.</td>
+</tr>
+<tr>
+<td>itransformer</td>
+<td>1) Add explicit variate identity embeddings. 2) Validate channel-order assumptions. 3) Benchmark on traffic/PEMS.</td>
+</tr>
+<tr>
+<td>patchtst</td>
+<td>1) Keep <code>add_after_patch</code> as primary. 2) Add explicit channel-order tests/permutation checks. 3) Keep wrapper path as fallback.</td>
+</tr>
+<tr>
+<td>timesnet</td>
+<td>1) Inject IDs before FFT/top-k period selection. 2) Optionally gate period weights by ID. 3) Validate period stability.</td>
+</tr>
+<tr>
+<td>timemixer</td>
+<td>1) Add entity-conditioned scale-mixing gates. 2) Validate multi-scale output consistency. 3) Measure latency impact.</td>
+</tr>
+<tr>
+<td>timexer</td>
+<td>1) Inject identity into endogenous embedding stream. 2) Optionally bias exogenous cross-attention. 3) Validate exogenous integrity.</td>
+</tr>
+<tr>
+<td>mamba</td>
+<td>1) Add native entity embedding/FILM option. 2) Keep wrapper mode. 3) Validate long-sequence stability and throughput.</td>
+</tr>
+<tr>
+<td>lstm (module)</td>
+<td>1) Add adapter with <code>EntityAwareMixin</code> or native embedding path. 2) Add no-ID parity + entity smoke tests. 3) Register in benchmark map.</td>
+</tr>
+<tr>
+<td>etsformer</td>
+<td>1) Add native entity hooks for level/growth/season blocks. 2) Add adapter-level entity support. 3) Benchmark vs wrapper-only.</td>
+</tr>
+<tr>
+<td>lightts</td>
+<td>1) Add entity-aware channel-projection bias/gate. 2) Add adapter for benchmark path. 3) Validate speed/accuracy tradeoff.</td>
+</tr>
+<tr>
+<td>reformer</td>
+<td>1) Add ID injection before LSH stack. 2) Add adapter and long-sequence correctness tests. 3) Compare to transformer injection.</td>
+</tr>
+<tr>
+<td>gpt4ts</td>
+<td>1) Add adapter exposing runtime config parity. 2) Add entity-token prefix strategy. 3) Benchmark against wrapper-only conditioning.</td>
+</tr>
+<tr>
+<td>nonstationary_transformer</td>
+<td>1) Add adapter. 2) Feed IDs into <code>tau_learner</code>/<code>delta_learner</code>. 3) Validate calibration by entity.</td>
+</tr>
+<tr>
+<td>timellm</td>
+<td>1) Keep numeric conditioning as baseline. 2) Add optional prompt entity tags. 3) Ablate numeric-only vs numeric+prompt.</td>
+</tr>
+<tr>
+<td>timemoe</td>
+<td>1) Align task-name semantics with runtime benchmark tasks. 2) Add entity-aware router bias/prefix path. 3) Add curated benchmark configs.</td>
+</tr>
+<tr>
+<td>Swiss LSTM family</td>
+<td>1) Preserve rich mode matrix. 2) Improve naming clarity vs vanilla <code>lstm</code> module. 3) Add cross-dataset smoke tests.</td>
+</tr>
+<tr>
+<td>Swiss Transformer family</td>
+<td>1) Preserve mode matrix. 2) Add stronger multi-channel handling/tests. 3) Harmonize docs with core entity guide.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="5-discrepancy-log-vs-prior-report">5. Discrepancy log vs prior report<a class="headerlink" href="#5-discrepancy-log-vs-prior-report" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Prior state</th>
+<th>Refined correction</th>
+<th>Impact</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Omission</td>
+<td>Plugin adapters not explicitly represented</td>
+<td>Added <code>SwissRiverDatasetAdapter</code> and <code>TrafficDatasetAdapter</code> as plugin-surface datasets; marked as synthetic stubs</td>
+<td>Prevents over-claiming plugin readiness</td>
+</tr>
+<tr>
+<td>Omission</td>
+<td>Downloader support surface not explicit</td>
+<td>Added downloader matrix (<code>_DATASET_FILES</code> and manual Swiss set)</td>
+<td>Clarifies what “supported” means operationally</td>
+</tr>
+<tr>
+<td>Semantics mismatch</td>
+<td>“Supported dataset” could be read as runtime-ready for all registry keys</td>
+<td>Split runtime-ready (<code>pipeline</code>) vs registry-only (<code>data_factory</code>) keys (<code>solar/m4/custom</code>)</td>
+<td>Avoids false assumption of runtime coverage</td>
+</tr>
+<tr>
+<td>Naming mismatch</td>
+<td>Lowercase runtime names and CamelCase benchmark names mixed</td>
+<td>Added canonical name map and per-surface table</td>
+<td>Prevents model coverage drift</td>
+</tr>
+<tr>
+<td>Surface mismatch</td>
+<td>Runtime module-only models not separated from benchmark adapter path</td>
+<td>Explicitly flagged <code>lstm/etsformer/lightts/reformer/gpt4ts/nonstationary_transformer</code> as runtime-only in benchmark tooling</td>
+<td>Prevents accidental omission in benchmarks</td>
+</tr>
+<tr>
+<td>Alias ambiguity</td>
+<td><code>LSTMAdapter</code> could be misread as vanilla <code>lstm.py</code> adapter</td>
+<td>Clarified <code>LSTMAdapter</code> export comes from <code>swiss_lstm.py</code></td>
+<td>Prevents wrong adapter assumptions</td>
+</tr>
+<tr>
+<td>Execution caveat</td>
+<td>TimeMoE practical run condition underemphasized</td>
+<td>Added task-name caveat (<code>zero_shot_forecast</code>)</td>
+<td>Prevents silent non-execution in standard flows</td>
+</tr>
+<tr>
+<td>Data plumbing risk</td>
+<td>Transparent mode no-op risk noted but not fully tied to split constructors</td>
+<td>Added explicit constructor-level evidence (station_name gating vs CSV/PEMS/swiss-mc paths)</td>
+<td>Stronger root-cause clarity</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="6-critical-self-critique-and-uncertainty-register">6. Critical self-critique and uncertainty register<a class="headerlink" href="#6-critical-self-critique-and-uncertainty-register" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Risk / uncertainty</th>
+<th>Mitigation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Causal claim (“IDs help”)</td>
+<td>This report is architectural and literature-backed; it is not a completed ablation run</td>
+<td>Execute controlled ablations by dataset family and report significance</td>
+</tr>
+<tr>
+<td><code>custom</code> / <code>solar</code></td>
+<td>Suitability depends on schema semantics</td>
+<td>Add schema validator: homogeneous-entity vs heterogeneous-feature classification</td>
+</tr>
+<tr>
+<td>TimeMoE conditioning</td>
+<td>Practical integration depends on generation/task API details</td>
+<td>Implement and test explicit runtime adapter contract for forecasting tasks</td>
+</tr>
+<tr>
+<td>Channel-order assumptions</td>
+<td><code>ChannelEntityWrapper</code> and PatchTST add-after-patch rely on stable channel indexing</td>
+<td>Add permutation tests + explicit channel index mapping</td>
+</tr>
+<tr>
+<td>Swiss multi-channel ID path</td>
+<td>Data-layer identifier args omitted in Swiss MC split constructor</td>
+<td>Add explicit pass-through for <code>identifier_mode/id_integration/station_ids</code> in MC builder</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="7-prioritized-implementation-roadmap">7. Prioritized implementation roadmap<a class="headerlink" href="#7-prioritized-implementation-roadmap" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Work package</th>
+<th>Why now</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P0</td>
+<td>Unify model/data registries across runtime, benchmark tool, and config generator</td>
+<td>Eliminates naming/coverage drift</td>
+</tr>
+<tr>
+<td>P0</td>
+<td>Fix transparent-ID plumbing for multi-channel CSV/PEMS/Swiss-MC paths</td>
+<td>Removes silent no-op behavior</td>
+</tr>
+<tr>
+<td>P0</td>
+<td>Clarify/standardize adapter naming (<code>VanillaLSTMAdapter</code> vs Swiss aliases)</td>
+<td>Avoids wrong-model execution in experiments</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>Add benchmark adapters for runtime-only models (<code>etsformer</code>, <code>lightts</code>, <code>reformer</code>, <code>gpt4ts</code>, <code>nonstationary_transformer</code>, optional <code>lstm</code>)</td>
+<td>Expands comparable model coverage</td>
+</tr>
+<tr>
+<td>P1</td>
+<td>Promote architecture-native ID hooks where wrappers are currently the only path</td>
+<td>Improves model-specific inductive bias</td>
+</tr>
+<tr>
+<td>P2</td>
+<td>Extend LLM/MoE ID conditioning (TimeLLM prompt tags + TimeMoE router priors)</td>
+<td>Higher upside, higher complexity</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8-final-completion-verification">8. Final completion verification<a class="headerlink" href="#8-final-completion-verification" title="Permanent link">&para;</a></h2>
+<h3 id="81-requirement-to-deliverable-mapping">8.1 Requirement-to-deliverable mapping<a class="headerlink" href="#81-requirement-to-deliverable-mapping" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Requested item</th>
+<th>Delivered</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Read code/docs/files and list supported datasets/models</td>
+<td>Sections 1 and 2</td>
+</tr>
+<tr>
+<td>Identify suitable datasets for entity identifiers</td>
+<td>Sections 1.1 and 1.2</td>
+</tr>
+<tr>
+<td>Identify identifier forms currently considered</td>
+<td>Section 3.3 (plus code anchors)</td>
+</tr>
+<tr>
+<td>Identify current model support and mechanisms</td>
+<td>Sections 2 and 4</td>
+</tr>
+<tr>
+<td>For each forecasting model: feasibility after revision + reasons + design</td>
+<td>Section 4.1</td>
+</tr>
+<tr>
+<td>Model-by-model detailed step plan</td>
+<td>Section 4.2</td>
+</tr>
+<tr>
+<td>Correct/refine prior report with explicit discrepancy log</td>
+<td>Section 5</td>
+</tr>
+<tr>
+<td>Final detailed verification</td>
+<td>This section (8)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="82-no-miss-dataset-coverage-table">8.2 No-miss dataset coverage table<a class="headerlink" href="#82-no-miss-dataset-coverage-table" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Dataset surface item</th>
+<th>Covered in this report</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>traffic</code>, <code>electricity</code>, <code>exchange_rate</code>, <code>weather</code>, <code>illness</code></td>
+<td>Section 1.1</td>
+</tr>
+<tr>
+<td><code>ETTh1</code>, <code>ETTh2</code>, <code>ETTm1</code>, <code>ETTm2</code></td>
+<td>Section 1.1</td>
+</tr>
+<tr>
+<td><code>PEMS03</code>, <code>PEMS04</code>, <code>PEMS07</code>, <code>PEMS08</code></td>
+<td>Section 1.1</td>
+</tr>
+<tr>
+<td><code>swiss-river-1990</code>, <code>swiss-river-2010</code>, <code>swiss-river-zurich</code></td>
+<td>Section 1.1</td>
+</tr>
+<tr>
+<td><code>solar</code>, <code>m4</code>, <code>custom</code></td>
+<td>Section 1.1</td>
+</tr>
+<tr>
+<td>Plugin datasets (<code>SwissRiverDatasetAdapter</code>, <code>TrafficDatasetAdapter</code>)</td>
+<td>Section 1.1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="83-no-miss-forecasting-model-coverage-table">8.3 No-miss forecasting model coverage table<a class="headerlink" href="#83-no-miss-forecasting-model-coverage-table" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Forecasting model surface item</th>
+<th>Covered in this report</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Runtime keys: <code>dlinear</code>, <code>transformer</code>, <code>informer</code>, <code>autoformer</code>, <code>fedformer</code>, <code>itransformer</code>, <code>patchtst</code>, <code>timesnet</code>, <code>timemixer</code>, <code>timexer</code>, <code>mamba</code>, <code>lstm</code>, <code>etsformer</code>, <code>lightts</code>, <code>reformer</code>, <code>gpt4ts</code>, <code>nonstationary_transformer</code>, <code>timellm</code>, <code>timemoe</code></td>
+<td>Sections 2.1 and 4</td>
+</tr>
+<tr>
+<td>Benchmark/Swiss adapter keys: <code>DLinear</code>, <code>Transformer</code>, <code>Informer</code>, <code>Autoformer</code>, <code>FEDformer</code>, <code>iTransformer</code>, <code>PatchTST</code>, <code>TimesNet</code>, <code>TimeMixer</code>, <code>TimeXer</code>, <code>Mamba</code>, <code>LSTMAdapter</code>, <code>ExtrapoLSTMAdapter</code>, <code>TransformerEncoderAdapter</code></td>
+<td>Sections 2.2 and 4</td>
+</tr>
+<tr>
+<td>Alias exports: <code>SwissLSTMAdapter</code>, <code>SwissExtrapoLSTMAdapter</code>, <code>SwissLSTMEmbeddingAdapter</code>, <code>SwissTransformerAdapter</code>, <code>SwissTransformerEmbeddingAdapter</code></td>
+<td>Sections 2.2 and 4</td>
+</tr>
+</tbody>
+</table>
+<h3 id="84-citation-completeness-check">8.4 Citation completeness check<a class="headerlink" href="#84-citation-completeness-check" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Claim class</th>
+<th>Code evidence</th>
+<th>External evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dataset support surfaces</td>
+<td>Yes</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>Model support surfaces</td>
+<td>Yes</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>Entity plumbing behavior</td>
+<td>Yes</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>Model architecture rationale</td>
+<td>Yes (code)</td>
+<td>Yes (paper links below)</td>
+</tr>
+<tr>
+<td>“Entity identity helps homogeneous MTS” rationale</td>
+<td>Yes (repo modes)</td>
+<td>Yes (STID, AGCRN + model papers)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="9-online-references-used-in-this-refined-pass">9. Online references used in this refined pass<a class="headerlink" href="#9-online-references-used-in-this-refined-pass" title="Permanent link">&para;</a></h2>
+<h3 id="91-model-papers">9.1 Model papers<a class="headerlink" href="#91-model-papers" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Paper/reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DLinear</td>
+<td>https://arxiv.org/pdf/2205.13504.pdf</td>
+</tr>
+<tr>
+<td>Transformer</td>
+<td>https://proceedings.neurips.cc/paper/2017/file/3f5ee243547dee91fbd053c1c4a845aa-Paper.pdf</td>
+</tr>
+<tr>
+<td>Informer</td>
+<td>https://ojs.aaai.org/index.php/AAAI/article/view/17325/17132</td>
+</tr>
+<tr>
+<td>Autoformer</td>
+<td>https://openreview.net/pdf?id=I55UqU-M11y</td>
+</tr>
+<tr>
+<td>FEDformer</td>
+<td>https://proceedings.mlr.press/v162/zhou22g.html</td>
+</tr>
+<tr>
+<td>iTransformer</td>
+<td>https://arxiv.org/abs/2310.06625</td>
+</tr>
+<tr>
+<td>PatchTST</td>
+<td>https://arxiv.org/abs/2211.14730</td>
+</tr>
+<tr>
+<td>TimesNet</td>
+<td>https://openreview.net/pdf?id=ju_Uqw384Oq</td>
+</tr>
+<tr>
+<td>TimeMixer</td>
+<td>https://openreview.net/pdf?id=7oLshfEIC2</td>
+</tr>
+<tr>
+<td>TimeXer</td>
+<td>https://arxiv.org/abs/2402.19072</td>
+</tr>
+<tr>
+<td>Mamba</td>
+<td>https://arxiv.org/abs/2312.00752</td>
+</tr>
+<tr>
+<td>TimeLLM</td>
+<td>https://arxiv.org/abs/2310.01728</td>
+</tr>
+<tr>
+<td>TimeMoE</td>
+<td>https://arxiv.org/abs/2409.16040</td>
+</tr>
+<tr>
+<td>ETSformer</td>
+<td>https://arxiv.org/abs/2202.01381</td>
+</tr>
+<tr>
+<td>LightTS</td>
+<td>https://arxiv.org/abs/2207.01186</td>
+</tr>
+<tr>
+<td>Reformer</td>
+<td>https://openreview.net/forum?id=rkgNKkHtvB</td>
+</tr>
+<tr>
+<td>GPT4TS (One Fits All)</td>
+<td>https://arxiv.org/abs/2302.11939</td>
+</tr>
+<tr>
+<td>Nonstationary Transformer</td>
+<td>https://openreview.net/pdf?id=ucNDIDRNjjv</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="10-deep-dive-corrections-and-refinements-2026-04-16">10. Deep-dive corrections and refinements (2026-04-16)<a class="headerlink" href="#10-deep-dive-corrections-and-refinements-2026-04-16" title="Permanent link">&para;</a></h2>
+<p><em>This section was added after completing per-model deep-dive audits in <code>docs/research/entity-id-deep/</code>. Each correction references the deep-dive file where the finding was made.</em></p>
+<h3 id="101-corrections-to-section-41-feasibility-matrix">10.1 Corrections to Section 4.1 feasibility matrix<a class="headerlink" href="#101-corrections-to-section-41-feasibility-matrix" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Prior claim (Section 4.1)</th>
+<th>Corrected finding</th>
+<th>Deep-dive file</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TimeMoE</td>
+<td>"Yes — entity-conditioned router prior/prefix expert token"</td>
+<td><strong>No</strong> for zero-shot mode. No training = no learnable parameters. Entity injection requires fine-tuning support (not implemented). Recommend excluding from entity-ID ablation.</td>
+<td><code>timemoe.md</code></td>
+</tr>
+<tr>
+<td>LSTM (vanilla)</td>
+<td>"Add adapter with EntityAwareMixin or native embedding path"</td>
+<td>Adapter (<code>lstm.py:96</code>) <strong>lacks EntityAwareMixin</strong> — must be retrofitted as prerequisite. Hidden-init (H2) is the LSTM-native primary design, not concat.</td>
+<td><code>lstm.md</code></td>
+</tr>
+<tr>
+<td>ETSformer</td>
+<td>"Add native entity hooks for level/growth/season blocks"</td>
+<td>Adapter (<code>etsformer.py:66</code>) <strong>lacks EntityAwareMixin</strong> — must be retrofitted. Additionally, <code>level_bias</code> (H3) is the architecturally natural injection for ETS decomposition — adds per-station offset to the exponential-smoothing level.</td>
+<td><code>etsformer.md</code></td>
+</tr>
+<tr>
+<td>LightTS</td>
+<td>"Add entity-aware channel-projection bias/gate"</td>
+<td><strong>No adapter class exists at all</strong> — only <code>Model</code>. Must create <code>LightTSAdapter(EntityAwareMixin, TorchModelAdapter)</code> first. Primary design is <code>post_output_affine</code> (H3), not channel-projection bias — LightTS is too simple for mid-model injection.</td>
+<td><code>lightts.md</code></td>
+</tr>
+<tr>
+<td>Reformer</td>
+<td>"Add ID injection before LSH stack"</td>
+<td><strong>No adapter class exists</strong> — must create <code>ReformerAdapter</code>. LSH bucketing partially cancels additive bias in dot-product → entity signal mainly flows through residual, not hash selection.</td>
+<td><code>reformer.md</code></td>
+</tr>
+<tr>
+<td>GPT4TS</td>
+<td>"Add adapter exposing runtime config parity"</td>
+<td><strong>No adapter class exists</strong> — must create <code>GPT4TSAdapter</code>. Entity embedding enters frozen GPT-2 via <code>inputs_embeds</code>; LN (only trainable component) mediates entity conditioning.</td>
+<td><code>gpt4ts.md</code></td>
+</tr>
+<tr>
+<td>NST</td>
+<td>"Add adapter; feed IDs into tau/delta projectors"</td>
+<td><strong>No adapter class exists</strong> — must create <code>NonstationaryTransformerAdapter</code>. Primary design is standard H2 <code>add_to_embed</code> (same as Transformer); tau/delta conditioning (H3) is secondary/deferred.</td>
+<td><code>nonstationary_transformer.md</code></td>
+</tr>
+<tr>
+<td>Mamba</td>
+<td>"Add native entity embedding/FILM option"</td>
+<td>Primary design is H2 <code>add_to_embed</code> pre-SSM — entity bias becomes input-dependent SSM parameterization (Δ, B, C). FiLM is over-engineering for the single-block TSL port.</td>
+<td><code>mamba.md</code></td>
+</tr>
+<tr>
+<td>TimeLLM</td>
+<td>"Numeric/entity embedding side channel + prompt tag template"</td>
+<td>H4 <code>entity_in_prompt</code> is the <strong>architecturally unique</strong> primary design — inject station name/description into the natural-language prompt. No other model can leverage text-based entity injection. H2 <code>add_to_patch_embed</code> is secondary.</td>
+<td><code>timellm.md</code></td>
+</tr>
+<tr>
+<td>TimeXer</td>
+<td>"Entity context on endogenous branch + cross-attn bias"</td>
+<td>H2′ <code>entity_global_token</code> — replace shared <code>glb_token</code> with per-entity learned token. <strong>Architecturally most novel</strong> in the suite: directly edits the existing entity-like slot that conditions cross-attention.</td>
+<td><code>timexer.md</code></td>
+</tr>
+<tr>
+<td>iTransformer</td>
+<td>"Variate-token identity embeddings"</td>
+<td><strong>Architecturally the best fit</strong> — <code>(B, N, d_model)</code> shape already has variates as tokens. Entity bias directly conditions cross-variate attention. Prior description was correct in spirit but understated the architectural alignment.</td>
+<td><code>itransformer.md</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="102-corrections-to-section-22-adapter-status">10.2 Corrections to Section 2.2 adapter status<a class="headerlink" href="#102-corrections-to-section-22-adapter-status" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Prior status</th>
+<th>Corrected status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lstm</code> (vanilla)</td>
+<td>"Runtime-only module"</td>
+<td><code>LSTMAdapter</code> exists at <code>lstm.py:96</code> but <strong>inherits only <code>TorchModelAdapter</code></strong> — no EntityAwareMixin</td>
+</tr>
+<tr>
+<td><code>etsformer</code></td>
+<td>"Runtime-only module"</td>
+<td><code>ETSformerAdapter</code> exists at <code>etsformer.py:66</code> but <strong>inherits only <code>TorchModelAdapter</code></strong> — no EntityAwareMixin, minimal <code>_build_model</code> style</td>
+</tr>
+<tr>
+<td><code>lightts</code></td>
+<td>"Runtime-only module"</td>
+<td><strong>No adapter class at all</strong> — only <code>Model</code> class. Dynamic import via <code>pipeline.build_model:442</code></td>
+</tr>
+<tr>
+<td><code>reformer</code></td>
+<td>"Runtime-only module"</td>
+<td><strong>No adapter class at all</strong> — only <code>Model</code> class</td>
+</tr>
+<tr>
+<td><code>gpt4ts</code></td>
+<td>"Runtime-only module"</td>
+<td><strong>No adapter class at all</strong> — only <code>Model</code> class</td>
+</tr>
+<tr>
+<td><code>nonstationary_transformer</code></td>
+<td>"Runtime-only module"</td>
+<td><strong>No adapter class at all</strong> — only <code>Model</code> class</td>
+</tr>
+</tbody>
+</table>
+<h3 id="103-new-architectural-taxonomy">10.3 New architectural taxonomy<a class="headerlink" href="#103-new-architectural-taxonomy" title="Permanent link">&para;</a></h3>
+<p>The deep-dive audit revealed a natural taxonomy for entity injection designs:</p>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Models</th>
+<th>Primary injection pattern</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Standard H2 <code>add_to_embed</code></strong></td>
+<td>Transformer, Informer, Autoformer, FEDformer, NST, TimesNet, Mamba, Reformer</td>
+<td>Additive <code>nn.Embedding(N, d_model)</code> after DataEmbedding, before encoder</td>
+</tr>
+<tr>
+<td><strong>Channel-independent post-patch</strong></td>
+<td>PatchTST (native), GPT4TS, TimeMixer, TimeLLM (secondary)</td>
+<td>Additive in <code>(B*C, num_patches, d_model)</code> layout — restores identity lost by CI</td>
+</tr>
+<tr>
+<td><strong>Architecture-specific slot</strong></td>
+<td>TimeXer (<code>entity_global_token</code>), iTransformer (variate-as-token)</td>
+<td>Leverages model's unique structural feature</td>
+</tr>
+<tr>
+<td><strong>Text-based prompt</strong></td>
+<td>TimeLLM (primary)</td>
+<td>Entity name/description in natural-language prompt — unique to LLM-based models</td>
+</tr>
+<tr>
+<td><strong>Hidden-state init</strong></td>
+<td>LSTM (vanilla)</td>
+<td>Per-entity <code>(h_0, c_0)</code> — classical RNN identity conditioning</td>
+</tr>
+<tr>
+<td><strong>ETS-level bias</strong></td>
+<td>ETSformer</td>
+<td>Per-station offset on exponential-smoothing level — domain-aligned</td>
+</tr>
+<tr>
+<td><strong>Output affine</strong></td>
+<td>DLinear (primary), LightTS (primary)</td>
+<td>Per-station <code>(N, pred_len)</code> bias on final output — minimal-parameter fallback</td>
+</tr>
+<tr>
+<td><strong>Pre-existing custom system</strong></td>
+<td>Swiss-LSTM, Swiss-Transformer</td>
+<td>Independent entity system with embedding/feature_concat/transparent modes</td>
+</tr>
+<tr>
+<td><strong>Not applicable</strong></td>
+<td>TimeMoE</td>
+<td>Zero-shot only — no learnable parameters</td>
+</tr>
+</tbody>
+</table>
+<h3 id="104-models-requiring-prerequisite-work-before-entity-injection">10.4 Models requiring prerequisite work before entity injection<a class="headerlink" href="#104-models-requiring-prerequisite-work-before-entity-injection" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Prerequisite</th>
+<th>Effort estimate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LSTM (vanilla)</td>
+<td>Add <code>EntityAwareMixin</code> to <code>LSTMAdapter</code> inheritance</td>
+<td>Small (copy MambaAdapter pattern)</td>
+</tr>
+<tr>
+<td>ETSformer</td>
+<td>Add <code>EntityAwareMixin</code> to <code>ETSformerAdapter</code> + expand from <code>_build_model</code> to <code>__init__</code></td>
+<td>Small-medium</td>
+</tr>
+<tr>
+<td>LightTS</td>
+<td>Create <code>LightTSAdapter(EntityAwareMixin, TorchModelAdapter)</code> from scratch</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>Reformer</td>
+<td>Create <code>ReformerAdapter(EntityAwareMixin, TorchModelAdapter)</code></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>GPT4TS</td>
+<td>Create <code>GPT4TSAdapter(EntityAwareMixin, TorchModelAdapter)</code></td>
+<td>Medium</td>
+</tr>
+<tr>
+<td>NST</td>
+<td>Create <code>NonstationaryTransformerAdapter(EntityAwareMixin, TorchModelAdapter)</code></td>
+<td>Medium</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="92-entity-identity-specific-evidence">9.2 Entity-identity-specific evidence<a class="headerlink" href="#92-entity-identity-specific-evidence" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Spatial/temporal identity as a key forecasting factor</td>
+<td>STID: https://arxiv.org/abs/2208.05233</td>
+</tr>
+<tr>
+<td>Node-specific embeddings improve traffic forecasting</td>
+<td>AGCRN: https://arxiv.org/abs/2007.02842</td>
+</tr>
+</tbody>
+</table>
+<h3 id="93-dataset-context-references">9.3 Dataset-context references<a class="headerlink" href="#93-dataset-context-references" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Topic</th>
+<th>Reference</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TSL benchmark ecosystem</td>
+<td>https://github.com/thuml/Time-Series-Library</td>
+</tr>
+<tr>
+<td>Traffic/Electricity benchmark provenance</td>
+<td>https://arxiv.org/abs/1703.07015</td>
+</tr>
+<tr>
+<td>PEMS source</td>
+<td>http://pems.dot.ca.gov</td>
+</tr>
+<tr>
+<td>Weather source context</td>
+<td>https://www.bgc-jena.mpg.de/wetter/</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

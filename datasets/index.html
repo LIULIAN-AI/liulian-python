@@ -1,0 +1,2815 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Research OS for spatiotemporal model experimentation">
+      
+      
+      
+        <link rel="canonical" href="https://jajupmochi.github.io/liulian-python/datasets/">
+      
+      
+        <link rel="prev" href="../data_loaders/">
+      
+      
+        <link rel="next" href="../tsl_comparison/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Datasets - LIULIAN</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#datasets" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="LIULIAN" class="md-header__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LIULIAN
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Datasets
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../cli/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../demo_gallery/" class="md-tabs__link">
+          
+  
+  
+  Demo Gallery
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../models/torch_models/" class="md-tabs__link">
+          
+  
+  
+  Models
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../data_loaders/" class="md-tabs__link">
+          
+  
+  
+  Data
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../tsl_comparison/" class="md-tabs__link">
+          
+  
+  
+  Benchmarks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="LIULIAN" class="md-nav__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LIULIAN
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../forecasting_pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adapter_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adapter Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../manifest_spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifest Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo Gallery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demo Gallery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../demo_gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../demo_patchtst_swiss1990/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PatchTST Swiss River 1990
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/torch_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyTorch Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../entity_identifiers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Entity Identifiers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../search_spaces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Spaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Data
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_loaders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Loaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#class-hierarchy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Class Hierarchy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#windowing-seq_len-label_len-pred_len" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Windowing: seq_len / label_len / pred_len
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Windowing: seq_len / label_len / pred_len">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#window-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Window layout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encoder-only-and-decoder-light-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encoder-only and decoder-light models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encoder-decoder-models-informer-autoformer-etc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encoder-decoder models (Informer, Autoformer, etc.)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#features-modes-m-ms-s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features Modes: 'M' / 'MS' / 'S'
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Features Modes: &#39;M&#39; / &#39;MS&#39; / &#39;S&#39;">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-ms-mode-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How MS mode works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tsl-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TSL default
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#time-feature-encoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time Feature Encoding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Time Feature Encoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#timeenc1-default-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        timeenc=1 (default — recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeenc0-categorical-manual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        timeenc=0 (categorical — manual)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#train-validation-test-splits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Train / Validation / Test Splits
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Train / Validation / Test Splits">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ett-datasets-calendar-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ETT datasets (calendar-based)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-csv-datasets-ratio-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom CSV datasets (ratio-based)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#border-offset-trick" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Border offset trick
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pems-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PEMS datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swiss-river-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Swiss River datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scaler-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaler Types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#standard-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Standard Benchmarks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Standard Benchmarks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ett-electricity-transformer-temperature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ETT (Electricity Transformer Temperature)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weather" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Weather
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#electricity-ecl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Electricity (ECL)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Traffic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exchange-rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exchange Rate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ili-influenza-like-illness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ILI (Influenza-Like Illness)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pems-traffic-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PEMS Traffic Datasets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#swiss-river-datasets_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Swiss River Datasets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-loader-output-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Loader Output Format
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entity-identifier-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entity Identifier Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-factory-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Factory Registry
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Benchmarks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tsl_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TSL Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results_json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset_config_audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset Config Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../breakpoint_bridge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Breakpoint Bridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#class-hierarchy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Class Hierarchy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#windowing-seq_len-label_len-pred_len" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Windowing: seq_len / label_len / pred_len
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Windowing: seq_len / label_len / pred_len">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#window-layout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Window layout
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encoder-only-and-decoder-light-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encoder-only and decoder-light models
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#encoder-decoder-models-informer-autoformer-etc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Encoder-decoder models (Informer, Autoformer, etc.)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#features-modes-m-ms-s" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Features Modes: 'M' / 'MS' / 'S'
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Features Modes: &#39;M&#39; / &#39;MS&#39; / &#39;S&#39;">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#how-ms-mode-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How MS mode works
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tsl-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TSL default
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#time-feature-encoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Time Feature Encoding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Time Feature Encoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#timeenc1-default-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        timeenc=1 (default — recommended)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeenc0-categorical-manual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        timeenc=0 (categorical — manual)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#train-validation-test-splits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Train / Validation / Test Splits
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Train / Validation / Test Splits">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ett-datasets-calendar-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ETT datasets (calendar-based)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-csv-datasets-ratio-based" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom CSV datasets (ratio-based)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#border-offset-trick" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Border offset trick
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pems-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PEMS datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swiss-river-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Swiss River datasets
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scaler-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scaler Types
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#standard-benchmarks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Standard Benchmarks
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Standard Benchmarks">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ett-electricity-transformer-temperature" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ETT (Electricity Transformer Temperature)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#weather" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Weather
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#electricity-ecl" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Electricity (ECL)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#traffic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Traffic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exchange-rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exchange Rate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ili-influenza-like-illness" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ILI (Influenza-Like Illness)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pems-traffic-datasets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PEMS Traffic Datasets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#swiss-river-datasets_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Swiss River Datasets
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-loader-output-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Loader Output Format
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entity-identifier-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entity Identifier Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-factory-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Factory Registry
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="datasets">Datasets<a class="headerlink" href="#datasets" title="Permanent link">&para;</a></h1>
+<p>Catalog of all supported datasets with architecture, loading instructions,
+and detailed technical notes on the TSL-compatible data pipeline.</p>
+<hr />
+<h2 id="class-hierarchy">Class Hierarchy<a class="headerlink" href="#class-hierarchy" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>classDiagram
+    BaseDataset &lt;|-- TimeSeriesDataset
+    TimeSeriesDataset &lt;|-- SpatialTempoDataset
+    SpatialTempoDataset &lt;|-- CSVTimeSeriesDataset
+    SpatialTempoDataset &lt;|-- PEMSDataset
+    SpatialTempoDataset &lt;|-- SwissRiverDataset
+    CSVTimeSeriesDataset &lt;|-- ETTHourDataset
+    CSVTimeSeriesDataset &lt;|-- ETTMinuteDataset
+    CSVTimeSeriesDataset &lt;|-- CustomCSVDataset
+
+    class TimeSeriesDataset {
+        +get_split(name) TimeSeriesSplit
+        +get_data_loaders(batch_size) dict
+        +info() dict
+        -_prepare_split()
+        -_precompute_tensors()
+        -_apply_scaler()
+    }
+    class SpatialTempoDataset {
+        +graph_mode: str
+        +edge_index: Tensor
+        +adj_matrix: Tensor
+        +num_nodes: int
+    }
+    class CSVTimeSeriesDataset {
+        -_load_and_split()
+        -_compute_borders(n)*
+        -_time_features_from_dates()
+    }
+    class CustomCSVDataset {
+        +train_ratio: float
+        +test_ratio: float
+    }</code></pre>
+<p><strong><code>TimeSeriesDataset</code></strong> is the core engine providing lazy windowing, gap
+handling, noise injection, entity identifiers, and scaler support.
+<strong><code>SpatialTempoDataset</code></strong> adds graph / spatial structure
+(<code>graph_mode</code>, <code>edge_index</code>, <code>adj_matrix</code>) on top.
+<strong><code>CSVTimeSeriesDataset</code></strong> adds CSV loading and border-based
+train/val/test splitting.  Subclasses only need to override
+<code>_compute_borders()</code> for custom split logic.</p>
+<hr />
+<h2 id="windowing-seq_len-label_len-pred_len">Windowing: seq_len / label_len / pred_len<a class="headerlink" href="#windowing-seq_len-label_len-pred_len" title="Permanent link">&para;</a></h2>
+<p>These three parameters define the sliding-window geometry, following the
+<a href="https://github.com/thuml/Time-Series-Library">Time-Series-Library</a> (TSL)
+convention used by PatchTST, iTransformer, TimesNet, DLinear, and many others.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>seq_len</code></td>
+<td>96</td>
+<td>Encoder look-back context length</td>
+</tr>
+<tr>
+<td><code>label_len</code></td>
+<td>48</td>
+<td>Decoder warm-up overlap (Transformer only)</td>
+</tr>
+<tr>
+<td><code>pred_len</code></td>
+<td>96</td>
+<td>Prediction horizon</td>
+</tr>
+</tbody>
+</table>
+<h3 id="window-layout">Window layout<a class="headerlink" href="#window-layout" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Row indices (within data array):
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>   i           i+seq_len-label_len    i+seq_len    i+seq_len+pred_len
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>   |                    |                  |                |
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>   |--- encoder (seq_len) -------&gt;|       |                |
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                        |--- decoder (label_len+pred_len) ---&gt;|
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                        |&lt;- overlap -&gt;|
+</code></pre></div>
+<p>In <code>__getitem__</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">seq_x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">seq_len</span><span class="p">]</span>                              <span class="c1"># encoder input</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">seq_y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="n">seq_len</span> <span class="o">-</span> <span class="n">label_len</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">seq_len</span> <span class="o">+</span> <span class="n">pred_len</span><span class="p">]</span>  <span class="c1"># decoder target</span>
+</code></pre></div>
+<p>At training time, the experiment code constructs the decoder input:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">dec_inp</span> <span class="o">=</span> <span class="n">cat</span><span class="p">([</span><span class="n">batch_y</span><span class="p">[:,</span> <span class="p">:</span><span class="n">label_len</span><span class="p">,</span> <span class="p">:],</span> <span class="n">zeros</span><span class="p">(</span><span class="n">pred_len</span><span class="p">)])</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="c1"># Ground-truth warm-up + zero placeholders for prediction</span>
+</code></pre></div>
+<h3 id="encoder-only-and-decoder-light-models">Encoder-only and decoder-light models<a class="headerlink" href="#encoder-only-and-decoder-light-models" title="Permanent link">&para;</a></h3>
+<p>Several models accept <code>(x_enc, x_mark_enc, x_dec, x_mark_dec)</code> for API
+compatibility but ignore part or all of the decoder path during the
+forecast forward pass. That means <code>label_len</code> often has no behavioral
+effect even when the benchmark config still carries a non-zero value.</p>
+<p>For strict TSL benchmark parity, many published <code>PatchTST</code> and <code>DLinear</code>
+scripts still keep the dataset default decoder overlap (<code>48</code> for the
+96-step benchmarks, <code>18</code> for ILI) even though the model does not use the
+decoder warm-up. By contrast, the TSL <code>TimeMixer</code> scripts intentionally
+set <code>label_len=0</code> across datasets, and we preserve that as a model-
+specific convention.</p>
+<h3 id="encoder-decoder-models-informer-autoformer-etc">Encoder-decoder models (Informer, Autoformer, etc.)<a class="headerlink" href="#encoder-decoder-models-informer-autoformer-etc" title="Permanent link">&para;</a></h3>
+<p>Set <code>label_len &gt; 0</code> (e.g. <code>label_len=48</code> for <code>seq_len=96</code>). The decoder
+receives <code>label_len</code> ground-truth warm-up tokens followed by <code>pred_len</code>
+zero placeholders.</p>
+<hr />
+<h2 id="features-modes-m-ms-s">Features Modes: 'M' / 'MS' / 'S'<a class="headerlink" href="#features-modes-m-ms-s" title="Permanent link">&para;</a></h2>
+<p>The <code>--features</code> flag controls column selection and output dimensionality:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Input columns</th>
+<th>Output columns</th>
+<th>TSL <code>enc_in=dec_in=c_out</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong><code>M</code></strong> (Multivariate→Multivariate)</td>
+<td>All non-date</td>
+<td>All non-date</td>
+<td>= num_channels</td>
+</tr>
+<tr>
+<td><strong><code>MS</code></strong> (Multivariate→Single)</td>
+<td>All non-date</td>
+<td>Target only</td>
+<td>= num_channels</td>
+</tr>
+<tr>
+<td><strong><code>S</code></strong> (Single→Single)</td>
+<td>Target only</td>
+<td>Target only</td>
+<td>= 1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="how-ms-mode-works">How MS mode works<a class="headerlink" href="#how-ms-mode-works" title="Permanent link">&para;</a></h3>
+<p>In MS mode, <code>enc_in = dec_in = c_out = num_channels</code> — the model still
+outputs all channels. The <strong>target selection happens at loss time</strong> via
+the <code>f_dim</code> mechanism in the trainer:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">f_dim</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">features</span> <span class="o">==</span> <span class="s1">&#39;MS&#39;</span> <span class="k">else</span> <span class="mi">0</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="n">outputs</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[:,</span> <span class="o">-</span><span class="n">pred_len</span><span class="p">:,</span> <span class="n">f_dim</span><span class="p">:]</span>  <span class="c1"># MS: only last column</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="n">batch_y</span> <span class="o">=</span> <span class="n">batch_y</span><span class="p">[:,</span> <span class="o">-</span><span class="n">pred_len</span><span class="p">:,</span> <span class="n">f_dim</span><span class="p">:]</span>
+</code></pre></div>
+<p>The target column is always reordered to be the <strong>last</strong> column in the
+DataFrame, so <code>f_dim=-1</code> selects it correctly.</p>
+<h3 id="tsl-default">TSL default<a class="headerlink" href="#tsl-default" title="Permanent link">&para;</a></h3>
+<p>All standard TSL benchmark scripts use <strong><code>features='M'</code></strong> (Multivariate)
+with <code>embed='timeF'</code> (continuous time features). The <code>MS</code> mode is only
+used for specialized models like TimeXer that explicitly handle exogenous
+variables. See the <code>scripts/long_term_forecast/</code> directory in TSL for
+reference.</p>
+<hr />
+<h2 id="time-feature-encoding">Time Feature Encoding<a class="headerlink" href="#time-feature-encoding" title="Permanent link">&para;</a></h2>
+<p>Two time encoding modes are supported:</p>
+<h3 id="timeenc1-default-recommended"><code>timeenc=1</code> (default — recommended)<a class="headerlink" href="#timeenc1-default-recommended" title="Permanent link">&para;</a></h3>
+<p>Uses <code>liulian.utils.timefeatures.time_features()</code> (adapted from GluonTS).
+Produces <strong>continuous features normalised to <code>[-0.5, 0.5]</code></strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Frequency</th>
+<th>Features</th>
+<th style="text-align: center;">Dimensions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Hourly (<code>h</code>)</td>
+<td>HourOfDay, DayOfWeek, DayOfMonth, DayOfYear</td>
+<td style="text-align: center;">4</td>
+</tr>
+<tr>
+<td>Minutely (<code>t</code>/<code>min</code>)</td>
+<td>MinuteOfHour + above</td>
+<td style="text-align: center;">5</td>
+</tr>
+<tr>
+<td>Daily (<code>d</code>)</td>
+<td>DayOfWeek, DayOfMonth, DayOfYear</td>
+<td style="text-align: center;">3</td>
+</tr>
+<tr>
+<td>Weekly (<code>w</code>)</td>
+<td>DayOfMonth, WeekOfYear</td>
+<td style="text-align: center;">2</td>
+</tr>
+<tr>
+<td>Monthly (<code>m</code>)</td>
+<td>MonthOfYear</td>
+<td style="text-align: center;">1</td>
+</tr>
+</tbody>
+</table>
+<p>This is the encoding used by <strong>all standard TSL benchmark scripts</strong>
+(via <code>--embed timeF</code>). Detailed minute offsets such as <code>10min</code> and
+<code>15min</code> are supported through pandas offset parsing and are preferable
+to ambiguous shorthand when the dataset cadence is known precisely.</p>
+<h3 id="timeenc0-categorical-manual"><code>timeenc=0</code> (categorical — manual)<a class="headerlink" href="#timeenc0-categorical-manual" title="Permanent link">&para;</a></h3>
+<p>Hand-crafted features normalised to <code>[-0.5, 0.5]</code>:
+<code>month/12-0.5</code>, <code>day/31-0.5</code>, <code>weekday/6-0.5</code>, <code>hour/23-0.5</code>
+(plus <code>minute/59-0.5</code> for minutely data).</p>
+<blockquote>
+<p><strong>Note:</strong> TSL's <code>timeenc=0</code> uses <strong>raw integers</strong> (month 1–12,
+day 1–31, etc.) without normalisation. Our version normalises to
+<code>[-0.5, 0.5]</code> for better neural-network compatibility. This is an
+intentional deviation from TSL.</p>
+</blockquote>
+<hr />
+<h2 id="train-validation-test-splits">Train / Validation / Test Splits<a class="headerlink" href="#train-validation-test-splits" title="Permanent link">&para;</a></h2>
+<h3 id="ett-datasets-calendar-based">ETT datasets (calendar-based)<a class="headerlink" href="#ett-datasets-calendar-based" title="Permanent link">&para;</a></h3>
+<p>Fixed 12/4/4-month calendar split:</p>
+<table>
+<thead>
+<tr>
+<th>Split</th>
+<th style="text-align: center;">ETTh (hourly)</th>
+<th style="text-align: center;">ETTm (15-min)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Train</td>
+<td style="text-align: center;">months 1–12 (8,640 rows)</td>
+<td style="text-align: center;">months 1–12 (34,560 rows)</td>
+</tr>
+<tr>
+<td>Val</td>
+<td style="text-align: center;">months 13–16 (2,880 rows)</td>
+<td style="text-align: center;">months 13–16 (11,520 rows)</td>
+</tr>
+<tr>
+<td>Test</td>
+<td style="text-align: center;">months 17–20 (2,880 rows)</td>
+<td style="text-align: center;">months 17–20 (11,520 rows)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="custom-csv-datasets-ratio-based">Custom CSV datasets (ratio-based)<a class="headerlink" href="#custom-csv-datasets-ratio-based" title="Permanent link">&para;</a></h3>
+<p>Default split ratios: <strong>70% / 10% / 20%</strong> (train / val / test):</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>num_train = int(n * 0.7)
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>num_test  = int(n * 0.2)
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>num_val   = n - num_train - num_test   (the remainder ≈ 10%)
+</code></pre></div>
+<h3 id="border-offset-trick">Border offset trick<a class="headerlink" href="#border-offset-trick" title="Permanent link">&para;</a></h3>
+<p>Validation and test splits start at <code>X - seq_len</code> instead of <code>X</code>, so the
+first sliding window in each split has <code>seq_len</code> rows of look-back context
+from the preceding split:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>|&lt;--- train (0 to num_train) ---&gt;|&lt;--- val ---&gt;|&lt;--- test ---&gt;|
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>                                 ↑
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>                border1_val = num_train - seq_len
+</code></pre></div>
+<p>This matches TSL's <code>Dataset_Custom._compute_borders()</code> exactly.</p>
+<h3 id="pems-datasets">PEMS datasets<a class="headerlink" href="#pems-datasets" title="Permanent link">&para;</a></h3>
+<p>6/2/2 ratio split (60% / 20% / 20%) applied to the total time steps.</p>
+<h3 id="swiss-river-datasets">Swiss River datasets<a class="headerlink" href="#swiss-river-datasets" title="Permanent link">&para;</a></h3>
+<p>Separate train/test CSV files with configurable <code>train_split</code> for
+train/val partitioning.</p>
+<hr />
+<h2 id="scaler-types">Scaler Types<a class="headerlink" href="#scaler-types" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;"><code>scaler_type</code></th>
+<th style="text-align: left;">Description</th>
+<th>When to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>standard</code></td>
+<td style="text-align: left;">Zero mean, unit variance (sklearn <code>StandardScaler</code>)</td>
+<td>Default for most benchmarks</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>minmax</code></td>
+<td style="text-align: left;">Scale to <code>[0, 1]</code> range</td>
+<td>Swiss River, bounded data</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>none</code></td>
+<td style="text-align: left;">No scaling</td>
+<td>Pre-normalised data</td>
+</tr>
+</tbody>
+</table>
+<p>The scaler is <strong>always fitted on the training split only</strong> and applied
+to all splits (train/val/test), preventing data leakage.</p>
+<hr />
+<h2 id="standard-benchmarks">Standard Benchmarks<a class="headerlink" href="#standard-benchmarks" title="Permanent link">&para;</a></h2>
+<h3 id="ett-electricity-transformer-temperature">ETT (Electricity Transformer Temperature)<a class="headerlink" href="#ett-electricity-transformer-temperature" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>File</th>
+<th>Rows</th>
+<th style="text-align: center;">Channels</th>
+<th>Frequency</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ETTh1</td>
+<td><code>ETTh1.csv</code></td>
+<td>17,420</td>
+<td style="text-align: center;">7</td>
+<td>Hourly</td>
+<td>OT</td>
+</tr>
+<tr>
+<td>ETTh2</td>
+<td><code>ETTh2.csv</code></td>
+<td>17,420</td>
+<td style="text-align: center;">7</td>
+<td>Hourly</td>
+<td>OT</td>
+</tr>
+<tr>
+<td>ETTm1</td>
+<td><code>ETTm1.csv</code></td>
+<td>69,680</td>
+<td style="text-align: center;">7</td>
+<td>15-min</td>
+<td>OT</td>
+</tr>
+<tr>
+<td>ETTm2</td>
+<td><code>ETTm2.csv</code></td>
+<td>69,680</td>
+<td style="text-align: center;">7</td>
+<td>15-min</td>
+<td>OT</td>
+</tr>
+</tbody>
+</table>
+<p>Features: HUFL (High UseFul Load), HULL (High UseLess Load), MUFL,
+MULL, LUFL, LULL, OT (Oil Temperature). Heterogeneous channels measuring
+load and temperature from electricity transformers.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">liulian.data.csv_dataset</span><span class="w"> </span><span class="kn">import</span> <span class="n">ETTHourDataset</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">ds</span> <span class="o">=</span> <span class="n">ETTHourDataset</span><span class="p">(</span><span class="s1">&#39;dataset/ETT-small&#39;</span><span class="p">,</span> <span class="s1">&#39;ETTh1.csv&#39;</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>                    <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">96</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">96</span><span class="p">),</span> <span class="n">features</span><span class="o">=</span><span class="s1">&#39;M&#39;</span><span class="p">)</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">split</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">get_split</span><span class="p">(</span><span class="s1">&#39;train&#39;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="weather">Weather<a class="headerlink" href="#weather" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Rows</th>
+<th style="text-align: center;">Channels</th>
+<th>Frequency</th>
+<th>Entity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>52,696</td>
+<td style="text-align: center;">21</td>
+<td>10-min</td>
+<td>No (heterogeneous)</td>
+</tr>
+</tbody>
+</table>
+<p>21 meteorological variables: pressure (mbar), temperature (°C),
+humidity (%), wind speed (m/s), radiation (W/m²), etc.</p>
+<h3 id="electricity-ecl">Electricity (ECL)<a class="headerlink" href="#electricity-ecl" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Rows</th>
+<th style="text-align: center;">Channels</th>
+<th>Frequency</th>
+<th>Entity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>26,304</td>
+<td style="text-align: center;">321</td>
+<td>Hourly</td>
+<td>Yes (clients)</td>
+</tr>
+</tbody>
+</table>
+<p>321 household electricity meters recording hourly kWh consumption.
+Columns <code>0</code>–<code>319</code> are anonymised client IDs, <code>OT</code> is the designated
+target column (electricity consumption of one selected client).
+Entity identifiers recommended.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="c1"># experiments/electricity/patchtst_config.yaml</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">electricity</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="nt">features</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">M</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="nt">identifier_mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">embedding</span>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="nt">id_integration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">add_after_patch</span>
+</code></pre></div>
+<h3 id="traffic">Traffic<a class="headerlink" href="#traffic" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Rows</th>
+<th style="text-align: center;">Channels</th>
+<th>Frequency</th>
+<th>Entity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>17,544</td>
+<td style="text-align: center;">862</td>
+<td>Hourly</td>
+<td>Yes (sensors)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>862 road occupancy-rate sensors</strong> from San Francisco Bay Area
+freeways, collected by the <a href="http://pems.dot.ca.gov">California Department of
+Transportation (Caltrans) PEMS system</a>.</p>
+<p><strong>What are the 862 features?</strong></p>
+<p>The CSV has 863 columns:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">Position</th>
+<th>Column</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">1</td>
+<td><code>date</code></td>
+<td>Timestamp (hourly, 2016-07-01 to 2018-07-01)</td>
+</tr>
+<tr>
+<td style="text-align: center;">2–862</td>
+<td><code>0</code>, <code>1</code>, …, <code>860</code></td>
+<td>861 individual loop-detector sensor readings</td>
+</tr>
+<tr>
+<td style="text-align: center;">863</td>
+<td><code>OT</code></td>
+<td>The designated <strong>target</strong> column</td>
+</tr>
+</tbody>
+</table>
+<p>Each sensor column records <strong>road occupancy rate</strong> — the fraction of
+time (0.0–1.0) that a loop detector embedded in the road is occupied
+by a vehicle during each hourly interval.  Higher values indicate
+heavier traffic.</p>
+<p><strong>What is <code>OT</code>?</strong>  <code>OT</code> ("Output Target") is simply <strong>one of the 862
+loop-detector sensors</strong> designated as the prediction target for
+<code>features='MS'</code> or <code>features='S'</code> mode. In <code>features='M'</code> mode (the
+standard default), all 862 columns are treated identically — <code>OT</code> has
+no special role and is predicted alongside every other sensor.</p>
+<p>The naming convention (<code>OT</code>) is inherited from the ETT dataset where
+"OT" stands for "Oil Temperature" — a genuinely different variable.
+For traffic data, <code>OT</code> is <strong>not</strong> an aggregated or derived quantity;
+it is a regular sensor column placed last by convention.</p>
+<p><strong>Source</strong>: Introduced by LSTNet (Lai et al., SIGIR 2018). Used by
+Autoformer, FEDformer, PatchTST, iTransformer, TimesNet, DLinear,
+TimeMixer, and virtually all modern TSL benchmarks.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># experiments/traffic/patchtst_config.yaml</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traffic</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="nt">features</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">M</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="nt">seq_len</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">96</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="nt">pred_len</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">96</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="nt">identifier_mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">embedding</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="nt">id_integration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">add_after_patch</span>
+</code></pre></div>
+<h3 id="exchange-rate">Exchange Rate<a class="headerlink" href="#exchange-rate" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Rows</th>
+<th style="text-align: center;">Channels</th>
+<th>Frequency</th>
+<th>Entity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>~7,588</td>
+<td style="text-align: center;">8</td>
+<td>Daily</td>
+<td>Borderline (countries)</td>
+</tr>
+</tbody>
+</table>
+<p>8 national currency exchange rates vs USD. Columns: Australia, UK,
+Canada, Switzerland, China, Japan, New Zealand, Singapore, plus <code>OT</code>
+(which equals one of the rates, designated as the target).</p>
+<h3 id="ili-influenza-like-illness">ILI (Influenza-Like Illness)<a class="headerlink" href="#ili-influenza-like-illness" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Rows</th>
+<th style="text-align: center;">Channels</th>
+<th>Frequency</th>
+<th>Entity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>~966</td>
+<td style="text-align: center;">7</td>
+<td>Weekly</td>
+<td>No (heterogeneous)</td>
+</tr>
+</tbody>
+</table>
+<p>CDC influenza surveillance data. Use shorter horizons (24, 36, 48, 60)
+due to weekly granularity.</p>
+<hr />
+<h2 id="pems-traffic-datasets">PEMS Traffic Datasets<a class="headerlink" href="#pems-traffic-datasets" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Dataset</th>
+<th style="text-align: center;">Sensors</th>
+<th style="text-align: center;">Features/Sensor</th>
+<th style="text-align: center;">Time Steps</th>
+<th style="text-align: center;">Adjacency</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PEMS03</td>
+<td style="text-align: center;">358</td>
+<td style="text-align: center;">1 (flow)</td>
+<td style="text-align: center;">26,208</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr>
+<td>PEMS04</td>
+<td style="text-align: center;">307</td>
+<td style="text-align: center;">3 (flow, occupancy, speed)</td>
+<td style="text-align: center;">16,992</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr>
+<td>PEMS07</td>
+<td style="text-align: center;">883</td>
+<td style="text-align: center;">1 (flow)</td>
+<td style="text-align: center;">28,224</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr>
+<td>PEMS08</td>
+<td style="text-align: center;">170</td>
+<td style="text-align: center;">3 (flow, occupancy, speed)</td>
+<td style="text-align: center;">17,856</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+</tbody>
+</table>
+<p>Loaded from <code>.npz</code> files. Entity identifiers strongly recommended.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># experiments/pems/patchtst_config.yaml</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="nt">data</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PEMS03</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="nt">features</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">M</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="nt">pred_len</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="nt">identifier_mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">embedding</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a><span class="nt">id_integration</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">add_after_patch</span>
+</code></pre></div>
+<hr />
+<h2 id="swiss-river-datasets_1">Swiss River Datasets<a class="headerlink" href="#swiss-river-datasets_1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th style="text-align: center;">Stations</th>
+<th style="text-align: center;">Features/Station</th>
+<th style="text-align: center;">Time Steps</th>
+<th>Period</th>
+<th style="text-align: center;">Topology</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>swiss-river-1990</td>
+<td style="text-align: center;">~64</td>
+<td style="text-align: center;">2 (water_temp, air_temp)</td>
+<td style="text-align: center;">~11,000</td>
+<td>1990–2020</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr>
+<td>swiss-river-2010</td>
+<td style="text-align: center;">~64</td>
+<td style="text-align: center;">2 (water_temp, air_temp)</td>
+<td style="text-align: center;">~4,000</td>
+<td>2010–2020</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+<tr>
+<td>swiss-river-zurich</td>
+<td style="text-align: center;">~15</td>
+<td style="text-align: center;">2 (water_temp, air_temp)</td>
+<td style="text-align: center;">~3,000</td>
+<td>Zurich region</td>
+<td style="text-align: center;">Yes</td>
+</tr>
+</tbody>
+</table>
+<p>Swiss river water temperature monitoring network. Full entity identifier
+support with geographic coordinates and river graph topology.</p>
+<hr />
+<h2 id="data-loader-output-format">Data Loader Output Format<a class="headerlink" href="#data-loader-output-format" title="Permanent link">&para;</a></h2>
+<p><code>dataset.get_data_loaders()</code> returns <code>{'train': DataLoader, 'val': DataLoader, 'test': DataLoader}</code>.</p>
+<p>Each batch is a tuple:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Without entity IDs</th>
+<th style="text-align: left;">With entity IDs</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>(batch_x, batch_y, batch_x_mark, batch_y_mark)</code></td>
+<td style="text-align: left;"><code>(batch_x, batch_y, batch_x_mark, batch_y_mark, entity_id_strs, entity_idx)</code></td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Field</th>
+<th style="text-align: left;">Shape</th>
+<th style="text-align: left;">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>batch_x</code></td>
+<td style="text-align: left;"><code>(B, seq_len, D_x)</code></td>
+<td style="text-align: left;">Encoder input features</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>batch_y</code></td>
+<td style="text-align: left;"><code>(B, label_len+pred_len, D_y)</code></td>
+<td style="text-align: left;">Decoder target (or <code>pred_len</code> when <code>label_len=0</code>)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>batch_x_mark</code></td>
+<td style="text-align: left;"><code>(B, seq_len, T)</code></td>
+<td style="text-align: left;">Encoder time features</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>batch_y_mark</code></td>
+<td style="text-align: left;"><code>(B, seq_len+label_len+pred_len, T)</code></td>
+<td style="text-align: left;">Full-window time features</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>entity_id_strs</code></td>
+<td style="text-align: left;"><code>list[str]</code> length B</td>
+<td style="text-align: left;">Entity ID strings (per-entity mode)</td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>entity_idx</code></td>
+<td style="text-align: left;"><code>(B,)</code> long tensor</td>
+<td style="text-align: left;">Integer station indices (for <code>nn.Embedding</code>)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="entity-identifier-integration">Entity Identifier Integration<a class="headerlink" href="#entity-identifier-integration" title="Permanent link">&para;</a></h2>
+<p>See <a href="../entity_identifiers/">Entity Identifiers</a> for full documentation
+on how <code>station_ids</code> are derived, embedding modes, and per-entity
+inverse transforms.</p>
+<p>For CSV datasets, <code>station_ids</code> is auto-detected from the data columns:
+- <strong><code>features='M'</code> or <code>'MS'</code></strong>: All non-date columns (including <code>OT</code>)
+  are station IDs, since all channels are treated symmetrically.
+- <strong><code>features='S'</code></strong>: Only the target column — no entity embedding needed.</p>
+<hr />
+<h2 id="data-factory-registry">Data Factory Registry<a class="headerlink" href="#data-factory-registry" title="Permanent link">&para;</a></h2>
+<p>All datasets are registered for use via the pipeline and CLI:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">liulian.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_dataset</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="c1"># Build from config:</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">config</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="s1">&#39;traffic&#39;</span><span class="p">,</span> <span class="s1">&#39;seq_len&#39;</span><span class="p">:</span> <span class="mi">96</span><span class="p">,</span> <span class="s1">&#39;pred_len&#39;</span><span class="p">:</span> <span class="mi">96</span><span class="p">,</span> <span class="o">...</span><span class="p">}</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">dataset</span> <span class="o">=</span> <span class="n">build_dataset</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Or via CLI:</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="c1"># liulian run experiments/traffic/patchtst_config.yaml --quick_test</span>
+</code></pre></div>
+<p>Registered dataset names: <code>ETTh1</code>, <code>ETTh2</code>, <code>ETTm1</code>, <code>ETTm2</code>,
+<code>weather</code>, <code>electricity</code>, <code>traffic</code>, <code>exchange_rate</code>, <code>illness</code>,
+<code>solar</code>, <code>custom</code>, <code>PEMS03</code>, <code>PEMS04</code>, <code>PEMS07</code>, <code>PEMS08</code>,
+<code>swiss-river-1990</code>, <code>swiss-river-2010</code>, <code>swiss-river-zurich</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

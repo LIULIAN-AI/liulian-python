@@ -1,0 +1,2998 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Research OS for spatiotemporal model experimentation">
+      
+      
+      
+        <link rel="canonical" href="https://jajupmochi.github.io/liulian-python/search_spaces/">
+      
+      
+        <link rel="prev" href="../entity_identifiers/">
+      
+      
+        <link rel="next" href="../data_loaders/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Search Spaces - LIULIAN</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#search-spaces-hyperparameter-references" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="LIULIAN" class="md-header__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LIULIAN
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Search Spaces
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../cli/" class="md-tabs__link">
+          
+  
+  
+  Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../demo_gallery/" class="md-tabs__link">
+          
+  
+  
+  Demo Gallery
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../models/torch_models/" class="md-tabs__link">
+          
+  
+  
+  Models
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../data_loaders/" class="md-tabs__link">
+          
+  
+  
+  Data
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../tsl_comparison/" class="md-tabs__link">
+          
+  
+  
+  Benchmarks
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../contributing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Contributing
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="LIULIAN" class="md-nav__button md-logo" aria-label="LIULIAN" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LIULIAN
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/jajupmochi/liulian-python" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jajupmochi/liulian-python
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI Usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../forecasting_pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecasting Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adapter_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adapter Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../manifest_spec/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Manifest Specification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demo Gallery
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demo Gallery
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../demo_gallery/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../demo_patchtst_swiss1990/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PatchTST Swiss River 1990
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/torch_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyTorch Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../entity_identifiers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Entity Identifiers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Spaces
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Spaces
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tslib-argparse-defaults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TSLib Argparse Defaults
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tsl-model-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TSL Model Spaces
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TSL Model Spaces">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dlinear" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DLinear
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transformer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#informer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Informer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#autoformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autoformer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fedformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FEDformer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#itransformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iTransformer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#patchtst" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PatchTST
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timesnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TimesNet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timemixer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TimeMixer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timexer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TimeXer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mamba-s-mamba" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mamba (S-Mamba)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#timellm-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TimeLLM Spaces
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#swiss-river-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Swiss-River Spaces
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-model-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Model Spaces
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Custom Model Spaces">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lstm-general" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LSTM (General)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformer-encoder-general" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transformer Encoder (General)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#asha-scheduler-presets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ASHA Scheduler Presets
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Data
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_loaders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Loaders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../datasets/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Datasets
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Benchmarks
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tsl_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TSL Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training_comparison/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Training Comparison
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../results_json/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Results JSON
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dataset_config_audit/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset Config Audit
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../breakpoint_bridge/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Breakpoint Bridge
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tslib-argparse-defaults" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TSLib Argparse Defaults
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tsl-model-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TSL Model Spaces
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TSL Model Spaces">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dlinear" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DLinear
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transformer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#informer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Informer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#autoformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Autoformer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#fedformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FEDformer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#itransformer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iTransformer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#patchtst" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PatchTST
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timesnet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TimesNet
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timemixer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TimeMixer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timexer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TimeXer
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mamba-s-mamba" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mamba (S-Mamba)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#timellm-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TimeLLM Spaces
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#swiss-river-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Swiss-River Spaces
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#custom-model-spaces" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Custom Model Spaces
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Custom Model Spaces">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lstm-general" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LSTM (General)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformer-encoder-general" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transformer Encoder (General)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#asha-scheduler-presets" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ASHA Scheduler Presets
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="search-spaces-hyperparameter-references">Search Spaces &amp; Hyperparameter References<a class="headerlink" href="#search-spaces-hyperparameter-references" title="Permanent link">&para;</a></h1>
+<p>Pre-defined HPO search spaces for all supported model architectures. Each space is cross-referenced against the model's original paper and the canonical <a href="https://github.com/thuml/Time-Series-Library">Time-Series-Library (TSLib)</a> training scripts.</p>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">liulian.optim.search_spaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_search_space</span><span class="p">,</span> <span class="n">get_asha_preset</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># Look up a space by name</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">space</span> <span class="o">=</span> <span class="n">get_search_space</span><span class="p">(</span><span class="s2">&quot;patchtst&quot;</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="c1"># With Ray Tune</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tune</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="n">ray_space</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">tune</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">space</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># ASHA scheduler preset</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="n">asha</span> <span class="o">=</span> <span class="n">get_asha_preset</span><span class="p">(</span><span class="s2">&quot;medium&quot;</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="tslib-argparse-defaults">TSLib Argparse Defaults<a class="headerlink" href="#tslib-argparse-defaults" title="Permanent link">&para;</a></h2>
+<p>All TSL models inherit these defaults from <code>run.py</code> unless overridden by per-model scripts:</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>d_model</code></td>
+<td>512</td>
+<td>Model dimension</td>
+</tr>
+<tr>
+<td><code>d_ff</code></td>
+<td>2048</td>
+<td>Feed-forward dimension</td>
+</tr>
+<tr>
+<td><code>n_heads</code></td>
+<td>8</td>
+<td>Attention heads</td>
+</tr>
+<tr>
+<td><code>e_layers</code></td>
+<td>2</td>
+<td>Encoder layers</td>
+</tr>
+<tr>
+<td><code>d_layers</code></td>
+<td>1</td>
+<td>Decoder layers</td>
+</tr>
+<tr>
+<td><code>dropout</code></td>
+<td>0.1</td>
+<td>Dropout rate</td>
+</tr>
+<tr>
+<td><code>factor</code></td>
+<td>1</td>
+<td>Attention factor</td>
+</tr>
+<tr>
+<td><code>moving_avg</code></td>
+<td>25</td>
+<td>Moving average window</td>
+</tr>
+<tr>
+<td><code>batch_size</code></td>
+<td>32</td>
+<td>Batch size</td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>0.0001</td>
+<td>Learning rate</td>
+</tr>
+<tr>
+<td><code>train_epochs</code></td>
+<td>10</td>
+<td>Training epochs</td>
+</tr>
+<tr>
+<td><code>patience</code></td>
+<td>3</td>
+<td>Early stopping patience</td>
+</tr>
+<tr>
+<td><code>top_k</code></td>
+<td>5</td>
+<td>TimesNet: top-k frequencies</td>
+</tr>
+<tr>
+<td><code>num_kernels</code></td>
+<td>6</td>
+<td>TimesNet: Inception kernels</td>
+</tr>
+<tr>
+<td><code>expand</code></td>
+<td>2</td>
+<td>Mamba: expansion factor</td>
+</tr>
+<tr>
+<td><code>d_conv</code></td>
+<td>4</td>
+<td>Mamba: conv kernel size</td>
+</tr>
+<tr>
+<td><code>patch_len</code></td>
+<td>16</td>
+<td>TimeXer: patch length</td>
+</tr>
+</tbody>
+</table>
+<p>Source: <a href="https://github.com/thuml/Time-Series-Library/blob/main/run.py">TSLib run.py</a></p>
+<hr />
+<h2 id="tsl-model-spaces">TSL Model Spaces<a class="headerlink" href="#tsl-model-spaces" title="Permanent link">&para;</a></h2>
+<h3 id="dlinear">DLinear<a class="headerlink" href="#dlinear" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Values</th>
+<th>TSLib Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>batch_size</code></td>
+<td>16, 32, 64, 128</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>0.0001, 0.0005, 0.001, 0.005</td>
+<td>0.0001</td>
+</tr>
+<tr>
+<td><code>train_epochs</code></td>
+<td>10, 20, 50</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>DLinear has no model-specific hyperparameters (no attention, d_model, or d_ff). The authors note <em>"no model hyper-parameter tuning needed"</em>.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper</strong></td>
+<td><em>"Are Transformers Effective for Time Series Forecasting?"</em> (AAAI 2023, Zeng et al.)</td>
+</tr>
+<tr>
+<td><strong>arXiv</strong></td>
+<td><a href="https://arxiv.org/abs/2205.13504">2205.13504</a></td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><a href="https://github.com/cure-lab/LTSF-Linear">cure-lab/LTSF-Linear</a></td>
+</tr>
+<tr>
+<td><strong>TSLib Script</strong></td>
+<td><a href="https://github.com/thuml/Time-Series-Library/blob/main/scripts/long_term_forecast/ETT_script/DLinear_ETTh1.sh">DLinear_ETTh1.sh</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="transformer">Transformer<a class="headerlink" href="#transformer" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Values</th>
+<th>TSLib Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>batch_size</code></td>
+<td>16, 32</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>0.0001, 0.0005, 0.001</td>
+<td>0.0001</td>
+</tr>
+<tr>
+<td><code>d_model</code></td>
+<td>128, 256, 512</td>
+<td>512</td>
+</tr>
+<tr>
+<td><code>d_ff</code></td>
+<td>256, 512, 2048</td>
+<td>2048</td>
+</tr>
+<tr>
+<td><code>n_heads</code></td>
+<td>4, 8</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>e_layers</code></td>
+<td>2, 3</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>d_layers</code></td>
+<td>1, 2</td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>dropout</code></td>
+<td>0.0, 0.1, 0.2</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td><code>train_epochs</code></td>
+<td>10, 20, 50</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper</strong></td>
+<td><em>"Attention Is All You Need"</em> (NeurIPS 2017, Vaswani et al.)</td>
+</tr>
+<tr>
+<td><strong>arXiv</strong></td>
+<td><a href="https://arxiv.org/abs/1706.03762">1706.03762</a></td>
+</tr>
+<tr>
+<td><strong>TSLib Script</strong></td>
+<td><a href="https://github.com/thuml/Time-Series-Library/blob/main/scripts/long_term_forecast/ECL_script/Transformer.sh">Transformer.sh</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="informer">Informer<a class="headerlink" href="#informer" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Values</th>
+<th>TSLib Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>batch_size</code></td>
+<td>16, 32</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>0.0001, 0.0005, 0.001</td>
+<td>0.0001</td>
+</tr>
+<tr>
+<td><code>d_model</code></td>
+<td>256, 512</td>
+<td>512</td>
+</tr>
+<tr>
+<td><code>d_ff</code></td>
+<td>512, 1024, 2048</td>
+<td>2048</td>
+</tr>
+<tr>
+<td><code>n_heads</code></td>
+<td>4, 8</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>e_layers</code></td>
+<td>2, 3</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>d_layers</code></td>
+<td>1, 2</td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>dropout</code></td>
+<td>0.0, 0.1, 0.2</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td><code>factor</code></td>
+<td>1, 3, 5</td>
+<td>3 (scripts)</td>
+</tr>
+<tr>
+<td><code>train_epochs</code></td>
+<td>10, 20, 50</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper</strong></td>
+<td><em>"Informer: Beyond Efficient Transformer for Long Sequence Time-Series Forecasting"</em> (AAAI 2021 Best Paper, Zhou et al.)</td>
+</tr>
+<tr>
+<td><strong>arXiv</strong></td>
+<td><a href="https://arxiv.org/abs/2012.07436">2012.07436</a></td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><a href="https://github.com/zhouhaoyi/Informer2020">zhouhaoyi/Informer2020</a></td>
+</tr>
+<tr>
+<td><strong>TSLib Script</strong></td>
+<td><a href="https://github.com/thuml/Time-Series-Library/blob/main/scripts/long_term_forecast/ECL_script/Informer.sh">Informer.sh</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="autoformer">Autoformer<a class="headerlink" href="#autoformer" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Values</th>
+<th>TSLib Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>batch_size</code></td>
+<td>16, 32</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>0.0001, 0.0005, 0.001</td>
+<td>0.0001</td>
+</tr>
+<tr>
+<td><code>d_model</code></td>
+<td>256, 512</td>
+<td>512</td>
+</tr>
+<tr>
+<td><code>d_ff</code></td>
+<td>512, 1024, 2048</td>
+<td>2048</td>
+</tr>
+<tr>
+<td><code>n_heads</code></td>
+<td>4, 8</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>e_layers</code></td>
+<td>2, 3</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>d_layers</code></td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>dropout</code></td>
+<td>0.0, 0.1, 0.2</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td><code>moving_avg</code></td>
+<td>13, 25</td>
+<td>25</td>
+</tr>
+<tr>
+<td><code>factor</code></td>
+<td>1, 3</td>
+<td>3 (scripts)</td>
+</tr>
+<tr>
+<td><code>train_epochs</code></td>
+<td>10, 20, 50</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper</strong></td>
+<td><em>"Autoformer: Decomposition Transformers with Auto-Correlation for Long-Term Series Forecasting"</em> (NeurIPS 2021, Wu et al.)</td>
+</tr>
+<tr>
+<td><strong>arXiv</strong></td>
+<td><a href="https://arxiv.org/abs/2106.13008">2106.13008</a></td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><a href="https://github.com/thuml/Autoformer">thuml/Autoformer</a></td>
+</tr>
+<tr>
+<td><strong>TSLib Script</strong></td>
+<td><a href="https://github.com/thuml/Time-Series-Library/blob/main/scripts/long_term_forecast/ECL_script/Autoformer.sh">Autoformer.sh</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="fedformer">FEDformer<a class="headerlink" href="#fedformer" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Values</th>
+<th>TSLib Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>batch_size</code></td>
+<td>16, 32</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>0.0001, 0.0005, 0.001</td>
+<td>0.0001</td>
+</tr>
+<tr>
+<td><code>d_model</code></td>
+<td>256, 512</td>
+<td>512</td>
+</tr>
+<tr>
+<td><code>d_ff</code></td>
+<td>512, 1024, 2048</td>
+<td>2048</td>
+</tr>
+<tr>
+<td><code>n_heads</code></td>
+<td>4, 8</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>e_layers</code></td>
+<td>2, 3</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>d_layers</code></td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td><code>dropout</code></td>
+<td>0.0, 0.1, 0.2</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td><code>moving_avg</code></td>
+<td>13, 25</td>
+<td>25</td>
+</tr>
+<tr>
+<td><code>train_epochs</code></td>
+<td>10, 20, 50</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper</strong></td>
+<td><em>"FEDformer: Frequency Enhanced Decomposed Transformer for Long-term Series Forecasting"</em> (ICML 2022, Zhou et al.)</td>
+</tr>
+<tr>
+<td><strong>Proceedings</strong></td>
+<td><a href="https://proceedings.mlr.press/v162/zhou22g.html">PMLR v162</a></td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><a href="https://github.com/MAZiqing/FEDformer">MAZiqing/FEDformer</a></td>
+</tr>
+<tr>
+<td><strong>TSLib Script</strong></td>
+<td><a href="https://github.com/thuml/Time-Series-Library/blob/main/scripts/long_term_forecast/ECL_script/FEDformer.sh">FEDformer.sh</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="itransformer">iTransformer<a class="headerlink" href="#itransformer" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Values</th>
+<th>TSLib Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>batch_size</code></td>
+<td>16, 32</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>0.0001, 0.0005, 0.001</td>
+<td>0.0001</td>
+</tr>
+<tr>
+<td><code>d_model</code></td>
+<td>128, 256, 512</td>
+<td>512</td>
+</tr>
+<tr>
+<td><code>d_ff</code></td>
+<td>128, 256, 512</td>
+<td>512 (!)</td>
+</tr>
+<tr>
+<td><code>n_heads</code></td>
+<td>4, 8</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>e_layers</code></td>
+<td>2, 3, 4</td>
+<td>3</td>
+</tr>
+<tr>
+<td><code>dropout</code></td>
+<td>0.0, 0.1, 0.2</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td><code>train_epochs</code></td>
+<td>10, 20, 50</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">d_ff = d_model</p>
+<p>iTransformer uses d_ff=512 (same as d_model), much smaller than the TSLib argparse default of 2048. This is intentional for the inverted architecture where attention operates over variables rather than time steps.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper</strong></td>
+<td><em>"iTransformer: Inverted Transformers Are Effective for Time Series Forecasting"</em> (ICLR 2024 Spotlight, Liu et al.)</td>
+</tr>
+<tr>
+<td><strong>arXiv</strong></td>
+<td><a href="https://arxiv.org/abs/2310.06625">2310.06625</a></td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><a href="https://github.com/thuml/iTransformer">thuml/iTransformer</a></td>
+</tr>
+<tr>
+<td><strong>TSLib Script</strong></td>
+<td><a href="https://github.com/thuml/Time-Series-Library/blob/main/scripts/long_term_forecast/Weather_script/iTransformer.sh">iTransformer.sh</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="patchtst">PatchTST<a class="headerlink" href="#patchtst" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Values</th>
+<th>TSLib Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>batch_size</code></td>
+<td>16, 32, 64, 128</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>0.0001, 0.0005, 0.001</td>
+<td>0.0001</td>
+</tr>
+<tr>
+<td><code>d_model</code></td>
+<td>128, 256, 512</td>
+<td>512</td>
+</tr>
+<tr>
+<td><code>d_ff</code></td>
+<td>256, 512, 2048</td>
+<td>2048</td>
+</tr>
+<tr>
+<td><code>n_heads</code></td>
+<td>2, 4, 8, 16</td>
+<td>varies</td>
+</tr>
+<tr>
+<td><code>e_layers</code></td>
+<td>1, 2, 3</td>
+<td>varies</td>
+</tr>
+<tr>
+<td><code>dropout</code></td>
+<td>0.0, 0.1, 0.2</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td><code>train_epochs</code></td>
+<td>10, 50, 100</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Variable e_layers and n_heads</p>
+<p>TSLib scripts use e_layers=1 for short horizons (96) and n_heads=2/8/16 depending on pred_len, rather than fixed values.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper</strong></td>
+<td><em>"A Time Series is Worth 64 Words: Long-term Forecasting with Transformers"</em> (ICLR 2023, Nie et al.)</td>
+</tr>
+<tr>
+<td><strong>arXiv</strong></td>
+<td><a href="https://arxiv.org/abs/2211.14730">2211.14730</a></td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><a href="https://github.com/yuqinie98/PatchTST">yuqinie98/PatchTST</a></td>
+</tr>
+<tr>
+<td><strong>TSLib Script</strong></td>
+<td><a href="https://github.com/thuml/Time-Series-Library/blob/main/scripts/long_term_forecast/ETT_script/PatchTST_ETTh1.sh">PatchTST_ETTh1.sh</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="timesnet">TimesNet<a class="headerlink" href="#timesnet" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Values</th>
+<th>TSLib Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>batch_size</code></td>
+<td>16, 32</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>0.0001, 0.0005, 0.001</td>
+<td>0.0001</td>
+</tr>
+<tr>
+<td><code>d_model</code></td>
+<td>16, 32, 64, 128</td>
+<td><strong>16</strong> (!)</td>
+</tr>
+<tr>
+<td><code>d_ff</code></td>
+<td>32, 64, 128, 256</td>
+<td><strong>32</strong> (!)</td>
+</tr>
+<tr>
+<td><code>e_layers</code></td>
+<td>2, 3</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>top_k</code></td>
+<td>3, 5</td>
+<td>5</td>
+</tr>
+<tr>
+<td><code>num_kernels</code></td>
+<td>3, 6</td>
+<td>6</td>
+</tr>
+<tr>
+<td><code>dropout</code></td>
+<td>0.0, 0.1, 0.2</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td><code>train_epochs</code></td>
+<td>10, 20, 50</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Tiny d_model / d_ff</p>
+<p>TimesNet uses d_model=16 and d_ff=32 in TSLib scripts — much smaller than the argparse defaults (512 / 2048). This is because the 2D-variation mechanism with Inception convolutions is already parameter-heavy.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper</strong></td>
+<td><em>"TimesNet: Temporal 2D-Variation Modeling for General Time Series Analysis"</em> (ICLR 2023, Wu et al.)</td>
+</tr>
+<tr>
+<td><strong>arXiv</strong></td>
+<td><a href="https://arxiv.org/abs/2210.02186">2210.02186</a></td>
+</tr>
+<tr>
+<td><strong>TSLib Script</strong></td>
+<td><a href="https://github.com/thuml/Time-Series-Library/blob/main/scripts/long_term_forecast/Weather_script/TimesNet.sh">TimesNet.sh</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="timemixer">TimeMixer<a class="headerlink" href="#timemixer" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Values</th>
+<th>TSLib Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>batch_size</code></td>
+<td>16, 32, 128</td>
+<td><strong>128</strong></td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>0.0001, 0.001, 0.01</td>
+<td><strong>0.01</strong></td>
+</tr>
+<tr>
+<td><code>d_model</code></td>
+<td>16, 32, 64, 128</td>
+<td><strong>16</strong></td>
+</tr>
+<tr>
+<td><code>d_ff</code></td>
+<td>32, 64, 128, 256</td>
+<td><strong>32</strong></td>
+</tr>
+<tr>
+<td><code>e_layers</code></td>
+<td>2, 3, 4</td>
+<td>3</td>
+</tr>
+<tr>
+<td><code>dropout</code></td>
+<td>0.0, 0.1, 0.2</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td><code>down_sampling_layers</code></td>
+<td>2, 3</td>
+<td>3</td>
+</tr>
+<tr>
+<td><code>down_sampling_window</code></td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>train_epochs</code></td>
+<td>10, 20, 50</td>
+<td>20</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">Non-standard defaults</p>
+<p>TimeMixer scripts diverge significantly from TSLib argparse defaults: lr=0.01 (vs 0.0001), batch_size=128 (vs 32), d_model=16 (vs 512).</p>
+</div>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper</strong></td>
+<td><em>"TimeMixer: Decomposable Multiscale Mixing for Time Series Forecasting"</em> (ICLR 2024, Wang et al.)</td>
+</tr>
+<tr>
+<td><strong>OpenReview</strong></td>
+<td><a href="https://openreview.net/pdf?id=7oLshfEIC2">7oLshfEIC2</a></td>
+</tr>
+<tr>
+<td><strong>TSLib Script</strong></td>
+<td><a href="https://github.com/thuml/Time-Series-Library/blob/main/scripts/long_term_forecast/Weather_script/TimeMixer.sh">TimeMixer.sh</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="timexer">TimeXer<a class="headerlink" href="#timexer" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Values</th>
+<th>TSLib Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>batch_size</code></td>
+<td>4, 16, 32</td>
+<td><strong>4</strong></td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>0.0001, 0.0005, 0.001</td>
+<td>0.0001</td>
+</tr>
+<tr>
+<td><code>d_model</code></td>
+<td>128, 256, 512</td>
+<td>128/256</td>
+</tr>
+<tr>
+<td><code>d_ff</code></td>
+<td>256, 512, 1024</td>
+<td>512/1024</td>
+</tr>
+<tr>
+<td><code>n_heads</code></td>
+<td>4, 8</td>
+<td>8</td>
+</tr>
+<tr>
+<td><code>e_layers</code></td>
+<td>1, 2, 3</td>
+<td>1/3</td>
+</tr>
+<tr>
+<td><code>dropout</code></td>
+<td>0.0, 0.1, 0.2</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td><code>train_epochs</code></td>
+<td>10, 20, 50</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper</strong></td>
+<td><em>"TimeXer: Empowering Transformers for Time Series Forecasting with Exogenous Variables"</em> (NeurIPS 2024, Wang et al.)</td>
+</tr>
+<tr>
+<td><strong>arXiv</strong></td>
+<td><a href="https://arxiv.org/abs/2402.19072">2402.19072</a></td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><a href="https://github.com/thuml/TimeXer">thuml/TimeXer</a></td>
+</tr>
+<tr>
+<td><strong>TSLib Script</strong></td>
+<td><a href="https://github.com/thuml/Time-Series-Library/blob/main/scripts/long_term_forecast/Weather_script/TimeXer.sh">TimeXer.sh</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="mamba-s-mamba">Mamba (S-Mamba)<a class="headerlink" href="#mamba-s-mamba" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Values</th>
+<th>TSLib Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>batch_size</code></td>
+<td>16, 32</td>
+<td>32</td>
+</tr>
+<tr>
+<td><code>learning_rate</code></td>
+<td>0.0001, 0.0005, 0.001</td>
+<td>0.0001</td>
+</tr>
+<tr>
+<td><code>d_model</code></td>
+<td>64, 128, 256</td>
+<td>128</td>
+</tr>
+<tr>
+<td><code>d_ff</code></td>
+<td>16, 32, 64</td>
+<td><strong>16</strong> (!)</td>
+</tr>
+<tr>
+<td><code>e_layers</code></td>
+<td>2, 4</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>d_state</code></td>
+<td>16, 32</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>expand</code></td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td><code>d_conv</code></td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td><code>dropout</code></td>
+<td>0.0, 0.1</td>
+<td>0.1</td>
+</tr>
+<tr>
+<td><code>train_epochs</code></td>
+<td>10, 20, 50</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="admonition-title">d_ff = 16</p>
+<p>Mamba uses d_ff=16 in TSLib scripts — drastically smaller than the 2048 default. Mamba relies on the selective SSM scan mechanism rather than large feed-forward layers. The <code>d_conv</code> parameter controls the local convolution kernel size in each Mamba block.</p>
+</div>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper</strong></td>
+<td><em>"Mamba: Linear-Time Sequence Modeling with Selective State Spaces"</em> (Gu &amp; Dao, 2024)</td>
+</tr>
+<tr>
+<td><strong>arXiv</strong></td>
+<td><a href="https://arxiv.org/abs/2312.00752">2312.00752</a></td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><a href="https://github.com/state-spaces/mamba">state-spaces/mamba</a></td>
+</tr>
+<tr>
+<td><strong>TSLib Script</strong></td>
+<td><a href="https://github.com/thuml/Time-Series-Library/blob/main/scripts/long_term_forecast/Weather_script/Mamba.sh">Mamba.sh</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="timellm-spaces">TimeLLM Spaces<a class="headerlink" href="#timellm-spaces" title="Permanent link">&para;</a></h2>
+<p>Dataset-specific grids derived from the <a href="https://github.com/KimMeen/Time-LLM">Time-LLM</a> training scripts.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Paper</strong></td>
+<td><em>"Time-LLM: Time Series Forecasting by Reprogramming Large Language Models"</em> (ICLR 2024)</td>
+</tr>
+<tr>
+<td><strong>arXiv</strong></td>
+<td><a href="https://arxiv.org/abs/2310.01728">2310.01728</a></td>
+</tr>
+<tr>
+<td><strong>Code</strong></td>
+<td><a href="https://github.com/KimMeen/Time-LLM">KimMeen/Time-LLM</a></td>
+</tr>
+</tbody>
+</table>
+<p>Available spaces: <code>timellm_etth1</code>, <code>timellm_etth2</code>, <code>timellm_ettm</code>, <code>timellm_weather</code>, <code>timellm_electricity</code>, <code>timellm_swissriver</code>.</p>
+<hr />
+<h2 id="swiss-river-spaces">Swiss-River Spaces<a class="headerlink" href="#swiss-river-spaces" title="Permanent link">&para;</a></h2>
+<p>Grids from the <a href="https://github.com/RiverNetwork/swiss-river-network-benchmark">swiss-river-network-benchmark</a> <code>ray_tune.py</code>.</p>
+<p>Available spaces: <code>swiss_lstm</code>, <code>swiss_transformer</code>, <code>swiss_lstm_embedding</code>, <code>swiss_transformer_embedding</code>, <code>swiss_stgnn</code>.</p>
+<hr />
+<h2 id="custom-model-spaces">Custom Model Spaces<a class="headerlink" href="#custom-model-spaces" title="Permanent link">&para;</a></h2>
+<h3 id="lstm-general">LSTM (General)<a class="headerlink" href="#lstm-general" title="Permanent link">&para;</a></h3>
+<p>Adapted from the swiss-river LSTM space with broader ranges for general datasets.</p>
+<p>Available as: <code>lstm</code> or <code>lstm_general</code>.</p>
+<h3 id="transformer-encoder-general">Transformer Encoder (General)<a class="headerlink" href="#transformer-encoder-general" title="Permanent link">&para;</a></h3>
+<p>Adapted from the swiss-river Transformer space with broader ranges.</p>
+<p>Available as: <code>transformer_encoder</code> or <code>transformer_enc</code>.</p>
+<hr />
+<h2 id="asha-scheduler-presets">ASHA Scheduler Presets<a class="headerlink" href="#asha-scheduler-presets" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Preset</th>
+<th>Max Epochs</th>
+<th>Grace Period</th>
+<th>Reduction Factor</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>default</code></td>
+<td>200</td>
+<td>3</td>
+<td>2</td>
+<td>Swiss-river default</td>
+</tr>
+<tr>
+<td><code>soft</code></td>
+<td>200</td>
+<td>5</td>
+<td>1.5</td>
+<td>Swiss-river gentle pruning</td>
+</tr>
+<tr>
+<td><code>single_soft</code></td>
+<td>500</td>
+<td>5</td>
+<td>1.5</td>
+<td>Single model, gentle</td>
+</tr>
+<tr>
+<td><code>single_hard</code></td>
+<td>500</td>
+<td>3</td>
+<td>2</td>
+<td>Single model, aggressive</td>
+</tr>
+<tr>
+<td><code>fast</code></td>
+<td>100</td>
+<td>5</td>
+<td>3</td>
+<td>DLinear, LSTM (fast models)</td>
+</tr>
+<tr>
+<td><code>medium</code></td>
+<td>50</td>
+<td>5</td>
+<td>2</td>
+<td>PatchTST, iTransformer, TimesNet</td>
+</tr>
+<tr>
+<td><code>slow</code></td>
+<td>30</td>
+<td>3</td>
+<td>2</td>
+<td>Transformer enc-dec, TimeLLM</td>
+</tr>
+</tbody>
+</table>
+<p>Reference: <a href="https://docs.ray.io/en/latest/tune/api/schedulers.html#asha">Ray Tune ASHA Documentation</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
