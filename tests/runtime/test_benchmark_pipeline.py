@@ -1,7 +1,5 @@
 """Smoke tests for the benchmark pipeline infrastructure.
 
-pytestmark = pytest.mark.skip(reason="pre-existing: scaler registry missing 'standard'; TODO: register or rewrite tests")
-
 Tests config generation, experiment runner plumbing, and results aggregation
 without running actual training (which is the user's responsibility).
 """
@@ -343,7 +341,7 @@ class TestRunBenchmarkHelpers:
 # ======================================================================
 
 
-@pytest.mark.skip(reason="pre-existing: scaler registry missing standard; see docs/ci-skips-2026-05-21.md")
+@pytest.mark.skip(reason='pre-existing: scaler registry missing standard; see docs/ci-skips-2026-05-21.md')
 class TestPEMSDataset:
     """Test PEMS dataset loading."""
 
