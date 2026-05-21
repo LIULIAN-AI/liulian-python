@@ -74,9 +74,7 @@ class EarlyStopping:
             # No improvement
             self.counter += 1
             if self.verbose:
-                logger.info(
-                    'EarlyStopping counter: %d out of %d', self.counter, self.patience
-                )
+                logger.info('EarlyStopping counter: %d out of %d', self.counter, self.patience)
             if self.counter >= self.patience:
                 self.early_stop = True
         else:
@@ -155,9 +153,7 @@ def adjust_learning_rate(
     elif lradj == 'cosine':
         # Cosine annealing
         train_epochs = args.get('train_epochs', 100)
-        lr_adjust = {
-            epoch: initial_lr / 2 * (1 + math.cos(epoch / train_epochs * math.pi))
-        }
+        lr_adjust = {epoch: initial_lr / 2 * (1 + math.cos(epoch / train_epochs * math.pi))}
 
     else:
         raise ValueError(f'Unknown learning rate adjustment type: {lradj}')
@@ -170,9 +166,7 @@ def adjust_learning_rate(
         print(f'Updating learning rate to {lr}')
 
 
-def visual(
-    true: np.ndarray, preds: Optional[np.ndarray] = None, name: str = './pic/test.pdf'
-):
+def visual(true: np.ndarray, preds: Optional[np.ndarray] = None, name: str = './pic/test.pdf'):
     """
     Visualize prediction results.
 

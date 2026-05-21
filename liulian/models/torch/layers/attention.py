@@ -20,9 +20,7 @@ class TriangularCausalMask:
     def __init__(self, B, L, device='cpu'):
         mask_shape = [B, 1, L, L]
         with torch.no_grad():
-            self._mask = torch.triu(
-                torch.ones(mask_shape, dtype=torch.bool), diagonal=1
-            ).to(device)
+            self._mask = torch.triu(torch.ones(mask_shape, dtype=torch.bool), diagonal=1).to(device)
 
     @property
     def mask(self):
@@ -35,9 +33,7 @@ class ProbMask:
     def __init__(self, B, H, L, index, scores, device='cpu'):
         _mask = torch.ones(L, scores.shape[-1], dtype=torch.bool).to(device).triu(1)
         _mask_ex = _mask[None, None, :].expand(B, H, L, scores.shape[-1])
-        indicator = _mask_ex[
-            torch.arange(B)[:, None, None], torch.arange(H)[None, :, None], index, :
-        ].to(device)
+        indicator = _mask_ex[torch.arange(B)[:, None, None], torch.arange(H)[None, :, None], index, :].to(device)
         self._mask = indicator.view(scores.shape).to(device)
 
     @property
@@ -68,9 +64,7 @@ class DSAttention(nn.Module):
         scale = self.scale or 1.0 / sqrt(E)
 
         tau = 1.0 if tau is None else tau.unsqueeze(1).unsqueeze(1)  # B x 1 x 1 x 1
-        delta = (
-            0.0 if delta is None else delta.unsqueeze(1).unsqueeze(1)
-        )  # B x 1 x 1 x S
+        delta = 0.0 if delta is None else delta.unsqueeze(1).unsqueeze(1)  # B x 1 x 1 x S
 
         # De-stationary Attention, rescaling pre-softmax score with learned de-stationary factors
         scores = torch.einsum('blhe,bshe->bhls', queries, keys) * tau + delta
@@ -164,9 +158,7 @@ class ProbAttention(nn.Module):
         M_top = M.topk(n_top, sorted=False)[1]
 
         # use the reduced Q to calculate Q_K
-        Q_reduce = Q[
-            torch.arange(B)[:, None, None], torch.arange(H)[None, :, None], M_top, :
-        ]  # factor*ln(L_q)
+        Q_reduce = Q[torch.arange(B)[:, None, None], torch.arange(H)[None, :, None], M_top, :]  # factor*ln(L_q)
         Q_K = torch.matmul(Q_reduce, K.transpose(-2, -1))  # factor*ln(L_q)*L_k
 
         return Q_K, M_top
@@ -192,14 +184,12 @@ class ProbAttention(nn.Module):
 
         attn = torch.softmax(scores, dim=-1)  # nn.Softmax(dim=-1)(scores)
 
-        context_in[
-            torch.arange(B)[:, None, None], torch.arange(H)[None, :, None], index, :
-        ] = torch.matmul(attn, V).type_as(context_in)
+        context_in[torch.arange(B)[:, None, None], torch.arange(H)[None, :, None], index, :] = torch.matmul(
+            attn, V
+        ).type_as(context_in)
         if self.output_attention:
             attns = (torch.ones([B, H, L_V, L_V]) / L_V).type_as(attn).to(attn.device)
-            attns[
-                torch.arange(B)[:, None, None], torch.arange(H)[None, :, None], index, :
-            ] = attn
+            attns[torch.arange(B)[:, None, None], torch.arange(H)[None, :, None], index, :] = attn
             return context_in, attns
         else:
             return context_in, None
@@ -227,9 +217,7 @@ class ProbAttention(nn.Module):
         # get the context
         context = self._get_initial_context(values, L_Q)
         # update the context with selected top_k queries
-        context, attn = self._update_context(
-            context, values, scores_top, index, L_Q, attn_mask
-        )
+        context, attn = self._update_context(context, values, scores_top, index, L_Q, attn_mask)
 
         return context.contiguous(), attn
 
@@ -244,8 +232,17 @@ class ReformerLayer(nn.Module):
     Paper link: https://openreview.net/forum?id=rkgNKkHtvB
     """
 
-    def __init__(self, attention, d_model, n_heads, d_keys=None,
-                 d_values=None, causal=False, bucket_size=4, n_hashes=4):
+    def __init__(
+        self,
+        attention,
+        d_model,
+        n_heads,
+        d_keys=None,
+        d_values=None,
+        causal=False,
+        bucket_size=4,
+        n_hashes=4,
+    ):
         super().__init__()
         from reformer_pytorch import LSHSelfAttention
 
@@ -265,7 +262,8 @@ class ReformerLayer(nn.Module):
             return queries
         fill_len = (self.bucket_size * 2) - (N % (self.bucket_size * 2))
         return torch.cat(
-            [queries, torch.zeros([B, fill_len, C]).to(queries.device)], dim=1,
+            [queries, torch.zeros([B, fill_len, C]).to(queries.device)],
+            dim=1,
         )
 
     def forward(self, queries, keys, values, attn_mask, tau=None, delta=None):
@@ -300,9 +298,7 @@ class AttentionLayer(nn.Module):
         keys = self.key_projection(keys).view(B, S, H, -1)
         values = self.value_projection(values).view(B, S, H, -1)
 
-        out, attn = self.inner_attention(
-            queries, keys, values, attn_mask, tau=tau, delta=delta
-        )
+        out, attn = self.inner_attention(queries, keys, values, attn_mask, tau=tau, delta=delta)
         out = out.view(B, L, -1)
 
         return self.out_projection(out), attn
@@ -314,9 +310,7 @@ class TwoStageAttentionLayer(nn.Module):
     input/output shape: [batch_size, Data_dim(D), Seg_num(L), d_model]
     """
 
-    def __init__(
-        self, configs, seg_num, factor, d_model, n_heads, d_ff=None, dropout=0.1
-    ):
+    def __init__(self, configs, seg_num, factor, d_model, n_heads, d_ff=None, dropout=0.1):
         super(TwoStageAttentionLayer, self).__init__()
         d_ff = d_ff or 4 * d_model
         self.time_attention = AttentionLayer(
@@ -358,47 +352,33 @@ class TwoStageAttentionLayer(nn.Module):
         self.norm3 = nn.LayerNorm(d_model)
         self.norm4 = nn.LayerNorm(d_model)
 
-        self.MLP1 = nn.Sequential(
-            nn.Linear(d_model, d_ff), nn.GELU(), nn.Linear(d_ff, d_model)
-        )
-        self.MLP2 = nn.Sequential(
-            nn.Linear(d_model, d_ff), nn.GELU(), nn.Linear(d_ff, d_model)
-        )
+        self.MLP1 = nn.Sequential(nn.Linear(d_model, d_ff), nn.GELU(), nn.Linear(d_ff, d_model))
+        self.MLP2 = nn.Sequential(nn.Linear(d_model, d_ff), nn.GELU(), nn.Linear(d_ff, d_model))
 
     def forward(self, x, attn_mask=None, tau=None, delta=None):
         # Cross Time Stage: Directly apply MSA to each dimension
         batch = x.shape[0]
         time_in = rearrange(x, 'b ts_d seg_num d_model -> (b ts_d) seg_num d_model')
-        time_enc, attn = self.time_attention(
-            time_in, time_in, time_in, attn_mask=None, tau=None, delta=None
-        )
+        time_enc, attn = self.time_attention(time_in, time_in, time_in, attn_mask=None, tau=None, delta=None)
         dim_in = time_in + self.dropout(time_enc)
         dim_in = self.norm1(dim_in)
         dim_in = dim_in + self.dropout(self.MLP1(dim_in))
         dim_in = self.norm2(dim_in)
 
         # Cross Dimension Stage: use a small set of learnable vectors to aggregate and distribute messages to build the D-to-D connection
-        dim_send = rearrange(
-            dim_in, '(b ts_d) seg_num d_model -> (b seg_num) ts_d d_model', b=batch
-        )
+        dim_send = rearrange(dim_in, '(b ts_d) seg_num d_model -> (b seg_num) ts_d d_model', b=batch)
         batch_router = repeat(
             self.router,
             'seg_num factor d_model -> (repeat seg_num) factor d_model',
             repeat=batch,
         )
-        dim_buffer, attn = self.dim_sender(
-            batch_router, dim_send, dim_send, attn_mask=None, tau=None, delta=None
-        )
-        dim_receive, attn = self.dim_receiver(
-            dim_send, dim_buffer, dim_buffer, attn_mask=None, tau=None, delta=None
-        )
+        dim_buffer, attn = self.dim_sender(batch_router, dim_send, dim_send, attn_mask=None, tau=None, delta=None)
+        dim_receive, attn = self.dim_receiver(dim_send, dim_buffer, dim_buffer, attn_mask=None, tau=None, delta=None)
         dim_enc = dim_send + self.dropout(dim_receive)
         dim_enc = self.norm3(dim_enc)
         dim_enc = dim_enc + self.dropout(self.MLP2(dim_enc))
         dim_enc = self.norm4(dim_enc)
 
-        final_out = rearrange(
-            dim_enc, '(b seg_num) ts_d d_model -> b ts_d seg_num d_model', b=batch
-        )
+        final_out = rearrange(dim_enc, '(b seg_num) ts_d d_model -> b ts_d seg_num d_model', b=batch)
 
         return final_out

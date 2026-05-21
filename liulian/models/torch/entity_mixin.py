@@ -44,9 +44,7 @@ import torch.nn as nn
 
 
 # Modes where the data layer already concatenated entity features into x_enc.
-_TRANSPARENT_MODES = frozenset(
-    {'onehot', 'coordinates', 'sinusoidal', 'random', 'descriptors', 'numeric_id'}
-)
+_TRANSPARENT_MODES = frozenset({'onehot', 'coordinates', 'sinusoidal', 'random', 'descriptors', 'numeric_id'})
 
 
 class EntityWrapper(nn.Module):
@@ -142,9 +140,7 @@ class EntityWrapper(nn.Module):
             if x_dec is not None:
                 T_dec = x_dec.size(1)
                 e_id_scalar = e_ids[:, 0:1]  # (B, 1)
-                dec_emb = self.embedding(
-                    e_id_scalar.expand(-1, T_dec)
-                )  # (B, T_dec, embedding_size)
+                dec_emb = self.embedding(e_id_scalar.expand(-1, T_dec))  # (B, T_dec, embedding_size)
                 x_dec = self.dec_proj(torch.cat([x_dec, dec_emb], dim=-1))
 
         # Only pass mask if explicitly provided — many TSL models
@@ -197,9 +193,7 @@ class ChannelEntityWrapper(nn.Module):
         self.enc_proj = nn.Linear(1 + embedding_size, 1)
         self.dec_proj = nn.Linear(1 + embedding_size, 1)
         # Fixed station indices [0, 1, ..., N-1]
-        self.register_buffer(
-            'station_ids', torch.arange(num_stations, dtype=torch.long)
-        )
+        self.register_buffer('station_ids', torch.arange(num_stations, dtype=torch.long))
 
     def _augment(
         self,
@@ -324,8 +318,7 @@ def _build_channel_features(
             pos = torch.zeros(sinusoidal_dim, dtype=torch.float32)
             half = sinusoidal_dim // 2
             freqs = torch.exp(
-                torch.arange(0, half, dtype=torch.float32)
-                * (-torch.log(torch.tensor(10000.0)) / max(half - 1, 1))
+                torch.arange(0, half, dtype=torch.float32) * (-torch.log(torch.tensor(10000.0)) / max(half - 1, 1))
             )
             pos[:half] = torch.sin(idx * freqs)
             pos[half : 2 * half] = torch.cos(idx * freqs)
@@ -337,9 +330,7 @@ def _build_channel_features(
         for idx in range(num_stations):
             key = f'{random_seed}:{ids[idx]}'
             digest = hashlib.sha256(key.encode('utf-8')).digest()
-            seed = int.from_bytes(digest[:8], byteorder='little', signed=False) % (
-                2**32
-            )
+            seed = int.from_bytes(digest[:8], byteorder='little', signed=False) % (2**32)
             rng = np.random.default_rng(seed)
             vec = torch.tensor(
                 rng.standard_normal(random_dim).astype(np.float32),

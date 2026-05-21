@@ -103,9 +103,7 @@ def _forward_adapter(adapter, batch_size: int = 2) -> torch.Tensor:
     return out['predictions']
 
 
-def _forward_model_direct(
-    model, cfg, adapter_cfg=None, batch_size: int = 2
-) -> torch.Tensor:
+def _forward_model_direct(model, cfg, adapter_cfg=None, batch_size: int = 2) -> torch.Tensor:
     """Call model(x_enc, x_mark_enc, x_dec, x_mark_dec) directly (trainer path).
 
     For EntityWrapper models, the wrapper augments x_enc/x_dec internally,
@@ -186,16 +184,12 @@ class TestEntityWrapper:
                 super().__init__()
                 self.proj = torch.nn.Linear(4, 3)  # enc_in=4
 
-            def forward(
-                self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None, mask=None
-            ):
+            def forward(self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None, mask=None):
                 return self.proj(x_enc)
 
         model = FakeModel()
         # Wrapper projects (4 + 10) → 4, then FakeModel projects 4 → 3
-        wrapper = EntityWrapper(
-            model, enc_in=4, num_embeddings=10, embedding_size=10, entity_id_col=0
-        )
+        wrapper = EntityWrapper(model, enc_in=4, num_embeddings=10, embedding_size=10, entity_id_col=0)
 
         B, T, C = 2, 8, 4
         x_enc = torch.randn(B, T, C)
@@ -210,14 +204,10 @@ class TestEntityWrapper:
         """Without x_mark_enc, wrapper should pass x_enc unchanged."""
 
         class Identity(torch.nn.Module):
-            def forward(
-                self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None, mask=None
-            ):
+            def forward(self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None, mask=None):
                 return x_enc
 
-        wrapper = EntityWrapper(
-            Identity(), enc_in=3, num_embeddings=5, embedding_size=4
-        )
+        wrapper = EntityWrapper(Identity(), enc_in=3, num_embeddings=5, embedding_size=4)
         x = torch.randn(2, 8, 3)
         out = wrapper(x)
         assert torch.equal(out, x)
@@ -280,9 +270,7 @@ class TestTSLAdaptersEmbeddingMode:
         out = adapter.forward(batch)
         assert 'predictions' in out
         assert out['predictions'].ndim == 3
-        assert torch.isfinite(out['predictions']).all(), (
-            'Embedding adapter forward produced non-finite'
-        )
+        assert torch.isfinite(out['predictions']).all(), 'Embedding adapter forward produced non-finite'
 
     def test_model_direct_embedding(self, adapter_spec):
         """Test trainer path: model(x_enc, x_mark, dec_inp, dec_mark)."""

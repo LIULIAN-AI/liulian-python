@@ -83,9 +83,7 @@ class TestDatasetCustom:
         dirname = os.path.dirname(sample_csv)
         basename = os.path.basename(sample_csv)
 
-        container = DatasetCustom(
-            root_path=dirname, data_path=basename, size=(24, 12, 6)
-        )
+        container = DatasetCustom(root_path=dirname, data_path=basename, size=(24, 12, 6))
         train = container.get_split('train')
         val = container.get_split('val')
         test = container.get_split('test')
@@ -268,9 +266,7 @@ class TestSequenceDatasets:
         assert noisy.shape == arr.shape
         assert not np.allclose(noisy, arr)
 
-        quantized = add_noise_to_array(
-            np.linspace(0, 1, 100), 'quantization', {'levels': 10}
-        )
+        quantized = add_noise_to_array(np.linspace(0, 1, 100), 'quantization', {'levels': 10})
         assert quantized.shape == (100,)
 
     def test_short_subsequence_drop(self):

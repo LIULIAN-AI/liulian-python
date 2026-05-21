@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.fft as fft
 from einops import rearrange, reduce, repeat
-import math, random
+import math
 from scipy.fftpack import next_fast_len
 
 
@@ -44,7 +44,6 @@ def conv1d_fft(f, g, dim=-1):
 
 
 class ExponentialSmoothing(nn.Module):
-
     def __init__(self, dim, nhead, dropout=0.1, aux=False):
         super().__init__()
         self._smoothing_weight = nn.Parameter(torch.randn(nhead, 1))
@@ -77,8 +76,7 @@ class ExponentialSmoothing(nn.Module):
         # \alpha^t for all t = 1, 2, ..., T
         init_weight = self.weight ** (powers + 1)
 
-        return rearrange(init_weight, 'h t -> 1 t h 1'), \
-               rearrange(weight, 'h t -> 1 t h 1')
+        return rearrange(init_weight, 'h t -> 1 t h 1'), rearrange(weight, 'h t -> 1 t h 1')
 
     @property
     def weight(self):
@@ -101,7 +99,6 @@ class Feedforward(nn.Module):
 
 
 class GrowthLayer(nn.Module):
-
     def __init__(self, d_model, nhead, d_head=None, dropout=0.1):
         super().__init__()
         self.d_head = d_head or (d_model // nhead)
@@ -113,7 +110,7 @@ class GrowthLayer(nn.Module):
         self.es = ExponentialSmoothing(self.d_head, self.nhead, dropout=dropout)
         self.out_proj = nn.Linear(self.d_head * self.nhead, self.d_model)
 
-        assert self.d_head * self.nhead == self.d_model, "d_model must be divisible by nhead"
+        assert self.d_head * self.nhead == self.d_model, 'd_model must be divisible by nhead'
 
     def forward(self, inputs):
         """
@@ -131,7 +128,6 @@ class GrowthLayer(nn.Module):
 
 
 class FourierLayer(nn.Module):
-
     def __init__(self, d_model, pred_len, k=None, low_freq=1):
         super().__init__()
         self.d_model = d_model
@@ -145,11 +141,11 @@ class FourierLayer(nn.Module):
         x_freq = fft.rfft(x, dim=1)
 
         if t % 2 == 0:
-            x_freq = x_freq[:, self.low_freq:-1]
-            f = fft.rfftfreq(t)[self.low_freq:-1]
+            x_freq = x_freq[:, self.low_freq : -1]
+            f = fft.rfftfreq(t)[self.low_freq : -1]
         else:
-            x_freq = x_freq[:, self.low_freq:]
-            f = fft.rfftfreq(t)[self.low_freq:]
+            x_freq = x_freq[:, self.low_freq :]
+            f = fft.rfftfreq(t)[self.low_freq :]
 
         x_freq, index_tuple = self.topk_freq(x_freq)
         f = repeat(f.to(x_freq.device), 'f -> b f d', b=x_freq.size(0), d=x_freq.size(2))
@@ -160,8 +156,7 @@ class FourierLayer(nn.Module):
     def extrapolate(self, x_freq, f, t):
         x_freq = torch.cat([x_freq, x_freq.conj()], dim=1)
         f = torch.cat([f, -f], dim=1)
-        t_val = rearrange(torch.arange(t + self.pred_len, dtype=torch.float),
-                          't -> () () t ()').to(x_freq.device)
+        t_val = rearrange(torch.arange(t + self.pred_len, dtype=torch.float), 't -> () () t ()').to(x_freq.device)
 
         amp = rearrange(x_freq.abs() / t, 'b f d -> b f () d')
         phase = rearrange(x_freq.angle(), 'b f d -> b f () d')
@@ -173,14 +168,17 @@ class FourierLayer(nn.Module):
     def topk_freq(self, x_freq):
         values, indices = torch.topk(x_freq.abs(), self.k, dim=1, largest=True, sorted=True)
         mesh_a, mesh_b = torch.meshgrid(torch.arange(x_freq.size(0)), torch.arange(x_freq.size(2)))
-        index_tuple = (mesh_a.unsqueeze(1).to(indices.device), indices, mesh_b.unsqueeze(1).to(indices.device))
+        index_tuple = (
+            mesh_a.unsqueeze(1).to(indices.device),
+            indices,
+            mesh_b.unsqueeze(1).to(indices.device),
+        )
         x_freq = x_freq[index_tuple]
 
         return x_freq, index_tuple
 
 
 class LevelLayer(nn.Module):
-
     def __init__(self, d_model, c_out, dropout=0.1):
         super().__init__()
         self.d_model = d_model
@@ -203,9 +201,19 @@ class LevelLayer(nn.Module):
 
 
 class EncoderLayer(nn.Module):
-
-    def __init__(self, d_model, nhead, c_out, seq_len, pred_len, k, dim_feedforward=None, dropout=0.1,
-                 activation='sigmoid', layer_norm_eps=1e-5):
+    def __init__(
+        self,
+        d_model,
+        nhead,
+        c_out,
+        seq_len,
+        pred_len,
+        k,
+        dim_feedforward=None,
+        dropout=0.1,
+        activation='sigmoid',
+        layer_norm_eps=1e-5,
+    ):
         super().__init__()
         self.d_model = d_model
         self.nhead = nhead
@@ -229,12 +237,12 @@ class EncoderLayer(nn.Module):
 
     def forward(self, res, level, attn_mask=None):
         season = self._season_block(res)
-        res = res - season[:, :-self.pred_len]
+        res = res - season[:, : -self.pred_len]
         growth = self._growth_block(res)
         res = self.norm1(res - growth[:, 1:])
         res = self.norm2(res + self.ff(res))
 
-        level = self.level_layer(level, growth[:, :-1], season[:, :-self.pred_len])
+        level = self.level_layer(level, growth[:, :-1], season[:, : -self.pred_len])
         return res, level, growth, season
 
     def _growth_block(self, x):
@@ -247,7 +255,6 @@ class EncoderLayer(nn.Module):
 
 
 class Encoder(nn.Module):
-
     def __init__(self, layers):
         super().__init__()
         self.layers = nn.ModuleList(layers)
@@ -264,7 +271,6 @@ class Encoder(nn.Module):
 
 
 class DampingLayer(nn.Module):
-
     def __init__(self, pred_len, nhead, dropout=0.1):
         super().__init__()
         self.pred_len = pred_len
@@ -278,7 +284,7 @@ class DampingLayer(nn.Module):
 
         powers = torch.arange(self.pred_len).to(self._damping_factor.device) + 1
         powers = powers.view(self.pred_len, 1)
-        damping_factors = self.damping_factor ** powers
+        damping_factors = self.damping_factor**powers
         damping_factors = damping_factors.cumsum(dim=0)
         x = x.view(b, t, self.nhead, -1)
         x = self.dropout(x) * damping_factors.unsqueeze(-1)
@@ -290,7 +296,6 @@ class DampingLayer(nn.Module):
 
 
 class DecoderLayer(nn.Module):
-
     def __init__(self, d_model, nhead, c_out, pred_len, dropout=0.1):
         super().__init__()
         self.d_model = d_model
@@ -305,12 +310,11 @@ class DecoderLayer(nn.Module):
         growth_horizon = self.growth_damping(growth[:, -1:])
         growth_horizon = self.dropout1(growth_horizon)
 
-        seasonal_horizon = season[:, -self.pred_len:]
+        seasonal_horizon = season[:, -self.pred_len :]
         return growth_horizon, seasonal_horizon
 
 
 class Decoder(nn.Module):
-
     def __init__(self, layers):
         super().__init__()
         self.d_model = layers[0].d_model

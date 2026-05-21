@@ -16,9 +16,7 @@ class Normalize(nn.Module):
     Normalization layer with affine transformation option
     """
 
-    def __init__(
-        self, num_features, eps=1e-5, affine=False, subtract_last=False, non_norm=False
-    ):
+    def __init__(self, num_features, eps=1e-5, affine=False, subtract_last=False, non_norm=False):
         """
         Args:
             num_features: the number of features or channels
@@ -57,9 +55,7 @@ class Normalize(nn.Module):
             self.last = x[:, -1, :].unsqueeze(1)
         else:
             self.mean = torch.mean(x, dim=dim2reduce, keepdim=True).detach()
-        self.stdev = torch.sqrt(
-            torch.var(x, dim=dim2reduce, keepdim=True, unbiased=False) + self.eps
-        ).detach()
+        self.stdev = torch.sqrt(torch.var(x, dim=dim2reduce, keepdim=True, unbiased=False) + self.eps).detach()
 
     def _normalize(self, x):
         if self.non_norm:  # todo: check if this is needed

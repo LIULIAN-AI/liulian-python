@@ -38,7 +38,10 @@ class Model(nn.Module):
         self.seq_len = configs.seq_len
 
         self.enc_embedding = DataEmbedding(
-            configs.enc_in, configs.d_model, configs.embed, configs.freq,
+            configs.enc_in,
+            configs.d_model,
+            configs.embed,
+            configs.freq,
             configs.dropout,
         )
 
@@ -47,8 +50,11 @@ class Model(nn.Module):
             [
                 EncoderLayer(
                     ReformerLayer(
-                        None, configs.d_model, configs.n_heads,
-                        bucket_size=bucket_size, n_hashes=n_hashes,
+                        None,
+                        configs.d_model,
+                        configs.n_heads,
+                        bucket_size=bucket_size,
+                        n_hashes=n_hashes,
                     ),
                     configs.d_model,
                     configs.d_ff,
@@ -64,19 +70,23 @@ class Model(nn.Module):
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
             self.projection = nn.Linear(
-                configs.d_model * configs.seq_len, configs.num_class,
+                configs.d_model * configs.seq_len,
+                configs.num_class,
             )
         else:
             self.projection = nn.Linear(
-                configs.d_model, configs.c_out, bias=True,
+                configs.d_model,
+                configs.c_out,
+                bias=True,
             )
 
     def long_forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         # Concatenate encoder input with decoder placeholder
-        x_enc = torch.cat([x_enc, x_dec[:, -self.pred_len:, :]], dim=1)
+        x_enc = torch.cat([x_enc, x_dec[:, -self.pred_len :, :]], dim=1)
         if x_mark_enc is not None:
             x_mark_enc = torch.cat(
-                [x_mark_enc, x_mark_dec[:, -self.pred_len:, :]], dim=1,
+                [x_mark_enc, x_mark_dec[:, -self.pred_len :, :]],
+                dim=1,
             )
 
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
@@ -88,15 +98,14 @@ class Model(nn.Module):
         # Normalization
         mean_enc = x_enc.mean(1, keepdim=True).detach()
         x_enc = x_enc - mean_enc
-        std_enc = torch.sqrt(
-            torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5
-        ).detach()
+        std_enc = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5).detach()
         x_enc = x_enc / std_enc
 
-        x_enc = torch.cat([x_enc, x_dec[:, -self.pred_len:, :]], dim=1)
+        x_enc = torch.cat([x_enc, x_dec[:, -self.pred_len :, :]], dim=1)
         if x_mark_enc is not None:
             x_mark_enc = torch.cat(
-                [x_mark_enc, x_mark_dec[:, -self.pred_len:, :]], dim=1,
+                [x_mark_enc, x_mark_dec[:, -self.pred_len :, :]],
+                dim=1,
             )
 
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
@@ -132,10 +141,10 @@ class Model(nn.Module):
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
         if self.task_name == 'long_term_forecast':
             dec_out = self.long_forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
-            return dec_out[:, -self.pred_len:, :]
+            return dec_out[:, -self.pred_len :, :]
         if self.task_name == 'short_term_forecast':
             dec_out = self.short_forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
-            return dec_out[:, -self.pred_len:, :]
+            return dec_out[:, -self.pred_len :, :]
         if self.task_name == 'imputation':
             dec_out = self.imputation(x_enc, x_mark_enc)
             return dec_out

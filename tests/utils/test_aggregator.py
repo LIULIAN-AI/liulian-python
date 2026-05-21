@@ -206,9 +206,7 @@ class TestSingle:
         # so we should see only windows 0 and 3 (indices 0, 3)
         # Window 0 pred_times = [5,6,7], Window 3 pred_times = [8,9,10]
         unique_times = result['time']
-        assert len(unique_times) == len(np.unique(unique_times)), (
-            'single method should produce unique timesteps'
-        )
+        assert len(unique_times) == len(np.unique(unique_times)), 'single method should produce unique timesteps'
 
     def test_values_from_correct_window(self):
         """Values should come from the selected (strided) windows."""
@@ -251,10 +249,10 @@ class TestMultiEntity:
         # Global aggregate should therefore use mean([2, 20]) = 11.
         preds = np.array(
             [
-                [[1.0], [2.0]],   # A window 0  -> times 5,6
-                [[3.0], [4.0]],   # A window 1  -> times 6,7
-                [[10.0], [20.0]], # B window 0  -> times 5,6
-                [[30.0], [40.0]], # B window 1  -> times 6,7
+                [[1.0], [2.0]],  # A window 0  -> times 5,6
+                [[3.0], [4.0]],  # A window 1  -> times 6,7
+                [[10.0], [20.0]],  # B window 0  -> times 5,6
+                [[30.0], [40.0]],  # B window 1  -> times 6,7
             ],
             dtype=np.float32,
         )
@@ -342,6 +340,4 @@ def test_output_is_chronological():
         'single',
     ):
         result = aggregate_predictions(preds, trues, times, method=method)
-        assert np.all(np.diff(result['time']) >= 0), (
-            f'method={method!r}: time not sorted'
-        )
+        assert np.all(np.diff(result['time']) >= 0), f'method={method!r}: time not sorted'

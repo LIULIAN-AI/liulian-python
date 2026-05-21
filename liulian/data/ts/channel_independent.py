@@ -21,7 +21,6 @@ Usage::
 
 from __future__ import annotations
 
-import torch
 from torch.utils.data import Dataset
 
 
@@ -92,11 +91,7 @@ class ChannelIndependentDataset(Dataset):
             feat = feat.unsqueeze(-1)
 
         # Optionally match target channel
-        if (
-            self.match_target_channel
-            and target.ndim >= 2
-            and target.shape[-1] == self.n_channels
-        ):
+        if self.match_target_channel and target.ndim >= 2 and target.shape[-1] == self.n_channels:
             target = target[:, channel_idx : channel_idx + 1]
 
         return feat, target, time

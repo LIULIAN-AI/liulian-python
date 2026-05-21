@@ -24,9 +24,7 @@ class FakeDataset(BaseDataset):
     domain = 'test'
     version = '0.0.1'
 
-    def __init__(
-        self, n_samples: int = 16, n_timesteps: int = 48, n_features: int = 3
-    ) -> None:
+    def __init__(self, n_samples: int = 16, n_timesteps: int = 48, n_features: int = 3) -> None:
         super().__init__()
         self._n_samples = n_samples
         self._n_timesteps = n_timesteps
@@ -34,9 +32,7 @@ class FakeDataset(BaseDataset):
 
     def get_split(self, split_name: str) -> DataSplit:
         rng = np.random.default_rng(seed=hash(split_name) % 2**32)
-        X = rng.normal(
-            size=(self._n_samples, self._n_timesteps, self._n_features)
-        ).astype(np.float32)
+        X = rng.normal(size=(self._n_samples, self._n_timesteps, self._n_features)).astype(np.float32)
         horizon = 12
         y = X[:, -horizon:, :]
         X_context = X[:, :-horizon, :]
@@ -73,9 +69,7 @@ def dummy_model() -> DummyModel:
 
 
 @pytest.fixture
-def configured_dummy_model(
-    dummy_model: DummyModel, prediction_task: PredictionTask
-) -> DummyModel:
+def configured_dummy_model(dummy_model: DummyModel, prediction_task: PredictionTask) -> DummyModel:
     """A DummyModel already configured with a PredictionTask."""
     dummy_model.configure(prediction_task, {})
     return dummy_model

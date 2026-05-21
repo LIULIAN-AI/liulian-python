@@ -459,9 +459,7 @@ class TimeSeriesSplit(Dataset):
         if idx < 0:
             idx += self._total
         if idx < 0 or idx >= self._total:
-            raise IndexError(
-                f'index {idx} out of range for dataset of size {self._total}'
-            )
+            raise IndexError(f'index {idx} out of range for dataset of size {self._total}')
 
         # Binary search: find which segment this index falls in
         seg_i = int(torch.searchsorted(self._cumlen, idx + 1).item())
@@ -802,9 +800,7 @@ class TimeSeriesDataset(BaseDataset):
             fields=fields,
             backend=backend,
         )
-        self.splits_raw = {
-            k: v.copy().reset_index(drop=True) for k, v in splits.items()
-        }
+        self.splits_raw = {k: v.copy().reset_index(drop=True) for k, v in splits.items()}
         self.time_col = time_col
         self.feature_cols = list(feature_cols) if feature_cols else []
         self.target_cols = list(target_cols) if target_cols else []
@@ -853,9 +849,7 @@ class TimeSeriesDataset(BaseDataset):
         seen = set()
         scale_cols = []
         for c in self.feature_cols + self.target_cols:
-            if c not in seen and any(
-                c in df.columns for df in self.splits_raw.values()
-            ):
+            if c not in seen and any(c in df.columns for df in self.splits_raw.values()):
                 seen.add(c)
                 scale_cols.append(c)
         if not scale_cols:
@@ -890,9 +884,7 @@ class TimeSeriesDataset(BaseDataset):
             if cols_present:
                 vals = df[cols_present].values.copy()
                 # Handle NaN: only transform non-NaN rows
-                nan_mask = np.isnan(vals).any(
-                    axis=1
-                )  # todo: maybe raise an error if there are NaNs.
+                nan_mask = np.isnan(vals).any(axis=1)  # todo: maybe raise an error if there are NaNs.
                 if not nan_mask.all():
                     vals[~nan_mask] = scaler.transform(vals[~nan_mask])
                     df[cols_present] = vals
@@ -948,10 +940,7 @@ class TimeSeriesDataset(BaseDataset):
         """Return a lazy :class:`TimeSeriesSplit` for *split_name*."""
         if split_name not in self._split_cache:
             if split_name not in self.splits_raw:
-                raise KeyError(
-                    f'Unknown split {split_name!r}. '
-                    f'Available: {list(self.splits_raw.keys())}'
-                )
+                raise KeyError(f'Unknown split {split_name!r}. Available: {list(self.splits_raw.keys())}')
             self._split_cache[split_name] = self._prepare_split(
                 self.splits_raw[split_name],
                 split_name,
@@ -1085,16 +1074,8 @@ class TimeSeriesDataset(BaseDataset):
         # Resolve dtype from config
         torch_dtype = torch.float64 if self.data_dtype == 'float64' else torch.float32
 
-        feat = (
-            torch.tensor(df[f_cols].values, dtype=torch_dtype)
-            if f_cols
-            else torch.zeros(N, 0, dtype=torch_dtype)
-        )
-        targ = (
-            torch.tensor(df[t_cols].values, dtype=torch_dtype)
-            if t_cols
-            else torch.zeros(N, 0, dtype=torch_dtype)
-        )
+        feat = torch.tensor(df[f_cols].values, dtype=torch_dtype) if f_cols else torch.zeros(N, 0, dtype=torch_dtype)
+        targ = torch.tensor(df[t_cols].values, dtype=torch_dtype) if t_cols else torch.zeros(N, 0, dtype=torch_dtype)
 
         # Time column — use time_feature_cols if available (multi-dim),
         # otherwise fall back to time_col (1D, will be unsqueezed in __getitem__)

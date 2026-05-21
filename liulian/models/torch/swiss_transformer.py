@@ -48,9 +48,7 @@ class SinusoidalPositionalEncoding(nn.Module):
         super().__init__()
         pe = torch.zeros(max_len, d_model)
         position = torch.arange(0, max_len, dtype=torch.float32).unsqueeze(1)
-        div_term = torch.exp(
-            torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model)
-        )
+        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
         self.register_buffer('pe', pe.unsqueeze(0))  # (1, max_len, d_model)
@@ -147,9 +145,7 @@ class SwissTransformerEmbeddingModel(nn.Module):
         self.future_steps = future_steps
 
         # Entity embedding (integer-ID mode)
-        self.embedding = (
-            nn.Embedding(num_embeddings, embedding_size) if num_embeddings > 0 else None
-        )
+        self.embedding = nn.Embedding(num_embeddings, embedding_size) if num_embeddings > 0 else None
 
         # d_model resolution
         if d_model is None:
@@ -208,15 +204,9 @@ class SwissTransformerEmbeddingModel(nn.Module):
         # Extrapolation mode
         self._target_postprocessor = None
         if not use_current_x:
-            self.future_step_embedding = nn.Parameter(
-                torch.zeros(1, future_steps, d_future_emb)
-            )
-            proj_in = (
-                (embedding_size + d_future_emb) if self.embedding else d_future_emb
-            )
-            self.future_proj = (
-                nn.Identity() if proj_in == d_model else nn.Linear(proj_in, d_model)
-            )
+            self.future_step_embedding = nn.Parameter(torch.zeros(1, future_steps, d_future_emb))
+            proj_in = (embedding_size + d_future_emb) if self.embedding else d_future_emb
+            self.future_proj = nn.Identity() if proj_in == d_model else nn.Linear(proj_in, d_model)
             self._target_postprocessor = lambda t: t[:, -future_steps:, :]
 
     def forward(
@@ -262,9 +252,7 @@ class SwissTransformerEmbeddingModel(nn.Module):
 
         # Causal / full mask
         if self.use_current_x:
-            causal = torch.triu(
-                torch.ones(seq_len, seq_len, device=x.device), diagonal=1
-            ).bool()
+            causal = torch.triu(torch.ones(seq_len, seq_len, device=x.device), diagonal=1).bool()
         else:
             causal = torch.zeros(seq_len, seq_len, device=x.device).bool()
 
@@ -275,9 +263,7 @@ class SwissTransformerEmbeddingModel(nn.Module):
                 hf_mask = hf_mask & (~time_masks).bool().unsqueeze(1)
             if pad_masks is not None:
                 hf_mask = hf_mask & (~pad_masks).bool().unsqueeze(1)
-            out = self.transformer(
-                inputs_embeds=x, attention_mask=hf_mask
-            ).last_hidden_state
+            out = self.transformer(inputs_embeds=x, attention_mask=hf_mask).last_hidden_state
         else:
             skp = None if self.use_mask_embedding else time_masks
             if pad_masks is not None:
@@ -371,9 +357,7 @@ class TransformerEntityFeatureModel(nn.Module):
         x = self.input_proj(x)
         x = self.pos_embedding(x)
         seq_len = x.size(1)
-        causal = torch.triu(
-            torch.ones(seq_len, seq_len, device=x.device), diagonal=1
-        ).bool()
+        causal = torch.triu(torch.ones(seq_len, seq_len, device=x.device), diagonal=1).bool()
         out = self.transformer(x, mask=causal)
         return self.linear(out)
 
@@ -397,9 +381,7 @@ class _TransformerBaseAdapter(TorchModelAdapter):
         self._entity_mode = config.get('identifier_mode', 'none')
         self._entity_id_col = config.get('entity_id_col', 0)
 
-    def _forward_torch_model(
-        self, torch_batch: Dict[str, Any]
-    ) -> Dict[str, torch.Tensor]:
+    def _forward_torch_model(self, torch_batch: Dict[str, Any]) -> Dict[str, torch.Tensor]:
         import numpy as np
 
         def _to(v: Any) -> Optional[torch.Tensor]:

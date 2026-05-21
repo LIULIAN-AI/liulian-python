@@ -16,10 +16,7 @@ from typing import Tuple
 try:
     import torch
 except ImportError:
-    raise ImportError(
-        'PyTorch metrics require torch to be installed. '
-        'Install with: pip install liulian[torch-models]'
-    )
+    raise ImportError('PyTorch metrics require torch to be installed. Install with: pip install liulian[torch-models]')
 
 
 def RSE(pred: torch.Tensor, true: torch.Tensor) -> float:
@@ -221,9 +218,7 @@ def MSPE(pred: torch.Tensor, true: torch.Tensor) -> float:
     return torch.mean(torch.square((true - pred) / true)).item()
 
 
-def metric(
-    pred: torch.Tensor, true: torch.Tensor
-) -> Tuple[float, float, float, float, float]:
+def metric(pred: torch.Tensor, true: torch.Tensor) -> Tuple[float, float, float, float, float]:
     """
     Calculate all standard time series metrics at once.
 

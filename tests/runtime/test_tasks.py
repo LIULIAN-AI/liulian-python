@@ -22,9 +22,7 @@ class TestPredictionRegime:
         assert r.multivariate is True
 
     def test_custom_values(self) -> None:
-        r = PredictionRegime(
-            horizon=24, context_length=72, stride=2, multivariate=False
-        )
+        r = PredictionRegime(horizon=24, context_length=72, stride=2, multivariate=False)
         assert r.horizon == 24
         assert r.context_length == 72
 
@@ -67,9 +65,7 @@ class TestPredictionTask:
     def test_compute_metrics(self, prediction_task: PredictionTask) -> None:
         targets = np.linspace(0.0, 1.0, num=4 * 12 * 3).reshape(4, 12, 3)
         preds = targets + 0.1
-        metrics = prediction_task.compute_metrics(
-            {'predictions': preds}, {'y': targets}
-        )
+        metrics = prediction_task.compute_metrics({'predictions': preds}, {'y': targets})
         assert 'mae' in metrics
         assert 'rmse' in metrics
         assert 'nse' in metrics
@@ -104,9 +100,7 @@ class TestTaskSuggester:
         assert 'time-series' in result['reason']
 
     def test_spatiotemporal_data(self) -> None:
-        result = TaskSuggester.suggest(
-            {'n_timesteps': 100, 'n_features': 5, 'has_graph': True}
-        )
+        result = TaskSuggester.suggest({'n_timesteps': 100, 'n_features': 5, 'has_graph': True})
         assert result['task'] == 'PredictionTask'
         assert 'spatiotemporal' in result['reason']
 

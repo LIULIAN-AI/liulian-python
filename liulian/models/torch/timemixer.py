@@ -174,9 +174,7 @@ class PastDecomposableMixing(nn.Module):
         out_trend_list = self.mixing_multi_scale_trend(trend_list)
 
         out_list = []
-        for ori, out_season, out_trend, length in zip(
-            x_list, out_season_list, out_trend_list, length_list
-        ):
+        for ori, out_season, out_trend, length in zip(x_list, out_season_list, out_trend_list, length_list):
             out = out_season + out_trend
             if self.channel_independence:
                 out = ori + self.out_cross_layer(out)
@@ -199,9 +197,7 @@ class Model(nn.Module):
         self.pred_len = configs.pred_len
         self.down_sampling_window = configs.down_sampling_window
         self.channel_independence = getattr(configs, 'channel_independence', 1)
-        self.pdm_blocks = nn.ModuleList(
-            [PastDecomposableMixing(configs) for _ in range(configs.e_layers)]
-        )
+        self.pdm_blocks = nn.ModuleList([PastDecomposableMixing(configs) for _ in range(configs.e_layers)])
 
         self.preprocess = series_decomp(configs.moving_avg)
         self.enc_in = configs.enc_in
@@ -230,18 +226,13 @@ class Model(nn.Module):
                 Normalize(
                     self.configs.enc_in,
                     affine=True,
-                    subtract_last=False
-                    if getattr(configs, 'use_norm', 1) != 0
-                    else True,
+                    subtract_last=False if getattr(configs, 'use_norm', 1) != 0 else True,
                 )
                 for i in range(configs.down_sampling_layers + 1)
             ]
         )
 
-        if (
-            self.task_name == 'long_term_forecast'
-            or self.task_name == 'short_term_forecast'
-        ):
+        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
             self.predict_layers = torch.nn.ModuleList(
                 [
                     torch.nn.Linear(
@@ -255,9 +246,7 @@ class Model(nn.Module):
             if self.channel_independence:
                 self.projection_layer = nn.Linear(configs.d_model, 1, bias=True)
             else:
-                self.projection_layer = nn.Linear(
-                    configs.d_model, configs.c_out, bias=True
-                )
+                self.projection_layer = nn.Linear(configs.d_model, configs.c_out, bias=True)
                 self.out_res_layers = torch.nn.ModuleList(
                     [
                         torch.nn.Linear(
@@ -281,15 +270,11 @@ class Model(nn.Module):
             if self.channel_independence:
                 self.projection_layer = nn.Linear(configs.d_model, 1, bias=True)
             else:
-                self.projection_layer = nn.Linear(
-                    configs.d_model, configs.c_out, bias=True
-                )
+                self.projection_layer = nn.Linear(configs.d_model, configs.c_out, bias=True)
         if self.task_name == 'classification':
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
-            self.projection = nn.Linear(
-                configs.d_model * configs.seq_len, configs.num_class
-            )
+            self.projection = nn.Linear(configs.d_model * configs.seq_len, configs.num_class)
 
     def out_projection(self, dec_out, i, out_res):
         dec_out = self.projection_layer(dec_out)
@@ -313,9 +298,7 @@ class Model(nn.Module):
 
     def __multi_scale_process_inputs(self, x_enc, x_mark_enc):
         if self.configs.down_sampling_method == 'max':
-            down_pool = torch.nn.MaxPool1d(
-                self.configs.down_sampling_window, return_indices=False
-            )
+            down_pool = torch.nn.MaxPool1d(self.configs.down_sampling_window, return_indices=False)
         elif self.configs.down_sampling_method == 'avg':
             down_pool = torch.nn.AvgPool1d(self.configs.down_sampling_window)
         elif self.configs.down_sampling_method == 'conv':
@@ -347,12 +330,8 @@ class Model(nn.Module):
             x_enc_ori = x_enc_sampling
 
             if x_mark_enc is not None:
-                x_mark_sampling_list.append(
-                    x_mark_enc_mark_ori[:, :: self.configs.down_sampling_window, :]
-                )
-                x_mark_enc_mark_ori = x_mark_enc_mark_ori[
-                    :, :: self.configs.down_sampling_window, :
-                ]
+                x_mark_sampling_list.append(x_mark_enc_mark_ori[:, :: self.configs.down_sampling_window, :])
+                x_mark_enc_mark_ori = x_mark_enc_mark_ori[:, :: self.configs.down_sampling_window, :]
 
         x_enc = x_enc_sampling_list
         x_mark_enc = x_mark_sampling_list if x_mark_enc is not None else None
@@ -407,23 +386,13 @@ class Model(nn.Module):
         if self.channel_independence:
             x_list = x_list[0]
             for i, enc_out in zip(range(len(x_list)), enc_out_list):
-                dec_out = self.predict_layers[i](enc_out.permute(0, 2, 1)).permute(
-                    0, 2, 1
-                )
+                dec_out = self.predict_layers[i](enc_out.permute(0, 2, 1)).permute(0, 2, 1)
                 dec_out = self.projection_layer(dec_out)
-                dec_out = (
-                    dec_out.reshape(B, self.configs.c_out, self.pred_len)
-                    .permute(0, 2, 1)
-                    .contiguous()
-                )
+                dec_out = dec_out.reshape(B, self.configs.c_out, self.pred_len).permute(0, 2, 1).contiguous()
                 dec_out_list.append(dec_out)
         else:
-            for i, enc_out, out_res in zip(
-                range(len(x_list[0])), enc_out_list, x_list[1]
-            ):
-                dec_out = self.predict_layers[i](enc_out.permute(0, 2, 1)).permute(
-                    0, 2, 1
-                )
+            for i, enc_out, out_res in zip(range(len(x_list[0])), enc_out_list, x_list[1]):
+                dec_out = self.predict_layers[i](enc_out.permute(0, 2, 1)).permute(0, 2, 1)
                 dec_out = self.out_projection(dec_out, i, out_res)
                 dec_out_list.append(dec_out)
         return dec_out_list
@@ -482,9 +451,7 @@ class Model(nn.Module):
             enc_out_list = self.pdm_blocks[i](enc_out_list)
 
         dec_out = self.projection_layer(enc_out_list[0])
-        dec_out = (
-            dec_out.reshape(B, self.configs.c_out, -1).permute(0, 2, 1).contiguous()
-        )
+        dec_out = dec_out.reshape(B, self.configs.c_out, -1).permute(0, 2, 1).contiguous()
         dec_out = self.normalize_layers[0](dec_out, 'denorm')
         return dec_out
 
@@ -493,9 +460,7 @@ class Model(nn.Module):
         means = means.unsqueeze(1).detach()
         x_enc = x_enc - means
         x_enc = x_enc.masked_fill(mask == 0, 0)
-        stdev = torch.sqrt(
-            torch.sum(x_enc * x_enc, dim=1) / torch.sum(mask == 1, dim=1) + 1e-5
-        )
+        stdev = torch.sqrt(torch.sum(x_enc * x_enc, dim=1) / torch.sum(mask == 1, dim=1) + 1e-5)
         stdev = stdev.unsqueeze(1).detach()
         x_enc /= stdev
 
@@ -528,19 +493,14 @@ class Model(nn.Module):
             enc_out_list = self.pdm_blocks[i](enc_out_list)
 
         dec_out = self.projection_layer(enc_out_list[0])
-        dec_out = (
-            dec_out.reshape(B, self.configs.c_out, -1).permute(0, 2, 1).contiguous()
-        )
+        dec_out = dec_out.reshape(B, self.configs.c_out, -1).permute(0, 2, 1).contiguous()
 
         dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.seq_len, 1))
         dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.seq_len, 1))
         return dec_out
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
-        if (
-            self.task_name == 'long_term_forecast'
-            or self.task_name == 'short_term_forecast'
-        ):
+        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
             dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
             return dec_out
         if self.task_name == 'imputation':

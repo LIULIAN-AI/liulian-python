@@ -39,9 +39,7 @@ class Model(nn.Module):
     """
 
     def __init__(self, configs):
-        super(
-            Model, self
-        ).__init__()  # todo: nowcasting? extrapo_mode: limo, future_embedding, recursive
+        super(Model, self).__init__()  # todo: nowcasting? extrapo_mode: limo, future_embedding, recursive
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
         self.enc_in = configs.enc_in

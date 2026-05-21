@@ -70,9 +70,7 @@ class M4DatasetInfo:
     values: np.ndarray  # Time series values
 
     @staticmethod
-    def load(
-        training: bool = True, dataset_file: str = '../dataset/m4'
-    ) -> 'M4DatasetInfo':
+    def load(training: bool = True, dataset_file: str = '../dataset/m4') -> 'M4DatasetInfo':
         """
         Load M4 dataset from cached files.
 
@@ -148,9 +146,7 @@ class M4Dataset(Dataset):
         root_path: str,
         flag: Literal['train', 'val', 'test'] = 'train',
         size: Tuple[int, int, int] = (96, 48, 96),
-        seasonal_patterns: Literal[
-            'Yearly', 'Quarterly', 'Monthly', 'Weekly', 'Daily', 'Hourly'
-        ] = 'Monthly',
+        seasonal_patterns: Literal['Yearly', 'Quarterly', 'Monthly', 'Weekly', 'Daily', 'Hourly'] = 'Monthly',
         scale: bool = False,
         **kwargs,
     ):
@@ -178,13 +174,9 @@ class M4Dataset(Dataset):
         # For M4, typically train and test are separate
         # For validation, we can use a portion of training data
         if self.flag in ['train', 'val']:
-            dataset_info = M4DatasetInfo.load(
-                training=True, dataset_file=self.root_path
-            )
+            dataset_info = M4DatasetInfo.load(training=True, dataset_file=self.root_path)
         else:
-            dataset_info = M4DatasetInfo.load(
-                training=False, dataset_file=self.root_path
-            )
+            dataset_info = M4DatasetInfo.load(training=False, dataset_file=self.root_path)
 
         # Filter by seasonal pattern
         mask = dataset_info.groups == self.seasonal_patterns
@@ -230,9 +222,7 @@ class M4Dataset(Dataset):
     def __len__(self) -> int:
         return len(self.timeseries)
 
-    def __getitem__(
-        self, index: int
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    def __getitem__(self, index: int) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Sample a window from the indexed time series.
 

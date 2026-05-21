@@ -78,9 +78,7 @@ class TestConfigGeneration:
 
     def test_ablation_norm_count(self, config_dir):
         yamls = list((config_dir / 'ablation_norm').glob('*.yaml'))
-        assert len(yamls) == 135, (
-            f'Expected 135 ablation_norm configs, got {len(yamls)}'
-        )
+        assert len(yamls) == 135, f'Expected 135 ablation_norm configs, got {len(yamls)}'
 
     def test_ablation_aug_count(self, config_dir):
         yamls = list((config_dir / 'ablation_aug').glob('*.yaml'))
@@ -88,9 +86,7 @@ class TestConfigGeneration:
 
     def test_ablation_seqlen_count(self, config_dir):
         yamls = list((config_dir / 'ablation_seqlen').glob('*.yaml'))
-        assert len(yamls) == 225, (
-            f'Expected 225 ablation_seqlen configs, got {len(yamls)}'
-        )
+        assert len(yamls) == 225, f'Expected 225 ablation_seqlen configs, got {len(yamls)}'
 
     def test_ablation_tf_count(self, config_dir):
         yamls = list((config_dir / 'ablation_tf').glob('*.yaml'))
@@ -98,9 +94,7 @@ class TestConfigGeneration:
 
     def test_total_count(self, config_dir):
         all_yamls = list(config_dir.rglob('*.yaml'))
-        assert len(all_yamls) == 2751, (
-            f'Expected 2751 total configs, got {len(all_yamls)}'
-        )
+        assert len(all_yamls) == 2751, f'Expected 2751 total configs, got {len(all_yamls)}'
 
     def test_config_parseable(self, config_dir):
         """Every generated YAML should be parseable and contain 'model' key."""
@@ -108,9 +102,7 @@ class TestConfigGeneration:
             with open(yf) as f:
                 cfg = yaml.safe_load(f)
             assert 'model' in cfg, f"Missing 'model' in {yf}"
-            assert 'dataset' in cfg or 'data_name' in cfg, (
-                f'Missing dataset info in {yf}'
-            )
+            assert 'dataset' in cfg or 'data_name' in cfg, f'Missing dataset info in {yf}'
 
     def test_long_term_has_required_keys(self, config_dir):
         """Spot-check a long_term config has all expected fields."""
@@ -151,9 +143,7 @@ class TestConfigGeneration:
 
     def test_all_models_in_long_term(self, config_dir):
         """All 15 models should appear in long_term configs."""
-        names = {
-            yf.stem.split('_')[0] for yf in (config_dir / 'long_term').glob('*.yaml')
-        }
+        names = {yf.stem.split('_')[0] for yf in (config_dir / 'long_term').glob('*.yaml')}
         # Some names may be lowered differently
         found = {n.lower() for n in names}
         for p in ['dlinear', 'transformer', 'informer', 'lstmadapter']:
@@ -194,8 +184,7 @@ class TestResultsAggregation:
                         'status': 'success',
                     }
                     with open(
-                        long_term
-                        / f'{model.lower()}_{dataset.lower()}_H96_seed{seed}.json',
+                        long_term / f'{model.lower()}_{dataset.lower()}_H96_seed{seed}.json',
                         'w',
                     ) as f:
                         json.dump(result, f)
@@ -253,10 +242,7 @@ class TestResultsAggregation:
         agg = aggregate_entity_ablation(groups['entity'], 'mse')
         assert ('DLinear', 'Traffic', 'none') in agg
         assert ('DLinear', 'Traffic', 'embedding') in agg
-        assert (
-            agg[('DLinear', 'Traffic', 'embedding')]['mean']
-            < agg[('DLinear', 'Traffic', 'none')]['mean']
-        )
+        assert agg[('DLinear', 'Traffic', 'embedding')]['mean'] < agg[('DLinear', 'Traffic', 'none')]['mean']
 
     def test_generate_markdown_report(self, mock_results_dir):
         from tools.aggregate_results import load_results, generate_markdown_report
@@ -440,9 +426,7 @@ class TestEntityMixinUnit:
                 super().__init__()
                 self.proj = torch.nn.Linear(7, 7)
 
-            def forward(
-                self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None, mask=None
-            ):
+            def forward(self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None, mask=None):
                 return self.proj(x_enc)
 
         model = SimpleModel()
@@ -461,9 +445,7 @@ class TestEntityMixinUnit:
                 super().__init__()
                 self.proj = torch.nn.Linear(7, 7)
 
-            def forward(
-                self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None, mask=None
-            ):
+            def forward(self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None, mask=None):
                 return self.proj(x_enc)
 
         model = SimpleModel()

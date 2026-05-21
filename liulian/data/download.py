@@ -28,11 +28,10 @@ Usage::
 from __future__ import annotations
 
 import logging
-import os
 import shutil
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Dict
 
 logger = logging.getLogger(__name__)
 
@@ -44,10 +43,7 @@ logger = logging.getLogger(__name__)
 # The bulk archive from the Autoformer repo contains all standard TSL
 # benchmarks in a single ~300 MB ZIP.
 
-_BULK_ARCHIVE_URL = (
-    'https://drive.google.com/uc?export=download&id='
-    '1NF7VEefXCmXuWNbnNe858WvQAkJ_7wuP'
-)
+_BULK_ARCHIVE_URL = 'https://drive.google.com/uc?export=download&id=1NF7VEefXCmXuWNbnNe858WvQAkJ_7wuP'
 
 # Individual dataset download URLs (fallback / convenience).
 # These are direct links from well-known academic repositories.
@@ -82,6 +78,7 @@ _MANUAL_DATASETS = {'swiss-river-1990', 'swiss-river-2010', 'swiss-river-zurich'
 def _project_root() -> Path:
     """Resolve the project root directory."""
     from liulian.config import PROJECT_ROOT
+
     return Path(PROJECT_ROOT)
 
 
@@ -155,9 +152,10 @@ def _download_file(url: str, dest: Path, *, desc: str = '') -> None:
 
         with urllib.request.urlopen(url) as resp:
             total = int(resp.headers.get('Content-Length', 0))
-            with open(tmp, 'wb') as fh, tqdm.tqdm(
-                total=total, unit='B', unit_scale=True, desc=desc or 'download'
-            ) as pbar:
+            with (
+                open(tmp, 'wb') as fh,
+                tqdm.tqdm(total=total, unit='B', unit_scale=True, desc=desc or 'download') as pbar,
+            ):
                 while True:
                     chunk = resp.read(8192)
                     if not chunk:
@@ -238,9 +236,7 @@ def ensure_dataset(data_name: str) -> None:
     subdir, filename = entry
     target = root / subdir / filename
 
-    logger.info(
-        'Dataset %r not found at %s — attempting auto-download.', data_name, target
-    )
+    logger.info('Dataset %r not found at %s — attempting auto-download.', data_name, target)
 
     # Strategy 1: Check if bulk archive already exists and extract
     archive_path = root / 'dataset' / 'time-series-dataset.zip'

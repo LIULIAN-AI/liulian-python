@@ -78,9 +78,7 @@ class TestRayOptimizer:
         result = opt.run(spec=None, search_space={'x': [1, 2]})
         assert isinstance(result.best_value, float)
 
-    def test_make_trainable_uses_trial_scoped_checkpoint_dir(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_make_trainable_uses_trial_scoped_checkpoint_dir(self, monkeypatch: pytest.MonkeyPatch) -> None:
         """Ray trials should use unique checkpoint dirs to avoid collisions."""
         captured: dict[str, object] = {}
 
@@ -116,9 +114,7 @@ class TestRayOptimizer:
             def get_context() -> _FakeTuneContext:
                 return _FakeTuneContext()
 
-        monkeypatch.setitem(
-            sys.modules, 'ray', types.SimpleNamespace(tune=_FakeTuneModule)
-        )
+        monkeypatch.setitem(sys.modules, 'ray', types.SimpleNamespace(tune=_FakeTuneModule))
         import liulian.runtime.trainer as trainer_mod
 
         monkeypatch.setattr(trainer_mod, 'ForecastTrainer', DummyTrainer)

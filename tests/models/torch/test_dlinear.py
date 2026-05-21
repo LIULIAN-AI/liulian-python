@@ -86,9 +86,7 @@ class TestDLinearForecast:
         # Outputs should be different (different parameterization)
         preds_s = outputs_shared['predictions'].detach().cpu()
         preds_i = outputs_individual['predictions'].detach().cpu()
-        assert not torch.allclose(preds_s, preds_i), (
-            'Individual and shared modes should produce different outputs'
-        )
+        assert not torch.allclose(preds_s, preds_i), 'Individual and shared modes should produce different outputs'
 
 
 class TestDLinearImputation:
@@ -163,18 +161,14 @@ class TestDLinearClassification:
             'individual': False,
         }
 
-    def test_classification_run(
-        self, classification_config, sample_classification_inputs
-    ):
+    def test_classification_run(self, classification_config, sample_classification_inputs):
         """Test classification task execution."""
         from liulian.models.torch.dlinear import DLinearAdapter
 
         model = DLinearAdapter(classification_config)
         outputs = model.run(sample_classification_inputs)
 
-        validate_classification_output(
-            outputs, batch_size=4, num_classes=classification_config['num_class']
-        )
+        validate_classification_output(outputs, batch_size=4, num_classes=classification_config['num_class'])
 
 
 class TestDLinearEdgeCases:
@@ -208,9 +202,7 @@ class TestDLinearEdgeCases:
         outputs = model.run(incomplete_inputs)
         assert 'predictions' in outputs
         assert outputs['predictions'].ndim == 3
-        assert torch.isfinite(outputs['predictions']).all(), (
-            'Missing-input predictions contain non-finite values'
-        )
+        assert torch.isfinite(outputs['predictions']).all(), 'Missing-input predictions contain non-finite values'
 
     def test_wrong_input_shapes(self, sample_forecast_inputs):
         """Test model behavior with mismatched input shapes.
@@ -243,6 +235,4 @@ class TestDLinearEdgeCases:
         # Just verify it runs and returns something
         assert 'predictions' in outputs
         assert outputs['predictions'].ndim == 3
-        assert torch.isfinite(outputs['predictions']).all(), (
-            'Wrong-input predictions contain non-finite values'
-        )
+        assert torch.isfinite(outputs['predictions']).all(), 'Wrong-input predictions contain non-finite values'

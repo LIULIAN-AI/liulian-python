@@ -11,8 +11,7 @@ Despite its simplicity, it often outperforms complex transformer-based models.
 
 import torch
 import torch.nn as nn
-import numpy as np
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 from liulian.models.torch.layers.decomposition import series_decomp
 from liulian.models.torch.base_adapter import TorchModelAdapter
 from liulian.models.torch.entity_mixin import EntityAwareMixin
@@ -65,17 +64,11 @@ class Model(nn.Module):
             self.Linear_Seasonal = nn.Linear(self.seq_len, self.pred_len)
             self.Linear_Trend = nn.Linear(self.seq_len, self.pred_len)
 
-            self.Linear_Seasonal.weight = nn.Parameter(
-                (1 / self.seq_len) * torch.ones([self.pred_len, self.seq_len])
-            )
-            self.Linear_Trend.weight = nn.Parameter(
-                (1 / self.seq_len) * torch.ones([self.pred_len, self.seq_len])
-            )
+            self.Linear_Seasonal.weight = nn.Parameter((1 / self.seq_len) * torch.ones([self.pred_len, self.seq_len]))
+            self.Linear_Trend.weight = nn.Parameter((1 / self.seq_len) * torch.ones([self.pred_len, self.seq_len]))
 
         if self.task_name == 'classification':
-            self.projection = nn.Linear(
-                configs.enc_in * configs.seq_len, configs.num_class
-            )
+            self.projection = nn.Linear(configs.enc_in * configs.seq_len, configs.num_class)
 
     def encoder(self, x):
         seasonal_init, trend_init = self.decompsition(x)
@@ -93,9 +86,7 @@ class Model(nn.Module):
                 dtype=trend_init.dtype,
             ).to(trend_init.device)
             for i in range(self.channels):
-                seasonal_output[:, i, :] = self.Linear_Seasonal[i](
-                    seasonal_init[:, i, :]
-                )
+                seasonal_output[:, i, :] = self.Linear_Seasonal[i](seasonal_init[:, i, :])
                 trend_output[:, i, :] = self.Linear_Trend[i](trend_init[:, i, :])
         else:
             seasonal_output = self.Linear_Seasonal(seasonal_init)
@@ -126,10 +117,7 @@ class Model(nn.Module):
         return output
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
-        if (
-            self.task_name == 'long_term_forecast'
-            or self.task_name == 'short_term_forecast'
-        ):
+        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
             dec_out = self.forecast(x_enc)
             return dec_out[:, -self.pred_len :, :]  # [B, L, D]
         if self.task_name == 'imputation':
@@ -191,14 +179,10 @@ class DLinearAdapter(EntityAwareMixin, TorchModelAdapter):
         batch_size, seq_len, n_features = x_enc.shape
 
         # DLinear doesn't really use time marks, decoder inputs
-        x_mark_enc = inputs.get(
-            'x_mark_enc', torch.zeros(batch_size, seq_len, 1, device=x_enc.device)
-        )
+        x_mark_enc = inputs.get('x_mark_enc', torch.zeros(batch_size, seq_len, 1, device=x_enc.device))
         x_dec = inputs.get(
             'x_dec',
-            torch.zeros(
-                batch_size, self.config['pred_len'], n_features, device=x_enc.device
-            ),
+            torch.zeros(batch_size, self.config['pred_len'], n_features, device=x_enc.device),
         )
         x_mark_dec = inputs.get(
             'x_mark_dec',

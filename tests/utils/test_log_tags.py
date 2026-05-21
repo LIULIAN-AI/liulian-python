@@ -497,9 +497,7 @@ class TestSetupLogging:
         assert root.name == 'root'
         assert any(isinstance(h.formatter, TaggedFormatter) for h in root.handlers)
         # Cleanup: remove our handler
-        root.handlers[:] = [
-            h for h in root.handlers if not isinstance(h.formatter, TaggedFormatter)
-        ]
+        root.handlers[:] = [h for h in root.handlers if not isinstance(h.formatter, TaggedFormatter)]
 
     def test_no_duplicate_handlers(self) -> None:
         from liulian.utils.log_tags import setup_logging, TaggedFormatter

@@ -139,9 +139,7 @@ def set_output_mode(mode: str) -> None:
     """Switch output mode (``'ansi'``, ``'plain'``, or ``'html'``)."""
     global _OUTPUT_MODE
     if mode not in (MODE_ANSI, MODE_PLAIN, MODE_HTML):
-        raise ValueError(
-            f'mode must be one of {MODE_ANSI!r}, {MODE_PLAIN!r}, {MODE_HTML!r}'
-        )
+        raise ValueError(f'mode must be one of {MODE_ANSI!r}, {MODE_PLAIN!r}, {MODE_HTML!r}')
     _OUTPUT_MODE = mode
     _rebuild_tags()
 
@@ -348,9 +346,7 @@ _TAG_LABELS = ('info', 'ok', 'warn', 'ERROR', 'CRIT', 'debug', 'hint', '...')
 
 # Matches an optional ANSI leader or HTML <span> followed by [label]
 _TAG_DETECT = _re.compile(
-    r'(?:\033\[[0-9;]*m|<span[^>]*>)*\[(?:'
-    + '|'.join(_re.escape(lbl) for lbl in _TAG_LABELS)
-    + r')\]'
+    r'(?:\033\[[0-9;]*m|<span[^>]*>)*\[(?:' + '|'.join(_re.escape(lbl) for lbl in _TAG_LABELS) + r')\]'
 )
 
 
@@ -422,9 +418,7 @@ class TaggedFormatter(_logging.Formatter):
         if not self.auto_tag or _msg_has_tag(msg):
             return msg
 
-        label, ansi_colour, html_key = self._LEVEL_SPEC.get(
-            record.levelno, ('info', _BLUE, 'blue')
-        )
+        label, ansi_colour, html_key = self._LEVEL_SPEC.get(record.levelno, ('info', _BLUE, 'blue'))
 
         if record.levelno >= _logging.ERROR:
             return _error_format(label, msg)

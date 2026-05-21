@@ -24,7 +24,7 @@ import logging
 import os
 import sys
 import time
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional
 
 import numpy as np
 import torch
@@ -94,33 +94,22 @@ class ForecastTrainer:
         inverse_transform: Optional[Callable[..., torch.Tensor]] = None,
     ) -> None:
         self.config = config
-        self.device = device or torch.device(
-            'cuda' if torch.cuda.is_available() else 'cpu'
-        )
+        self.device = device or torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.checkpoint_dir = checkpoint_dir or 'checkpoints'
         self.exp_logger = exp_logger
         self.inverse_transform_fn = inverse_transform
         self.loss_name = str(self.config.get('loss', 'mse')).strip().lower()
-        self.metric_names = self._parse_metric_names(
-            self.config.get('metrics', ['rmse', 'mae', 'nse'])
-        )
+        self.metric_names = self._parse_metric_names(self.config.get('metrics', ['rmse', 'mae', 'nse']))
         self.show_progress = bool(self.config.get('show_progress', True))
         self.nan_mask_loss = bool(self.config.get('nan_mask_loss', False))
-        self.teacher_forcing = (
-            str(self.config.get('teacher_forcing', 'label')).strip().lower()
-        )
+        self.teacher_forcing = str(self.config.get('teacher_forcing', 'label')).strip().lower()
         self.eval_denorm = bool(self.config.get('eval_denorm', False))
-        self.use_entity_embedding = (
-            str(self.config.get('identifier_mode', 'none')).strip().lower()
-            == 'embedding'
-        )
+        self.use_entity_embedding = str(self.config.get('identifier_mode', 'none')).strip().lower() == 'embedding'
 
         # Data augmentation during training
         aug_cfg = self.config.get('augmentation', None)
         if isinstance(aug_cfg, str):
-            self.augmentation_list = [
-                s.strip() for s in aug_cfg.split(',') if s.strip()
-            ]
+            self.augmentation_list = [s.strip() for s in aug_cfg.split(',') if s.strip()]
         elif isinstance(aug_cfg, (list, tuple)):
             self.augmentation_list = list(aug_cfg)
         else:
@@ -211,12 +200,8 @@ class ForecastTrainer:
         best_val_score: float = float('inf')
         best_epoch_idx: int = 0
 
-        eval_metric_names = self._dedupe_metric_names(
-            [self.loss_name] + list(self.metric_names)
-        )
-        monitor_key = (
-            str(cfg.get('monitor_metric', f'val_{self.loss_name}')).strip().lower()
-        )
+        eval_metric_names = self._dedupe_metric_names([self.loss_name] + list(self.metric_names))
+        monitor_key = str(cfg.get('monitor_metric', f'val_{self.loss_name}')).strip().lower()
 
         for epoch in range(train_epochs):
             # --- train one epoch ---
@@ -282,24 +267,12 @@ class ForecastTrainer:
                 monitor_value = float('inf')
 
             # Collect denorm metric strings for val and test
-            val_denorm_str = ', '.join(
-                f'val_{k}={v:.6f}'
-                for k, v in val_metrics.items()
-                if k.startswith('denorm_')
-            )
-            test_denorm_str = ', '.join(
-                f'test_{k}={v:.6f}'
-                for k, v in test_metrics.items()
-                if k.startswith('denorm_')
-            )
+            val_denorm_str = ', '.join(f'val_{k}={v:.6f}' for k, v in val_metrics.items() if k.startswith('denorm_'))
+            test_denorm_str = ', '.join(f'test_{k}={v:.6f}' for k, v in test_metrics.items() if k.startswith('denorm_'))
             extra_parts = []
             if val_denorm_str:
                 extra_parts.append(val_denorm_str)
-            norm_test = ', '.join(
-                f'test_{k}={v:.6f}'
-                for k, v in test_metrics.items()
-                if not k.startswith('denorm_')
-            )
+            norm_test = ', '.join(f'test_{k}={v:.6f}' for k, v in test_metrics.items() if not k.startswith('denorm_'))
             if norm_test:
                 extra_parts.append(norm_test)
             if test_denorm_str:
@@ -336,9 +309,7 @@ class ForecastTrainer:
                 try:
                     epoch_callback(epoch_record, model, self.checkpoint_dir)
                 except Exception as e:
-                    raise RuntimeError(
-                        f'Epoch callback failed at epoch {epoch + 1}'
-                    ) from e
+                    raise RuntimeError(f'Epoch callback failed at epoch {epoch + 1}') from e
                     pass  # callback failure should not abort training
 
             if early_stopping.early_stop and not disable_es:
@@ -356,23 +327,13 @@ class ForecastTrainer:
         # --- Load best model ---
         best_ckpt = os.path.join(self.checkpoint_dir, 'checkpoint')
         if os.path.exists(best_ckpt):
-            model.load_state_dict(
-                torch.load(best_ckpt, map_location=self.device, weights_only=True)
-            )
+            model.load_state_dict(torch.load(best_ckpt, map_location=self.device, weights_only=True))
 
         # --- Extract best-epoch metrics from history ---
         best_record = self.history[best_epoch_idx] if self.history else {}
 
-        val_metrics_best = {
-            k.removeprefix('val_'): v
-            for k, v in best_record.items()
-            if k.startswith('val_')
-        }
-        test_metrics_best = {
-            k.removeprefix('test_'): v
-            for k, v in best_record.items()
-            if k.startswith('test_')
-        }
+        val_metrics_best = {k.removeprefix('val_'): v for k, v in best_record.items() if k.startswith('val_')}
+        test_metrics_best = {k.removeprefix('test_'): v for k, v in best_record.items() if k.startswith('test_')}
 
         if test_metrics_best:
             logger.ok(
@@ -417,15 +378,11 @@ class ForecastTrainer:
         cfg = self.config
         model = model.to(self.device)
         model.eval()
-        resolved_metric_names = self._dedupe_metric_names(
-            [self.loss_name] + list(metric_names or self.metric_names)
-        )
+        resolved_metric_names = self._dedupe_metric_names([self.loss_name] + list(metric_names or self.metric_names))
         # Each entry is (metric_value, batch_size) to enable
         # sample-weighted averaging (equivalent to global metric over all
         # test samples, matching TSL's concat-then-compute approach).
-        collected: Dict[str, List[tuple[float, int]]] = {
-            name: [] for name in resolved_metric_names
-        }
+        collected: Dict[str, List[tuple[float, int]]] = {name: [] for name in resolved_metric_names}
         denorm_collected: Dict[str, List[tuple[float, int]]] = (
             {name: [] for name in resolved_metric_names}
             if self.eval_denorm and self.inverse_transform_fn is not None
@@ -457,9 +414,7 @@ class ForecastTrainer:
                 batch_entity_ids = batch[4] if len(batch) > 4 else None
                 batch_entity_idx = batch[5] if len(batch) > 5 else None
 
-                batch_x = batch_x.float().to(
-                    self.device
-                )  # todo: always to float as timellm?
+                batch_x = batch_x.float().to(self.device)  # todo: always to float as timellm?
                 batch_y = batch_y.float()
                 batch_x_mark = batch_x_mark.float().to(self.device)
                 batch_y_mark = batch_y_mark.float().to(self.device)
@@ -475,9 +430,7 @@ class ForecastTrainer:
                 fwd_kwargs: Dict[str, Any] = {}
                 if self.use_entity_embedding and batch_entity_idx is not None:
                     fwd_kwargs['entity_ids'] = batch_entity_idx
-                outputs = model(
-                    batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs
-                )
+                outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs)
                 if isinstance(outputs, tuple):
                     outputs = outputs[0]
 
@@ -496,39 +449,23 @@ class ForecastTrainer:
                         inv_kwargs: Dict[str, Any] = {}
                         if batch_entity_ids is not None:
                             inv_kwargs['entity_ids'] = batch_entity_ids
-                        inv_kwargs['timestamps'] = (
-                            batch_y_mark.detach()
-                        )  # todo: is this useful or correct?
-                        out_dn = self.inverse_transform_fn(
-                            outputs.detach(), **inv_kwargs
-                        )
-                        tgt_dn = self.inverse_transform_fn(
-                            batch_y.detach(), **inv_kwargs
-                        )
+                        inv_kwargs['timestamps'] = batch_y_mark.detach()  # todo: is this useful or correct?
+                        out_dn = self.inverse_transform_fn(outputs.detach(), **inv_kwargs)
+                        tgt_dn = self.inverse_transform_fn(batch_y.detach(), **inv_kwargs)
                         if out_dn is None:
                             raise ValueError('inverse_transform returned None for outputs.')
                             out_dn = outputs.detach()
                         if tgt_dn is None:
                             raise ValueError('inverse_transform returned None for targets.')
                             tgt_dn = batch_y.detach()
-                        dn_metrics = self._compute_metrics(
-                            out_dn, tgt_dn, resolved_metric_names
-                        )
+                        dn_metrics = self._compute_metrics(out_dn, tgt_dn, resolved_metric_names)
                         for name, value in dn_metrics.items():
                             denorm_collected[name].append((value, cur_batch_size))
                     except Exception as exc:
-                        logger.debug(
-                            'inverse_transform failed (batch %d): %s', idx, exc
-                        )
+                        logger.debug('inverse_transform failed (batch %d): %s', idx, exc)
 
                 if tqdm is not None and hasattr(iterator, 'set_postfix'):
-                    iterator.set_postfix(
-                        {
-                            resolved_metric_names[0]: (
-                                collected[resolved_metric_names[0]][-1][0]
-                            )
-                        }
-                    )
+                    iterator.set_postfix({resolved_metric_names[0]: (collected[resolved_metric_names[0]][-1][0])})
 
         model.train()
 
@@ -548,10 +485,7 @@ class ForecastTrainer:
                 return float('nan')
             return float(np.average(vals, weights=weights))
 
-        result = {
-            name: _weighted_mean(values)
-            for name, values in collected.items()
-        }
+        result = {name: _weighted_mean(values) for name, values in collected.items()}
         if denorm_collected:
             for name, values in denorm_collected.items():
                 result[f'denorm_{name}'] = _weighted_mean(values)
@@ -626,9 +560,7 @@ class ForecastTrainer:
                 fwd_kwargs: Dict[str, Any] = {}
                 if self.use_entity_embedding and batch_entity_idx is not None:
                     fwd_kwargs['entity_ids'] = batch_entity_idx
-                outputs = model(
-                    batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs
-                )
+                outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs)
                 if isinstance(outputs, tuple):
                     outputs = outputs[0]
 
@@ -670,21 +602,16 @@ class ForecastTrainer:
                         inv_kwargs['entity_ids'] = np.concatenate(all_entity_ids, axis=0)
                 preds_dn = self.inverse_transform_fn(preds_cat, **inv_kwargs)
                 trues_dn = self.inverse_transform_fn(trues_cat, **inv_kwargs)
-                if (
-                    isinstance(preds_dn, torch.Tensor)
-                    and isinstance(trues_dn, torch.Tensor)
-                ):
+                if isinstance(preds_dn, torch.Tensor) and isinstance(trues_dn, torch.Tensor):
                     preds_cat = preds_dn
                     trues_cat = trues_dn
                 else:
                     logger.warning(
-                        'inverse_transform returned non-tensor — '
-                        'predictions will remain in normalised scale.'
+                        'inverse_transform returned non-tensor — predictions will remain in normalised scale.'
                     )
             except Exception as exc:
                 logger.warning(
-                    'inverse_transform failed in predict(): %s — '
-                    'predictions will remain in normalised scale.',
+                    'inverse_transform failed in predict(): %s — predictions will remain in normalised scale.',
                     exc,
                 )
 
@@ -757,9 +684,7 @@ class ForecastTrainer:
 
             # --- Data augmentation (training only) ---
             if self.augmentation_list:
-                batch_x = apply_augmentations(
-                    batch_x, self.augmentation_list, **self.augmentation_kwargs
-                )
+                batch_x = apply_augmentations(batch_x, self.augmentation_list, **self.augmentation_kwargs)
 
             label_len = cfg.get('label_len', 0)
             pred_len = cfg['pred_len']
@@ -788,10 +713,7 @@ class ForecastTrainer:
                 loss.backward()
             optimizer.step()
 
-            if (
-                scheduler is not None
-                and getattr(self, '_sched_step_mode', 'batch') == 'batch'
-            ):
+            if scheduler is not None and getattr(self, '_sched_step_mode', 'batch') == 'batch':
                 scheduler.step()
 
             if tqdm is not None and hasattr(iterator, 'set_postfix'):
@@ -903,9 +825,7 @@ class ForecastTrainer:
         }
         unknown = sorted(set(metric_names) - set(values))
         if unknown:
-            raise ValueError(
-                f'Unsupported metrics={unknown}. Supported: {sorted(values)}'
-            )
+            raise ValueError(f'Unsupported metrics={unknown}. Supported: {sorted(values)}')
         return {name: values[name] for name in metric_names}
 
     def _with_progress(

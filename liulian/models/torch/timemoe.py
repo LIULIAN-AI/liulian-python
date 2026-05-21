@@ -10,7 +10,6 @@ Uses pretrained Maple728/TimeMoE-50M model for zero-shot forecasting.
 
 import torch
 from torch import nn
-import numpy as np
 from typing import Dict, Any
 from liulian.models.torch.base_adapter import TorchModelAdapter
 from liulian.models.torch.entity_mixin import EntityAwareMixin
@@ -27,9 +26,7 @@ class Model(nn.Module):
         # Import here to make it optional
         from transformers import AutoModelForCausalLM
 
-        self.model = AutoModelForCausalLM.from_pretrained(
-            'Maple728/TimeMoE-50M', trust_remote_code=True
-        )
+        self.model = AutoModelForCausalLM.from_pretrained('Maple728/TimeMoE-50M', trust_remote_code=True)
         self.task_name = configs.task_name
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
@@ -84,14 +81,10 @@ class TimeMoEAdapter(EntityAwareMixin, TorchModelAdapter):
         x_enc = inputs['x_enc']
         batch_size, seq_len, n_features = x_enc.shape
 
-        x_mark_enc = inputs.get(
-            'x_mark_enc', torch.zeros(batch_size, seq_len, 1, device=x_enc.device)
-        )
+        x_mark_enc = inputs.get('x_mark_enc', torch.zeros(batch_size, seq_len, 1, device=x_enc.device))
         x_dec = inputs.get(
             'x_dec',
-            torch.zeros(
-                batch_size, self.config['pred_len'], n_features, device=x_enc.device
-            ),
+            torch.zeros(batch_size, self.config['pred_len'], n_features, device=x_enc.device),
         )
         x_mark_dec = inputs.get(
             'x_mark_dec',

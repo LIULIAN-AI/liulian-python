@@ -92,9 +92,7 @@ class StateMachine:
             ValueError: If the transition is not allowed.
         """
         if not self.can_transition(target):
-            raise ValueError(
-                f'Invalid transition: {self._state.value} -> {target.value}'
-            )
+            raise ValueError(f'Invalid transition: {self._state.value} -> {target.value}')
         self._state = target
 
     def reset(self) -> None:

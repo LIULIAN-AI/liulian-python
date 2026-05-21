@@ -84,7 +84,7 @@ Migration guide::
 from __future__ import annotations
 
 import os
-from typing import Any, Literal, Mapping, Optional, Sequence, Tuple
+from typing import Tuple
 
 import numpy as np
 import pandas as pd
@@ -328,10 +328,7 @@ class CSVTimeSeriesDataset(SpatialTempoDataset):
 
         # Ensure 'date' column exists
         if 'date' not in df_raw.columns:
-            raise ValueError(
-                f'CSV must contain a "date" column. '
-                f'Found columns: {list(df_raw.columns)}'
-            )
+            raise ValueError(f'CSV must contain a "date" column. Found columns: {list(df_raw.columns)}')
 
         # Reorder columns: date, ...features, target
         cols = list(df_raw.columns)

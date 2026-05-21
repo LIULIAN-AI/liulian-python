@@ -61,9 +61,7 @@ from tests.e2e.baselines import (
 
 pytestmark = pytest.mark.main_branch
 
-DATASET_ROOT = os.path.join(
-    os.path.dirname(__file__), '..', '..', 'dataset', 'swiss_river'
-)
+DATASET_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'dataset', 'swiss_river')
 
 
 # ── Shared helpers ──────────────────────────────────────────────────────
@@ -94,11 +92,7 @@ def _base_config(
     from liulian.config import load_config
 
     if id_integration is None:
-        id_integration = (
-            'add_after_patch'
-            if model == 'patchtst' and identifier_mode == 'embedding'
-            else 'concat_to_x'
-        )
+        id_integration = 'add_after_patch' if model == 'patchtst' and identifier_mode == 'embedding' else 'concat_to_x'
 
     cfg = load_config()  # start from DEFAULT_CONFIG
     cfg.update(
@@ -197,15 +191,11 @@ def _run_and_collect(cfg: dict, tmp_path) -> dict:
         os.chdir(old_cwd)
 
     # ---- Status must be 'ok' ----
-    assert summary['status'] == 'ok', (
-        f'Experiment failed with status={summary["status"]}'
-    )
+    assert summary['status'] == 'ok', f'Experiment failed with status={summary["status"]}'
 
     # ---- Artifacts directory must exist ----
     artifacts_dir = os.path.join(str(tmp_path), summary['artifacts_dir'])
-    assert os.path.isdir(artifacts_dir), (
-        f'Artifacts dir does not exist: {artifacts_dir}'
-    )
+    assert os.path.isdir(artifacts_dir), f'Artifacts dir does not exist: {artifacts_dir}'
 
     # ---- Metrics must be present ----
     assert 'metrics' in summary, 'Summary missing "metrics" key'
@@ -236,9 +226,7 @@ def _run_and_collect(cfg: dict, tmp_path) -> dict:
 
     preds = preds_dict['preds']
     trues = preds_dict['trues']
-    assert preds.shape == trues.shape, (
-        f'preds shape {preds.shape} != trues shape {trues.shape}'
-    )
+    assert preds.shape == trues.shape, f'preds shape {preds.shape} != trues shape {trues.shape}'
     result['pred_shape'] = tuple(preds.shape)
 
     # First 5 predictions flattened (for reproducibility check)
@@ -272,9 +260,7 @@ def _assert_baseline(result: dict, bl: dict, scenario: str) -> None:
         )
 
     # Shape
-    assert result['pred_shape'] == bl['pred_shape'], (
-        f'Shape mismatch: {result["pred_shape"]} vs {bl["pred_shape"]}'
-    )
+    assert result['pred_shape'] == bl['pred_shape'], f'Shape mismatch: {result["pred_shape"]} vs {bl["pred_shape"]}'
     assert len(result['pred_shape']) == 3, 'Preds should be (N, pred_len, C)'
     assert result['pred_shape'][1] == 3, 'pred_len should be 3'
 
@@ -328,8 +314,10 @@ class TestLstmSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='lstm', split_mode='per_entity',
-            identifier_mode='embedding', hpo=False,
+            model='lstm',
+            split_mode='per_entity',
+            identifier_mode='embedding',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, LSTM_SWISS1990['single_emb'], 'lstm_single_emb')
@@ -340,8 +328,10 @@ class TestLstmSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='lstm', split_mode='per_entity',
-            identifier_mode='none', hpo=False,
+            model='lstm',
+            split_mode='per_entity',
+            identifier_mode='none',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, LSTM_SWISS1990['single_no_emb'], 'lstm_single_no_emb')
@@ -352,8 +342,10 @@ class TestLstmTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='lstm', split_mode='per_entity',
-            identifier_mode='embedding', hpo=True,
+            model='lstm',
+            split_mode='per_entity',
+            identifier_mode='embedding',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, LSTM_SWISS1990['tune_emb'], 'lstm_tune_emb')
@@ -364,8 +356,10 @@ class TestLstmTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='lstm', split_mode='per_entity',
-            identifier_mode='none', hpo=True,
+            model='lstm',
+            split_mode='per_entity',
+            identifier_mode='none',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, LSTM_SWISS1990['tune_no_emb'], 'lstm_tune_no_emb')
@@ -381,8 +375,10 @@ class TestDLinearSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='dlinear', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='dlinear',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, DLINEAR_SWISS1990['single_no_emb'], 'dlinear_single_no_emb')
@@ -393,8 +389,10 @@ class TestDLinearSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='dlinear', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
+            model='dlinear',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, DLINEAR_SWISS1990['single_emb'], 'dlinear_single_emb')
@@ -405,8 +403,10 @@ class TestDLinearTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='dlinear', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='dlinear',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, DLINEAR_SWISS1990['tune_no_emb'], 'dlinear_tune_no_emb')
@@ -417,8 +417,10 @@ class TestDLinearTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='dlinear', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
+            model='dlinear',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, DLINEAR_SWISS1990['tune_emb'], 'dlinear_tune_emb')
@@ -434,8 +436,10 @@ class TestPatchTSTSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='patchtst', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='patchtst',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, PATCHTST_SWISS1990['single_no_emb'], 'patchtst_single_no_emb')
@@ -446,8 +450,10 @@ class TestPatchTSTSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='patchtst', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
+            model='patchtst',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, PATCHTST_SWISS1990['single_emb'], 'patchtst_single_emb')
@@ -458,8 +464,10 @@ class TestPatchTSTTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='patchtst', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='patchtst',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, PATCHTST_SWISS1990['tune_no_emb'], 'patchtst_tune_no_emb')
@@ -470,8 +478,10 @@ class TestPatchTSTTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='patchtst', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
+            model='patchtst',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, PATCHTST_SWISS1990['tune_emb'], 'patchtst_tune_emb')
@@ -480,6 +490,7 @@ class TestPatchTSTTuneEmb:
 # ═══════════════════════════════════════════════════════════════════════
 # TSL enc-dec models — helper for shared overrides
 # ═══════════════════════════════════════════════════════════════════════
+
 
 def _enc_dec_overrides(**extra: object) -> dict:
     """Shared config overrides for TSL encoder-decoder architectures.
@@ -503,8 +514,10 @@ class TestInformerSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='informer', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='informer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
             **_enc_dec_overrides(factor=3),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -516,8 +529,10 @@ class TestInformerSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='informer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
+            model='informer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
             **_enc_dec_overrides(factor=3),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -529,8 +544,10 @@ class TestInformerTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='informer', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='informer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
             **_enc_dec_overrides(factor=3),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -542,8 +559,10 @@ class TestInformerTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='informer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
+            model='informer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
             **_enc_dec_overrides(factor=3),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -560,8 +579,10 @@ class TestAutoformerSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='autoformer', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='autoformer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
             **_enc_dec_overrides(factor=3),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -573,8 +594,10 @@ class TestAutoformerSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='autoformer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
+            model='autoformer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
             **_enc_dec_overrides(factor=3),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -586,8 +609,10 @@ class TestAutoformerTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='autoformer', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='autoformer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
             **_enc_dec_overrides(factor=3),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -599,8 +624,10 @@ class TestAutoformerTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='autoformer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
+            model='autoformer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
             **_enc_dec_overrides(factor=3),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -617,8 +644,10 @@ class TestFEDformerSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='fedformer', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='fedformer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
             **_enc_dec_overrides(),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -630,8 +659,10 @@ class TestFEDformerSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='fedformer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
+            model='fedformer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
             **_enc_dec_overrides(),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -643,8 +674,10 @@ class TestFEDformerTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='fedformer', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='fedformer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
             **_enc_dec_overrides(),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -656,8 +689,10 @@ class TestFEDformerTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='fedformer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
+            model='fedformer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
             **_enc_dec_overrides(),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -674,8 +709,10 @@ class TestTimesNetSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='timesnet', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='timesnet',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
             **_enc_dec_overrides(top_k=5, num_kernels=6),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -687,8 +724,10 @@ class TestTimesNetSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='timesnet', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
+            model='timesnet',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
             **_enc_dec_overrides(top_k=5, num_kernels=6),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -700,8 +739,10 @@ class TestTimesNetTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='timesnet', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='timesnet',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
             **_enc_dec_overrides(top_k=5, num_kernels=6),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -713,8 +754,10 @@ class TestTimesNetTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='timesnet', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
+            model='timesnet',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
             **_enc_dec_overrides(top_k=5, num_kernels=6),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -731,8 +774,10 @@ class TestTransformerSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='transformer', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='transformer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
             **_enc_dec_overrides(),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -744,8 +789,10 @@ class TestTransformerSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='transformer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
+            model='transformer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
             **_enc_dec_overrides(),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -757,8 +804,10 @@ class TestTransformerTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='transformer', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='transformer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
             **_enc_dec_overrides(),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -770,8 +819,10 @@ class TestTransformerTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='transformer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
+            model='transformer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
             **_enc_dec_overrides(),
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -788,11 +839,17 @@ class TestiTransformerSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='itransformer', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='itransformer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
-        _assert_baseline(result, ITRANSFORMER_SWISS1990['single_no_emb'], 'itransformer_single_no_emb')
+        _assert_baseline(
+            result,
+            ITRANSFORMER_SWISS1990['single_no_emb'],
+            'itransformer_single_no_emb',
+        )
 
 
 class TestiTransformerSingleEmb:
@@ -800,8 +857,10 @@ class TestiTransformerSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='itransformer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
+            model='itransformer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, ITRANSFORMER_SWISS1990['single_emb'], 'itransformer_single_emb')
@@ -812,8 +871,10 @@ class TestiTransformerTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='itransformer', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='itransformer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, ITRANSFORMER_SWISS1990['tune_no_emb'], 'itransformer_tune_no_emb')
@@ -824,8 +885,10 @@ class TestiTransformerTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='itransformer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
+            model='itransformer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, ITRANSFORMER_SWISS1990['tune_emb'], 'itransformer_tune_emb')
@@ -841,9 +904,13 @@ class TestTimeMixerSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='timemixer', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
-            label_len=0, down_sampling_layers=3, down_sampling_window=2,
+            model='timemixer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
+            label_len=0,
+            down_sampling_layers=3,
+            down_sampling_window=2,
             down_sampling_method='avg',
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -855,9 +922,13 @@ class TestTimeMixerSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='timemixer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
-            label_len=0, down_sampling_layers=3, down_sampling_window=2,
+            model='timemixer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
+            label_len=0,
+            down_sampling_layers=3,
+            down_sampling_window=2,
             down_sampling_method='avg',
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -869,9 +940,13 @@ class TestTimeMixerTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='timemixer', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
-            label_len=0, down_sampling_layers=3, down_sampling_window=2,
+            model='timemixer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
+            label_len=0,
+            down_sampling_layers=3,
+            down_sampling_window=2,
             down_sampling_method='avg',
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -883,9 +958,13 @@ class TestTimeMixerTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='timemixer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
-            label_len=0, down_sampling_layers=3, down_sampling_window=2,
+            model='timemixer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
+            label_len=0,
+            down_sampling_layers=3,
+            down_sampling_window=2,
             down_sampling_method='avg',
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -902,8 +981,10 @@ class TestTimeXerSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='timexer', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='timexer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, TIMEXER_SWISS1990['single_no_emb'], 'timexer_single_no_emb')
@@ -914,8 +995,10 @@ class TestTimeXerSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='timexer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
+            model='timexer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, TIMEXER_SWISS1990['single_emb'], 'timexer_single_emb')
@@ -926,8 +1009,10 @@ class TestTimeXerTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='timexer', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='timexer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, TIMEXER_SWISS1990['tune_no_emb'], 'timexer_tune_no_emb')
@@ -938,8 +1023,10 @@ class TestTimeXerTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='timexer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
+            model='timexer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, TIMEXER_SWISS1990['tune_emb'], 'timexer_tune_emb')
@@ -955,9 +1042,13 @@ class TestMambaSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='mamba', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
-            d_ff=16, expand=2, d_conv=4,
+            model='mamba',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
+            d_ff=16,
+            expand=2,
+            d_conv=4,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, MAMBA_SWISS1990['single_no_emb'], 'mamba_single_no_emb')
@@ -968,9 +1059,13 @@ class TestMambaSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='mamba', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
-            d_ff=16, expand=2, d_conv=4,
+            model='mamba',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
+            d_ff=16,
+            expand=2,
+            d_conv=4,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, MAMBA_SWISS1990['single_emb'], 'mamba_single_emb')
@@ -981,9 +1076,13 @@ class TestMambaTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='mamba', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
-            d_ff=16, expand=2, d_conv=4,
+            model='mamba',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
+            d_ff=16,
+            expand=2,
+            d_conv=4,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, MAMBA_SWISS1990['tune_no_emb'], 'mamba_tune_no_emb')
@@ -994,9 +1093,13 @@ class TestMambaTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='mamba', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
-            d_ff=16, expand=2, d_conv=4,
+            model='mamba',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
+            d_ff=16,
+            expand=2,
+            d_conv=4,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, MAMBA_SWISS1990['tune_emb'], 'mamba_tune_emb')
@@ -1012,12 +1115,19 @@ class TestNonstationaryTransformerSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='nonstationary_transformer', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
-            p_hidden_dims=[128, 128], p_hidden_layers=2,
+            model='nonstationary_transformer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
+            p_hidden_dims=[128, 128],
+            p_hidden_layers=2,
         )
         result = _run_and_collect(cfg, tmp_path)
-        _assert_baseline(result, NONSTATIONARY_TRANSFORMER_SWISS1990['single_no_emb'], 'nstransformer_single_no_emb')
+        _assert_baseline(
+            result,
+            NONSTATIONARY_TRANSFORMER_SWISS1990['single_no_emb'],
+            'nstransformer_single_no_emb',
+        )
 
 
 class TestNonstationaryTransformerSingleEmb:
@@ -1025,12 +1135,19 @@ class TestNonstationaryTransformerSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='nonstationary_transformer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
-            p_hidden_dims=[128, 128], p_hidden_layers=2,
+            model='nonstationary_transformer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
+            p_hidden_dims=[128, 128],
+            p_hidden_layers=2,
         )
         result = _run_and_collect(cfg, tmp_path)
-        _assert_baseline(result, NONSTATIONARY_TRANSFORMER_SWISS1990['single_emb'], 'nstransformer_single_emb')
+        _assert_baseline(
+            result,
+            NONSTATIONARY_TRANSFORMER_SWISS1990['single_emb'],
+            'nstransformer_single_emb',
+        )
 
 
 class TestNonstationaryTransformerTuneNoEmb:
@@ -1038,12 +1155,19 @@ class TestNonstationaryTransformerTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='nonstationary_transformer', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
-            p_hidden_dims=[128, 128], p_hidden_layers=2,
+            model='nonstationary_transformer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
+            p_hidden_dims=[128, 128],
+            p_hidden_layers=2,
         )
         result = _run_and_collect(cfg, tmp_path)
-        _assert_baseline(result, NONSTATIONARY_TRANSFORMER_SWISS1990['tune_no_emb'], 'nstransformer_tune_no_emb')
+        _assert_baseline(
+            result,
+            NONSTATIONARY_TRANSFORMER_SWISS1990['tune_no_emb'],
+            'nstransformer_tune_no_emb',
+        )
 
 
 class TestNonstationaryTransformerTuneEmb:
@@ -1051,12 +1175,19 @@ class TestNonstationaryTransformerTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='nonstationary_transformer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
-            p_hidden_dims=[128, 128], p_hidden_layers=2,
+            model='nonstationary_transformer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
+            p_hidden_dims=[128, 128],
+            p_hidden_layers=2,
         )
         result = _run_and_collect(cfg, tmp_path)
-        _assert_baseline(result, NONSTATIONARY_TRANSFORMER_SWISS1990['tune_emb'], 'nstransformer_tune_emb')
+        _assert_baseline(
+            result,
+            NONSTATIONARY_TRANSFORMER_SWISS1990['tune_emb'],
+            'nstransformer_tune_emb',
+        )
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -1069,8 +1200,10 @@ class TestLightTSSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='lightts', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='lightts',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, LIGHTTS_SWISS1990['single_no_emb'], 'lightts_single_no_emb')
@@ -1081,8 +1214,10 @@ class TestLightTSSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='lightts', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
+            model='lightts',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, LIGHTTS_SWISS1990['single_emb'], 'lightts_single_emb')
@@ -1093,8 +1228,10 @@ class TestLightTSTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='lightts', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='lightts',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, LIGHTTS_SWISS1990['tune_no_emb'], 'lightts_tune_no_emb')
@@ -1105,8 +1242,10 @@ class TestLightTSTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='lightts', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
+            model='lightts',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, LIGHTTS_SWISS1990['tune_emb'], 'lightts_tune_emb')
@@ -1122,8 +1261,10 @@ class TestReformerSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='reformer', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='reformer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, REFORMER_SWISS1990['single_no_emb'], 'reformer_single_no_emb')
@@ -1134,8 +1275,10 @@ class TestReformerSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='reformer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
+            model='reformer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, REFORMER_SWISS1990['single_emb'], 'reformer_single_emb')
@@ -1146,8 +1289,10 @@ class TestReformerTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='reformer', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='reformer',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, REFORMER_SWISS1990['tune_no_emb'], 'reformer_tune_no_emb')
@@ -1158,8 +1303,10 @@ class TestReformerTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='reformer', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
+            model='reformer',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, REFORMER_SWISS1990['tune_emb'], 'reformer_tune_emb')
@@ -1175,8 +1322,10 @@ class TestGPT4TSSingleNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='gpt4ts', split_mode='multi_channel',
-            identifier_mode='none', hpo=False,
+            model='gpt4ts',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=False,
             gpt_layers=6,
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -1188,8 +1337,10 @@ class TestGPT4TSSingleEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='gpt4ts', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=False,
+            model='gpt4ts',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=False,
             gpt_layers=6,
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -1201,8 +1352,10 @@ class TestGPT4TSTuneNoEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='gpt4ts', split_mode='multi_channel',
-            identifier_mode='none', hpo=True,
+            model='gpt4ts',
+            split_mode='multi_channel',
+            identifier_mode='none',
+            hpo=True,
             gpt_layers=6,
         )
         result = _run_and_collect(cfg, tmp_path)
@@ -1214,10 +1367,11 @@ class TestGPT4TSTuneEmb:
 
     def test_pipeline(self, tmp_path):
         cfg = _base_config(
-            model='gpt4ts', split_mode='multi_channel',
-            identifier_mode='embedding', hpo=True,
+            model='gpt4ts',
+            split_mode='multi_channel',
+            identifier_mode='embedding',
+            hpo=True,
             gpt_layers=6,
         )
         result = _run_and_collect(cfg, tmp_path)
         _assert_baseline(result, GPT4TS_SWISS1990['tune_emb'], 'gpt4ts_tune_emb')
-

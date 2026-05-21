@@ -95,9 +95,7 @@ def add_impulse_noise(
         return noisy
     spike_idx = np.random.choice(n_samples, n_spikes, replace=False)
     flat = noisy.ravel()
-    flat[spike_idx] += np.random.choice([-magnitude, magnitude], size=n_spikes).astype(
-        flat.dtype
-    )
+    flat[spike_idx] += np.random.choice([-magnitude, magnitude], size=n_spikes).astype(flat.dtype)
     return noisy
 
 

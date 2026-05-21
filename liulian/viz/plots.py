@@ -12,7 +12,7 @@ Provides:
 from __future__ import annotations
 
 import os
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Sequence
 
 import numpy as np
 
@@ -97,9 +97,7 @@ def plot_predictions(
     if target_names is None:
         target_names = [f'Target {i}' for i in range(C)]
 
-    fig, axes = plt.subplots(
-        C, 1, figsize=(figsize[0], figsize[1] * C), squeeze=False, sharex=True
-    )
+    fig, axes = plt.subplots(C, 1, figsize=(figsize[0], figsize[1] * C), squeeze=False, sharex=True)
 
     for c in range(C):
         ax = axes[c, 0]
@@ -159,15 +157,11 @@ def plot_prediction_summary(
         pred_std = pred_std[:, None]
         true_mean = true_mean[:, None]
 
-    fig, axes = plt.subplots(
-        C, 1, figsize=(figsize[0], figsize[1] * C), squeeze=False, sharex=True
-    )
+    fig, axes = plt.subplots(C, 1, figsize=(figsize[0], figsize[1] * C), squeeze=False, sharex=True)
     for c in range(C):
         ax = axes[c, 0]
         ax.plot(time, true_mean[:, c], label='GT Mean', linewidth=1.2, color='#1f77b4')
-        ax.plot(
-            time, pred_mean[:, c], label='Pred Mean', linewidth=1.2, color='#ff7f0e'
-        )
+        ax.plot(time, pred_mean[:, c], label='Pred Mean', linewidth=1.2, color='#ff7f0e')
         ax.fill_between(
             time,
             pred_mean[:, c] - pred_std[:, c],
@@ -242,9 +236,7 @@ def plot_prediction_range(
     if times.ndim == 1:
         times = times[None, :]
     if times.ndim != 2:
-        raise ValueError(
-            f'Expected times with 2 dims after normalization, got shape={times.shape}.'
-        )
+        raise ValueError(f'Expected times with 2 dims after normalization, got shape={times.shape}.')
 
     N = preds.shape[0]
     if pred_len is None:

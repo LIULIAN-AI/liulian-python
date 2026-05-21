@@ -43,25 +43,25 @@ logger = logging.getLogger(__name__)
 
 def seed_everything(seed: int, deterministic: bool = False) -> None:
     """Set random seeds for reproducibility (random, numpy, torch).
-    
+
     Args:
         seed: Random seed value.
         deterministic: If True, enable full CUDA determinism for identical results.
             This is slower but guarantees bit-exact reproducibility.
     """
     import os
-    
+
     random.seed(seed)
     np.random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
-    
+
     try:
         import torch
 
         torch.manual_seed(seed)
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(seed)
-        
+
         if deterministic:
             # Full CUDA determinism for identical results
             torch.backends.cudnn.deterministic = True
@@ -212,9 +212,7 @@ def build_dataset(config: Dict[str, Any]) -> Any:
         # Match Time-Series-Library behavior:
         #   timeenc = 0 if embed != 'timeF' else 1
         # If config does not provide timeenc explicitly, derive it from embed.
-        inferred_timeenc = (
-            0 if str(config.get('embed', 'timeF')) != 'timeF' else 1
-        )
+        inferred_timeenc = 0 if str(config.get('embed', 'timeF')) != 'timeF' else 1
 
         _common_kwargs = dict(
             root_path=root_path,
@@ -238,12 +236,15 @@ def build_dataset(config: Dict[str, Any]) -> Any:
 
         if data_name in ('ETTh1', 'ETTh2'):
             from liulian.data.csv_dataset import ETTHourDataset
+
             dataset = ETTHourDataset(**_common_kwargs)
         elif data_name in ('ETTm1', 'ETTm2'):
             from liulian.data.csv_dataset import ETTMinuteDataset
+
             dataset = ETTMinuteDataset(**_common_kwargs)
         else:
             from liulian.data.csv_dataset import CustomCSVDataset
+
             dataset = CustomCSVDataset(**_common_kwargs)
 
         # Propagate split_mode for info()
@@ -344,10 +345,7 @@ def _load_prompt_content(config: Dict[str, Any]) -> str:
     if os.path.exists(prompt_path):
         with open(prompt_path) as fh:
             return fh.read()
-    return (
-        'Time series dataset for forecasting. '
-        'Data includes monitoring stations with periodic observations.'
-    )
+    return 'Time series dataset for forecasting. Data includes monitoring stations with periodic observations.'
 
 
 def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
@@ -418,7 +416,9 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
         config['dec_in'] = config['enc_in']
         logger.info(
             'Auto-set c_out=%d, dec_in=%d for features=%r (multi_channel mode)',
-            config['c_out'], config['dec_in'], features,
+            config['c_out'],
+            config['dec_in'],
+            features,
         )
 
     ns = SimpleNamespace(**config)
@@ -449,10 +449,7 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
 
     # Wrap with entity embedding when configured.
     # PatchTST + add_after_patch is handled internally by the model.
-    if (
-        config.get('identifier_mode') == 'embedding'
-        and config.get('id_integration') != 'add_after_patch'
-    ):
+    if config.get('identifier_mode') == 'embedding' and config.get('id_integration') != 'add_after_patch':
         num_emb = config.get('num_embeddings')
         if num_emb is None and dataset is not None:
             num_emb = len(dataset.station_ids)
@@ -511,20 +508,14 @@ def build_loaders(dataset: Any, config: Dict[str, Any]) -> Dict[str, Any]:
     if max_train_samples is not None:
         max_train_samples = int(max_train_samples)
         if max_train_samples <= 0:
-            raise ValueError(
-                f'max_train_samples must be positive, got {max_train_samples}.'
-            )
+            raise ValueError(f'max_train_samples must be positive, got {max_train_samples}.')
         train_split = dataset.get_split('train')
         if not hasattr(train_split, 'with_max_samples'):
-            raise ValueError(
-                'Dataset train split does not support max_train_samples capping.'
-            )
+            raise ValueError('Dataset train split does not support max_train_samples capping.')
         capped_train = train_split.with_max_samples(max_train_samples)
         split_cache = getattr(dataset, '_split_cache', None)
         if not isinstance(split_cache, dict):
-            raise ValueError(
-                'Dataset does not expose mutable split cache for max_train_samples.'
-            )
+            raise ValueError('Dataset does not expose mutable split cache for max_train_samples.')
         split_cache['train'] = capped_train
         logger.info(
             'Applied max_train_samples=%d (train split: %d -> %d)',
@@ -535,7 +526,7 @@ def build_loaders(dataset: Any, config: Dict[str, Any]) -> Dict[str, Any]:
 
     # In deterministic mode, disable shuffle for reproducible batch ordering
     shuffle_train = not config.get('deterministic', False)
-    
+
     return dataset.get_data_loaders(
         batch_size=config.get('batch_size', 8),
         num_workers=config.get('num_workers', 0),
@@ -808,7 +799,7 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
     from liulian.config import apply_quick_test
 
     t0 = time.time()
-    
+
     # Check for deterministic mode
     deterministic = config.get('deterministic', False)
 
@@ -1004,9 +995,19 @@ def print_experiment_info(config: Dict[str, Any]) -> None:
     # ── Model Architecture ──────────────────────────────────────────
     print(_bold('\n  Model Architecture'))
     for k in (
-        'enc_in', 'dec_in', 'c_out', 'd_model', 'd_ff',
-        'n_heads', 'e_layers', 'd_layers', 'dropout',
-        'patch_len', 'stride', 'individual', 'moving_avg',
+        'enc_in',
+        'dec_in',
+        'c_out',
+        'd_model',
+        'd_ff',
+        'n_heads',
+        'e_layers',
+        'd_layers',
+        'dropout',
+        'patch_len',
+        'stride',
+        'individual',
+        'moving_avg',
     ):
         v = config.get(k)
         if v is not None:
@@ -1046,10 +1047,7 @@ def print_experiment_info(config: Dict[str, Any]) -> None:
         print(
             _kv_line(
                 'Resources / trial',
-                'cpu='
-                + str(config.get('hpo_resources_cpu', 1))
-                + ', gpu='
-                + str(config.get('hpo_resources_gpu', 0)),
+                'cpu=' + str(config.get('hpo_resources_cpu', 1)) + ', gpu=' + str(config.get('hpo_resources_gpu', 0)),
             )
         )
         print(_kv_line('Max concurrent', config.get('hpo_max_concurrent', 'auto')))
@@ -1091,8 +1089,7 @@ def print_report(
     print(
         _kv_line(
             'Task',
-            f'{config["task"]}  (seq={config["seq_len"]}, '
-            f'pred={config["pred_len"]})',
+            f'{config["task"]}  (seq={config["seq_len"]}, pred={config["pred_len"]})',
         )
     )
     print(_kv_line('Model', config.get('model', 'N/A')))

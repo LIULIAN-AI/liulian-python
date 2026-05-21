@@ -44,9 +44,7 @@ def scaling(x: torch.Tensor, sigma: float = 0.1) -> torch.Tensor:
         >>> x_aug = scaling(x, sigma=0.2)
     """
     # Generate scaling factors: shape (batch_size, 1, n_features)
-    scale_factors = (
-        torch.randn(x.shape[0], 1, x.shape[2], device=x.device) * sigma + 1.0
-    )
+    scale_factors = torch.randn(x.shape[0], 1, x.shape[2], device=x.device) * sigma + 1.0
     return x * scale_factors
 
 
@@ -128,9 +126,7 @@ def permutation(
         else:  # random
             # Random split points
             n_segments = torch.randint(2, max_segments + 1, (1,)).item()
-            split_points = torch.sort(
-                torch.randint(0, seq_len, (n_segments - 1,), device=device)
-            )[0]
+            split_points = torch.sort(torch.randint(0, seq_len, (n_segments - 1,), device=device))[0]
             split_points = torch.cat(
                 [
                     torch.tensor([0], device=device),
@@ -176,9 +172,7 @@ def magnitude_warp(x: torch.Tensor, sigma: float = 0.2, knot: int = 4) -> torch.
         from scipy.interpolate import CubicSpline
     except ImportError:
         # Fallback to linear interpolation if scipy not available
-        print(
-            'Warning: scipy not available, using linear interpolation instead of cubic spline'
-        )
+        print('Warning: scipy not available, using linear interpolation instead of cubic spline')
         return _magnitude_warp_linear(x, sigma, knot)
 
     batch_size, seq_len, n_features = x.shape
@@ -192,9 +186,7 @@ def magnitude_warp(x: torch.Tensor, sigma: float = 0.2, knot: int = 4) -> torch.
 
     for i in range(batch_size):
         # Random knot points
-        random_warps = np.random.normal(
-            loc=1.0, scale=sigma, size=(knot + 2, n_features)
-        )
+        random_warps = np.random.normal(loc=1.0, scale=sigma, size=(knot + 2, n_features))
 
         # Interpolation points
         warp_steps = np.linspace(0, seq_len - 1, num=knot + 2)
@@ -259,9 +251,7 @@ def time_warp(x: torch.Tensor, sigma: float = 0.2, knot: int = 4) -> torch.Tenso
     try:
         from scipy.interpolate import CubicSpline
     except ImportError:
-        print(
-            'Warning: scipy not available, using linear interpolation instead of cubic spline'
-        )
+        print('Warning: scipy not available, using linear interpolation instead of cubic spline')
         return _time_warp_linear(x, sigma, knot)
 
     batch_size, seq_len, n_features = x.shape
@@ -301,9 +291,7 @@ def _time_warp_linear(x: torch.Tensor, sigma: float, knot: int) -> torch.Tensor:
     for i in range(batch_size):
         # Simple linear time warp
         time_warp_map = torch.linspace(0, seq_len - 1, seq_len, device=device)
-        time_warp_map = time_warp_map * (
-            1.0 + torch.randn(1, device=device).item() * sigma * 0.1
-        )
+        time_warp_map = time_warp_map * (1.0 + torch.randn(1, device=device).item() * sigma * 0.1)
         time_warp_map = torch.clamp(time_warp_map, 0, seq_len - 1)
 
         for dim in range(n_features):
@@ -355,17 +343,13 @@ def window_slice(x: torch.Tensor, reduce_ratio: float = 0.9) -> torch.Tensor:
         # Interpolate back to original length
         # Reshape for interpolate: (1, n_features, target_len) -> (1, n_features, seq_len)
         window_T = window.T.unsqueeze(0)  # (1, n_features, target_len)
-        interpolated = torch.nn.functional.interpolate(
-            window_T, size=seq_len, mode='linear', align_corners=True
-        )
+        interpolated = torch.nn.functional.interpolate(window_T, size=seq_len, mode='linear', align_corners=True)
         ret[i] = interpolated.squeeze(0).T  # (seq_len, n_features)
 
     return ret
 
 
-def window_warp(
-    x: torch.Tensor, window_ratio: float = 0.1, scales: tuple = (0.5, 2.0)
-) -> torch.Tensor:
+def window_warp(x: torch.Tensor, window_ratio: float = 0.1, scales: tuple = (0.5, 2.0)) -> torch.Tensor:
     """
     Randomly warp windows within time series.
     Speeds up or slows down specific temporal windows.
@@ -415,9 +399,7 @@ def window_warp(
 
             # Concatenate and interpolate back to original length
             warped = np.concatenate((start_seg, window_warped, end_seg))
-            ret_np[i, :, dim] = np.interp(
-                np.arange(seq_len), np.linspace(0, seq_len - 1, num=warped.size), warped
-            )
+            ret_np[i, :, dim] = np.interp(np.arange(seq_len), np.linspace(0, seq_len - 1, num=warped.size), warped)
 
     return torch.from_numpy(ret_np).to(device)
 
@@ -427,9 +409,7 @@ def window_warp(
 # ==============================================================================
 
 
-def apply_augmentations(
-    x: torch.Tensor, augmentation_list: list[str], **kwargs
-) -> torch.Tensor:
+def apply_augmentations(x: torch.Tensor, augmentation_list: list[str], **kwargs) -> torch.Tensor:
     """
     Apply multiple augmentations sequentially.
 

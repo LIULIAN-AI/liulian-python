@@ -362,11 +362,7 @@ class TestSpatialTempoGraphBackend:
             coordinates={'A': (1.0, 2.0), 'B': (3.0, 4.0), 'C': (5.0, 6.0)},
         )
         ds = SpatialTempoDataset(
-            splits={
-                'train': pd.DataFrame(
-                    {'epoch_day': range(50), 'x': range(50), 'y': range(50)}
-                )
-            },
+            splits={'train': pd.DataFrame({'epoch_day': range(50), 'x': range(50), 'y': range(50)})},
             time_col='epoch_day',
             feature_cols=['x'],
             target_cols=['y'],
@@ -401,11 +397,7 @@ class TestSpatialTempoGraphBackend:
         from liulian.data.st.spatialtempodataset import SpatialTempoDataset
 
         ds = SpatialTempoDataset(
-            splits={
-                'train': pd.DataFrame(
-                    {'epoch_day': range(50), 'x': range(50), 'y': range(50)}
-                )
-            },
+            splits={'train': pd.DataFrame({'epoch_day': range(50), 'x': range(50), 'y': range(50)})},
             time_col='epoch_day',
             feature_cols=['x'],
             target_cols=['y'],
@@ -431,9 +423,7 @@ def _swiss_data_available() -> bool:
     return (root / 'swiss-1990_train.csv').exists()
 
 
-@pytest.mark.skipif(
-    not _swiss_data_available(), reason='Swiss River data not available'
-)
+@pytest.mark.skipif(not _swiss_data_available(), reason='Swiss River data not available')
 class TestSwissRiverGraphOptional:
     """SwissRiverDataset works without graph data."""
 

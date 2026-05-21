@@ -79,9 +79,7 @@ class BaseTask(ABC):
         """
 
     @abstractmethod
-    def compute_metrics(
-        self, model_output: Dict[str, Any], batch: Dict[str, Any]
-    ) -> Dict[str, float]:
+    def compute_metrics(self, model_output: Dict[str, Any], batch: Dict[str, Any]) -> Dict[str, float]:
         """Evaluate model output and return metric name → scalar value.
 
         Args:
@@ -132,31 +130,22 @@ class PredictionTask(BaseTask):
         """
         if output_type == 'probabilistic':
             raise NotImplementedError(
-                'Probabilistic prediction is planned for v1+. '
-                "Use output_type='deterministic' for MVP1."
+                "Probabilistic prediction is planned for v1+. Use output_type='deterministic' for MVP1."
             )
         self.regime = regime or PredictionRegime()
         self.output_type = output_type
         self.loss_name = loss_name.lower().strip()
-        self.metric_names = [
-            m.lower().strip() for m in (metrics or list(self.default_metrics))
-        ]
+        self.metric_names = [m.lower().strip() for m in (metrics or list(self.default_metrics))]
 
         supported_losses = {'mse', 'mae', 'rmse'}
         supported_metrics = {'mse', 'mae', 'rmse', 'nse'}
 
         if self.loss_name not in supported_losses:
-            raise ValueError(
-                f'Unknown loss_name={loss_name!r}. '
-                f'Supported: {sorted(supported_losses)}'
-            )
+            raise ValueError(f'Unknown loss_name={loss_name!r}. Supported: {sorted(supported_losses)}')
 
         unknown_metrics = sorted(set(self.metric_names) - supported_metrics)
         if unknown_metrics:
-            raise ValueError(
-                f'Unknown metrics={unknown_metrics}. '
-                f'Supported: {sorted(supported_metrics)}'
-            )
+            raise ValueError(f'Unknown metrics={unknown_metrics}. Supported: {sorted(supported_metrics)}')
 
     def prepare_batch(self, raw_batch: Dict[str, Any]) -> Dict[str, Any]:
         """Slice raw arrays into context (X) and target (y) windows.
@@ -199,9 +188,7 @@ class PredictionTask(BaseTask):
             return float(np.sqrt(np.mean((preds - targets) ** 2)))
         raise ValueError(f'Unsupported loss_name={self.loss_name!r}')
 
-    def compute_metrics(
-        self, model_output: Dict[str, Any], batch: Dict[str, Any]
-    ) -> Dict[str, float]:
+    def compute_metrics(self, model_output: Dict[str, Any], batch: Dict[str, Any]) -> Dict[str, float]:
         """Compute configured metrics.
 
         Args:

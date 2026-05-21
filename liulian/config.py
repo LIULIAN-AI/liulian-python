@@ -12,9 +12,7 @@ Usage::
     cfg = load_config('experiments/swiss_river/default_config.yaml')
 
     # YAML + CLI overrides
-    cfg = load_config(
-        'config.yaml', cli_overrides={'model': 'lstm', 'quick_test': True}
-    )
+    cfg = load_config('config.yaml', cli_overrides={'model': 'lstm', 'quick_test': True})
 
     # Defaults only (no YAML)
     cfg = load_config()
@@ -269,11 +267,7 @@ def load_config(
     if yaml_path is not None:
         yaml_cfg = _load_yaml(yaml_path)
 
-    model_name = (
-        (cli_overrides or {}).get('model')
-        or yaml_cfg.get('model')
-        or cfg.get('model', '')
-    )
+    model_name = (cli_overrides or {}).get('model') or yaml_cfg.get('model') or cfg.get('model', '')
 
     # Layer 1.5: Model-specific defaults (between DEFAULT and YAML)
     model_defaults = MODEL_DEFAULTS.get(model_name, {})

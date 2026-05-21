@@ -157,9 +157,7 @@ class TorchBackend(ArrayBackend):
         try:
             import torch as _torch
         except ImportError as exc:
-            raise ImportError(
-                'TorchBackend requires PyTorch. Install with: pip install torch'
-            ) from exc
+            raise ImportError('TorchBackend requires PyTorch. Install with: pip install torch') from exc
         self._torch = _torch
 
     def _dtype(self, s: str):
@@ -203,15 +201,11 @@ class TorchBackend(ArrayBackend):
         )
 
     def stack(self, arrays, axis=0):
-        tensors = [
-            a if isinstance(a, self._torch.Tensor) else self.asarray(a) for a in arrays
-        ]
+        tensors = [a if isinstance(a, self._torch.Tensor) else self.asarray(a) for a in arrays]
         return self._torch.stack(tensors, dim=axis)
 
     def concatenate(self, arrays, axis=0):
-        tensors = [
-            a if isinstance(a, self._torch.Tensor) else self.asarray(a) for a in arrays
-        ]
+        tensors = [a if isinstance(a, self._torch.Tensor) else self.asarray(a) for a in arrays]
         return self._torch.cat(tensors, dim=axis)
 
     def pad(self, array, pad_width, constant_values=0):

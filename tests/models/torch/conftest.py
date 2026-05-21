@@ -87,14 +87,10 @@ def check_transformers_available():
 
         return True
     except ImportError:
-        pytest.skip(
-            "transformers not installed (requires pip install -e '.[torch-models-full]')"
-        )
+        pytest.skip("transformers not installed (requires pip install -e '.[torch-models-full]')")
 
 
-def validate_forecast_output(
-    outputs: Dict, batch_size: int, pred_len: int, features: int
-):
+def validate_forecast_output(outputs: Dict, batch_size: int, pred_len: int, features: int):
     """Validate forecasting task output format."""
     assert 'predictions' in outputs, "Output must contain 'predictions' key"
     predictions = outputs['predictions']
@@ -103,16 +99,12 @@ def validate_forecast_output(
     assert predictions.shape == (batch_size, pred_len, features), (
         f'Expected shape ({batch_size}, {pred_len}, {features}), got {predictions.shape}'
     )
-    assert predictions.dtype in [torch.float32, torch.float64], (
-        f'Expected float dtype, got {predictions.dtype}'
-    )
+    assert predictions.dtype in [torch.float32, torch.float64], f'Expected float dtype, got {predictions.dtype}'
     assert not torch.isnan(predictions).any(), 'Predictions contain NaN values'
     assert not torch.isinf(predictions).any(), 'Predictions contain Inf values'
 
 
-def validate_imputation_output(
-    outputs: Dict, batch_size: int, seq_len: int, features: int
-):
+def validate_imputation_output(outputs: Dict, batch_size: int, seq_len: int, features: int):
     """Validate imputation task output format."""
     assert 'predictions' in outputs, "Output must contain 'predictions' key"
     predictions = outputs['predictions']
@@ -121,16 +113,12 @@ def validate_imputation_output(
     assert predictions.shape == (batch_size, seq_len, features), (
         f'Expected shape ({batch_size}, {seq_len}, {features}), got {predictions.shape}'
     )
-    assert predictions.dtype in [torch.float32, torch.float64], (
-        f'Expected float dtype, got {predictions.dtype}'
-    )
+    assert predictions.dtype in [torch.float32, torch.float64], f'Expected float dtype, got {predictions.dtype}'
     assert not torch.isnan(predictions).any(), 'Predictions contain NaN values'
     assert not torch.isinf(predictions).any(), 'Predictions contain Inf values'
 
 
-def validate_anomaly_output(
-    outputs: Dict, batch_size: int, seq_len: int, features: int
-):
+def validate_anomaly_output(outputs: Dict, batch_size: int, seq_len: int, features: int):
     """Validate anomaly detection task output format."""
     assert 'predictions' in outputs, "Output must contain 'predictions' key"
     predictions = outputs['predictions']
@@ -139,9 +127,7 @@ def validate_anomaly_output(
     assert predictions.shape == (batch_size, seq_len, features), (
         f'Expected shape ({batch_size}, {seq_len}, {features}), got {predictions.shape}'
     )
-    assert predictions.dtype in [torch.float32, torch.float64], (
-        f'Expected float dtype, got {predictions.dtype}'
-    )
+    assert predictions.dtype in [torch.float32, torch.float64], f'Expected float dtype, got {predictions.dtype}'
     assert not torch.isnan(predictions).any(), 'Predictions contain NaN values'
     assert not torch.isinf(predictions).any(), 'Predictions contain Inf values'
 
@@ -155,8 +141,6 @@ def validate_classification_output(outputs: Dict, batch_size: int, num_classes: 
     assert predictions.shape == (batch_size, num_classes), (
         f'Expected shape ({batch_size}, {num_classes}), got {predictions.shape}'
     )
-    assert predictions.dtype in [torch.float32, torch.float64], (
-        f'Expected float dtype, got {predictions.dtype}'
-    )
+    assert predictions.dtype in [torch.float32, torch.float64], f'Expected float dtype, got {predictions.dtype}'
     assert not torch.isnan(predictions).any(), 'Predictions contain NaN values'
     assert not torch.isinf(predictions).any(), 'Predictions contain Inf values'

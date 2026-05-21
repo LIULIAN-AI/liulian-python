@@ -210,9 +210,7 @@ class TestSwissModels:
     def test_extrapo_limo(self):
         from liulian.models.torch.swiss_lstm import ExtrapoLstmModelLIMO
 
-        m = ExtrapoLstmModelLIMO(
-            input_size=2, hidden_size=16, num_layers=1, future_steps=3
-        )
+        m = ExtrapoLstmModelLIMO(input_size=2, hidden_size=16, num_layers=1, future_steps=3)
         x = torch.randn(2, 13, 2)  # 10 + 3 future
         out = m(x)
         assert out.shape == (2, 3, 1)
@@ -334,9 +332,7 @@ class TestGeneralizedModels:
         x = torch.randn(2, 96, 7)
         out = m(x)
         assert out.shape == (2, 96, 7)
-        assert torch.isfinite(out).all(), (
-            'lstm_multi_channel produced non-finite values'
-        )
+        assert torch.isfinite(out).all(), 'lstm_multi_channel produced non-finite values'
 
     def test_extrapo_limo_multi_channel(self):
         from liulian.models.torch.swiss_lstm import ExtrapoLstmModelLIMO
@@ -351,9 +347,7 @@ class TestGeneralizedModels:
         x = torch.randn(2, 96 + 24, 7)
         out = m(x)
         assert out.shape == (2, 24, 7)
-        assert torch.isfinite(out).all(), (
-            'extrapo_limo_multi produced non-finite values'
-        )
+        assert torch.isfinite(out).all(), 'extrapo_limo_multi produced non-finite values'
 
     def test_extrapo_fembed_multi_channel(self):
         from liulian.models.torch.swiss_lstm import ExtrapoLstmModelFEmbed
@@ -369,9 +363,7 @@ class TestGeneralizedModels:
         x = torch.randn(2, 96 + 24, 7)
         out = m(x)
         assert out.shape == (2, 24, 7)
-        assert torch.isfinite(out).all(), (
-            'extrapo_fembed_multi produced non-finite values'
-        )
+        assert torch.isfinite(out).all(), 'extrapo_fembed_multi produced non-finite values'
 
     def test_lstm_embedding_multi_channel(self):
         from liulian.models.torch.swiss_lstm import LstmEmbeddingModel
@@ -388,9 +380,7 @@ class TestGeneralizedModels:
         x = torch.randn(2, 96, 7)
         out = m(e, x)
         assert out.shape == (2, 96, 7)
-        assert torch.isfinite(out).all(), (
-            'lstm_embedding_multi produced non-finite values'
-        )
+        assert torch.isfinite(out).all(), 'lstm_embedding_multi produced non-finite values'
 
     def test_transformer_multi_channel(self):
         from liulian.models.torch.swiss_transformer import SwissTransformerModel
@@ -429,9 +419,7 @@ class TestGeneralizedModels:
         x = torch.randn(2, 96, 7)
         out = m(e, x)
         assert out.shape == (2, 96, 7)
-        assert torch.isfinite(out).all(), (
-            'transformer_embedding_multi produced non-finite values'
-        )
+        assert torch.isfinite(out).all(), 'transformer_embedding_multi produced non-finite values'
 
     # — LSTMAdapter with different entity modes ——————————————————————
 
@@ -449,9 +437,7 @@ class TestGeneralizedModels:
         )
         out = adapter.forward({'x_enc': torch.randn(2, 96, 10)})
         assert out['predictions'].shape == (2, 96, 10)
-        assert torch.isfinite(out['predictions']).all(), (
-            'lstm_adapter_no_entity produced non-finite'
-        )
+        assert torch.isfinite(out['predictions']).all(), 'lstm_adapter_no_entity produced non-finite'
 
     def test_lstm_adapter_embedding_mode(self):
         """Entity embedding mode — IDs from x_mark_enc."""
@@ -477,9 +463,7 @@ class TestGeneralizedModels:
             }
         )
         assert out['predictions'].shape == (2, 10, 1)
-        assert torch.isfinite(out['predictions']).all(), (
-            'lstm_adapter_embedding produced non-finite'
-        )
+        assert torch.isfinite(out['predictions']).all(), 'lstm_adapter_embedding produced non-finite'
 
     def test_lstm_adapter_feature_concat_mode(self):
         """feature_concat mode — separate entity_features tensor."""
@@ -502,9 +486,7 @@ class TestGeneralizedModels:
             }
         )
         assert out['predictions'].shape == (2, 10, 1)
-        assert torch.isfinite(out['predictions']).all(), (
-            'lstm_adapter_feature_concat produced non-finite'
-        )
+        assert torch.isfinite(out['predictions']).all(), 'lstm_adapter_feature_concat produced non-finite'
 
     def test_lstm_adapter_onehot_transparent(self):
         """One-hot entity features already in x_enc — transparent."""
@@ -522,9 +504,7 @@ class TestGeneralizedModels:
         )
         out = adapter.forward({'x_enc': torch.randn(2, 10, 8)})
         assert out['predictions'].shape == (2, 10, 1)
-        assert torch.isfinite(out['predictions']).all(), (
-            'lstm_adapter_onehot produced non-finite'
-        )
+        assert torch.isfinite(out['predictions']).all(), 'lstm_adapter_onehot produced non-finite'
 
     # — TransformerEncoderAdapter with different entity modes ————————
 
@@ -545,9 +525,7 @@ class TestGeneralizedModels:
         )
         out = adapter.forward({'x_enc': torch.randn(2, 96, 7)})
         assert out['predictions'].shape == (2, 96, 7)
-        assert torch.isfinite(out['predictions']).all(), (
-            'transformer_adapter_multi produced non-finite'
-        )
+        assert torch.isfinite(out['predictions']).all(), 'transformer_adapter_multi produced non-finite'
 
     def test_transformer_adapter_embedding_mode(self):
         from liulian.models.torch.swiss_transformer import TransformerEncoderAdapter
@@ -574,9 +552,7 @@ class TestGeneralizedModels:
             }
         )
         assert out['predictions'].shape == (2, 10, 1)
-        assert torch.isfinite(out['predictions']).all(), (
-            'transformer_adapter_embedding produced non-finite'
-        )
+        assert torch.isfinite(out['predictions']).all(), 'transformer_adapter_embedding produced non-finite'
 
     def test_transformer_adapter_feature_concat(self):
         from liulian.models.torch.swiss_transformer import TransformerEncoderAdapter
@@ -600,9 +576,7 @@ class TestGeneralizedModels:
             }
         )
         assert out['predictions'].shape == (2, 10, 1)
-        assert torch.isfinite(out['predictions']).all(), (
-            'transformer_adapter_feature_concat produced non-finite'
-        )
+        assert torch.isfinite(out['predictions']).all(), 'transformer_adapter_feature_concat produced non-finite'
 
     # — Entity feature model (standalone) ———————————————————————————
 
@@ -620,9 +594,7 @@ class TestGeneralizedModels:
         ef = torch.randn(2, 10, 5)
         out = m(x, ef)
         assert out.shape == (2, 10, 1)
-        assert torch.isfinite(out).all(), (
-            'lstm_entity_feature produced non-finite values'
-        )
+        assert torch.isfinite(out).all(), 'lstm_entity_feature produced non-finite values'
 
     def test_transformer_entity_feature_model(self):
         from liulian.models.torch.swiss_transformer import TransformerEntityFeatureModel
@@ -640,9 +612,7 @@ class TestGeneralizedModels:
         ef = torch.randn(2, 10, 5)
         out = m(x, ef)
         assert out.shape == (2, 10, 3)
-        assert torch.isfinite(out).all(), (
-            'transformer_entity_feature produced non-finite values'
-        )
+        assert torch.isfinite(out).all(), 'transformer_entity_feature produced non-finite values'
 
     # — ExtrapoLSTMAdapter ——————————————————————————————————————————
 
@@ -660,9 +630,7 @@ class TestGeneralizedModels:
         )
         out = adapter.forward({'x_enc': torch.randn(2, 96, 7)})
         assert out['predictions'].shape == (2, 24, 7)
-        assert torch.isfinite(out['predictions']).all(), (
-            'extrapo_adapter_multi produced non-finite'
-        )
+        assert torch.isfinite(out['predictions']).all(), 'extrapo_adapter_multi produced non-finite'
 
     # — Backward compatibility ——————————————————————————————————————
 
@@ -925,9 +893,7 @@ class TestSearchSpaces:
         assert len(space) > 0
         for v in space.values():
             # Values are ray.tune.* sample objects (choice, uniform, etc.)
-            assert not isinstance(v, (int, float, str)), (
-                f"Expected ray.tune.* object, got {type(v)}"
-            )
+            assert not isinstance(v, (int, float, str)), f'Expected ray.tune.* object, got {type(v)}'
 
     def test_unknown_raises(self):
         from liulian.optim.search_spaces import get_search_space

@@ -78,8 +78,8 @@ def swiss_lstm_space() -> Dict[str, Any]:
     return {
         'batch_size': ray.tune.choice([32, 64, 128, 256]),
         'learning_rate': ray.tune.uniform(0.00001, 0.01),
-        'd_model': ray.tune.choice([16, 32, 64, 128]),        # ref: hidden_size
-        'e_layers': ray.tune.choice([1, 2, 3]),               # ref: num_layers
+        'd_model': ray.tune.choice([16, 32, 64, 128]),  # ref: hidden_size
+        'e_layers': ray.tune.choice([1, 2, 3]),  # ref: num_layers
     }
 
 
@@ -111,8 +111,8 @@ def swiss_lstm_embedding_space() -> Dict[str, Any]:
     return {
         'batch_size': ray.tune.choice([32, 64, 128, 256]),
         'learning_rate': ray.tune.choice([0.00001, 0.0001, 0.0005, 0.001]),
-        'd_model': ray.tune.choice([16, 32, 64, 128]),        # ref: hidden_size
-        'e_layers': ray.tune.choice([1, 2, 3]),               # ref: num_layers
+        'd_model': ray.tune.choice([16, 32, 64, 128]),  # ref: hidden_size
+        'e_layers': ray.tune.choice([1, 2, 3]),  # ref: num_layers
         'embedding_size': ray.tune.randint(1, 31),
     }
 
@@ -342,9 +342,9 @@ def dlinear_space() -> Dict[str, Any]:
       average; controls the trend/seasonal split (TSLib default: 25).
     """
     return {
-        'batch_size': ray.tune.choice([16, 32, 64, 128]),      # TSLib default: 32
-        'learning_rate': ray.tune.loguniform(1e-4, 5e-3),      # TSLib default: 0.0001
-        'moving_avg': ray.tune.choice([13, 25, 51]),            # decomposition kernel; TSLib: 25
+        'batch_size': ray.tune.choice([16, 32, 64, 128]),  # TSLib default: 32
+        'learning_rate': ray.tune.loguniform(1e-4, 5e-3),  # TSLib default: 0.0001
+        'moving_avg': ray.tune.choice([13, 25, 51]),  # decomposition kernel; TSLib: 25
     }
 
 
@@ -370,14 +370,14 @@ def transformer_tsl_space() -> Dict[str, Any]:
     n_heads=8, e_layers=2, d_layers=1, dropout=0.1.
     """
     return {
-        'batch_size': ray.tune.choice([16, 32]),                # TSLib default: 32
-        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),      # TSLib default: 0.0001
-        'd_model': ray.tune.choice([128, 256, 512]),            # TSLib default: 512
-        'd_ff': ray.tune.choice([256, 512, 2048]),              # TSLib default: 2048
-        'n_heads': ray.tune.choice([4, 8]),                     # TSLib default: 8
-        'e_layers': ray.tune.choice([2, 3]),                    # TSLib default: 2
-        'd_layers': ray.tune.choice([1, 2]),                    # TSLib default: 1
-        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),           # TSLib default: 0.1
+        'batch_size': ray.tune.choice([16, 32]),  # TSLib default: 32
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),  # TSLib default: 0.0001
+        'd_model': ray.tune.choice([128, 256, 512]),  # TSLib default: 512
+        'd_ff': ray.tune.choice([256, 512, 2048]),  # TSLib default: 2048
+        'n_heads': ray.tune.choice([4, 8]),  # TSLib default: 8
+        'e_layers': ray.tune.choice([2, 3]),  # TSLib default: 2
+        'd_layers': ray.tune.choice([1, 2]),  # TSLib default: 1
+        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),  # TSLib default: 0.1
     }
 
 
@@ -395,15 +395,15 @@ def informer_space() -> Dict[str, Any]:
     ``distil=True`` by default (argparse ``store_false``).
     """
     return {
-        'batch_size': ray.tune.choice([16, 32]),                # TSLib default: 32
-        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),      # TSLib default: 0.0001
-        'd_model': ray.tune.choice([256, 512]),                 # TSLib default: 512
-        'd_ff': ray.tune.choice([512, 1024, 2048]),             # TSLib default: 2048
-        'n_heads': ray.tune.choice([4, 8]),                     # TSLib default: 8
-        'e_layers': ray.tune.choice([2, 3]),                    # TSLib default: 2
-        'd_layers': ray.tune.choice([1, 2]),                    # TSLib default: 1
-        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),           # TSLib default: 0.1
-        'factor': ray.tune.choice([1, 3, 5]),                   # TSLib scripts: 3; controls ProbSparse sampling
+        'batch_size': ray.tune.choice([16, 32]),  # TSLib default: 32
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),  # TSLib default: 0.0001
+        'd_model': ray.tune.choice([256, 512]),  # TSLib default: 512
+        'd_ff': ray.tune.choice([512, 1024, 2048]),  # TSLib default: 2048
+        'n_heads': ray.tune.choice([4, 8]),  # TSLib default: 8
+        'e_layers': ray.tune.choice([2, 3]),  # TSLib default: 2
+        'd_layers': ray.tune.choice([1, 2]),  # TSLib default: 1
+        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),  # TSLib default: 0.1
+        'factor': ray.tune.choice([1, 3, 5]),  # TSLib scripts: 3; controls ProbSparse sampling
     }
 
 
@@ -421,16 +421,16 @@ def autoformer_space() -> Dict[str, Any]:
     moving_avg=25.
     """
     return {
-        'batch_size': ray.tune.choice([16, 32]),                # TSLib default: 32
-        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),      # TSLib default: 0.0001
-        'd_model': ray.tune.choice([256, 512]),                 # TSLib default: 512
-        'd_ff': ray.tune.choice([512, 1024, 2048]),             # TSLib default: 2048
-        'n_heads': ray.tune.choice([4, 8]),                     # TSLib default: 8
-        'e_layers': ray.tune.choice([2, 3]),                    # TSLib default: 2
-        'd_layers': ray.tune.choice([1]),                       # TSLib default: 1
-        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),           # TSLib default: 0.1
-        'moving_avg': ray.tune.choice([13, 25]),                # TSLib default: 25
-        'factor': ray.tune.choice([1, 3]),                      # TSLib scripts: 3
+        'batch_size': ray.tune.choice([16, 32]),  # TSLib default: 32
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),  # TSLib default: 0.0001
+        'd_model': ray.tune.choice([256, 512]),  # TSLib default: 512
+        'd_ff': ray.tune.choice([512, 1024, 2048]),  # TSLib default: 2048
+        'n_heads': ray.tune.choice([4, 8]),  # TSLib default: 8
+        'e_layers': ray.tune.choice([2, 3]),  # TSLib default: 2
+        'd_layers': ray.tune.choice([1]),  # TSLib default: 1
+        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),  # TSLib default: 0.1
+        'moving_avg': ray.tune.choice([13, 25]),  # TSLib default: 25
+        'factor': ray.tune.choice([1, 3]),  # TSLib scripts: 3
     }
 
 
@@ -447,15 +447,15 @@ def fedformer_space() -> Dict[str, Any]:
     e_layers=2, d_layers=1, factor=3, moving_avg=25.
     """
     return {
-        'batch_size': ray.tune.choice([16, 32]),                # TSLib default: 32
-        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),      # TSLib default: 0.0001
-        'd_model': ray.tune.choice([256, 512]),                 # TSLib default: 512
-        'd_ff': ray.tune.choice([512, 1024, 2048]),             # TSLib default: 2048
-        'n_heads': ray.tune.choice([4, 8]),                     # TSLib default: 8
-        'e_layers': ray.tune.choice([2, 3]),                    # TSLib default: 2
-        'd_layers': ray.tune.choice([1]),                       # TSLib default: 1
-        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),           # TSLib default: 0.1
-        'moving_avg': ray.tune.choice([13, 25]),                # TSLib default: 25
+        'batch_size': ray.tune.choice([16, 32]),  # TSLib default: 32
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),  # TSLib default: 0.0001
+        'd_model': ray.tune.choice([256, 512]),  # TSLib default: 512
+        'd_ff': ray.tune.choice([512, 1024, 2048]),  # TSLib default: 2048
+        'n_heads': ray.tune.choice([4, 8]),  # TSLib default: 8
+        'e_layers': ray.tune.choice([2, 3]),  # TSLib default: 2
+        'd_layers': ray.tune.choice([1]),  # TSLib default: 1
+        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),  # TSLib default: 0.1
+        'moving_avg': ray.tune.choice([13, 25]),  # TSLib default: 25
     }
 
 
@@ -473,13 +473,13 @@ def itransformer_space() -> Dict[str, Any]:
     equals d_model — this is intentional for the inverted architecture.
     """
     return {
-        'batch_size': ray.tune.choice([16, 32]),                # TSLib default: 32
-        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),      # TSLib default: 0.0001
-        'd_model': ray.tune.choice([128, 256, 512]),            # TSLib Weather: 512
-        'd_ff': ray.tune.choice([128, 256, 512]),               # TSLib Weather: 512 (= d_model)
-        'n_heads': ray.tune.choice([4, 8]),                     # TSLib default: 8
-        'e_layers': ray.tune.choice([2, 3, 4]),                 # TSLib Weather: 3
-        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),           # TSLib default: 0.1
+        'batch_size': ray.tune.choice([16, 32]),  # TSLib default: 32
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),  # TSLib default: 0.0001
+        'd_model': ray.tune.choice([128, 256, 512]),  # TSLib Weather: 512
+        'd_ff': ray.tune.choice([128, 256, 512]),  # TSLib Weather: 512 (= d_model)
+        'n_heads': ray.tune.choice([4, 8]),  # TSLib default: 8
+        'e_layers': ray.tune.choice([2, 3, 4]),  # TSLib Weather: 3
+        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),  # TSLib default: 0.1
     }
 
 
@@ -499,13 +499,13 @@ def patchtst_space() -> Dict[str, Any]:
     Range below spans both paper and TSLib values.
     """
     return {
-        'batch_size': ray.tune.choice([16, 32, 64, 128]),      # TSLib: 32; paper: 128
-        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),      # universally 0.0001 in TSLib
-        'd_model': ray.tune.choice([128, 256, 512]),            # paper: 128; TSLib: 512
-        'd_ff': ray.tune.choice([256, 512, 2048]),              # paper: 256; TSLib: 2048
-        'n_heads': ray.tune.choice([2, 4, 8, 16]),             # TSLib scripts: 2/4/8/16
-        'e_layers': ray.tune.choice([1, 2, 3]),                # TSLib: 1 (short) to 4 (ILI)
-        'dropout': ray.tune.choice([0.1, 0.2]),                # paper: 0.2; TSLib: 0.1
+        'batch_size': ray.tune.choice([16, 32, 64, 128]),  # TSLib: 32; paper: 128
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),  # universally 0.0001 in TSLib
+        'd_model': ray.tune.choice([128, 256, 512]),  # paper: 128; TSLib: 512
+        'd_ff': ray.tune.choice([256, 512, 2048]),  # paper: 256; TSLib: 2048
+        'n_heads': ray.tune.choice([2, 4, 8, 16]),  # TSLib scripts: 2/4/8/16
+        'e_layers': ray.tune.choice([1, 2, 3]),  # TSLib: 1 (short) to 4 (ILI)
+        'dropout': ray.tune.choice([0.1, 0.2]),  # paper: 0.2; TSLib: 0.1
     }
 
 
@@ -536,14 +536,14 @@ def timesnet_space() -> Dict[str, Any]:
     because the 2D-variation mechanism is already parameter-heavy.
     """
     return {
-        'batch_size': ray.tune.choice([16, 32]),                # TSLib default: 32
-        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),      # TSLib default: 0.0001
-        'd_model': ray.tune.choice([16, 32, 64, 128]),         # TSLib Weather: 16 (!)
-        'd_ff': ray.tune.choice([32, 64, 128, 256]),            # TSLib Weather: 32 (!)
-        'e_layers': ray.tune.choice([2, 3]),                    # TSLib default: 2
-        'top_k': ray.tune.choice([3, 5]),                       # TSLib default: 5
-        'num_kernels': ray.tune.choice([3, 6]),                 # TSLib default: 6
-        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),           # TSLib default: 0.1
+        'batch_size': ray.tune.choice([16, 32]),  # TSLib default: 32
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),  # TSLib default: 0.0001
+        'd_model': ray.tune.choice([16, 32, 64, 128]),  # TSLib Weather: 16 (!)
+        'd_ff': ray.tune.choice([32, 64, 128, 256]),  # TSLib Weather: 32 (!)
+        'e_layers': ray.tune.choice([2, 3]),  # TSLib default: 2
+        'top_k': ray.tune.choice([3, 5]),  # TSLib default: 5
+        'num_kernels': ray.tune.choice([3, 6]),  # TSLib default: 6
+        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),  # TSLib default: 0.1
     }
 
 
@@ -564,14 +564,14 @@ def timemixer_space() -> Dict[str, Any]:
     deviate from the 0.0001 default.
     """
     return {
-        'batch_size': ray.tune.choice([16, 32, 128]),           # TSLib Weather: 128
-        'learning_rate': ray.tune.loguniform(1e-4, 1e-2),      # TSLib Weather: 0.01 (unique!)
-        'd_model': ray.tune.choice([16, 32, 64, 128]),         # TSLib Weather: 16
-        'd_ff': ray.tune.choice([32, 64, 128, 256]),            # TSLib Weather: 32
-        'e_layers': ray.tune.choice([2, 3, 4]),                 # TSLib Weather: 3
-        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),           # TSLib default: 0.1
-        'down_sampling_layers': ray.tune.choice([2, 3]),        # TSLib Weather: 3
-        'down_sampling_window': ray.tune.choice([2]),           # TSLib Weather: 2
+        'batch_size': ray.tune.choice([16, 32, 128]),  # TSLib Weather: 128
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-2),  # TSLib Weather: 0.01 (unique!)
+        'd_model': ray.tune.choice([16, 32, 64, 128]),  # TSLib Weather: 16
+        'd_ff': ray.tune.choice([32, 64, 128, 256]),  # TSLib Weather: 32
+        'e_layers': ray.tune.choice([2, 3, 4]),  # TSLib Weather: 3
+        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),  # TSLib default: 0.1
+        'down_sampling_layers': ray.tune.choice([2, 3]),  # TSLib Weather: 3
+        'down_sampling_window': ray.tune.choice([2]),  # TSLib Weather: 2
     }
 
 
@@ -588,13 +588,13 @@ def timexer_space() -> Dict[str, Any]:
     d_ff=512/1024, e_layers=1/3, patch_len=16 (argparse default).
     """
     return {
-        'batch_size': ray.tune.choice([4, 16, 32]),             # TSLib Weather: 4
-        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),      # TSLib default: 0.0001
-        'd_model': ray.tune.choice([128, 256, 512]),            # TSLib Weather: 128/256
-        'd_ff': ray.tune.choice([256, 512, 1024]),              # TSLib Weather: 512/1024
-        'n_heads': ray.tune.choice([4, 8]),                     # TSLib default: 8
-        'e_layers': ray.tune.choice([1, 2, 3]),                 # TSLib Weather: 1/3
-        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),           # TSLib default: 0.1
+        'batch_size': ray.tune.choice([4, 16, 32]),  # TSLib Weather: 4
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),  # TSLib default: 0.0001
+        'd_model': ray.tune.choice([128, 256, 512]),  # TSLib Weather: 128/256
+        'd_ff': ray.tune.choice([256, 512, 1024]),  # TSLib Weather: 512/1024
+        'n_heads': ray.tune.choice([4, 8]),  # TSLib default: 8
+        'e_layers': ray.tune.choice([1, 2, 3]),  # TSLib Weather: 1/3
+        'dropout': ray.tune.choice([0.0, 0.1, 0.2]),  # TSLib default: 0.1
     }
 
 
@@ -614,15 +614,15 @@ def mamba_space() -> Dict[str, Any]:
     kernel size in the Mamba block.
     """
     return {
-        'batch_size': ray.tune.choice([16, 32]),                # TSLib default: 32
-        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),      # TSLib default: 0.0001
-        'd_model': ray.tune.choice([64, 128, 256]),             # TSLib Weather: 128
-        'd_ff': ray.tune.choice([16, 32, 64]),                  # TSLib Weather: 16 (!); NOT the usual 2048
-        'e_layers': ray.tune.choice([2, 4]),                    # TSLib Weather: 2
-        'd_state': ray.tune.choice([16, 32]),                   # SSM state dimension
-        'expand': ray.tune.choice([2]),                         # TSLib default: 2; Mamba expansion factor
-        'd_conv': ray.tune.choice([4]),                         # TSLib default: 4; local conv kernel
-        'dropout': ray.tune.choice([0.0, 0.1]),                # TSLib default: 0.1
+        'batch_size': ray.tune.choice([16, 32]),  # TSLib default: 32
+        'learning_rate': ray.tune.loguniform(1e-4, 1e-3),  # TSLib default: 0.0001
+        'd_model': ray.tune.choice([64, 128, 256]),  # TSLib Weather: 128
+        'd_ff': ray.tune.choice([16, 32, 64]),  # TSLib Weather: 16 (!); NOT the usual 2048
+        'e_layers': ray.tune.choice([2, 4]),  # TSLib Weather: 2
+        'd_state': ray.tune.choice([16, 32]),  # SSM state dimension
+        'expand': ray.tune.choice([2]),  # TSLib default: 2; Mamba expansion factor
+        'd_conv': ray.tune.choice([4]),  # TSLib default: 4; local conv kernel
+        'dropout': ray.tune.choice([0.0, 0.1]),  # TSLib default: 0.1
     }
 
 
@@ -639,8 +639,8 @@ def lstm_general_space() -> Dict[str, Any]:
     return {
         'batch_size': ray.tune.choice([32, 64, 128, 256]),
         'learning_rate': ray.tune.loguniform(1e-4, 5e-3),
-        'd_model': ray.tune.choice([32, 64, 128, 256]),         # ref: hidden_size
-        'e_layers': ray.tune.choice([1, 2, 3]),                # ref: num_layers
+        'd_model': ray.tune.choice([32, 64, 128, 256]),  # ref: hidden_size
+        'e_layers': ray.tune.choice([1, 2, 3]),  # ref: num_layers
         'dropout': ray.tune.choice([0.0, 0.1, 0.2, 0.3]),
     }
 
@@ -858,9 +858,7 @@ def get_search_space(name: str) -> Dict[str, Any]:
     """
     fn = _SPACE_REGISTRY.get(name.strip().lower())
     if fn is None:
-        raise ValueError(
-            f"Unknown search space '{name}'. Available: {sorted(_SPACE_REGISTRY)}"
-        )
+        raise ValueError(f"Unknown search space '{name}'. Available: {sorted(_SPACE_REGISTRY)}")
     return fn()
 
 
@@ -876,9 +874,7 @@ def get_asha_preset(name: str = 'default') -> Dict[str, Any]:
     """
     fn = _ASHA_REGISTRY.get(name.strip().lower())
     if fn is None:
-        raise ValueError(
-            f"Unknown ASHA preset '{name}'. Available: {sorted(_ASHA_REGISTRY)}"
-        )
+        raise ValueError(f"Unknown ASHA preset '{name}'. Available: {sorted(_ASHA_REGISTRY)}")
     return fn()
 
 
@@ -908,7 +904,7 @@ _RESOLVE_ORDER: list[tuple[str | None, str, bool | None, str]] = [
     ('swiss-river', 'timellm', None, 'timellm_swissriver'),
     ('ETTh1', 'timellm', None, 'timellm_etth1'),
     ('ETTh2', 'timellm', None, 'timellm_etth2'),
-    ('ETTm', 'timellm', None, 'timellm_ettm'),       # covers ETTm1 & ETTm2
+    ('ETTm', 'timellm', None, 'timellm_ettm'),  # covers ETTm1 & ETTm2
     ('weather', 'timellm', None, 'timellm_weather'),
     ('electricity', 'timellm', None, 'timellm_electricity'),
     # STGNN swiss-river

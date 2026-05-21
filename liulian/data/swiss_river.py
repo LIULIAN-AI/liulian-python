@@ -133,9 +133,7 @@ class SwissRiverDataset(SpatialTempoDataset):
         self.random_identifier_seed = int(random_identifier_seed)
 
         project_root = Path(__file__).resolve().parents[2]
-        self.root_path = (
-            Path(root_path) if root_path else project_root / 'dataset' / 'swiss_river'
-        )
+        self.root_path = Path(root_path) if root_path else project_root / 'dataset' / 'swiss_river'
 
         self._file_map = {
             'swiss-river-1990': {
@@ -164,9 +162,7 @@ class SwissRiverDataset(SpatialTempoDataset):
         # --- Load raw DataFrames ----------------------------------------
         train_df = self._read_csv(self._file_map[data_name]['train'])
         test_df = self._read_csv(self._file_map[data_name]['test'])
-        train_df, val_df = TimeSeriesDataset.split_train_val(
-            train_df, train_ratio=train_split
-        )
+        train_df, val_df = TimeSeriesDataset.split_train_val(train_df, train_ratio=train_split)
 
         self.graph_name = self._file_map[data_name]['graph_name']
         # todo: check if we need to use the original read_graph() to get station ids instead:
@@ -327,9 +323,7 @@ class SwissRiverDataset(SpatialTempoDataset):
                 if 0 <= s < len(node_ids) and 0 <= d < len(node_ids):
                     edges.append((node_ids[s], node_ids[d]))
                 else:
-                    raise ValueError(
-                        f'Edge index out of bounds: {(s, d)} with {len(node_ids)} nodes.'
-                    )
+                    raise ValueError(f'Edge index out of bounds: {(s, d)} with {len(node_ids)} nodes.')
 
         coords: dict[str, tuple[float, float]] = {}
         if hasattr(x, 'shape') and x.shape[1] >= 2:
@@ -432,20 +426,12 @@ class SwissRiverDataset(SpatialTempoDataset):
         ``torch.utils.data.ConcatDataset`` in the reference project).
         """
         df = self._split_frames[split_name]
-        graphlet_map = (
-            self._graphlet_neighbor_map()
-            if self.graph_mode == 'graphlet_features'
-            else {}
-        )
+        graphlet_map = self._graphlet_neighbor_map() if self.graph_mode == 'graphlet_features' else {}
 
         parts: list[TimeSeriesSplit] = []
         for station in self.station_ids:
-            station_df = self._make_station_frame(
-                df, station, graphlet_neighbors=graphlet_map.get(station)
-            )
-            predicted_cols = [
-                col for col in station_df.columns if col.endswith('_wt_hat')
-            ]
+            station_df = self._make_station_frame(df, station, graphlet_neighbors=graphlet_map.get(station))
+            predicted_cols = [col for col in station_df.columns if col.endswith('_wt_hat')]
             ds_station = TimeSeriesDataset(
                 splits={split_name: station_df},
                 time_col='epoch_day',
@@ -487,16 +473,8 @@ class SwissRiverDataset(SpatialTempoDataset):
         the [``Time-Series-Library``](https://github.com/thuml/Time-Series-Library/tree/main).
         """
         df = self._split_frames[split_name].copy().reset_index(drop=True)
-        feature_cols = [
-            f'{station}_at'
-            for station in self.station_ids
-            if f'{station}_at' in df.columns
-        ]
-        target_cols = [
-            f'{station}_wt'
-            for station in self.station_ids
-            if f'{station}_wt' in df.columns
-        ]
+        feature_cols = [f'{station}_at' for station in self.station_ids if f'{station}_at' in df.columns]
+        target_cols = [f'{station}_wt' for station in self.station_ids if f'{station}_wt' in df.columns]
 
         mc_ds = TimeSeriesDataset(
             splits={split_name: df[['epoch_day'] + feature_cols + target_cols]},

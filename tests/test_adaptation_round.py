@@ -16,7 +16,7 @@ from __future__ import annotations
 import os
 import sys
 from types import SimpleNamespace
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 import numpy as np
 import pytest
@@ -42,13 +42,7 @@ def dummy_loaders():
     x = torch.randn(B, seq_len, C)
     y = torch.randn(B, pred_len + seq_len, 1)
     xm = torch.arange(seq_len).float().unsqueeze(0).expand(B, -1).unsqueeze(-1)
-    ym = (
-        torch.arange(pred_len + seq_len)
-        .float()
-        .unsqueeze(0)
-        .expand(B, -1)
-        .unsqueeze(-1)
-    )
+    ym = torch.arange(pred_len + seq_len).float().unsqueeze(0).expand(B, -1).unsqueeze(-1)
     ds = TensorDataset(x, y, xm, ym)
     loader = DataLoader(ds, batch_size=4)
     return {

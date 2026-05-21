@@ -52,10 +52,7 @@ def build_accelerator(config: Dict[str, Any]) -> Optional[Any]:
         return None
 
     if not _ACCELERATE_AVAILABLE:
-        logger.warning(
-            'use_accelerator=True but `accelerate` is not installed. '
-            'Falling back to vanilla training.'
-        )
+        logger.warning('use_accelerator=True but `accelerate` is not installed. Falling back to vanilla training.')
         return None
 
     mixed_precision = config.get('mixed_precision', 'no')

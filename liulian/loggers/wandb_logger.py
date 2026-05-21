@@ -77,9 +77,7 @@ class WandbLogger(LoggerInterface):
             return
         self._wandb.log({**metrics, 'step': step})
 
-    def log_artifact(
-        self, path: str, metadata: Optional[Dict[str, Any]] = None
-    ) -> None:
+    def log_artifact(self, path: str, metadata: Optional[Dict[str, Any]] = None) -> None:
         """Log an artifact to WandB or copy locally as fallback.
 
         Args:

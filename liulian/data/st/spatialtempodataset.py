@@ -25,13 +25,10 @@ Adapted from:
 
 from __future__ import annotations
 
-from typing import Any, Dict, Mapping, Optional, Sequence, Union
+from typing import Any, Dict
 
-import numpy as np
-import pandas as pd
 
-from liulian.data.spec import FieldSpec, TopologySpec
-from liulian.data.ts.timeseriesdataset import TimeSeriesDataset, TimeSeriesSplit
+from liulian.data.ts.timeseriesdataset import TimeSeriesDataset
 
 
 class SpatialTempoDataset(TimeSeriesDataset):
@@ -147,9 +144,7 @@ class SpatialTempoDataset(TimeSeriesDataset):
             {
                 'graph_mode': self.graph_mode,
                 'num_nodes': self.num_nodes,
-                'num_edges': (
-                    self._edge_index.shape[1] if self._edge_index is not None else 0
-                ),
+                'num_edges': (self._edge_index.shape[1] if self._edge_index is not None else 0),
                 'graph_metadata': self.graph_metadata,
             }
         )

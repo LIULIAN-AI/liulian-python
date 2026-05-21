@@ -98,26 +98,18 @@ def aggregate_predictions(
     if times.ndim == 1:
         times = times[None, :]
     if times.ndim != 2:
-        raise ValueError(
-            f'Expected times with 2 dims after normalization, got shape={times.shape}.'
-        )
+        raise ValueError(f'Expected times with 2 dims after normalization, got shape={times.shape}.')
     if pred_len is None:
         pred_len = preds.shape[1]
     C = preds.shape[2]
     if trues.shape[:2] != preds.shape[:2]:
         raise ValueError(
-            f'preds and trues must share leading dims (N, pred_len). '
-            f'Got preds={preds.shape}, trues={trues.shape}.'
+            f'preds and trues must share leading dims (N, pred_len). Got preds={preds.shape}, trues={trues.shape}.'
         )
     if times.shape[0] != N:
-        raise ValueError(
-            f'times first dimension must match N. Got times={times.shape}, N={N}.'
-        )
+        raise ValueError(f'times first dimension must match N. Got times={times.shape}, N={N}.')
     if times.shape[1] < pred_len:
-        raise ValueError(
-            f'times second dimension must be >= pred_len ({pred_len}). '
-            f'Got times={times.shape}.'
-        )
+        raise ValueError(f'times second dimension must be >= pred_len ({pred_len}). Got times={times.shape}.')
 
     normalized_entity_ids = _normalize_entity_ids(entity_ids, expected_n=N)
     if normalized_entity_ids is not None and len(set(normalized_entity_ids)) > 1:
@@ -184,9 +176,7 @@ def _normalize_entity_ids(
     if ids_np.ndim > 1:
         ids_np = ids_np.reshape(-1)
     if ids_np.shape[0] != expected_n:
-        raise ValueError(
-            f'entity_ids length must match N. Got len={ids_np.shape[0]}, N={expected_n}.'
-        )
+        raise ValueError(f'entity_ids length must match N. Got len={ids_np.shape[0]}, N={expected_n}.')
     return ids_np.astype(object)
 
 
@@ -224,9 +214,7 @@ def _agg_by_entity_then_mean(
         )
         per_entity_results.append(result)
 
-    all_times = np.unique(
-        np.concatenate([result['time'] for result in per_entity_results]).astype(np.int64)
-    )
+    all_times = np.unique(np.concatenate([result['time'] for result in per_entity_results]).astype(np.int64))
     all_times.sort()
     T = len(all_times)
     time_to_idx = {int(t): i for i, t in enumerate(all_times)}

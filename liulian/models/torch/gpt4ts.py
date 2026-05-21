@@ -17,8 +17,6 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from liulian.models.torch.layers.embed import DataEmbedding
-
 
 class Model(nn.Module):
     """GPT4TS — frozen GPT-2 backbone with fine-tuned LayerNorm for time series.
@@ -97,7 +95,8 @@ class Model(nn.Module):
 
         if self.task_name in ('long_term_forecast', 'short_term_forecast'):
             self.out_layer = nn.Linear(
-                self.gpt2_dim * self.num_patches, self.pred_len,
+                self.gpt2_dim * self.num_patches,
+                self.pred_len,
             )
         elif self.task_name == 'imputation':
             self.out_layer = nn.Linear(self.gpt2_dim, self.seq_len)
@@ -107,7 +106,8 @@ class Model(nn.Module):
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
             self.out_layer = nn.Linear(
-                self.gpt2_dim * self.num_patches, configs.num_class,
+                self.gpt2_dim * self.num_patches,
+                configs.num_class,
             )
 
     def _patchify(self, x):
@@ -116,9 +116,7 @@ class Model(nn.Module):
         # Instance normalization (per-channel)
         means = x.mean(1, keepdim=True).detach()
         x = x - means
-        stdev = torch.sqrt(
-            torch.var(x, dim=1, keepdim=True, unbiased=False) + 1e-5
-        ).detach()
+        stdev = torch.sqrt(torch.var(x, dim=1, keepdim=True, unbiased=False) + 1e-5).detach()
         x = x / stdev
 
         # [B, L, C] → [B, C, L] → unfold → [B, C, num_patches, patch_size]
@@ -131,12 +129,12 @@ class Model(nn.Module):
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         x, means, stdev, B, C = self._patchify(x_enc)
 
-        x = self.in_layer(x)               # [B*C, num_patches, gpt2_dim]
+        x = self.in_layer(x)  # [B*C, num_patches, gpt2_dim]
         outputs = self.gpt2(inputs_embeds=x).last_hidden_state
 
         # [B*C, num_patches, gpt2_dim] → [B*C, num_patches * gpt2_dim]
         outputs = outputs.reshape(B * C, -1)
-        outputs = self.out_layer(outputs)   # [B*C, pred_len]
+        outputs = self.out_layer(outputs)  # [B*C, pred_len]
         outputs = outputs.reshape(B, C, -1).permute(0, 2, 1)  # [B, pred_len, C]
 
         # De-normalize
@@ -150,7 +148,7 @@ class Model(nn.Module):
         outputs = self.gpt2(inputs_embeds=x).last_hidden_state
 
         outputs = self.out_layer(outputs[:, -1:, :])  # [B*C, 1, seq_len]
-        outputs = outputs.squeeze(1)                    # [B*C, seq_len]
+        outputs = outputs.squeeze(1)  # [B*C, seq_len]
         outputs = outputs.reshape(B, C, -1).permute(0, 2, 1)  # [B, L, C]
 
         outputs = outputs * stdev + means
@@ -176,14 +174,14 @@ class Model(nn.Module):
 
         # Pool per-channel, then average across channels
         outputs = outputs.reshape(B * C, -1)
-        outputs = self.out_layer(outputs)   # [B*C, num_class]
+        outputs = self.out_layer(outputs)  # [B*C, num_class]
         outputs = outputs.reshape(B, C, -1).mean(dim=1)  # [B, num_class]
         return outputs
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
         if self.task_name in ('long_term_forecast', 'short_term_forecast'):
             dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
-            return dec_out[:, -self.pred_len:, :]
+            return dec_out[:, -self.pred_len :, :]
         if self.task_name == 'imputation':
             dec_out = self.imputation(x_enc, x_mark_enc, x_dec, x_mark_dec, mask)
             return dec_out

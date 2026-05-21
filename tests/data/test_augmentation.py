@@ -237,9 +237,7 @@ def test_random_augmentation_custom_list(sample_data):
     np.random.seed(42)
 
     available_augs = ['jitter', 'scaling']
-    x_aug = random_augmentation(
-        sample_data.clone(), num_augmentations=2, available_augs=available_augs
-    )
+    x_aug = random_augmentation(sample_data.clone(), num_augmentations=2, available_augs=available_augs)
 
     assert x_aug.shape == sample_data.shape
     assert not torch.allclose(x_aug, sample_data)

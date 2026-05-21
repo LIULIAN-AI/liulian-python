@@ -33,7 +33,7 @@ Originally adapted from swiss-river-network-benchmark ``model.py``.
 
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 import torch
 import torch.nn as nn
@@ -159,14 +159,8 @@ class ExtrapoLstmModelFEmbed(nn.Module):
     ):
         super().__init__()
         self.future_steps = future_steps
-        self.input_proj = (
-            nn.Linear(input_size, d_future_emb)
-            if input_size != d_future_emb
-            else nn.Identity()
-        )
-        self.future_step_embedding = nn.Parameter(
-            torch.zeros(1, future_steps, d_future_emb)
-        )
+        self.input_proj = nn.Linear(input_size, d_future_emb) if input_size != d_future_emb else nn.Identity()
+        self.future_step_embedding = nn.Parameter(torch.zeros(1, future_steps, d_future_emb))
         self.lstm = nn.LSTM(
             input_size=d_future_emb,
             hidden_size=hidden_size,
@@ -339,9 +333,7 @@ class _LSTMBaseAdapter(TorchModelAdapter):
         self._entity_mode = config.get('identifier_mode', 'none')
         self._entity_id_col = config.get('entity_id_col', 0)
 
-    def _forward_torch_model(
-        self, torch_batch: Dict[str, Any]
-    ) -> Dict[str, torch.Tensor]:
+    def _forward_torch_model(self, torch_batch: Dict[str, Any]) -> Dict[str, torch.Tensor]:
         import numpy as np
 
         def _to_tensor(v: Any) -> Optional[torch.Tensor]:
@@ -432,9 +424,7 @@ class LSTMAdapter(_LSTMBaseAdapter):
         )
 
         # ETT dataset with one-hot entity features (already in x_enc)
-        LSTMAdapter(
-            {'enc_in': 7 + 10, 'c_out': 7, 'd_model': 64, 'identifier_mode': 'onehot'}
-        )
+        LSTMAdapter({'enc_in': 7 + 10, 'c_out': 7, 'd_model': 64, 'identifier_mode': 'onehot'})
     """
 
     def __init__(self, config: Dict[str, Any]):
