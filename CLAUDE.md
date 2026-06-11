@@ -62,3 +62,30 @@ Layer → directory map: `tasks/`, `data/`, `models/` (ABC), `adapters/` (wrappe
 - `refer_projects/`, `.worktrees/`, `wandb/`, `artifacts/`, `cache/`, `checkpoints/`, `jobs/`, `vibe/` are local/generated — don't assume they're canonical.
 - There are several ad-hoc top-level scripts (`_record_baselines.py`, `test_etsformer_*.py`, `_test_batch.py`) that are not part of the test suite. Real tests are under `tests/`.
 - `experiments/adapt_tsl_lib/` is an active comparison study against the TSL library; check its own READMEs before editing.
+
+## Change-making principles (standing requirements)
+
+Apply these to **every** change in this repo:
+
+1. **Whole-project context.** Before editing, trace the change through all entry
+   points and callers, not just the local file. A fix must keep every path that
+   reaches the touched code working (e.g. a search-space change must hold for the
+   `pipeline.build_optimizer`, `matrix.validate_*`, and any experiment runner that
+   resolves it). Verify the callers, don't assume.
+2. **Modular + minimal.** Prefer the smallest, simplest, most system-efficient
+   change that is still modular. Compose behaviour from small reusable pieces
+   (e.g. `base model space` + `identifier-mode params`) instead of large
+   conflated blocks. Avoid touching the hot/core path more than necessary.
+3. **Externalize config-like data to config files (front-end ready).** Things
+   that are *data* — HPO search spaces and ranges, hyperparameter grids,
+   per-(model, dataset, mode) settings, tier/resource presets — belong in
+   declarative config files (YAML), not hard-coded in Python, so the front-end
+   can display and edit them without code changes. New tunables/settings should
+   land in the relevant config file with a thin loader, with Python kept as a
+   fallback only. Example: `liulian/optim/search_spaces.yaml` drives
+   `resolve_search_space()` for the entity-identifier matrix.
+4. **No dead knobs.** Never add a hyperparameter to a search space unless a tuned
+   value actually changes the trained model on that code path. (Mode-dependent:
+   e.g. `embedding_size` only for `embedding` mode; transparent-feature dims only
+   for `multi_channel` where the wrapper is rebuilt per trial — gated out of
+   `per_entity` where the feature is frozen in the data loaders.)
