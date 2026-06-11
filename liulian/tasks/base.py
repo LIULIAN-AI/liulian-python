@@ -129,7 +129,7 @@ class PredictionTask(BaseTask):
             NotImplementedError: If *output_type* is ``"probabilistic"``.
         """
         if output_type == 'probabilistic':
-            raise NotImplementedError(
+            raise NotImplementedError(  # todo: when should this be used?
                 "Probabilistic prediction is planned for v1+. Use output_type='deterministic' for MVP1."
             )
         self.regime = regime or PredictionRegime()

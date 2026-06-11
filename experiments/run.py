@@ -112,7 +112,7 @@ def run_with_config(
     cli_overrides: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Run one experiment from config path + overrides and return summary."""
-    cfg = load_config(yaml_path=config_path, cli_overrides=cli_overrides or {})
+    cfg = load_config(yaml_path=config_path, cli_overrides=cli_overrides or {})  # fixme: why not just use the saved config. this is a bit duplicated
     return run_experiment(cfg)
 
 

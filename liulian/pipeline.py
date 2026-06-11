@@ -294,7 +294,7 @@ def print_dataset_summary(dataset: Any) -> None:
         info.get('graph_name', 'none'),
     )
     logger.info(
-        '  stations=%d, task=%s, seq_len=%d, pred_len=%d',
+        '  stations=%d, task=%s, seq_len=%d, pred_len=%d',  # fixme: what happens for other datasets without stations
         info.get('num_stations', len(getattr(dataset, 'station_ids', []))),
         info.get('task', ''),
         info.get('seq_len', 0),
@@ -552,9 +552,8 @@ def build_optimizer(config: Dict[str, Any]) -> Optional[Any]:
         logger.info('ray[tune] not installed — HPO disabled.')
         return None
 
-    optimizer = RayOptimizer(
-        config={
-            'num_samples': config.get('hpo_num_samples', 200),
+    opt_config = {  # todo: for the whole project (and ai agent in general), make this rule: if a arguments contains large content, always make a temporal variable to create first for the sake of easy debugging, unless it is bad for performance. Discuss with ai to determine if this is a valid point, and if the deployment version should be seperated and how.
+            'num_samples': config.get('hpo_num_samples', 200),  # todo: make this config consistent across the project
             'max_epochs': config.get('train_epochs', 30),
             'metric': 'loss',
             'mode': 'min',
@@ -582,8 +581,9 @@ def build_optimizer(config: Dict[str, Any]) -> Optional[Any]:
             'model': config.get('model'),
             'task': config.get('task'),
             'mode_tag': config.get('split_mode'),
-        },
-    )
+        }
+
+    optimizer = RayOptimizer(config=opt_config)
 
     # Default search space — resolved from search_spaces.py registry
     if 'search_space' not in config:
@@ -602,7 +602,7 @@ def build_optimizer(config: Dict[str, Any]) -> Optional[Any]:
             list(config['search_space'].keys()),
         )
 
-    logger.info(
+    logger.info(  # todo: should here use opt_config?
         'HPO enabled: samples=%s, grace=%s, reduction=%s, storage=%s, '
         'resources_per_trial={cpu:%s,gpu:%s}, max_concurrent=%s, '
         'early_stopping=%s (patience=%s)',
@@ -688,7 +688,7 @@ def build_experiment(
 
     # Spec — comprehensive snapshot of every experiment parameter
     model_name = config.get('model', 'model')
-    spec = ExperimentSpec(
+    spec = ExperimentSpec(  # todo: similarly, many configs here might be tuned by optimizer.
         name=f'{config.get("data", "data")}_{model_name}'
         f'_{config.get("task", "forecast")}_{config.get("split_mode", "per_entity")}',
         task={
@@ -765,7 +765,7 @@ def build_experiment(
 
     # Viz config
     config['auto_viz'] = config.get('auto_viz', True)
-    config['viz_method'] = config.get('viz_method', 'mean')
+    config['viz_method'] = config.get('viz_method', 'mean')  # maybe this should be multiple possibility
 
     return Experiment(
         spec=spec,
@@ -815,21 +815,21 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
         apply_quick_test(config)
 
     # ── Print experiment info ───────────────────────────────────────
-    print_experiment_info(config)
+    print_experiment_info(config)  # todo: if hparam optimization is on, some of this info is not yet final at this point. This is the same problem when saving the config to "resolved_config.yaml"
 
     # ── Build ───────────────────────────────────────────────────────
     dataset = build_dataset(config)
     # TSL seeds once and instantiates the model before building loaders.
     # Re-seed here so dataset construction does not perturb the model/init RNG
     # stream relative to the TSL reference pipeline.
-    seed_everything(config.get('seed', 2026), deterministic=deterministic)
+    seed_everything(config.get('seed', 2026), deterministic=deterministic)  #  fixme: why this is done twice?
     model = build_model(config, dataset)
     print_dataset_summary(dataset)  # Print after model build to avoid any RNG consumption
     loaders = build_loaders(dataset, config)
     exp = build_experiment(config, dataset, model, loaders)
 
     # ── Run ─────────────────────────────────────────────────────────
-    summary = exp.run(train=not config.get('eval_only', False))
+    summary = exp.run(train=not config.get('eval_only', False))  # todo: include best hprams here or is it already saved (then include the path to it)
 
     elapsed = time.time() - t0
 
@@ -1149,10 +1149,10 @@ def build_results_dict(
     elapsed: float,
     model: Any = None,
 ) -> Dict[str, Any]:
-    """Build a comprehensive results dictionary for JSON serialisation.
+    """Build a comprehensive results dictionary for JSON serialization.
 
     The returned dict contains all information needed to reproduce,
-    compare, and analyse the experiment results.  See
+    compare, and analyze the experiment results.  See
     ``docs/results_json.md`` for a detailed field reference.
     """
     gpu = _gpu_info()

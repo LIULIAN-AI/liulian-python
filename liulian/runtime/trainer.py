@@ -180,7 +180,7 @@ class ForecastTrainer:
         early_stopping = EarlyStopping(patience=patience, verbose=False, save_mode=False)
 
         # Accelerator wrapping
-        if self.accelerator is not None:
+        if self.accelerator is not None:  # todo: test this
             model, model_optim, train_loader, sched = self.accelerator.prepare(
                 model,
                 model_optim,
@@ -683,7 +683,7 @@ class ForecastTrainer:
                 batch_entity_idx = batch_entity_idx.to(self.device)
 
             # --- Data augmentation (training only) ---
-            if self.augmentation_list:
+            if self.augmentation_list:  # todo: test this
                 batch_x = apply_augmentations(batch_x, self.augmentation_list, **self.augmentation_kwargs)
 
             label_len = cfg.get('label_len', 0)

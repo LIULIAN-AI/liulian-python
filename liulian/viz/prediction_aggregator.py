@@ -87,7 +87,7 @@ def aggregate_predictions(
         ``time`` — ``(T,)``  unique sorted time indices.
         ``pred`` — ``(T, C)`` aggregated predictions.
         ``true`` — ``(T, C)`` ground-truth values.
-    """
+    """  # todo: test it
     preds = _to_numpy(preds)
     trues = _to_numpy(trues)
     times = _to_numpy(times)

@@ -65,3 +65,7 @@ _test_batch.py
 # Local git worktrees
 .worktrees/
 worktrees/
+
+# Archived Claude Code session transcripts (local backups, may contain
+# private prompts — never commit)
+.claude-sessions/
