@@ -643,7 +643,7 @@ def run_matrix(args: argparse.Namespace) -> dict[str, Any]:
 
         npz_path = result_json_path.parent / 'predictions.npz'
         if npz_path.exists():
-            try:
+            try:  # todo： is this a bit duplicate with the one in experiment.run()?
                 plot_paths = create_pred_vs_true_plots(
                     npz_path=npz_path,
                     output_dir=job_dir,
@@ -673,6 +673,7 @@ def run_matrix(args: argparse.Namespace) -> dict[str, Any]:
 
 def _parse_args(
         parser: argparse.ArgumentParser,
+        argv: list[str] | None = None,
 ) -> argparse.Namespace:
     """
     Parse command line arguments.
@@ -681,11 +682,17 @@ def _parse_args(
 
     Args:
         parser: Argument parser to use for parsing CLI arguments.
+        argv: Optional explicit argument vector. When ``None`` (default) the
+            process ``sys.argv`` is used (normal CLI behaviour). When a list is
+            given, those tokens are parsed instead — this lets an in-process
+            caller (e.g. ``jobs/run_job.py`` local mode) drive ``main`` with a
+            programmatic argv so breakpoints inside ``main``/``run_matrix`` are
+            hit without spawning a subprocess.
 
     Returns:
         argparse.Namespace: Parsed CLI arguments.
     """
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
     if not args.config:
         return args
     defaults = {
@@ -881,12 +888,22 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main() -> None:
-    """CLI entry point."""
+def main(argv: list[str] | None = None) -> dict[str, Any]:
+    """CLI entry point.
+
+    Args:
+        argv: Optional explicit argument vector forwarded to the parser. When
+            ``None`` the process ``sys.argv`` is used. Pass a list to invoke the
+            matrix runner in-process (debuggable) — see ``jobs/run_job.py``.
+
+    Returns:
+        The run-matrix summary dict (also printed as JSON).
+    """
     parser = _build_parser()
-    args = _parse_args(parser)
+    args = _parse_args(parser, argv)
     summary = run_matrix(args)
     print(json.dumps(summary, indent=2, ensure_ascii=False))
+    return summary
 
 
 if __name__ == '__main__':

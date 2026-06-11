@@ -76,7 +76,7 @@ prompt_domain: 0
 
 # ── Training ────────────────────────────────────────────────────────────
 train_epochs: 30
-batch_size: 8
+batch_size: 32  # fixed, NOT HPO-tuned. Was 8 until 2026-06-11 — pre-June swiss-lstm baselines used 8.
 learning_rate: 0.001
 loss: mse                         # mse | mae | rmse
 metrics: rmse,mae,nse

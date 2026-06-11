@@ -10,6 +10,8 @@ from typing import Any, Iterable
 
 DATASETS: tuple[str, ...] = (
     'swiss-river-1990',
+    'swiss-river-2010',
+    'swiss-river-zurich',
     'traffic',
     'electricity',
 )
@@ -34,19 +36,43 @@ _ALWAYS_SUPPORTED_MODES = frozenset(
 # Modes needing extra information (e.g. geographic coordinates) are
 # restricted to pairs where that data is available.
 _EXTRA_MODES_BY_PAIR: dict[tuple[str, str], frozenset[str]] = {
-    # Coordinates are available for Swiss River datasets.
+    # Coordinates live in the Swiss graph files. Offered ONLY for the
+    # per_entity path (LSTM) for now: the multi_channel wrapper needs
+    # config['coordinates'] injected, which the pipeline does not do yet.
+    # Before 2026-06-11 the multi_channel cells silently ran ZERO vectors
+    # (make_channel_features fallback) — those results are invalid, so the
+    # patchtst/dlinear coordinate cells are withdrawn until the injection
+    # fix lands.
     ('swiss-river-1990', 'lstm'): frozenset({'coordinates'}),
-    ('swiss-river-1990', 'patchtst'): frozenset({'coordinates'}),
-    ('swiss-river-1990', 'dlinear'): frozenset({'coordinates'}),
+    ('swiss-river-2010', 'lstm'): frozenset({'coordinates'}),
+    ('swiss-river-zurich', 'lstm'): frozenset({'coordinates'}),
 }
 
 
 BASE_CONFIG_BY_PAIR: dict[tuple[str, str], Path] = {
+    # All Swiss variants share the same base configs — the `data` key is
+    # overridden per job by build_cli_overrides().
     ('swiss-river-1990', 'lstm'): Path('experiments/swiss_river/default_config.yaml'),
     ('swiss-river-1990', 'patchtst'): Path(
         'experiments/swiss_river/patchtst_config.yaml'
     ),
     ('swiss-river-1990', 'dlinear'): Path(
+        'experiments/swiss_river/dlinear_config.yaml'
+    ),
+    ('swiss-river-2010', 'lstm'): Path('experiments/swiss_river/default_config.yaml'),
+    ('swiss-river-2010', 'patchtst'): Path(
+        'experiments/swiss_river/patchtst_config.yaml'
+    ),
+    ('swiss-river-2010', 'dlinear'): Path(
+        'experiments/swiss_river/dlinear_config.yaml'
+    ),
+    ('swiss-river-zurich', 'lstm'): Path(
+        'experiments/swiss_river/default_config.yaml'
+    ),
+    ('swiss-river-zurich', 'patchtst'): Path(
+        'experiments/swiss_river/patchtst_config.yaml'
+    ),
+    ('swiss-river-zurich', 'dlinear'): Path(
         'experiments/swiss_river/dlinear_config.yaml'
     ),
     ('traffic', 'lstm'): Path('experiments/traffic/lstm_config.yaml'),
@@ -256,7 +282,7 @@ def recommend_hpo_parallelism(job: MatrixJob) -> tuple[int, float]:
     Returns:
         Tuple ``(max_concurrent_trials, gpu_per_trial)``.
     """
-    if job.dataset == 'swiss-river-1990' and job.model == 'lstm':
+    if job.dataset.startswith('swiss-river') and job.model == 'lstm':
         preset = HPO_PARALLELISM_PRESETS['small']
     elif job.model == 'patchtst':
         preset = HPO_PARALLELISM_PRESETS['large']
@@ -304,7 +330,7 @@ def build_cli_overrides(
     }
 
     # Keep split-mode deterministic for this specific matrix.
-    if job.dataset == 'swiss-river-1990' and job.model == 'lstm':
+    if job.dataset.startswith('swiss-river') and job.model == 'lstm':
         overrides['split_mode'] = 'per_entity'
     else:
         overrides['split_mode'] = 'multi_channel'

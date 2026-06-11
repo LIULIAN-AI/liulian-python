@@ -36,18 +36,25 @@ from experiments.entity_identifier.submit_slurm import (
 
 def test_iter_jobs_default_matrix_size() -> None:
     jobs = iter_jobs()
-    # 9 pairs x (none + embedding) = 18 baseline jobs
-    # + 3 universally-supported transparent modes (onehot, sinusoidal, random) x 9 pairs = 27
-    # + coordinates for 3 Swiss pairs = 3
-    # Total = 18 + 27 + 3 = 48
-    assert len(jobs) == 48
+    # 15 pairs (5 datasets x 3 models) x (none + embedding) = 30 baseline jobs
+    # + 3 universally-supported transparent modes (onehot, sinusoidal, random) x 15 pairs = 45
+    # + coordinates for the 3 Swiss LSTM pairs (per_entity path only) = 3
+    # Total = 30 + 45 + 3 = 78
+    assert len(jobs) == 78
     coord_jobs = [job for job in jobs if job.mode == 'coordinates']
-    # Coordinates only available for Swiss River pairs
+    # Coordinates only available for Swiss River + LSTM (per_entity) pairs
     assert len(coord_jobs) == 3
-    assert all(job.dataset == 'swiss-river-1990' for job in coord_jobs)
+    assert all(job.dataset.startswith('swiss-river') for job in coord_jobs)
+    assert all(job.model == 'lstm' for job in coord_jobs)
     # All pairs get onehot, sinusoidal, random
     onehot_datasets = {job.dataset for job in jobs if job.mode == 'onehot'}
-    assert onehot_datasets == {'swiss-river-1990', 'traffic', 'electricity'}
+    assert onehot_datasets == {
+        'swiss-river-1990',
+        'swiss-river-2010',
+        'swiss-river-zurich',
+        'traffic',
+        'electricity',
+    }
     assert all('seed2026' in job.folder_name for job in jobs)
 
 
@@ -353,7 +360,7 @@ def test_single_matrix_command_includes_explicit_full_scope_defaults() -> None:
         plot_formats=['png'],
         plot_file_stem='pred_vs_gt',
     )
-    assert '--datasets swiss-river-1990 traffic electricity' in command
+    assert ('--datasets swiss-river-1990 swiss-river-2010 swiss-river-zurich traffic electricity') in command
     assert '--models lstm patchtst dlinear' in command
     assert '--modes none embedding onehot coordinates sinusoidal random' in command
     assert '--resume' in command
