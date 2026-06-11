@@ -114,8 +114,8 @@ class SwissRiverDataset(SpatialTempoDataset):
         include_historical_predicted_y: bool = False,
         identifier_mode: str = 'none',
         id_integration: str = 'concat_to_x',
-        sinusoidal_dim: int = 16,
-        random_identifier_dim: int = 16,
+        sinusoidal_dim: int = 16,  # CASE 1 (inner HPO) tunable for multi_channel via search_spaces.yaml; per_entity (here) is frozen per run -> CASE 2 outer sweep for "dim vs metrics" analysis (separate entry point, TBD)
+        random_identifier_dim: int = 16,  # same as sinusoidal_dim (see CASE 1 / CASE 2 note above)
         random_identifier_seed: int = 2026,
         graph_mode: str = 'none',
         graphlet_num_hops: int = 1,
@@ -181,8 +181,11 @@ class SwissRiverDataset(SpatialTempoDataset):
         for df in (train_df, val_df, test_df):
             entity_scaler.transform(df)
 
-        # --- Topology is optional (only needed for graph-based modes) ----
-        if graph_mode != 'none':
+        # --- Topology: needed for graph-based modes AND for the
+        # 'coordinates' identifier (station coords live in the graph file).
+        # Before 2026-06-11 it was only loaded for graph modes, so the
+        # coordinates identifier silently received an empty mapping.
+        if graph_mode != 'none' or identifier_mode == 'coordinates':
             topology = self._load_topology(self._file_map[data_name]['graph'])
         else:
             topology = None
@@ -342,7 +345,7 @@ class SwissRiverDataset(SpatialTempoDataset):
         station: str,
         graphlet_neighbors: list[str] | None = None,
     ) -> pd.DataFrame:
-        """Build a single-station DataFrame with standard column names.
+        """Build a single-station DataFrame with standard column names.  # todo: resolve the duplication
 
         Parameters
         ----------
@@ -377,6 +380,15 @@ class SwissRiverDataset(SpatialTempoDataset):
         # Include predicted y for this station if available
         if f'{station}_wt_hat' in df.columns:
             out['water_temperature_hat'] = df[f'{station}_wt_hat']
+
+        # Drop rows where THIS station has missing measurements (stations
+        # join/leave the network at different times — the swiss-river-2010 /
+        # zurich CSVs carry NaNs; swiss-river-1990 is pre-cleaned so this is
+        # a no-op there). The resulting epoch_day jumps become segment breaks
+        # via _detect_breaks(), so no window ever spans a dropped region.
+        # Without this a single NaN sample drives the whole per_entity loss
+        # to NaN (observed on swiss-river-2010, 2026-06-11).
+        out = out.dropna().reset_index(drop=True)
 
         return out
 

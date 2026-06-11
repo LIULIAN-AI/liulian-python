@@ -62,6 +62,21 @@ def _sinusoidal_encoding(
     return enc
 
 
+def _normalize_coordinates(
+    coordinates: dict[str, tuple[float, float]],
+) -> dict[str, torch.Tensor]:
+    """Min-max normalize station coordinates to ``[0, 1]`` per dimension.
+
+    Raw geographic coordinates (e.g. CH1903 meters, magnitude ~1e5-1e6)
+    would dwarf the scaled model inputs; normalizing over the dataset's own
+    stations keeps relative geography while staying input-scale compatible.
+    """
+    arr = torch.tensor(list(coordinates.values()), dtype=torch.float32)
+    lo = arr.min(dim=0).values
+    span = (arr.max(dim=0).values - lo).clamp_min(1e-12)
+    return {name: (torch.tensor(val, dtype=torch.float32) - lo) / span for name, val in coordinates.items()}
+
+
 def make_entity_features(
     station_name: str,
     station_ids: list[str],
@@ -107,10 +122,17 @@ def make_entity_features(
         val = idx / max(n_stations - 1, 1)
         vec = torch.tensor([val], dtype=torch.float32)
     elif mode == 'coordinates':
-        if coordinates and station_name in coordinates:
-            vec = torch.tensor(coordinates[station_name], dtype=torch.float32)
-        else:
-            vec = torch.zeros(2, dtype=torch.float32)
+        if not coordinates or station_name not in coordinates:
+            # No silent zero fallback: a zero vector would FAKE the
+            # identifier (every station identical) while looking like a
+            # successful run — exactly what happened to the pre-2026-06-11
+            # swiss coordinate baselines.
+            raise ValueError(
+                f"identifier_mode='coordinates' requires a coordinate for "
+                f'station {station_name!r}, but none was provided. Load the '
+                f'dataset topology (station coords live in the graph file).'
+            )
+        vec = _normalize_coordinates(coordinates)[station_name]
     elif mode == 'sinusoidal':
         vec = _sinusoidal_encoding(idx, sinusoidal_dim)
     elif mode == 'random':
@@ -275,7 +297,7 @@ def _handle_short_subsequences(
     eff_lengths = raw_lengths - window_len + 1
 
     if method == 'drop':
-        keep = eff_lengths > 0
+        keep = eff_lengths > 0  # todo: exp this by human for all experiment pairs
         return df, starts[keep], eff_lengths[keep], raw_lengths[keep]
 
     elif method == 'pad':
@@ -842,7 +864,7 @@ class TimeSeriesDataset(BaseDataset):
     # ------------------------------------------------------------------
 
     def _apply_scaler(self) -> None:
-        """Fit a scaler on the train split and transform all splits."""
+        """Fit a scaler on the train split and transform all splits."""  # todo: reduce duplication
         from liulian.data.scalers import get_scaler
 
         # Determine which columns to scale (feature + target, deduplicated)
@@ -890,7 +912,7 @@ class TimeSeriesDataset(BaseDataset):
                     df[cols_present] = vals
 
     def inverse_transform(self, data, **kwargs):
-        """Inverse-transform normalized predictions back to original scale.
+        """Inverse-transform normalized predictions back to original scale.  # todo: reduce duplication
 
         Delegates to the fitted scaler when ``scaler_type`` is not ``'none'``.
 
@@ -1003,7 +1025,7 @@ class TimeSeriesDataset(BaseDataset):
         #              last pred_len as target in the training loop)
         #    nowcast:  window = seq_len (predict y_t from x_1..x_t)
         if self.use_full_history:
-            win = 0  # full-sequence mode
+            win = 0  # full-sequence mode  todo: test this
         elif self.task == 'forecast':
             win = self.seq_len + self.pred_len
         else:  # nowcast
@@ -1038,7 +1060,7 @@ class TimeSeriesDataset(BaseDataset):
         feat_tensor, targ_tensor, time_tensor = self._precompute_tensors(df)
 
         # Build per-segment entity IDs (if station_name is set, all
-        # segments in this split belong to the same entity).
+        # segments in this split belong to the same entity).  todo: comment be specific about what this is for
         seg_eids: list[str] | None = None
         if self.station_name is not None:
             n_segs = len(seg_starts)
@@ -1071,7 +1093,7 @@ class TimeSeriesDataset(BaseDataset):
         f_cols = [c for c in self.feature_cols if c in df.columns]
         t_cols = [c for c in self.target_cols if c in df.columns]
 
-        # Resolve dtype from config
+        # Resolve dtype from config  todo: consider to set and revise this globally
         torch_dtype = torch.float64 if self.data_dtype == 'float64' else torch.float32
 
         feat = torch.tensor(df[f_cols].values, dtype=torch_dtype) if f_cols else torch.zeros(N, 0, dtype=torch_dtype)
@@ -1092,7 +1114,7 @@ class TimeSeriesDataset(BaseDataset):
             )
 
         # Historical predicted y → extra features
-        if self.include_historical_predicted_y:
+        if self.include_historical_predicted_y:  # todo: test this
             py_cols = [c for c in self.predicted_y_cols if c in df.columns]
             if py_cols:
                 feat = torch.cat(
@@ -1100,7 +1122,7 @@ class TimeSeriesDataset(BaseDataset):
                     dim=-1,
                 )
 
-        # Historical y → extra features
+        # Historical y → extra features  todo: test this
         if self.include_historical_y == 'gt':
             feat = torch.cat([feat, targ.clone()], dim=-1)
         elif self.include_historical_y == 'predicted':
@@ -1121,7 +1143,7 @@ class TimeSeriesDataset(BaseDataset):
             'numeric_id',
         }
         if self.identifier_mode in _transparent_modes and self.station_name is None:
-            logger.warning(
+            logger.warning(  # todo: test this
                 'identifier_mode=%r requires station_name to generate '
                 'entity features in the data layer, but station_name is '
                 'None. Entity features will NOT be produced. For '

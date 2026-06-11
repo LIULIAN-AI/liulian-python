@@ -343,14 +343,28 @@ def _build_channel_features(
         return torch.stack(rows)
 
     if mode == 'coordinates':
-        rows = []
-        for idx in range(num_stations):
-            name = ids[idx]
-            if coordinates and name in coordinates:
-                rows.append(torch.tensor(coordinates[name], dtype=torch.float32))
-            else:
-                rows.append(torch.zeros(2, dtype=torch.float32))
-        return torch.stack(rows)
+        coords = coordinates or {}
+        missing = [ids[idx] for idx in range(num_stations) if ids[idx] not in coords]
+        if missing:
+            # No silent zero fallback: zero vectors FAKE the identifier
+            # (all channels identical) while the run still "succeeds" —
+            # this is what invalidated the pre-2026-06-11 multi_channel
+            # swiss coordinate cells. Inject the station->(x, y) mapping
+            # via config['coordinates'] (not wired in the pipeline yet).
+            raise ValueError(
+                "identifier_mode='coordinates' requires a coordinate for "
+                f'every channel; missing for {missing[:5]!r}'
+                f'{"..." if len(missing) > 5 else ""}.'
+            )
+        arr = torch.tensor(
+            [coords[ids[idx]] for idx in range(num_stations)],
+            dtype=torch.float32,
+        )
+        # Min-max normalize per dimension (raw CH1903 meters are ~1e5-1e6,
+        # which would dwarf the scaled inputs).
+        lo = arr.min(dim=0).values
+        span = (arr.max(dim=0).values - lo).clamp_min(1e-12)
+        return (arr - lo) / span
 
     raise ValueError(f'Unsupported transparent mode for channel wrapper: {mode!r}')
 
