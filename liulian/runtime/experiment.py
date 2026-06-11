@@ -374,17 +374,28 @@ class Experiment:
             # models per trial.
             from liulian.models.torch.entity_mixin import (
                 ChannelEntityWrapper,
+                ChannelTransparentWrapper,
                 EntityWrapper,
             )
 
             is_entity_wrapped = isinstance(torch_model, EntityWrapper)
             is_channel_wrapped = isinstance(torch_model, ChannelEntityWrapper)
+            is_transparent_wrapped = isinstance(torch_model, ChannelTransparentWrapper)
 
             if is_channel_wrapped:
                 inner_model_cls = type(torch_model.inner)
                 model_args = getattr(torch_model.inner, '_args', None)
                 _cw_num_stations = torch_model.station_embedding.num_embeddings
                 _cw_emb_size = torch_model.station_embedding.embedding_dim
+            elif is_transparent_wrapped:
+                # Transparent multi_channel modes (onehot/sinusoidal/random/
+                # coordinates). The wrapper holds the (N, D) feature matrix; we
+                # capture N + the mode so the per-trial factory can rebuild it
+                # with a tuned sinusoidal_dim / random_identifier_dim.
+                inner_model_cls = type(torch_model.inner)
+                model_args = getattr(torch_model.inner, '_args', None)
+                _tw_num_stations = int(torch_model.channel_features.shape[0])
+                _tw_mode = str(self.config.get('identifier_mode', 'none'))
             elif is_entity_wrapped:
                 inner_model_cls = type(torch_model.inner)
                 model_args = getattr(torch_model.inner, '_args', None)
@@ -404,9 +415,16 @@ class Experiment:
 
                 model_args = SimpleNamespace(**self.config)
 
+            if is_transparent_wrapped:
+                # Make the transparent-dim knobs visible on the namespace so a
+                # tuned value from the trial config propagates into the rebuild
+                # (make_trainable only sets config keys the namespace already has).
+                for _attr in ('sinusoidal_dim', 'random_identifier_dim'):
+                    if not hasattr(model_args, _attr):
+                        setattr(model_args, _attr, self.config.get(_attr, 16))
+
             # Build a model factory that rebuilds the full model (including
-            # EntityWrapper / ChannelEntityWrapper wrapping) from a
-            # namespace of args.
+            # entity / transparent wrapping) from a namespace of args.
             if is_channel_wrapped:
 
                 def _model_factory(args):
@@ -429,6 +447,33 @@ class Experiment:
                         num_embeddings=_ew_num_embeddings,
                         embedding_size=emb_size,
                         entity_id_col=_ew_entity_id_col,
+                    )
+
+            elif is_transparent_wrapped:
+
+                def _model_factory(args):
+                    inner = inner_model_cls(args).float()
+                    return ChannelTransparentWrapper(
+                        inner_model=inner,
+                        mode=_tw_mode,
+                        num_stations=_tw_num_stations,
+                        sinusoidal_dim=int(
+                            getattr(
+                                args,
+                                'sinusoidal_dim',
+                                self.config.get('sinusoidal_dim', 16),
+                            )
+                        ),
+                        random_dim=int(
+                            getattr(
+                                args,
+                                'random_identifier_dim',
+                                self.config.get('random_identifier_dim', 16),
+                            )
+                        ),
+                        random_seed=int(self.config.get('random_identifier_seed', 2026)),
+                        coordinates=self.config.get('coordinates'),
+                        station_ids=self.config.get('station_ids'),
                     )
             else:
                 _model_factory = None

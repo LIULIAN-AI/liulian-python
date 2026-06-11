@@ -55,9 +55,12 @@ Usage::
 
 from __future__ import annotations
 
+import functools
+from pathlib import Path
 from typing import Any, Dict
 
 import ray.tune
+import yaml
 
 # ======================================================================
 # Swiss-river reference spaces
@@ -912,6 +915,94 @@ _RESOLVE_ORDER: list[tuple[str | None, str, bool | None, str]] = [
 ]
 
 
+# ======================================================================
+# YAML-config-driven composition (entity-identifier matrix models)
+#
+# search_spaces.yaml declares model_spaces + identifier_spaces + resolution
+# so the front-end can display/edit ranges without touching Python. Models
+# not covered by the YAML fall back to the Python registry above.
+# ======================================================================
+
+_YAML_PATH = Path(__file__).with_name('search_spaces.yaml')
+
+# Identifier params whose feature is built in the DATA layer (frozen per HPO run
+# for per_entity splits) — gated out of inner-HPO for per_entity models.
+_DATA_LAYER_DIMS = frozenset({'sinusoidal_dim', 'random_identifier_dim'})
+
+
+def _spec_to_tune(spec: Dict[str, Any]) -> Any:
+    """Convert one YAML sampler spec dict into a ``ray.tune`` sample object.
+
+    Grammar: ``{dist: choice, values: [...]}`` /
+    ``{dist: uniform|loguniform, low, high}`` / ``{dist: randint, low, high}``.
+    """
+    dist = str(spec.get('dist', '')).strip().lower()
+    if dist == 'choice':
+        return ray.tune.choice(list(spec['values']))
+    if dist == 'uniform':
+        return ray.tune.uniform(float(spec['low']), float(spec['high']))
+    if dist == 'loguniform':
+        return ray.tune.loguniform(float(spec['low']), float(spec['high']))
+    if dist == 'randint':
+        return ray.tune.randint(int(spec['low']), int(spec['high']))
+    raise ValueError(f'Unknown sampler dist {spec.get("dist")!r} in {_YAML_PATH.name}')
+
+
+@functools.lru_cache(maxsize=1)
+def _load_yaml_config() -> Dict[str, Any]:
+    """Load and cache the YAML search-space config (empty dict if missing)."""
+    if not _YAML_PATH.exists():
+        return {'model_spaces': {}, 'identifier_spaces': {}, 'resolution': []}
+    with _YAML_PATH.open('r', encoding='utf-8') as fh:
+        cfg = yaml.safe_load(fh) or {}
+    cfg.setdefault('model_spaces', {})
+    cfg.setdefault('identifier_spaces', {})
+    cfg.setdefault('resolution', [])
+    return cfg
+
+
+def _resolve_base_key(cfg: Dict[str, Any], model: str, data: str) -> str | None:
+    """Resolve the base model-space key for ``(model, data)``; first match wins."""
+    for rule in cfg['resolution']:
+        if rule.get('model') != model:
+            continue
+        prefix = rule.get('data')
+        if prefix is not None and not data.startswith(prefix):
+            continue
+        return rule.get('space')
+    return None
+
+
+def _resolve_from_yaml(model: str, data: str, identifier_mode: str, id_integration: str) -> Dict[str, Any] | None:
+    """Compose a search space from the YAML config.
+
+    Returns ``None`` when the model is not covered by the YAML resolution
+    (caller then falls back to the Python registry). Composition is
+    **mode-aware**: identifier params are added per ``identifier_mode``, and
+    ``embedding_size`` is skipped for ``patchtst`` + ``add_after_patch`` (its
+    internal embedding is fixed to ``d_model``).
+    """
+    cfg = _load_yaml_config()
+    key = _resolve_base_key(cfg, model, data)
+    if key is None or key not in cfg['model_spaces']:
+        return None
+    space: Dict[str, Any] = {name: _spec_to_tune(spec) for name, spec in cfg['model_spaces'][key].items()}
+    id_extra = cfg['identifier_spaces'].get(identifier_mode, {}) or {}
+    has_emb = identifier_mode in ('embedding', 'embedding_idx')
+    skip_emb = model == 'patchtst' and has_emb and id_integration == 'add_after_patch'
+    # Transparent-feature dims are tunable ONLY for multi_channel models; for
+    # per_entity (swiss-lstm) the feature is frozen in the data loaders, so a
+    # tuned value would be a dead knob — gate it out (use the Case-2 sweep).
+    is_per_entity = model == 'lstm' and data.startswith('swiss-river')
+    for name, spec in id_extra.items():
+        if name == 'embedding_size' and skip_emb:
+            continue
+        if name in _DATA_LAYER_DIMS and is_per_entity:
+            continue
+        space[name] = _spec_to_tune(spec)
+    return space
+
+
 def resolve_search_space(
     model: str,
     data: str = '',
@@ -948,20 +1039,16 @@ def resolve_search_space(
     if model == 'patchtst' and has_emb and id_integration == 'add_after_patch':
         has_emb = False
 
-    # ── LSTM: use legacy randint / uniform space for backward compat ──
-    # The original pipeline used randint / uniform (not discrete choice).
-    # Changing the sampler type alters HPO trajectories even at the same
-    # seed, so we preserve the exact definitions to keep anchored baselines
-    # reproducible.
-    if model == 'lstm':
-        return {
-            'embedding_size': ray.tune.randint(1, 31),
-            'd_model': ray.tune.randint(16, 129),
-            'e_layers': ray.tune.randint(1, 4),
-            'learning_rate': ray.tune.uniform(0.00001, 0.01),
-        }
+    # ── Config-driven path: entity-identifier matrix models (lstm / dlinear /
+    #    patchtst) resolve from search_spaces.yaml so the front-end can edit
+    #    ranges without touching Python. The composition there is mode-aware —
+    #    embedding_size is added ONLY for embedding mode, which fixes the
+    #    historical bug where `none` still tuned embedding_size.
+    yaml_space = _resolve_from_yaml(model, data, identifier_mode, id_integration)
+    if yaml_space is not None:
+        return yaml_space
 
-    # ── All other models: resolve from registry ─────────────────────
+    # ── All other models: resolve from the Python registry ───────────
     space: Dict[str, Any] | None = None
 
     # 1. Try explicit resolution order

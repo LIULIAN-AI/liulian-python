@@ -1,0 +1,92 @@
+# HPO search-space config for the entity-identifier matrix (lstm / dlinear / patchtst).
+#
+# Why a config file: the search space is data the front-end should be able to
+# DISPLAY and EDIT without touching Python. `resolve_search_space()` in
+# search_spaces.py reads this file and composes the final Ray Tune space.
+# Models NOT listed here fall back to the Python registry in search_spaces.py.
+#
+# Sampler spec grammar (each leaf is one of):
+#   {dist: choice,     values: [...]}        -> ray.tune.choice
+#   {dist: uniform,    low: a, high: b}      -> ray.tune.uniform(a, b)
+#   {dist: loguniform, low: a, high: b}      -> ray.tune.loguniform(a, b)
+#   {dist: randint,    low: a, high: b}      -> ray.tune.randint(a, b)   # high EXCLUSIVE
+#
+# Composition: final space = model_spaces[<resolved key>]  +  identifier_spaces[<mode>]
+#   - identifier params are added per `identifier_mode` (mode-aware).
+#   - SPECIAL CASE: patchtst + embedding + id_integration=add_after_patch does NOT
+#     add embedding_size (the internal embedding is fixed to d_model).
+# This is what fixes the historical bug where `none` still tuned `embedding_size`.
+
+# --------------------------------------------------------------------------- #
+# Base model HP spaces — NO identifier params here (those compose in below).   #
+# --------------------------------------------------------------------------- #
+model_spaces:
+
+  # LSTM on swiss-river. Ranges follow the swiss-river-network benchmark
+  # ray_tune.py (search_space_lstm): hidden_size->d_model, num_layers->e_layers.
+  # ref: https://github.com/jajupmochi/swiss-river-network-benchmark/blob/main/swissrivernetwork/benchmark/ray_tune.py
+  lstm_swiss:
+#    batch_size:    {dist: randint, low: 32, high: 257}     # ref: randint(32, 257)
+    learning_rate: {dist: loguniform, low: 0.0001, high: 0.005}  # ref lstm uses 1e-4 low; 1e-5 keeps the prior anchored range
+    d_model:       {dist: randint, low: 16, high: 257}     # ref hidden_size: randint(16, 129)
+    e_layers:      {dist: randint, low: 1, high: 4}        # ref num_layers: randint(1, 4)
+
+  # LSTM on other datasets (traffic/electricity, multi_channel). Discrete ranges.
+  lstm_general:
+#    batch_size:    {dist: choice, values: [32, 64, 128, 256]}
+    learning_rate: {dist: loguniform, low: 0.0001, high: 0.005}
+    d_model:       {dist: randint, low: 16, high: 257}
+    e_layers:      {dist: randint, low: 1, high: 4}
+    dropout:       {dist: choice, values: [0.0, 0.1, 0.2, 0.3]}
+
+  # DLinear — must EXACTLY mirror dlinear_space() to preserve anchored baselines.
+  # batch_size stays TUNED here: the 2026-05 traffic/electricity baselines were
+  # produced with it, and TSL_REQUIRED_HPARAMS (matrix.py) enforces coverage.
+  dlinear:
+    batch_size:    {dist: choice, values: [16, 32, 64, 128]}
+    learning_rate: {dist: loguniform, low: 0.0001, high: 0.005}
+    moving_avg:    {dist: choice, values: [13, 25, 51]}
+
+  # PatchTST — must EXACTLY mirror patchtst_space() to preserve anchored baselines.
+  # batch_size stays TUNED (same reason as dlinear above).
+  patchtst:
+    batch_size:    {dist: choice, values: [16, 32, 64, 128]}
+    learning_rate: {dist: loguniform, low: 0.0001, high: 0.005}
+    d_model:       {dist: choice, values: [128, 256, 512]}
+    d_ff:          {dist: choice, values: [256, 512, 2048]}
+    n_heads:       {dist: choice, values: [2, 4, 8, 16]}
+    e_layers:      {dist: choice, values: [1, 2, 3]}
+    dropout:       {dist: choice, values: [0.1, 0.2]}
+
+# --------------------------------------------------------------------------- #
+# Identifier-mode params, composed on top of the base space (mode-aware).      #
+# --------------------------------------------------------------------------- #
+identifier_spaces:
+  none:        {}                                          # baseline — no identifier params
+  onehot:      {}                                          # dim = #stations (fixed, not tunable)
+  coordinates: {}                                          # dim = 2 (lat/lon, fixed)
+  embedding:
+    embedding_size: {dist: randint, low: 1, high: 31}      # ref: randint(1, 31). Skipped for patchtst+add_after_patch.
+
+  # sinusoidal_dim / random_identifier_dim ARE tunable (CASE 1 — inner HPO),
+  # but ONLY for multi_channel models: the ChannelTransparentWrapper is rebuilt
+  # per HPO trial (see runtime/experiment.py), so a tuned dim takes effect.
+  # For per_entity (swiss-lstm) the transparent feature is baked into the FROZEN
+  # data loaders (built once per run, not per trial), so resolve_search_space()
+  # GATES these knobs out there — tuning them would be a dead knob. To study
+  # "dim vs metrics" for swiss-lstm, use the CASE 2 outer sweep (separate
+  # param-analysis entry point — recorded, not yet built; see swiss_river.py FIXME).
+  sinusoidal:
+    sinusoidal_dim:        {dist: randint, low: 1, high: 31}
+  random:
+    random_identifier_dim: {dist: randint, low: 1, high: 31}
+
+# --------------------------------------------------------------------------- #
+# Resolution: (data prefix, model) -> base space key. Mode-INDEPENDENT.        #
+# First match wins. Omit `data` to match any dataset.                          #
+# --------------------------------------------------------------------------- #
+resolution:
+  - {data: swiss-river, model: lstm,     space: lstm_swiss}
+  - {model: lstm,                         space: lstm_general}
+  - {model: dlinear,                      space: dlinear}
+  - {model: patchtst,                     space: patchtst}
