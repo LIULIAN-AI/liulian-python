@@ -505,6 +505,9 @@ class Experiment:
             )
             summary['metrics']['hpo'] = {
                 'best_config': hpo_result.best_config,
+                # Alias for the results.json contract (docs/results_json.md,
+                # field `hpo.best_hparams`); `best_config` stays for cli.py.
+                'best_hparams': hpo_result.best_config,
                 'best_value': hpo_result.best_value,
                 'n_trials': hpo_result.n_trials,
                 'best_checkpoint_path': hpo_result.best_checkpoint_path,

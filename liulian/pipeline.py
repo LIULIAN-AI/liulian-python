@@ -450,7 +450,7 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
     # Wrap with entity embedding when configured.
     # PatchTST + add_after_patch is handled internally by the model.
     if config.get('identifier_mode') == 'embedding' and config.get('id_integration') != 'add_after_patch':
-        num_emb = config.get('num_embeddings')
+        num_emb = config.get('num_embeddings')  # todo: should embedding be refactored with other mode?
         if num_emb is None and dataset is not None:
             num_emb = len(dataset.station_ids)
         if num_emb is None:
@@ -553,35 +553,35 @@ def build_optimizer(config: Dict[str, Any]) -> Optional[Any]:
         return None
 
     opt_config = {  # todo: for the whole project (and ai agent in general), make this rule: if a arguments contains large content, always make a temporal variable to create first for the sake of easy debugging, unless it is bad for performance. Discuss with ai to determine if this is a valid point, and if the deployment version should be seperated and how.
-            'num_samples': config.get('hpo_num_samples', 200),  # todo: make this config consistent across the project
-            'max_epochs': config.get('train_epochs', 30),
-            'metric': 'loss',
-            'mode': 'min',
-            'scheduler': config.get('hpo_scheduler', 'asha'),
-            'grace_period': config.get('hpo_grace_period', 5),
-            'reduction_factor': config.get('hpo_reduction_factor', 1.5),
-            'storage_path': config.get('hpo_storage_path'),
-            'resources_per_trial': {
-                'cpu': config.get('hpo_resources_cpu', 1),
-                'gpu': config.get('hpo_resources_gpu', 0),
-            },
-            'num_cpus': config.get('hpo_num_cpus'),
-            'max_concurrent_trials': config.get('hpo_max_concurrent'),
-            'resume': config.get('hpo_resume', False),
-            'save_checkpoints': config.get('hpo_save_checkpoints', True),
-            'trim_checkpoints': config.get('hpo_trim_checkpoints', True),
-            'keep_best_n': config.get('hpo_keep_best_n', 10),
-            'trim_best_n': config.get('hpo_trim_best_n', True),
-            'trim_keep_best': config.get('hpo_trim_keep_best', True),
-            'trim_keep_last': config.get('hpo_trim_keep_last', False),
-            'experiment_name': build_hpo_experiment_name(config),
-            'local_mode': config.get('hpo_local_mode', False),
-            # Pass through for experiment_name building
-            'data': config.get('data'),
-            'model': config.get('model'),
-            'task': config.get('task'),
-            'mode_tag': config.get('split_mode'),
-        }
+        'num_samples': config.get('hpo_num_samples', 200),  # todo: make this config consistent across the project
+        'max_epochs': config.get('train_epochs', 30),
+        'metric': 'loss',
+        'mode': 'min',
+        'scheduler': config.get('hpo_scheduler', 'asha'),
+        'grace_period': config.get('hpo_grace_period', 5),
+        'reduction_factor': config.get('hpo_reduction_factor', 1.5),
+        'storage_path': config.get('hpo_storage_path'),
+        'resources_per_trial': {
+            'cpu': config.get('hpo_resources_cpu', 1),
+            'gpu': config.get('hpo_resources_gpu', 0),
+        },
+        'num_cpus': config.get('hpo_num_cpus'),
+        'max_concurrent_trials': config.get('hpo_max_concurrent'),
+        'resume': config.get('hpo_resume', False),
+        'save_checkpoints': config.get('hpo_save_checkpoints', True),
+        'trim_checkpoints': config.get('hpo_trim_checkpoints', True),
+        'keep_best_n': config.get('hpo_keep_best_n', 10),
+        'trim_best_n': config.get('hpo_trim_best_n', True),
+        'trim_keep_best': config.get('hpo_trim_keep_best', True),
+        'trim_keep_last': config.get('hpo_trim_keep_last', False),
+        'experiment_name': build_hpo_experiment_name(config),
+        'local_mode': config.get('hpo_local_mode', False),
+        # Pass through for experiment_name building
+        'data': config.get('data'),
+        'model': config.get('model'),
+        'task': config.get('task'),
+        'mode_tag': config.get('split_mode'),
+    }
 
     optimizer = RayOptimizer(config=opt_config)
 
@@ -815,7 +815,9 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
         apply_quick_test(config)
 
     # ── Print experiment info ───────────────────────────────────────
-    print_experiment_info(config)  # todo: if hparam optimization is on, some of this info is not yet final at this point. This is the same problem when saving the config to "resolved_config.yaml"
+    print_experiment_info(
+        config
+    )  # todo: if hparam optimization is on, some of this info is not yet final at this point. This is the same problem when saving the config to "resolved_config.yaml"
 
     # ── Build ───────────────────────────────────────────────────────
     dataset = build_dataset(config)
@@ -829,7 +831,9 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
     exp = build_experiment(config, dataset, model, loaders)
 
     # ── Run ─────────────────────────────────────────────────────────
-    summary = exp.run(train=not config.get('eval_only', False))  # todo: include best hprams here or is it already saved (then include the path to it)
+    summary = exp.run(
+        train=not config.get('eval_only', False)
+    )  # todo: include best hprams here or is it already saved (then include the path to it)
 
     elapsed = time.time() - t0
 
@@ -1178,7 +1182,9 @@ def build_results_dict(
         hpo_info = {
             'best_value': hpo_raw.get('best_value'),
             'n_trials': hpo_raw.get('n_trials'),
-            'best_hparams': hpo_raw.get('best_hparams', {}),
+            # Fall back to the legacy `best_config` key so pre-2026-06-12
+            # summaries still populate the documented field.
+            'best_hparams': hpo_raw.get('best_hparams') or hpo_raw.get('best_config', {}),
         }
         structured_metrics['hpo'] = hpo_info
 
