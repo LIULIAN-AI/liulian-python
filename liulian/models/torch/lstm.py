@@ -89,8 +89,9 @@ class Model(nn.Module):
         # family as the swiss-river benchmark's ExtrapoLstmModel('limo').
         # NOTE: the benchmark's plain LstmModel instead decodes PER TIME STEP
         # over the whole window ((B, win_len, 1), loss on the full masked
-        # sequence — its output is NOT truncated; see
-        # https://github.com/jajupmochi/swiss-river-network-benchmark/blob/main/swissrivernetwork/benchmark/model.py#L32 ).
+        # sequence — its output is NOT truncated; see model.py#L32 in
+        # github.com/jajupmochi/swiss-river-network-benchmark
+        # (swissrivernetwork/benchmark/model.py).
         # The produce-then-truncate pattern lives in TSL's exp loop
         # (outputs[:, -pred_len:]), not in the benchmark.
         # TODO(nowcast): for task='nowcast' this last-hidden head is wasteful
