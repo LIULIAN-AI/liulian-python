@@ -151,3 +151,32 @@ class LSTMAdapter(EntityAwareMixin, TorchModelAdapter):    # changed inheritance
 **Uncertainties:**
 - Whether a learned `(h_0, c_0)` actually helps beyond the RNN's own capacity — for long sequences, the initial state gets overwritten quickly. Short-horizon tasks benefit more.
 - In multi-channel split, LSTM processes all `enc_in` channels jointly → per-sample entity id is ill-defined (*whose* station is this sample about?). Only unambiguous in per-entity split. Document this constraint.
+
+## 9. TODO(nowcast) — decoding scheme (recorded 2026-06-12)
+
+Three decoding schemes exist across the reference projects and this repo:
+
+| Scheme | Output | Supervision per forward | Used by |
+|---|---|---|---|
+| Per-time-step decoding | `(B, win_len, 1)` — linear head on **every** LSTM output; loss on the full NaN/pad-masked sequence (output NOT truncated) | `win_len` steps | swiss benchmark `LstmModel` (`model.py#L32`, `training.py:147`) — its **nowcast** models |
+| Direct multi-step (DMS) | `(B, pred_len, c_out)` from the **last** hidden state | `pred_len` steps | **our `lstm.py`**; swiss benchmark `ExtrapoLstmModel('limo')`; TSL contract (DLinear `Linear(seq_len→pred_len)`, PatchTST flatten-head) |
+| Produce-then-truncate | decoder emits `label_len+pred_len`, exp loop slices `outputs[:, -pred_len:]` | `pred_len` steps | TSL encoder-decoder family (`exp_long_term_forecasting.py:66`) |
+
+For `task='forecast'` (the entity-identifier matrix) DMS is the right tool and
+matches both references. For `task='nowcast'` our last-hidden head is
+**wasteful**: 1 supervised step per window (vs `win_len`), and covering a
+series of length `T` needs `T` sliding windows ≈ `seq_len`× redundant compute
+versus one per-step pass; the only upside is a homogeneous fixed-length
+context per prediction.
+
+**Action items before any nowcast experiment (task #31):**
+1. Add a per-step decoding head to `lstm.py` for `task='nowcast'`
+   (benchmark `LstmModel` style: head on every LSTM output, full-sequence
+   masked loss).
+2. Audit the other adapters (dlinear / patchtst / …) for nowcast behaviour
+   and decide per model — DMS models may need a `pred_len=seq_len` mode
+   (cf. DLinear's existing branch at `models/DLinear.py:20`).
+3. Optional research item: per-step auxiliary loss as multi-task for the
+   forecast setting (dense supervision without changing the primary head).
+
+See also the inline `TODO(nowcast)` block in `liulian/models/torch/lstm.py`.
