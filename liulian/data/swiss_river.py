@@ -114,8 +114,12 @@ class SwissRiverDataset(SpatialTempoDataset):
         include_historical_predicted_y: bool = False,
         identifier_mode: str = 'none',
         id_integration: str = 'concat_to_x',
-        sinusoidal_dim: int = 16,  # CASE 1 (inner HPO) tunable for multi_channel via search_spaces.yaml; per_entity (here) is frozen per run -> CASE 2 outer sweep for "dim vs metrics" analysis (separate entry point, TBD)
-        random_identifier_dim: int = 16,  # same as sinusoidal_dim (see CASE 1 / CASE 2 note above)
+        # sinusoidal_dim / random_identifier_dim: CASE 1 (inner HPO) tunable
+        # for multi_channel via search_spaces.yaml; per_entity (here) is
+        # frozen per run -> CASE 2 outer sweep for "dim vs metrics" analysis
+        # (separate entry point, TBD — see docs/tasks.md).
+        sinusoidal_dim: int = 16,
+        random_identifier_dim: int = 16,
         random_identifier_seed: int = 2026,
         graph_mode: str = 'none',
         graphlet_num_hops: int = 1,
