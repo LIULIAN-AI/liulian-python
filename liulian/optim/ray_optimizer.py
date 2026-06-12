@@ -74,6 +74,29 @@ def make_trainable(
         # Merge base config with trial-specific hypers
         merged = {**base_config, **config}
 
+        # Per-trial deterministic seeding: base seed + trial index. Each
+        # trial becomes reproducible, and trials differ only through their
+        # sampled hyperparameters — not through uncontrolled worker RNG
+        # (model init, dropout masks, batch order). Before 2026-06-12 Ray
+        # workers never re-seeded, so trial scores carried init noise.
+        trial_index = 0
+        try:
+            from ray import tune as _tune
+
+            _ctx_getter = getattr(_tune, 'get_context', None)
+            _ctx = _ctx_getter() if callable(_ctx_getter) else None
+            if _ctx is not None:
+                # Ray trial ids look like '761d6_00046' — suffix is the index.
+                trial_index = int(str(_ctx.get_trial_id()).rsplit('_', 1)[-1])
+        except Exception:
+            pass
+        from liulian.pipeline import seed_everything
+
+        seed_everything(
+            int(merged.get('seed', 2026)) + trial_index,
+            deterministic=bool(merged.get('deterministic', False)),
+        )
+
         # Override model_args with trial hypers
         args = _clone_namespace(model_args)
         for k, v in config.items():
