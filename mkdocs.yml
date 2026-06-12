@@ -27,6 +27,7 @@ theme:
 nav:
   - Home: index.md
   - Architecture: architecture.md
+  - Task Ledger: tasks.md
   - Guides:
       - CLI Usage: cli.md
       - Forecasting Pipeline: forecasting_pipeline.md
