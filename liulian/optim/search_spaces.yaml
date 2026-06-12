@@ -72,14 +72,13 @@ identifier_spaces:
   embedding:
     embedding_size: {dist: randint, low: 1, high: 31}      # ref: randint(1, 31). Skipped for patchtst+add_after_patch.
 
-  # sinusoidal_dim / random_identifier_dim ARE tunable (CASE 1 — inner HPO),
-  # but ONLY for multi_channel models: the ChannelTransparentWrapper is rebuilt
-  # per HPO trial (see runtime/experiment.py), so a tuned dim takes effect.
-  # For per_entity (swiss-lstm) the transparent feature is baked into the FROZEN
-  # data loaders (built once per run, not per trial), so resolve_search_space()
-  # GATES these knobs out there — tuning them would be a dead knob. To study
-  # "dim vs metrics" for swiss-lstm, use the CASE 2 outer sweep (separate
-  # param-analysis entry point — recorded, not yet built; see swiss_river.py FIXME).
+  # sinusoidal_dim / random_identifier_dim are REAL inner-HPO knobs in BOTH
+  # split modes (since 2026-06-12): multi_channel rebuilds the
+  # ChannelTransparentWrapper per trial; per_entity REBUILDS THE DATA LOADERS
+  # per trial (the feature is baked into the windows) and re-syncs enc_in —
+  # see make_trainable(loaders_factory=...) in optim/ray_optimizer.py and the
+  # post-HPO rebuild in runtime/experiment.py. The CASE-2 outer sweep (ledger
+  # item #26) remains for systematic dim-vs-metrics curves at a fixed budget.
   sinusoidal:
     sinusoidal_dim:        {dist: randint, low: 1, high: 31}
   random:

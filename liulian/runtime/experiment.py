@@ -478,6 +478,14 @@ class Experiment:
             else:
                 _model_factory = None
 
+            def _loaders_factory(cfg: dict) -> dict:
+                """Rebuild dataset + loaders for a trial that tunes a
+                data-layer dim (runs inside the Ray worker; captures
+                nothing, so the closure stays small)."""
+                from liulian.pipeline import build_dataset, build_loaders
+
+                return build_loaders(build_dataset(cfg), cfg)
+
             trainable = None
             try:
                 from liulian.optim.ray_optimizer import make_trainable
@@ -494,6 +502,7 @@ class Experiment:
                     base_config=self.config,
                     model_factory=_model_factory,
                     save_checkpoints=_save_ckpts,
+                    loaders_factory=_loaders_factory,
                 )
             except Exception as exc:
                 logger.warning('Could not build HPO trainable: %s', exc)
@@ -544,6 +553,30 @@ class Experiment:
             # Retrain with best config
             best_cfg = {**self.config, **hpo_result.best_config}
             best_cfg.pop('search_space', None)
+
+            # If the best trial tuned a data-layer dim, the frozen loaders
+            # were built with the BASE dim — rebuild with the winning dim so
+            # the final model/evaluation matches the best trial's input space.
+            from liulian.optim.search_spaces import DATA_LAYER_DIM_KEYS
+
+            _best_dims = {k: hpo_result.best_config[k] for k in DATA_LAYER_DIM_KEYS if k in hpo_result.best_config}
+            _rebuilt_enc_in: int | None = None
+            if _best_dims:
+                from liulian.pipeline import build_dataset, build_loaders
+
+                loaders = build_loaders(build_dataset(best_cfg), best_cfg)
+                train_loader = loaders['train']
+                val_loader = loaders['val']
+                test_loader = loaders.get('test')
+                _xb = next(iter(train_loader))[0]
+                _rebuilt_enc_in = int(_xb.shape[-1])
+                best_cfg['enc_in'] = _rebuilt_enc_in
+                logger.info(
+                    'Rebuilt loaders for best data-layer dims %s (enc_in=%d)',
+                    _best_dims,
+                    _rebuilt_enc_in,
+                )
+
             trainer = ForecastTrainer(
                 config=best_cfg,
                 checkpoint_dir=ckpt_dir,
@@ -556,6 +589,8 @@ class Experiment:
                 from types import SimpleNamespace as _NS
 
                 best_args = _NS(**{**vars(model_args), **hpo_result.best_config})
+                if _rebuilt_enc_in is not None and hasattr(best_args, 'enc_in'):
+                    best_args.enc_in = _rebuilt_enc_in
                 if _model_factory is not None:
                     torch_model = _model_factory(best_args)
                 else:

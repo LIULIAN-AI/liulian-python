@@ -925,9 +925,11 @@ _RESOLVE_ORDER: list[tuple[str | None, str, bool | None, str]] = [
 
 _YAML_PATH = Path(__file__).with_name('search_spaces.yaml')
 
-# Identifier params whose feature is built in the DATA layer (frozen per HPO run
-# for per_entity splits) — gated out of inner-HPO for per_entity models.
-_DATA_LAYER_DIMS = frozenset({'sinusoidal_dim', 'random_identifier_dim'})
+# Identifier params whose feature is built in the DATA layer. Tuning one in a
+# trial requires REBUILDING the data loaders for that trial (and syncing
+# enc_in) — wired via make_trainable(loaders_factory=...) in ray_optimizer.py
+# and the post-HPO rebuild in runtime/experiment.py.
+DATA_LAYER_DIM_KEYS: tuple[str, ...] = ('sinusoidal_dim', 'random_identifier_dim')
 
 
 def _spec_to_tune(spec: Dict[str, Any]) -> Any:
@@ -990,14 +992,13 @@ def _resolve_from_yaml(model: str, data: str, identifier_mode: str, id_integrati
     id_extra = cfg['identifier_spaces'].get(identifier_mode, {}) or {}
     has_emb = identifier_mode in ('embedding', 'embedding_idx')
     skip_emb = model == 'patchtst' and has_emb and id_integration == 'add_after_patch'
-    # Transparent-feature dims are tunable ONLY for multi_channel models; for
-    # per_entity (swiss-lstm) the feature is frozen in the data loaders, so a
-    # tuned value would be a dead knob — gate it out (use the Case-2 sweep).
-    is_per_entity = model == 'lstm' and data.startswith('swiss-river')
+    # Transparent-feature dims (DATA_LAYER_DIM_KEYS) are live knobs in BOTH
+    # split modes: multi_channel rebuilds the wrapper per trial; per_entity
+    # rebuilds the data loaders per trial (loaders_factory in
+    # ray_optimizer.make_trainable) so the sampled dim genuinely changes the
+    # inputs.
     for name, spec in id_extra.items():
         if name == 'embedding_size' and skip_emb:
-            continue
-        if name in _DATA_LAYER_DIMS and is_per_entity:
             continue
         space[name] = _spec_to_tune(spec)
     return space

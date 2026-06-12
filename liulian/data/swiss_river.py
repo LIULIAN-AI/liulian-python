@@ -114,10 +114,12 @@ class SwissRiverDataset(SpatialTempoDataset):
         include_historical_predicted_y: bool = False,
         identifier_mode: str = 'none',
         id_integration: str = 'concat_to_x',
-        # sinusoidal_dim / random_identifier_dim: CASE 1 (inner HPO) tunable
-        # for multi_channel via search_spaces.yaml; per_entity (here) is
-        # frozen per run -> CASE 2 outer sweep for "dim vs metrics" analysis
-        # (separate entry point, TBD — see docs/tasks.md).
+        # sinusoidal_dim / random_identifier_dim: inner-HPO tunable in BOTH
+        # split modes (since 2026-06-12). per_entity trials rebuild this
+        # dataset + its loaders with the sampled dim (loaders_factory in
+        # optim/ray_optimizer.make_trainable); multi_channel rebuilds the
+        # ChannelTransparentWrapper instead. The CASE-2 outer sweep (ledger
+        # #26) remains for systematic dim-vs-metrics curves.
         sinusoidal_dim: int = 16,
         random_identifier_dim: int = 16,
         random_identifier_seed: int = 2026,

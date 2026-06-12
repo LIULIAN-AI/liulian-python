@@ -36,6 +36,7 @@ def make_trainable(
     base_config: Dict[str, Any],
     model_factory: Optional[Callable[[Any], Any]] = None,
     save_checkpoints: bool = True,
+    loaders_factory: Optional[Callable[[Dict[str, Any]], Dict[str, Any]]] = None,
 ) -> Callable[[Dict[str, Any]], None]:
     """Create a Ray Tune trainable from liulian components.
 
@@ -58,6 +59,14 @@ def make_trainable(
         save_checkpoints: If ``True`` save a ``.pth`` model state-dict
             **every epoch** alongside the Ray report.  Required for
             post-HPO checkpoint trimming and best-model loading.
+        loaders_factory: Optional callable ``(merged_config) -> loaders``.
+            Invoked INSIDE the trial (Ray worker) when the trial config
+            samples a data-layer dim (``DATA_LAYER_DIM_KEYS``, e.g.
+            ``sinusoidal_dim``): those features are baked into the windows
+            at dataset-build time, so the shared ``loaders`` (built with
+            the base dim) must be rebuilt for the trial — otherwise the
+            sampled value would be a dead knob. ``enc_in`` is re-synced
+            from the rebuilt loaders automatically.
 
     Returns:
         A callable ``(config: dict) -> None`` suitable for ``tune.run``.
@@ -103,6 +112,21 @@ def make_trainable(
             if hasattr(args, k):
                 setattr(args, k, v)
 
+        # Data-layer dims (entity-feature width) are baked into the loaders
+        # at dataset-build time. When this trial samples one, rebuild the
+        # loaders for THIS trial and sync enc_in from a real batch —
+        # otherwise the sampled value would be a dead knob.
+        from liulian.optim.search_spaces import DATA_LAYER_DIM_KEYS
+
+        trial_loaders = loaders
+        if loaders_factory is not None and any(k in config for k in DATA_LAYER_DIM_KEYS):
+            trial_loaders = loaders_factory(merged)
+            xb = next(iter(trial_loaders['train']))[0]
+            enc_in = int(xb.shape[-1])
+            merged['enc_in'] = enc_in
+            if hasattr(args, 'enc_in'):
+                args.enc_in = enc_in
+
         # Build fresh model — use factory if available
         if model_factory is not None:
             model = model_factory(args)
@@ -139,9 +163,9 @@ def make_trainable(
             checkpoint_dir=trial_checkpoint_dir,
         )
 
-        train_loader = loaders['train']
-        val_loader = loaders['val']
-        test_loader = loaders.get('test')
+        train_loader = trial_loaders['train']
+        val_loader = trial_loaders['val']
+        test_loader = trial_loaders.get('test')
 
         # Build epoch callback for per-epoch Ray reporting
         metric_name = merged.get('metric', 'loss')
