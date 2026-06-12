@@ -30,6 +30,10 @@ model_spaces:
     learning_rate: {dist: loguniform, low: 0.0001, high: 0.005}  # ref lstm uses 1e-4 low; 1e-5 keeps the prior anchored range
     d_model:       {dist: randint, low: 16, high: 257}     # ref hidden_size: randint(16, 129)
     e_layers:      {dist: randint, low: 1, high: 4}        # ref num_layers: randint(1, 4)
+    # ref LstmModel has NO dropout; ours applies config dropout (lstm.py:49)
+    # between layers AND on the head. Tune {0, 0.1} so HPO can pick the
+    # reference behaviour (0) or our previous default (0.1).
+    dropout:       {dist: choice, values: [0.0, 0.1]}
 
   # LSTM on other datasets (traffic/electricity, multi_channel). Discrete ranges.
   lstm_general:
