@@ -137,7 +137,7 @@ class EntityWrapper(nn.Module):
             x_enc = self.enc_proj(torch.cat([x_enc, emb], dim=-1))
 
             # Also augment x_dec for encoder-decoder models  # todo: this is not needed for non-enc-dec models
-            if x_dec is not None: # todo: test this part
+            if x_dec is not None:  # todo: test this part
                 T_dec = x_dec.size(1)
                 e_id_scalar = e_ids[:, 0:1]  # (B, 1)
                 dec_emb = self.embedding(e_id_scalar.expand(-1, T_dec))  # (B, T_dec, embedding_size)
