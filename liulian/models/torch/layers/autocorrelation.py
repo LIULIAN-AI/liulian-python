@@ -57,11 +57,7 @@ class AutoCorrelation(nn.Module):
         for i in range(top_k):
             pattern = torch.roll(tmp_values, -int(index[i]), -1)
             delays_agg = delays_agg + pattern * (
-                tmp_corr[:, i]
-                .unsqueeze(1)
-                .unsqueeze(1)
-                .unsqueeze(1)
-                .repeat(1, head, channel, length)
+                tmp_corr[:, i].unsqueeze(1).unsqueeze(1).unsqueeze(1).repeat(1, head, channel, length)
             )
         return delays_agg
 
@@ -93,16 +89,10 @@ class AutoCorrelation(nn.Module):
         tmp_values = values.repeat(1, 1, 1, 2)
         delays_agg = torch.zeros_like(values).float()
         for i in range(top_k):
-            tmp_delay = init_index + delay[:, i].unsqueeze(1).unsqueeze(1).unsqueeze(
-                1
-            ).repeat(1, head, channel, length)
+            tmp_delay = init_index + delay[:, i].unsqueeze(1).unsqueeze(1).unsqueeze(1).repeat(1, head, channel, length)
             pattern = torch.gather(tmp_values, dim=-1, index=tmp_delay)
             delays_agg = delays_agg + pattern * (
-                tmp_corr[:, i]
-                .unsqueeze(1)
-                .unsqueeze(1)
-                .unsqueeze(1)
-                .repeat(1, head, channel, length)
+                tmp_corr[:, i].unsqueeze(1).unsqueeze(1).unsqueeze(1).repeat(1, head, channel, length)
             )
         return delays_agg
 
@@ -156,13 +146,9 @@ class AutoCorrelation(nn.Module):
 
         # time delay agg
         if self.training:
-            V = self.time_delay_agg_training(
-                values.permute(0, 2, 3, 1).contiguous(), corr
-            ).permute(0, 3, 1, 2)
+            V = self.time_delay_agg_training(values.permute(0, 2, 3, 1).contiguous(), corr).permute(0, 3, 1, 2)
         else:
-            V = self.time_delay_agg_inference(
-                values.permute(0, 2, 3, 1).contiguous(), corr
-            ).permute(0, 3, 1, 2)
+            V = self.time_delay_agg_inference(values.permute(0, 2, 3, 1).contiguous(), corr).permute(0, 3, 1, 2)
 
         if self.output_attention:
             return (V.contiguous(), corr.permute(0, 3, 1, 2))

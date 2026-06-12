@@ -49,9 +49,7 @@ class DummyModel(ExecutableModel):
         self.task = task
         self.config = config or {}
         # PredictionTask exposes regime.horizon; fallback to config
-        self.horizon = getattr(
-            getattr(task, 'regime', None), 'horizon', config.get('horizon', 1)
-        )
+        self.horizon = getattr(getattr(task, 'regime', None), 'horizon', config.get('horizon', 1))
 
     def forward(self, batch: Dict[str, np.ndarray]) -> Dict[str, Any]:
         """Repeat the last observed value across the prediction horizon.

@@ -41,16 +41,37 @@ logger = logging.getLogger(__name__)
 # ── Helpers ─────────────────────────────────────────────────────────────
 
 
-def seed_everything(seed: int) -> None:
-    """Set random seeds for reproducibility (random, numpy, torch)."""
+def seed_everything(seed: int, deterministic: bool = False) -> None:
+    """Set random seeds for reproducibility (random, numpy, torch).
+
+    Args:
+        seed: Random seed value.
+        deterministic: If True, enable full CUDA determinism for identical results.
+            This is slower but guarantees bit-exact reproducibility.
+    """
+    import os
+
     random.seed(seed)
     np.random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+
     try:
         import torch
 
         torch.manual_seed(seed)
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(seed)
+
+        if deterministic:
+            # Full CUDA determinism for identical results
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
+            os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+            try:
+                torch.use_deterministic_algorithms(True)
+            except Exception:
+                pass
+            logger.info('Deterministic mode enabled (CUDA)')
     except ImportError:
         pass
     logger.info('Random seed set to %d', seed)
@@ -174,6 +195,9 @@ def build_dataset(config: Dict[str, Any]) -> Any:
             include_historical_predicted_y=config['include_historical_predicted_y'],
             identifier_mode=config['identifier_mode'],
             id_integration=config['id_integration'],
+            sinusoidal_dim=config.get('sinusoidal_dim', 16),
+            random_identifier_dim=config.get('random_identifier_dim', 16),
+            random_identifier_seed=config.get('random_identifier_seed', 2026),
             graph_mode=config['graph_mode'],
             graphlet_num_hops=config['graphlet_num_hops'],
             max_samples=config.get('max_samples'),
@@ -188,9 +212,7 @@ def build_dataset(config: Dict[str, Any]) -> Any:
         # Match Time-Series-Library behavior:
         #   timeenc = 0 if embed != 'timeF' else 1
         # If config does not provide timeenc explicitly, derive it from embed.
-        inferred_timeenc = (
-            0 if str(config.get('embed', 'timeF')) != 'timeF' else 1
-        )
+        inferred_timeenc = 0 if str(config.get('embed', 'timeF')) != 'timeF' else 1
 
         _common_kwargs = dict(
             root_path=root_path,
@@ -204,17 +226,25 @@ def build_dataset(config: Dict[str, Any]) -> Any:
             freq=config.get('freq', 'h'),
             identifier_mode=config.get('identifier_mode', 'none'),
             id_integration=config.get('id_integration', 'concat_to_x'),
+            sinusoidal_dim=config.get('sinusoidal_dim', 16),
+            random_identifier_dim=config.get('random_identifier_dim', 16),
+            random_identifier_seed=config.get('random_identifier_seed', 2026),
             graph_mode=config.get('graph_mode', 'none'),
+            data_dtype=config.get('data_dtype', 'float32'),
+            max_samples=config.get('max_samples'),
         )
 
         if data_name in ('ETTh1', 'ETTh2'):
             from liulian.data.csv_dataset import ETTHourDataset
+
             dataset = ETTHourDataset(**_common_kwargs)
         elif data_name in ('ETTm1', 'ETTm2'):
             from liulian.data.csv_dataset import ETTMinuteDataset
+
             dataset = ETTMinuteDataset(**_common_kwargs)
         else:
             from liulian.data.csv_dataset import CustomCSVDataset
+
             dataset = CustomCSVDataset(**_common_kwargs)
 
         # Propagate split_mode for info()
@@ -235,7 +265,11 @@ def build_dataset(config: Dict[str, Any]) -> Any:
             scaler_type=config.get('scaler', 'standard'),
             identifier_mode=config.get('identifier_mode', 'none'),
             id_integration=config.get('id_integration', 'concat_to_x'),
+            sinusoidal_dim=config.get('sinusoidal_dim', 16),
+            random_identifier_dim=config.get('random_identifier_dim', 16),
+            random_identifier_seed=config.get('random_identifier_seed', 2026),
             graph_mode=config.get('graph_mode', 'none'),
+            max_samples=config.get('max_samples'),
         )
         # Propagate split_mode for info()
         dataset.split_mode = config.get('split_mode', 'multi_channel')
@@ -260,7 +294,7 @@ def print_dataset_summary(dataset: Any) -> None:
         info.get('graph_name', 'none'),
     )
     logger.info(
-        '  stations=%d, task=%s, seq_len=%d, pred_len=%d',
+        '  stations=%d, task=%s, seq_len=%d, pred_len=%d',  # fixme: what happens for other datasets without stations
         info.get('num_stations', len(getattr(dataset, 'station_ids', []))),
         info.get('task', ''),
         info.get('seq_len', 0),
@@ -311,10 +345,7 @@ def _load_prompt_content(config: Dict[str, Any]) -> str:
     if os.path.exists(prompt_path):
         with open(prompt_path) as fh:
             return fh.read()
-    return (
-        'Time series dataset for forecasting. '
-        'Data includes monitoring stations with periodic observations.'
-    )
+    return 'Time series dataset for forecasting. Data includes monitoring stations with periodic observations.'
 
 
 def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
@@ -385,7 +416,9 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
         config['dec_in'] = config['enc_in']
         logger.info(
             'Auto-set c_out=%d, dec_in=%d for features=%r (multi_channel mode)',
-            config['c_out'], config['dec_in'], features,
+            config['c_out'],
+            config['dec_in'],
+            features,
         )
 
     ns = SimpleNamespace(**config)
@@ -416,11 +449,8 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
 
     # Wrap with entity embedding when configured.
     # PatchTST + add_after_patch is handled internally by the model.
-    if (
-        config.get('identifier_mode') == 'embedding'
-        and config.get('id_integration') != 'add_after_patch'
-    ):
-        num_emb = config.get('num_embeddings')
+    if config.get('identifier_mode') == 'embedding' and config.get('id_integration') != 'add_after_patch':
+        num_emb = config.get('num_embeddings')  # todo: should embedding be refactored with other mode?
         if num_emb is None and dataset is not None:
             num_emb = len(dataset.station_ids)
         if num_emb is None:
@@ -474,9 +504,33 @@ def build_loaders(dataset: Any, config: Dict[str, Any]) -> Dict[str, Any]:
     Delegates to ``dataset.get_data_loaders()`` which is the standard
     interface for liulian datasets.
     """
+    max_train_samples = config.get('max_train_samples')
+    if max_train_samples is not None:
+        max_train_samples = int(max_train_samples)
+        if max_train_samples <= 0:
+            raise ValueError(f'max_train_samples must be positive, got {max_train_samples}.')
+        train_split = dataset.get_split('train')
+        if not hasattr(train_split, 'with_max_samples'):
+            raise ValueError('Dataset train split does not support max_train_samples capping.')
+        capped_train = train_split.with_max_samples(max_train_samples)
+        split_cache = getattr(dataset, '_split_cache', None)
+        if not isinstance(split_cache, dict):
+            raise ValueError('Dataset does not expose mutable split cache for max_train_samples.')
+        split_cache['train'] = capped_train
+        logger.info(
+            'Applied max_train_samples=%d (train split: %d -> %d)',
+            max_train_samples,
+            len(train_split),
+            len(capped_train),
+        )
+
+    # In deterministic mode, disable shuffle for reproducible batch ordering
+    shuffle_train = not config.get('deterministic', False)
+
     return dataset.get_data_loaders(
         batch_size=config.get('batch_size', 8),
         num_workers=config.get('num_workers', 0),
+        shuffle_train=shuffle_train,
     )
 
 
@@ -498,38 +552,38 @@ def build_optimizer(config: Dict[str, Any]) -> Optional[Any]:
         logger.info('ray[tune] not installed — HPO disabled.')
         return None
 
-    optimizer = RayOptimizer(
-        config={
-            'num_samples': config.get('hpo_num_samples', 200),
-            'max_epochs': config.get('train_epochs', 30),
-            'metric': 'loss',
-            'mode': 'min',
-            'scheduler': config.get('hpo_scheduler', 'asha'),
-            'grace_period': config.get('hpo_grace_period', 5),
-            'reduction_factor': config.get('hpo_reduction_factor', 1.5),
-            'storage_path': config.get('hpo_storage_path'),
-            'resources_per_trial': {
-                'cpu': config.get('hpo_resources_cpu', 1),
-                'gpu': config.get('hpo_resources_gpu', 0),
-            },
-            'num_cpus': config.get('hpo_num_cpus'),
-            'max_concurrent_trials': config.get('hpo_max_concurrent'),
-            'resume': config.get('hpo_resume', False),
-            'save_checkpoints': config.get('hpo_save_checkpoints', True),
-            'trim_checkpoints': config.get('hpo_trim_checkpoints', True),
-            'keep_best_n': config.get('hpo_keep_best_n', 10),
-            'trim_best_n': config.get('hpo_trim_best_n', True),
-            'trim_keep_best': config.get('hpo_trim_keep_best', True),
-            'trim_keep_last': config.get('hpo_trim_keep_last', False),
-            'experiment_name': build_hpo_experiment_name(config),
-            'local_mode': config.get('hpo_local_mode', False),
-            # Pass through for experiment_name building
-            'data': config.get('data'),
-            'model': config.get('model'),
-            'task': config.get('task'),
-            'mode_tag': config.get('split_mode'),
+    opt_config = {  # todo: for the whole project (and ai agent in general), make this rule: if a arguments contains large content, always make a temporal variable to create first for the sake of easy debugging, unless it is bad for performance. Discuss with ai to determine if this is a valid point, and if the deployment version should be seperated and how.
+        'num_samples': config.get('hpo_num_samples', 200),  # todo: make this config consistent across the project
+        'max_epochs': config.get('train_epochs', 30),
+        'metric': 'loss',
+        'mode': 'min',
+        'scheduler': config.get('hpo_scheduler', 'asha'),
+        'grace_period': config.get('hpo_grace_period', 5),
+        'reduction_factor': config.get('hpo_reduction_factor', 1.5),
+        'storage_path': config.get('hpo_storage_path'),
+        'resources_per_trial': {
+            'cpu': config.get('hpo_resources_cpu', 1),
+            'gpu': config.get('hpo_resources_gpu', 0),
         },
-    )
+        'num_cpus': config.get('hpo_num_cpus'),
+        'max_concurrent_trials': config.get('hpo_max_concurrent'),
+        'resume': config.get('hpo_resume', False),
+        'save_checkpoints': config.get('hpo_save_checkpoints', True),
+        'trim_checkpoints': config.get('hpo_trim_checkpoints', True),
+        'keep_best_n': config.get('hpo_keep_best_n', 10),
+        'trim_best_n': config.get('hpo_trim_best_n', True),
+        'trim_keep_best': config.get('hpo_trim_keep_best', True),
+        'trim_keep_last': config.get('hpo_trim_keep_last', False),
+        'experiment_name': build_hpo_experiment_name(config),
+        'local_mode': config.get('hpo_local_mode', False),
+        # Pass through for experiment_name building
+        'data': config.get('data'),
+        'model': config.get('model'),
+        'task': config.get('task'),
+        'mode_tag': config.get('split_mode'),
+    }
+
+    optimizer = RayOptimizer(config=opt_config)
 
     # Default search space — resolved from search_spaces.py registry
     if 'search_space' not in config:
@@ -548,12 +602,19 @@ def build_optimizer(config: Dict[str, Any]) -> Optional[Any]:
             list(config['search_space'].keys()),
         )
 
-    logger.info(
-        'HPO enabled: %d samples, grace=%s, reduction=%s, storage=%s',
+    logger.info(  # todo: should here use opt_config?
+        'HPO enabled: samples=%s, grace=%s, reduction=%s, storage=%s, '
+        'resources_per_trial={cpu:%s,gpu:%s}, max_concurrent=%s, '
+        'early_stopping=%s (patience=%s)',
         config.get('hpo_num_samples', 200),
         config.get('hpo_grace_period', 5),
         config.get('hpo_reduction_factor', 1.5),
         config.get('hpo_storage_path', 'artifacts/ray_results'),
+        config.get('hpo_resources_cpu', 1),
+        config.get('hpo_resources_gpu', 0),
+        config.get('hpo_max_concurrent'),
+        not bool(config.get('disable_early_stopping', False)),
+        config.get('patience', 10),
     )
     return optimizer
 
@@ -627,7 +688,7 @@ def build_experiment(
 
     # Spec — comprehensive snapshot of every experiment parameter
     model_name = config.get('model', 'model')
-    spec = ExperimentSpec(
+    spec = ExperimentSpec(  # todo: similarly, many configs here might be tuned by optimizer.
         name=f'{config.get("data", "data")}_{model_name}'
         f'_{config.get("task", "forecast")}_{config.get("split_mode", "per_entity")}',
         task={
@@ -704,7 +765,7 @@ def build_experiment(
 
     # Viz config
     config['auto_viz'] = config.get('auto_viz', True)
-    config['viz_method'] = config.get('viz_method', 'mean')
+    config['viz_method'] = config.get('viz_method', 'mean')  # maybe this should be multiple possibility
 
     return Experiment(
         spec=spec,
@@ -739,29 +800,40 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
 
     t0 = time.time()
 
+    # Check for deterministic mode
+    deterministic = config.get('deterministic', False)
+
+    # In deterministic mode, force dropout=0 to eliminate stochasticity
+    if deterministic:
+        config['dropout'] = 0.0
+
     # ── Seed ────────────────────────────────────────────────────────
-    seed_everything(config.get('seed', 2026))
+    seed_everything(config.get('seed', 2026), deterministic=deterministic)
 
     # ── Quick-test overrides ────────────────────────────────────────
     if config.get('quick_test', False):
         apply_quick_test(config)
 
     # ── Print experiment info ───────────────────────────────────────
-    print_experiment_info(config)
+    print_experiment_info(
+        config
+    )  # todo: if hparam optimization is on, some of this info is not yet final at this point. This is the same problem when saving the config to "resolved_config.yaml"
 
     # ── Build ───────────────────────────────────────────────────────
     dataset = build_dataset(config)
-    print_dataset_summary(dataset)
     # TSL seeds once and instantiates the model before building loaders.
     # Re-seed here so dataset construction does not perturb the model/init RNG
     # stream relative to the TSL reference pipeline.
-    seed_everything(config.get('seed', 2026))
+    seed_everything(config.get('seed', 2026), deterministic=deterministic)  #  fixme: why this is done twice?
     model = build_model(config, dataset)
+    print_dataset_summary(dataset)  # Print after model build to avoid any RNG consumption
     loaders = build_loaders(dataset, config)
     exp = build_experiment(config, dataset, model, loaders)
 
     # ── Run ─────────────────────────────────────────────────────────
-    summary = exp.run(train=not config.get('eval_only', False))
+    summary = exp.run(
+        train=not config.get('eval_only', False)
+    )  # todo: include best hprams here or is it already saved (then include the path to it)
 
     elapsed = time.time() - t0
 
@@ -789,6 +861,7 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
                 preds=pred_result['preds'],
                 trues=pred_result['trues'],
                 times=pred_result['times'],
+                entity_ids=pred_result.get('entity_ids'),
                 method=viz_method,
                 output_dir=viz_dir,
                 title_prefix=f'{config["data"]} / {config["model"]} — ',
@@ -805,12 +878,15 @@ def run_experiment(config: Dict[str, Any]) -> Dict[str, Any]:
     # Save raw predictions as .npz
     if pred_result is not None:
         npz_path = os.path.join(artifacts_dir, 'predictions.npz')
-        np.savez_compressed(
-            npz_path,
-            preds=pred_result['preds'].numpy(),
-            trues=pred_result['trues'].numpy(),
-            times=pred_result['times'].numpy(),
-        )
+        npz_payload: dict[str, Any] = {
+            'preds': pred_result['preds'].numpy(),
+            'trues': pred_result['trues'].numpy(),
+            'times': pred_result['times'].numpy(),
+        }
+        entity_ids = pred_result.get('entity_ids')
+        if entity_ids is not None:
+            npz_payload['entity_ids'] = np.asarray(entity_ids, dtype=object)
+        np.savez_compressed(npz_path, **npz_payload)
         logger.ok('Raw predictions saved → %s', npz_path)
 
     # ── Console report ──────────────────────────────────────────────
@@ -923,9 +999,19 @@ def print_experiment_info(config: Dict[str, Any]) -> None:
     # ── Model Architecture ──────────────────────────────────────────
     print(_bold('\n  Model Architecture'))
     for k in (
-        'enc_in', 'dec_in', 'c_out', 'd_model', 'd_ff',
-        'n_heads', 'e_layers', 'd_layers', 'dropout',
-        'patch_len', 'stride', 'individual', 'moving_avg',
+        'enc_in',
+        'dec_in',
+        'c_out',
+        'd_model',
+        'd_ff',
+        'n_heads',
+        'e_layers',
+        'd_layers',
+        'dropout',
+        'patch_len',
+        'stride',
+        'individual',
+        'moving_avg',
     ):
         v = config.get(k)
         if v is not None:
@@ -940,6 +1026,12 @@ def print_experiment_info(config: Dict[str, Any]) -> None:
     print(_kv_line('Loss', config.get('loss', 'mse')))
     print(_kv_line('Metrics', config.get('metrics', 'N/A')))
     print(_kv_line('Patience', config.get('patience', 'N/A')))
+    print(
+        _kv_line(
+            'Early stopping',
+            not bool(config.get('disable_early_stopping', False)),
+        )
+    )
     print(_kv_line('Eval denorm', config.get('eval_denorm', True)))
 
     # ── Noise ───────────────────────────────────────────────────────
@@ -956,6 +1048,13 @@ def print_experiment_info(config: Dict[str, Any]) -> None:
         print(_kv_line('Num samples', config.get('hpo_num_samples', 100)))
         print(_kv_line('Scheduler', config.get('hpo_scheduler', 'asha')))
         print(_kv_line('Grace period', config.get('hpo_grace_period', 5)))
+        print(
+            _kv_line(
+                'Resources / trial',
+                'cpu=' + str(config.get('hpo_resources_cpu', 1)) + ', gpu=' + str(config.get('hpo_resources_gpu', 0)),
+            )
+        )
+        print(_kv_line('Max concurrent', config.get('hpo_max_concurrent', 'auto')))
         print(_kv_line('Resume', config.get('hpo_resume', False)))
 
     # ── GPU ─────────────────────────────────────────────────────────
@@ -994,8 +1093,7 @@ def print_report(
     print(
         _kv_line(
             'Task',
-            f'{config["task"]}  (seq={config["seq_len"]}, '
-            f'pred={config["pred_len"]})',
+            f'{config["task"]}  (seq={config["seq_len"]}, pred={config["pred_len"]})',
         )
     )
     print(_kv_line('Model', config.get('model', 'N/A')))
@@ -1055,10 +1153,10 @@ def build_results_dict(
     elapsed: float,
     model: Any = None,
 ) -> Dict[str, Any]:
-    """Build a comprehensive results dictionary for JSON serialisation.
+    """Build a comprehensive results dictionary for JSON serialization.
 
     The returned dict contains all information needed to reproduce,
-    compare, and analyse the experiment results.  See
+    compare, and analyze the experiment results.  See
     ``docs/results_json.md`` for a detailed field reference.
     """
     gpu = _gpu_info()
@@ -1084,7 +1182,9 @@ def build_results_dict(
         hpo_info = {
             'best_value': hpo_raw.get('best_value'),
             'n_trials': hpo_raw.get('n_trials'),
-            'best_hparams': hpo_raw.get('best_hparams', {}),
+            # Fall back to the legacy `best_config` key so pre-2026-06-12
+            # summaries still populate the documented field.
+            'best_hparams': hpo_raw.get('best_hparams') or hpo_raw.get('best_config', {}),
         }
         structured_metrics['hpo'] = hpo_info
 

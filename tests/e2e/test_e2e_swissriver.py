@@ -16,9 +16,7 @@ import pytest
 # Mark the entire module so it's easy to skip in CI feature branches
 pytestmark = pytest.mark.main_branch
 
-DATASET_ROOT = os.path.join(
-    os.path.dirname(__file__), '..', '..', 'dataset', 'swiss_river'
-)
+DATASET_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'dataset', 'swiss_river')
 SKIP_REASON = 'Swiss River CSV data not found under dataset/swiss_river'
 
 

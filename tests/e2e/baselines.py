@@ -56,6 +56,7 @@ def _placeholder(n: int = 4) -> dict[str, dict]:
         for k in keys[:n]
     }
 
+
 # ── LSTM + Swiss River 1990 + per_entity mode ──────────────────────────────
 
 LSTM_SWISS1990: dict[str, dict] = {

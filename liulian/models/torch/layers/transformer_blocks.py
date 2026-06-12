@@ -7,7 +7,6 @@ https://github.com/thuml/Time-Series-Library/blob/main/layers/Transformer_EncDec
 Standard transformer building blocks with optional distillation for forecasting tasks.
 """
 
-import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
@@ -68,18 +67,14 @@ class Encoder(nn.Module):
     def __init__(self, attn_layers, conv_layers=None, norm_layer=None):
         super(Encoder, self).__init__()
         self.attn_layers = nn.ModuleList(attn_layers)
-        self.conv_layers = (
-            nn.ModuleList(conv_layers) if conv_layers is not None else None
-        )
+        self.conv_layers = nn.ModuleList(conv_layers) if conv_layers is not None else None
         self.norm = norm_layer
 
     def forward(self, x, attn_mask=None, tau=None, delta=None):
         # x [B, L, D]
         attns = []
         if self.conv_layers is not None:
-            for i, (attn_layer, conv_layer) in enumerate(
-                zip(self.attn_layers, self.conv_layers)
-            ):
+            for i, (attn_layer, conv_layer) in enumerate(zip(self.attn_layers, self.conv_layers)):
                 delta = delta if i == 0 else None
                 x, attn = attn_layer(x, attn_mask=attn_mask, tau=tau, delta=delta)
                 x = conv_layer(x)
@@ -122,16 +117,10 @@ class DecoderLayer(nn.Module):
         self.activation = F.relu if activation == 'relu' else F.gelu
 
     def forward(self, x, cross, x_mask=None, cross_mask=None, tau=None, delta=None):
-        x = x + self.dropout(
-            self.self_attention(x, x, x, attn_mask=x_mask, tau=tau, delta=None)[0]
-        )
+        x = x + self.dropout(self.self_attention(x, x, x, attn_mask=x_mask, tau=tau, delta=None)[0])
         x = self.norm1(x)
 
-        x = x + self.dropout(
-            self.cross_attention(
-                x, cross, cross, attn_mask=cross_mask, tau=tau, delta=delta
-            )[0]
-        )
+        x = x + self.dropout(self.cross_attention(x, cross, cross, attn_mask=cross_mask, tau=tau, delta=delta)[0])
 
         y = x = self.norm2(x)
         y = self.dropout(self.activation(self.conv1(y.transpose(-1, 1))))
@@ -151,9 +140,7 @@ class Decoder(nn.Module):
 
     def forward(self, x, cross, x_mask=None, cross_mask=None, tau=None, delta=None):
         for layer in self.layers:
-            x = layer(
-                x, cross, x_mask=x_mask, cross_mask=cross_mask, tau=tau, delta=delta
-            )
+            x = layer(x, cross, x_mask=x_mask, cross_mask=cross_mask, tau=tau, delta=delta)
 
         if self.norm is not None:
             x = self.norm(x)

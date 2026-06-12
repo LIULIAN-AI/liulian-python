@@ -39,9 +39,7 @@ class Model(nn.Module):
     """
 
     def __init__(self, configs):
-        super(
-            Model, self
-        ).__init__()  # todo: nowcasting? extrapo_mode: limo, future_embedding, recursive
+        super(Model, self).__init__()  # todo: nowcasting? extrapo_mode: limo, future_embedding, recursive
         self.seq_len = configs.seq_len
         self.pred_len = configs.pred_len
         self.enc_in = configs.enc_in
@@ -86,7 +84,20 @@ class Model(nn.Module):
         last_hidden = lstm_out[:, -1, :]  # [B, d_model]
         last_hidden = self.dropout(last_hidden)
 
-        # Project to prediction
+        # Project to prediction — DIRECT MULTI-STEP (DMS), the TSL contract:
+        # one shot from the last hidden state to all pred_len steps. Same
+        # family as the swiss-river benchmark's ExtrapoLstmModel('limo').
+        # NOTE: the benchmark's plain LstmModel instead decodes PER TIME STEP
+        # over the whole window ((B, win_len, 1), loss on the full masked
+        # sequence — its output is NOT truncated; see
+        # https://github.com/jajupmochi/swiss-river-network-benchmark/blob/main/swissrivernetwork/benchmark/model.py#L32 ).
+        # The produce-then-truncate pattern lives in TSL's exp loop
+        # (outputs[:, -pred_len:]), not in the benchmark.
+        # TODO(nowcast): for task='nowcast' this last-hidden head is wasteful
+        # (1 supervised step per window, ~seq_len x redundant compute vs
+        # per-step decoding). Add a per-step decoding head for lstm (and
+        # audit the other models) per the 2026-06-12 discussion BEFORE
+        # running nowcast experiments.
         out = self.projection(last_hidden)  # [B, pred_len * c_out]
         out = out.view(-1, self.pred_len, self.c_out)  # [B, pred_len, c_out]
 

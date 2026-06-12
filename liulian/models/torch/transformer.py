@@ -68,10 +68,7 @@ class Model(nn.Module):
             norm_layer=torch.nn.LayerNorm(configs.d_model),
         )
         # Decoder
-        if (
-            self.task_name == 'long_term_forecast'
-            or self.task_name == 'short_term_forecast'
-        ):
+        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
             self.dec_embedding = DataEmbedding(
                 configs.dec_in,
                 configs.d_model,
@@ -119,9 +116,7 @@ class Model(nn.Module):
         if self.task_name == 'classification':
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
-            self.projection = nn.Linear(
-                configs.d_model * configs.seq_len, configs.num_class
-            )
+            self.projection = nn.Linear(configs.d_model * configs.seq_len, configs.num_class)
 
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
@@ -129,7 +124,7 @@ class Model(nn.Module):
 
         # align x_mark_dec to x_dec length (label_len+pred_len)
         if x_mark_dec is not None and x_mark_dec.shape[1] > x_dec.shape[1]:
-            x_mark_dec = x_mark_dec[:, :x_dec.shape[1], :]
+            x_mark_dec = x_mark_dec[:, : x_dec.shape[1], :]
         dec_out = self.dec_embedding(x_dec, x_mark_dec)
         dec_out = self.decoder(dec_out, enc_out, x_mask=None, cross_mask=None)
         return dec_out
@@ -163,10 +158,7 @@ class Model(nn.Module):
         return output
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
-        if (
-            self.task_name == 'long_term_forecast'
-            or self.task_name == 'short_term_forecast'
-        ):
+        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
             dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
             return dec_out[:, -self.pred_len :, :]
         if self.task_name == 'imputation':

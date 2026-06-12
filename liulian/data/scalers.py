@@ -29,7 +29,7 @@ making it easy to configure via YAML / CLI::
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List, Optional, Sequence, Union
+from typing import Any, Dict, Optional, Sequence
 
 import numpy as np
 import pandas as pd
@@ -177,9 +177,7 @@ class StationSplitScaler:
         names = np.asarray(global_scaler.feature_names_in_, dtype=str)
         mask = np.char.endswith(names, feat_suffix)
         feat_idx = np.nonzero(mask)[0]
-        feat_keys = [
-            n.rstrip(feat_suffix) if feat_suffix else n for n in names[feat_idx]
-        ]
+        feat_keys = [n.rstrip(feat_suffix) if feat_suffix else n for n in names[feat_idx]]
 
         self.feat_keys = feat_keys
         self._scalers: Dict[str, Any] = {}
@@ -310,11 +308,7 @@ class EntityScaler:
                 self._scalers[(entity, suffix)] = scaler
 
                 # Collect target values for optional global scaler
-                if (
-                    self.create_global_scaler
-                    and suffix in self.target_suffixes
-                    and mask.any()
-                ):
+                if self.create_global_scaler and suffix in self.target_suffixes and mask.any():
                     all_target_vals.append(vals[mask])
 
         # Optional global target scaler (pooled over all entities)
@@ -407,9 +401,7 @@ class EntityScaler:
         if entity_ids is not None:
             n_samples = arr.shape[0]
             if len(entity_ids) != n_samples:
-                raise ValueError(
-                    f'entity_ids length ({len(entity_ids)}) != batch size ({n_samples})'
-                )
+                raise ValueError(f'entity_ids length ({len(entity_ids)}) != batch size ({n_samples})')
             result = np.empty_like(arr)
             for i, eid in enumerate(entity_ids):
                 sample = arr[i]  # shape (T, C) or (C,)
@@ -417,18 +409,12 @@ class EntityScaler:
                 n_cols = sample.shape[-1]
                 for c in range(n_cols):
                     suffix = (
-                        self.target_suffixes[c]
-                        if c < len(self.target_suffixes)
-                        else self.target_suffixes[0]
+                        self.target_suffixes[c] if c < len(self.target_suffixes) else self.target_suffixes[0]
                     )  # todo: Is this correct? Should have a kwarg input for this
                     col_data = sample[:, c : c + 1] if was_2d else sample[c : c + 1]
                     result_col = self.inverse_transform_entity(col_data, eid, suffix)
                     if was_2d:
-                        result[i, :, c : c + 1] = (
-                            result_col
-                            if result_col.ndim == 2
-                            else result_col.reshape(-1, 1)
-                        )
+                        result[i, :, c : c + 1] = result_col if result_col.ndim == 2 else result_col.reshape(-1, 1)
                     else:
                         result[i, c : c + 1] = result_col.ravel()[:1]
             if is_tensor:
@@ -494,8 +480,7 @@ class EntityScaler:
         key = (entity_id, suffix)
         if key not in self._scalers:
             raise KeyError(
-                f'No scaler for entity={entity_id!r}, suffix={suffix!r}. '
-                f'Available entities: {self.entity_ids}'
+                f'No scaler for entity={entity_id!r}, suffix={suffix!r}. Available entities: {self.entity_ids}'
             )
         was_1d = data.ndim == 1
         arr = data.reshape(-1, 1) if was_1d else data

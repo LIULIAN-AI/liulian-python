@@ -2,10 +2,14 @@
 
 from __future__ import annotations
 
+import sys
+import types
+from types import SimpleNamespace
+
 import pytest
 
 from liulian.optim.base import OptimizationResult
-from liulian.optim.ray_optimizer import RayOptimizer
+from liulian.optim.ray_optimizer import RayOptimizer, make_trainable
 
 
 class TestOptimizationResult:
@@ -73,3 +77,55 @@ class TestRayOptimizer:
 
         result = opt.run(spec=None, search_space={'x': [1, 2]})
         assert isinstance(result.best_value, float)
+
+    def test_make_trainable_uses_trial_scoped_checkpoint_dir(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        """Ray trials should use unique checkpoint dirs to avoid collisions."""
+        captured: dict[str, object] = {}
+
+        class DummyTrainer:
+            def __init__(
+                self,
+                config: dict[str, object],
+                device: object = None,
+                checkpoint_dir: str | None = None,
+                exp_logger: object = None,
+                inverse_transform: object = None,
+            ) -> None:
+                del device, exp_logger, inverse_transform
+                captured['config'] = config
+                captured['checkpoint_dir'] = checkpoint_dir
+
+            def fit(self, *args: object, **kwargs: object) -> None:
+                del args, kwargs
+
+        class DummyModel:
+            def __init__(self, args: SimpleNamespace) -> None:
+                del args
+
+            def float(self) -> 'DummyModel':
+                return self
+
+        class _FakeTuneContext:
+            def get_trial_id(self) -> str:
+                return 'abc123'
+
+        class _FakeTuneModule:
+            @staticmethod
+            def get_context() -> _FakeTuneContext:
+                return _FakeTuneContext()
+
+        monkeypatch.setitem(sys.modules, 'ray', types.SimpleNamespace(tune=_FakeTuneModule))
+        import liulian.runtime.trainer as trainer_mod
+
+        monkeypatch.setattr(trainer_mod, 'ForecastTrainer', DummyTrainer)
+
+        trainable = make_trainable(
+            model_cls=DummyModel,
+            model_args=SimpleNamespace(),
+            loaders={'train': object(), 'val': object(), 'test': object()},
+            base_config={},
+        )
+        trainable({})
+
+        assert captured['config'] == {'disable_early_stopping': False}
+        assert captured['checkpoint_dir'] == 'checkpoints/trial_abc123'

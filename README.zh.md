@@ -111,6 +111,27 @@ print(metrics)  # {'mse': ..., 'mae': ..., 'rmse': ...}
 
 详见[适配器指南](docs/adapter_guide.md)了解完整的契约规范。
 
+## 其余文档的位置
+
+`liulian-python` 仅保留 ML 库本身的内容。**跨库的平台级文档**（blueprint、
+ADRs、user stories、agile 模板、advisor 简报）现在集中在一个独立的联邦
+文档枢纽：[**`liulian-docs`**](../liulian-docs/) —— 用 `mkdocs serve`
+本地浏览。
+
+各领域文档由各自的兄弟库承载。完整索引见
+[`docs/strategy/MOVED.md`](docs/strategy/MOVED.md)。
+
+简要分布：
+
+- **联邦枢纽 — blueprint / ADRs / user stories / agile / advisor briefings** → `liulian-docs/docs/`
+- **UI / web 重设计 / spec** → `liulian-web/docs/`
+- **设计系统、tokens、参考资源** → `liulian-design-system/docs/`
+- **开发环境与集群设置** → `liulian-dev-env/docs/`
+- **运维 / 部署 / 成本账本** → `liulian-ops/docs/`
+- **Agent / LLM 网关** → `liulian-agent/docs/`
+- **Mobile（iOS / Android / HarmonyOS）** → `liulian-mobile/`
+- **数据采集管线** → `liulian-ingest/`
+
 ## 项目结构
 
 ```

@@ -42,6 +42,9 @@ from liulian.models.torch.transformer import TransformerAdapter
 from liulian.models.torch.training_utils import EarlyStopping
 from liulian.optim.lr_schedulers import adjust_learning_rate
 
+# Import float64-aligned dataloader for TSL matching
+from experiments.adapt_tsl_lib.tsl_float64_dataloader import create_tsl_aligned_dataloader
+
 warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,6 +57,19 @@ def fix_seed(seed: int = 2021):
     np.random.seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+    
+    # Enable deterministic mode for reproducibility
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    
+    # Set CUBLAS workspace config for deterministic algorithms
+    os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8'
+    
+    # Enable PyTorch deterministic algorithms (may raise errors for non-deterministic ops)
+    try:
+        torch.use_deterministic_algorithms(True)
+    except Exception:
+        pass  # Not supported on all PyTorch versions
 
 
 def create_dataloader_tsl_style(dataset, batch_size: int, shuffle: bool, num_workers: int = 0):
@@ -317,57 +333,105 @@ def main():
         data_path = config.get('data_path', f'{data_name}.csv')
 
     # Create DATALOADERS after model (but model already created above)
-    # Create dataloaders exactly like TSL (with drop_last=True)
-    train_loader = create_dataloader(
-        data_name=data_name,
-        root_path=root_path,
-        data_path=data_path,
-        flag='train',
-        size=(seq_len, label_len, pred_len),
-        features=config.get('features', 'M'),
-        target=config.get('target', 'OT'),
-        scale=True,
-        timeenc=1 if config.get('embed', 'timeF') == 'timeF' else 0,
-        freq=config.get('freq', 'h'),
-        batch_size=batch_size,
-        num_workers=0,
-        shuffle=True,
-        drop_last=True,  # TSL uses drop_last=True
-    )
+    # Use float64-aligned dataloader to match TSL exactly
+    use_float64 = config.get('use_float64', True)
     
-    val_loader = create_dataloader(
-        data_name=data_name,
-        root_path=root_path,
-        data_path=data_path,
-        flag='val',
-        size=(seq_len, label_len, pred_len),
-        features=config.get('features', 'M'),
-        target=config.get('target', 'OT'),
-        scale=True,
-        timeenc=1 if config.get('embed', 'timeF') == 'timeF' else 0,
-        freq=config.get('freq', 'h'),
-        batch_size=batch_size,
-        num_workers=0,
-        shuffle=False,
-        drop_last=True,  # TSL uses drop_last=True
-    )
-    
-    test_loader = create_dataloader(
-        data_name=data_name,
-        root_path=root_path,
-        data_path=data_path,
-        flag='test',
-        size=(seq_len, label_len, pred_len),
-        features=config.get('features', 'M'),
-        target=config.get('target', 'OT'),
-        scale=True,
-        timeenc=1 if config.get('embed', 'timeF') == 'timeF' else 0,
-        freq=config.get('freq', 'h'),
-        batch_size=batch_size,
-        num_workers=0,
-        shuffle=False,
-        drop_last=True,  # TSL uses drop_last=True
-    )
+    if use_float64:
+        logger.info("Using float64-aligned dataloader (matching TSL)")
+        train_loader = create_tsl_aligned_dataloader(
+            root_path=root_path,
+            data_path=data_path,
+            flag='train',
+            seq_len=seq_len,
+            label_len=label_len,
+            pred_len=pred_len,
+            features=config.get('features', 'M'),
+            target=config.get('target', 'OT'),
+            batch_size=batch_size,
+            shuffle=True,
+            drop_last=True,
+        )
+        
+        val_loader = create_tsl_aligned_dataloader(
+            root_path=root_path,
+            data_path=data_path,
+            flag='val',
+            seq_len=seq_len,
+            label_len=label_len,
+            pred_len=pred_len,
+            features=config.get('features', 'M'),
+            target=config.get('target', 'OT'),
+            batch_size=batch_size,
+            shuffle=False,
+            drop_last=True,
+        )
+        
+        test_loader = create_tsl_aligned_dataloader(
+            root_path=root_path,
+            data_path=data_path,
+            flag='test',
+            seq_len=seq_len,
+            label_len=label_len,
+            pred_len=pred_len,
+            features=config.get('features', 'M'),
+            target=config.get('target', 'OT'),
+            batch_size=batch_size,
+            shuffle=False,
+            drop_last=True,
+        )
+    else:
+        # Use Liulian's native float32 dataloaders
+        logger.info("Using Liulian float32 dataloader")
+        train_loader = create_dataloader(
+            data_name=data_name,
+            root_path=root_path,
+            data_path=data_path,
+            flag='train',
+            size=(seq_len, label_len, pred_len),
+            features=config.get('features', 'M'),
+            target=config.get('target', 'OT'),
+            scale=True,
+            timeenc=1 if config.get('embed', 'timeF') == 'timeF' else 0,
+            freq=config.get('freq', 'h'),
+            batch_size=batch_size,
+            num_workers=0,
+            shuffle=True,
+            drop_last=True,
+        )
+        
+        val_loader = create_dataloader(
+            data_name=data_name,
+            root_path=root_path,
+            data_path=data_path,
+            flag='val',
+            size=(seq_len, label_len, pred_len),
+            features=config.get('features', 'M'),
+            target=config.get('target', 'OT'),
+            scale=True,
+            timeenc=1 if config.get('embed', 'timeF') == 'timeF' else 0,
+            freq=config.get('freq', 'h'),
+            batch_size=batch_size,
+            num_workers=0,
+            shuffle=False,
+            drop_last=True,
+        )
+        
+        test_loader = create_dataloader(
+            data_name=data_name,
+            root_path=root_path,
+            data_path=data_path,
+            flag='test',
+            size=(seq_len, label_len, pred_len),
+            features=config.get('features', 'M'),
+            target=config.get('target', 'OT'),
+            scale=True,
+            timeenc=1 if config.get('embed', 'timeF') == 'timeF' else 0,
+            freq=config.get('freq', 'h'),
+            batch_size=batch_size,
+            num_workers=0,
+            shuffle=False,
+            drop_last=True,
+        )
 
     logger.info(f"Train batches: {len(train_loader)}, Val batches: {len(val_loader)}, Test batches: {len(test_loader)}")
 
@@ -382,6 +446,7 @@ def main():
         'lradj': config.get('lradj', 'type1'),
         'use_amp': config.get('use_amp', False),
         'checkpoint_dir': f'checkpoints/tsl_aligned_{data_name}_transformer',
+        'use_float64': config.get('use_float64', True),  # Match TSL's internal dtype
     }
 
     trainer = TSLAlignedTrainer(trainer_config, device=str(device))

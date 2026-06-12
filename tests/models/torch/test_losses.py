@@ -224,12 +224,8 @@ class TestMASELoss:
         mask = torch.ones_like(forecast)
 
         # Different frequencies should give different losses
-        loss_freq12 = criterion(
-            insample, freq=12, forecast=forecast, target=target, mask=mask
-        )
-        loss_freq24 = criterion(
-            insample, freq=24, forecast=forecast, target=target, mask=mask
-        )
+        loss_freq12 = criterion(insample, freq=12, forecast=forecast, target=target, mask=mask)
+        loss_freq24 = criterion(insample, freq=24, forecast=forecast, target=target, mask=mask)
 
         # Both should be valid (positive)
         assert loss_freq12.item() >= 0

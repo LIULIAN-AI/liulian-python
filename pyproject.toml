@@ -25,6 +25,7 @@ classifiers = [
 ]
 dependencies = [
     "numpy>=1.24.0",
+    "pandas>=2.0.0",
     "pyyaml>=6.0",
 ]
 
@@ -34,6 +35,7 @@ hpo = ["ray[tune]>=2.0.0"]
 docs = ["mkdocs>=1.5", "mkdocs-material>=9.0"]
 dev = [
     "pytest>=7.0",
+    "matplotlib>=3.7",
     "pytest-cov>=4.0",
     "black>=23.0",
     "isort>=5.12",
@@ -72,9 +74,33 @@ line-length = 88
 target-version = ["py310"]
 
 [tool.ruff]
-line-length = 88
+line-length = 120
 target-version = "py310"
-exclude = [".github/skills"]
+
+[tool.ruff.lint]
+select = ["E", "F"]
+
+[tool.ruff.lint.per-file-ignores]
+"liulian/data/scalers.py" = ["F401"]
+"liulian/models/torch/__init__.py" = ["F401"]
+"liulian/models/torch/layers/__init__.py" = ["F401"]
+"liulian/models/torch/autoformer.py" = ["E741"]
+"liulian/models/torch/informer.py" = ["E741"]
+"liulian/models/torch/itransformer.py" = ["E741"]
+"liulian/data/ts/timeseriesdataset.py" = ["E402"]
+"tests/test_adaptation_round.py" = ["F841"]
+"tests/test_cli_subcommands.py" = ["F401"]
+"tests/**/*.py" = ["F841"]
+"liulian/models/torch/layers/attention.py" = ["E501"]
+"liulian/models/torch/patchtst.py" = ["E741"]
+"liulian/models/torch/timellm.py" = ["E501"]
+"liulian/models/torch/timexer.py" = ["E501"]
+"liulian/models/torch/timemoe.py" = ["E501"]
+"tests/test_data_augmentation.py" = ["F841"]
+"liulian/optim/ray_optimizer.py" = ["E501"]
+"liulian/pipeline.py" = ["E501"]
+"liulian/runtime/experiment.py" = ["E501"]
+"liulian/utils/augmentation.py" = ["F841"]
 
 [tool.ruff.format]
 quote-style = "single"

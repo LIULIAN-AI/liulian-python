@@ -15,7 +15,7 @@ https://github.com/thuml/Time-Series-Library/blob/main/data_provider/data_factor
 MIT License
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Optional
 from torch.utils.data import DataLoader
 
 from liulian.data.csv_dataset import (
@@ -128,10 +128,7 @@ def create_dataloader(
     """
     # Get dataset class from registry
     if data_name not in DATASET_REGISTRY:
-        raise ValueError(
-            f'Unknown dataset: {data_name}. '
-            f'Available datasets: {list(DATASET_REGISTRY.keys())}'
-        )
+        raise ValueError(f'Unknown dataset: {data_name}. Available datasets: {list(DATASET_REGISTRY.keys())}')
 
     dataset_class = DATASET_REGISTRY[data_name]
 
@@ -149,9 +146,7 @@ def create_dataloader(
     # Multi-split datasets (TimeSeriesDataset subclasses)
     if isinstance(dataset_class, type) and issubclass(dataset_class, BaseDataset):
         # Cache key to avoid re-loading per flag
-        cache_key = (
-            f'{data_name}:{root_path}:{data_path}:{size}:{features}:{target}:{scale}'
-        )
+        cache_key = f'{data_name}:{root_path}:{data_path}:{size}:{features}:{target}:{scale}'
         if cache_key not in _DATASET_CACHE:
             # Filter out flag — these datasets create all splits at once
             ctor_kwargs.pop('flag', None)

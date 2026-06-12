@@ -64,9 +64,7 @@ def load_csv_as_array(
     return np.array(rows, dtype=dtype)
 
 
-def list_data_files(
-    directory: str, extensions: Tuple[str, ...] = ('.npy', '.csv')
-) -> List[str]:
+def list_data_files(directory: str, extensions: Tuple[str, ...] = ('.npy', '.csv')) -> List[str]:
     """List data files in *directory* filtered by extension.
 
     Args:

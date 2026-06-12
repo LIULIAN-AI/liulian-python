@@ -1,0 +1,59 @@
+{
+  "currency": "CHF",
+  "hard_cap": 10.0,
+  "warn_threshold": 9.0,
+  "jobs": [
+    {
+      "jobid": "4310212",
+      "run_tag": "traffic-lstm-REAL-20260515-163055",
+      "account": "paygo",
+      "wckey": "inf_prg-research",
+      "session": "entity-id-2026-05",
+      "submit_date": "2026-05-19",
+      "projected_chf": 1.2,
+      "actual_chf": 1.1191,
+      "status": "done",
+      "notes": "traffic LSTM 3-mode, 1x4090 12h paygo",
+      "cost_method": "elapsed"
+    },
+    {
+      "jobid": "4310361",
+      "run_tag": "traffic-patchtst-REAL-20260519-130445",
+      "account": "paygo",
+      "wckey": "inf_prg-research",
+      "session": "entity-id-2026-05",
+      "submit_date": "2026-05-19",
+      "projected_chf": 1.2,
+      "actual_chf": 1.2,
+      "status": "done",
+      "notes": "traffic PatchTST 3-mode, 1x4090 12h paygo",
+      "cost_method": "elapsed"
+    },
+    {
+      "jobid": "4368572",
+      "run_tag": "traffic-patchtst-REAL-20260519-130445",
+      "account": "paygo",
+      "wckey": "inf_prg-research",
+      "session": "entity-id-2026-05",
+      "submit_date": "2026-05-20",
+      "projected_chf": 1.2,
+      "actual_chf": 1.2003,
+      "cost_method": "elapsed",
+      "status": "done",
+      "notes": "traffic PatchTST resume (1/3 done, 2 cells remain)"
+    },
+    {
+      "jobid": "4395191",
+      "run_tag": "traffic-patchtst-REAL-20260519-130445",
+      "account": "paygo",
+      "wckey": "inf_prg-research",
+      "session": "entity-id-2026-05",
+      "submit_date": "2026-05-20",
+      "projected_chf": 1.2,
+      "actual_chf": 0.9002,
+      "cost_method": "elapsed",
+      "status": "done",
+      "notes": "Paygo PatchTST resume #2 — onehot only"
+    }
+  ]
+}

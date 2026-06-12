@@ -8,7 +8,7 @@ Supported identifier modes
 ---------------------------
 * ``'none'``         — no entity features; pass-through.
 * Transparent modes (``'onehot'``, ``'coordinates'``, ``'sinusoidal'``,
-  ``'descriptors'``, ``'numeric_id'``) — entity features are concatenated
+  ``'random'``, ``'descriptors'``, ``'numeric_id'``) — entity features are concatenated
   into ``x_enc`` by the data layer; no model changes needed other than setting
   ``enc_in`` to include the extra dimensions.
 * ``'embedding'``    — **per_entity mode**: integer station IDs are extracted
@@ -44,9 +44,7 @@ import torch.nn as nn
 
 
 # Modes where the data layer already concatenated entity features into x_enc.
-_TRANSPARENT_MODES = frozenset(
-    {'onehot', 'coordinates', 'sinusoidal', 'descriptors', 'numeric_id'}
-)
+_TRANSPARENT_MODES = frozenset({'onehot', 'coordinates', 'sinusoidal', 'random', 'descriptors', 'numeric_id'})
 
 
 class EntityWrapper(nn.Module):
@@ -124,10 +122,10 @@ class EntityWrapper(nn.Module):
         # Resolve entity indices
         e_ids: torch.Tensor | None = None
         if entity_ids is not None:
-            # Direct entity_ids tensor: (B,) → expand to (B, T_enc)
+            # Direct entity_ids tensor: (B,) → expand to (B, T_enc)  todo: test this
             e_ids = entity_ids.unsqueeze(1).expand(-1, x_enc.size(1))  # (B, T_enc)
         elif x_mark_enc is not None and x_mark_enc.ndim >= 2:
-            # Legacy: read from mark tensor
+            # Legacy: read from mark tensor  todo: test this
             col = self.entity_id_col
             if x_mark_enc.ndim == 3:
                 e_ids = x_mark_enc[:, : x_enc.size(1), col].long()
@@ -138,13 +136,11 @@ class EntityWrapper(nn.Module):
             emb = self.embedding(e_ids)  # (B, T_enc, embedding_size)
             x_enc = self.enc_proj(torch.cat([x_enc, emb], dim=-1))
 
-            # Also augment x_dec for encoder-decoder models
-            if x_dec is not None:  # todo: is this correct?
+            # Also augment x_dec for encoder-decoder models  # todo: this is not needed for non-enc-dec models
+            if x_dec is not None: # todo: test this part
                 T_dec = x_dec.size(1)
                 e_id_scalar = e_ids[:, 0:1]  # (B, 1)
-                dec_emb = self.embedding(
-                    e_id_scalar.expand(-1, T_dec)
-                )  # (B, T_dec, embedding_size)
+                dec_emb = self.embedding(e_id_scalar.expand(-1, T_dec))  # (B, T_dec, embedding_size)
                 x_dec = self.dec_proj(torch.cat([x_dec, dec_emb], dim=-1))
 
         # Only pass mask if explicitly provided — many TSL models
@@ -197,14 +193,13 @@ class ChannelEntityWrapper(nn.Module):
         self.enc_proj = nn.Linear(1 + embedding_size, 1)
         self.dec_proj = nn.Linear(1 + embedding_size, 1)
         # Fixed station indices [0, 1, ..., N-1]
-        self.register_buffer(
-            'station_ids', torch.arange(num_stations, dtype=torch.long)
-        )
+        self.register_buffer('station_ids', torch.arange(num_stations, dtype=torch.long))
 
     def _augment(
         self,
         x: torch.Tensor,
         proj: nn.Linear,
+        channel_ids: torch.Tensor | None = None,
     ) -> torch.Tensor:
         """Inject station embeddings channel-wise.
 
@@ -214,6 +209,11 @@ class ChannelEntityWrapper(nn.Module):
             Input tensor of shape ``(B, T, N)``.
         proj : nn.Linear
             Projection layer ``Linear(1+d, 1)``.
+        channel_ids : torch.Tensor | None
+            Optional channel-to-station mapping of shape ``(N,)`` or
+            ``(B, N)``.  When provided, these indices are used for the
+            embedding lookup instead of the default ``arange(N)`` buffer.
+            This makes the wrapper safe under channel permutation.
 
         Returns
         -------
@@ -221,10 +221,16 @@ class ChannelEntityWrapper(nn.Module):
             Augmented tensor of shape ``(B, T, N)``.
         """
         B, T, N = x.shape
-        # (N, d) station embeddings
-        emb = self.station_embedding(self.station_ids)  # (N, d)
-        # Broadcast: (1, 1, N, d) → (B, T, N, d)
-        emb = emb.unsqueeze(0).unsqueeze(0).expand(B, T, -1, -1)
+        # Resolve channel → station mapping
+        ids = channel_ids if channel_ids is not None else self.station_ids
+        # (N, d) or (B, N, d) station embeddings
+        emb = self.station_embedding(ids)
+        if emb.ndim == 2:
+            # (N, d) → broadcast to (B, T, N, d)
+            emb = emb.unsqueeze(0).unsqueeze(0).expand(B, T, -1, -1)
+        else:
+            # (B, N, d) → (B, 1, N, d) → (B, T, N, d)
+            emb = emb.unsqueeze(1).expand(-1, T, -1, -1)
         # Reshape x: (B, T, N) → (B, T, N, 1)
         x_4d = x.unsqueeze(-1)
         # Concat: (B, T, N, 1+d)
@@ -244,14 +250,212 @@ class ChannelEntityWrapper(nn.Module):
         """Forward pass with per-channel station embedding injection.
 
         Signature matches the TSL model convention plus optional
-        ``entity_ids`` (accepted but ignored — station indices are
-        pre-registered internally).
+        ``entity_ids``.
+
+        Parameters
+        ----------
+        entity_ids : torch.Tensor | None
+            When provided (shape ``(N,)`` or ``(B, N)``), used as the
+            channel-to-station mapping for the embedding lookup instead
+            of the default ``arange(N)`` buffer.  This makes the wrapper
+            safe when channel order may be permuted (e.g. by data
+            augmentation or non-standard loaders).
         """
-        x_enc = self._augment(x_enc, self.enc_proj)
+        x_enc = self._augment(x_enc, self.enc_proj, channel_ids=entity_ids)
 
         if x_dec is not None:
-            x_dec = self._augment(x_dec, self.dec_proj)
+            x_dec = self._augment(x_dec, self.dec_proj, channel_ids=entity_ids)
 
+        if mask is not None:
+            return self.inner(x_enc, x_mark_enc, x_dec, x_mark_dec, mask)
+        return self.inner(x_enc, x_mark_enc, x_dec, x_mark_dec)
+
+
+def _build_channel_features(
+    mode: str,
+    num_stations: int,
+    *,
+    sinusoidal_dim: int = 16,
+    random_dim: int = 16,
+    random_seed: int = 2026,
+    coordinates: dict[str, tuple[float, float]] | None = None,
+    station_ids: list[str] | None = None,
+) -> torch.Tensor:
+    """Build a ``(N, D)`` feature matrix for all channels.
+
+    Each row is the transparent identifier vector for one channel/station.
+
+    Args:
+        mode: Identifier mode (``onehot``, ``sinusoidal``, ``random``,
+            ``coordinates``, ``numeric_id``).
+        num_stations: Number of channels/stations.
+        sinusoidal_dim: Dimension for sinusoidal encoding.
+        random_dim: Dimension for random encoding.
+        random_seed: Base seed for random identifiers.
+        coordinates: Station-name to ``(lat, lon)`` mapping.
+        station_ids: Ordered station name list (index-aligned with channels).
+
+    Returns:
+        Feature tensor of shape ``(N, D)``.
+    """
+    import hashlib
+
+    import numpy as np
+
+    ids = station_ids or [str(i) for i in range(num_stations)]
+
+    if mode == 'onehot':
+        return torch.eye(num_stations, dtype=torch.float32)
+
+    if mode == 'numeric_id':
+        denom = max(num_stations - 1, 1)
+        vals = [i / denom for i in range(num_stations)]
+        return torch.tensor(vals, dtype=torch.float32).unsqueeze(-1)
+
+    if mode == 'sinusoidal':
+        rows = []
+        for idx in range(num_stations):
+            pos = torch.zeros(sinusoidal_dim, dtype=torch.float32)
+            half = sinusoidal_dim // 2
+            freqs = torch.exp(
+                torch.arange(0, half, dtype=torch.float32) * (-torch.log(torch.tensor(10000.0)) / max(half - 1, 1))
+            )
+            pos[:half] = torch.sin(idx * freqs)
+            pos[half : 2 * half] = torch.cos(idx * freqs)
+            rows.append(pos)
+        return torch.stack(rows)
+
+    if mode == 'random':
+        rows = []
+        for idx in range(num_stations):
+            key = f'{random_seed}:{ids[idx]}'
+            digest = hashlib.sha256(key.encode('utf-8')).digest()
+            seed = int.from_bytes(digest[:8], byteorder='little', signed=False) % (2**32)
+            rng = np.random.default_rng(seed)
+            vec = torch.tensor(
+                rng.standard_normal(random_dim).astype(np.float32),
+                dtype=torch.float32,
+            )
+            norm = torch.linalg.norm(vec)
+            if torch.isfinite(norm) and float(norm) > 0:
+                vec = vec / norm
+            rows.append(vec)
+        return torch.stack(rows)
+
+    if mode == 'coordinates':
+        coords = coordinates or {}
+        missing = [ids[idx] for idx in range(num_stations) if ids[idx] not in coords]
+        if missing:
+            # No silent zero fallback: zero vectors FAKE the identifier
+            # (all channels identical) while the run still "succeeds" —
+            # this is what invalidated the pre-2026-06-11 multi_channel
+            # swiss coordinate cells. Inject the station->(x, y) mapping
+            # via config['coordinates'] (not wired in the pipeline yet).
+            raise ValueError(
+                "identifier_mode='coordinates' requires a coordinate for "
+                f'every channel; missing for {missing[:5]!r}'
+                f'{"..." if len(missing) > 5 else ""}.'
+            )
+        arr = torch.tensor(
+            [coords[ids[idx]] for idx in range(num_stations)],
+            dtype=torch.float32,
+        )
+        # Min-max normalize per dimension (raw CH1903 meters are ~1e5-1e6,
+        # which would dwarf the scaled inputs).
+        lo = arr.min(dim=0).values
+        span = (arr.max(dim=0).values - lo).clamp_min(1e-12)
+        return (arr - lo) / span
+
+    raise ValueError(f'Unsupported transparent mode for channel wrapper: {mode!r}')
+
+
+class ChannelTransparentWrapper(nn.Module):
+    """Per-channel transparent (non-learned) feature injection for multi_channel mode.
+
+    Similar to :class:`ChannelEntityWrapper` but uses pre-computed feature
+    vectors (onehot, sinusoidal, random, coordinates, numeric_id) instead of
+    learned ``nn.Embedding``.
+
+    The feature matrix is registered as a buffer so it moves with the model
+    to GPU and is included in ``state_dict``.
+
+    Architecture:
+
+    1. Pre-compute ``(N, D)`` feature matrix at init.
+    2. Reshape ``x_enc`` from ``(B, T, N)`` to ``(B, T, N, 1)``.
+    3. Broadcast features to ``(B, T, N, D)``.
+    4. Concatenate: ``(B, T, N, 1+D)``.
+    5. Project per-element: ``Linear(1+D, 1)`` -> ``(B, T, N)``.
+    6. Inner model receives original shape ``(B, T, N)``.
+
+    Parameters
+    ----------
+    inner_model : nn.Module
+        The original TSL model.
+    mode : str
+        Transparent identifier mode.
+    num_stations : int
+        Number of channels/stations.
+    sinusoidal_dim : int
+        Dimension for sinusoidal encoding.
+    random_dim : int
+        Dimension for random encoding.
+    random_seed : int
+        Base seed for random identifiers.
+    coordinates : dict or None
+        Station-to-coordinate mapping.
+    station_ids : list[str] or None
+        Ordered station name list.
+    """
+
+    def __init__(
+        self,
+        inner_model: nn.Module,
+        mode: str,
+        num_stations: int,
+        *,
+        sinusoidal_dim: int = 16,
+        random_dim: int = 16,
+        random_seed: int = 2026,
+        coordinates: dict[str, tuple[float, float]] | None = None,
+        station_ids: list[str] | None = None,
+    ) -> None:
+        super().__init__()
+        self.inner = inner_model
+        features = _build_channel_features(
+            mode,
+            num_stations,
+            sinusoidal_dim=sinusoidal_dim,
+            random_dim=random_dim,
+            random_seed=random_seed,
+            coordinates=coordinates,
+            station_ids=station_ids,
+        )
+        self.register_buffer('channel_features', features)  # (N, D)
+        feat_dim = features.shape[1]
+        self.enc_proj = nn.Linear(1 + feat_dim, 1)
+        self.dec_proj = nn.Linear(1 + feat_dim, 1)
+
+    def _augment(self, x: torch.Tensor, proj: nn.Linear) -> torch.Tensor:
+        B, T, N = x.shape
+        feats = self.channel_features  # (N, D)
+        feats = feats.unsqueeze(0).unsqueeze(0).expand(B, T, -1, -1)  # (B,T,N,D)
+        x_4d = x.unsqueeze(-1)  # (B, T, N, 1)
+        augmented = torch.cat([x_4d, feats], dim=-1)  # (B, T, N, 1+D)
+        return proj(augmented).squeeze(-1)  # (B, T, N)
+
+    def forward(
+        self,
+        x_enc: torch.Tensor,
+        x_mark_enc: torch.Tensor | None = None,
+        x_dec: torch.Tensor | None = None,
+        x_mark_dec: torch.Tensor | None = None,
+        mask: torch.Tensor | None = None,
+        entity_ids: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        x_enc = self._augment(x_enc, self.enc_proj)
+        if x_dec is not None:
+            x_dec = self._augment(x_dec, self.dec_proj)
         if mask is not None:
             return self.inner(x_enc, x_mark_enc, x_dec, x_mark_dec, mask)
         return self.inner(x_enc, x_mark_enc, x_dec, x_mark_dec)
@@ -278,7 +482,7 @@ class EntityAwareMixin:
     -----------
     identifier_mode : str
         One of ``'none'``, ``'embedding'``,
-        ``'onehot'``, ``'coordinates'``, ``'sinusoidal'``,
+        ``'onehot'``, ``'coordinates'``, ``'sinusoidal'``, ``'random'``,
         ``'descriptors'``, ``'numeric_id'``.
         ``'embedding'`` + ``id_integration='add_after_patch'`` is handled
         by PatchTST internally; no wrapper is applied.
@@ -317,17 +521,26 @@ class EntityAwareMixin:
         """Finalise entity support after the model has been built.
 
         For ``'embedding'`` mode this wraps ``self._model`` inside an
-        :class:`EntityWrapper` (per_entity mode) or :class:`ChannelEntityWrapper`
-        (multi_channel mode) and moves it to ``self.device``.
+        :class:`EntityWrapper` (per_entity) or :class:`ChannelEntityWrapper`
+        (multi_channel) and moves it to ``self.device``.
+
+        For transparent modes (``onehot``, ``sinusoidal``, ``random``,
+        ``coordinates``, ``numeric_id``) in ``multi_channel`` split, this
+        wraps ``self._model`` in :class:`ChannelTransparentWrapper` so that
+        per-channel features are injected at forward time without requiring
+        ``station_name`` in the data layer.
         """
         self._entity_mode = config.get('identifier_mode', 'none')
         self._entity_id_col = config.get('entity_id_col', 0)
 
-        if (
-            self._entity_mode == 'embedding'
-            and config.get('id_integration') != 'add_after_patch'
-        ):
-            if config.get('split_mode') == 'multi_channel':
+        if self._entity_mode == 'none':
+            return
+
+        is_multi_channel = config.get('split_mode') == 'multi_channel'
+        is_add_after_patch = config.get('id_integration') == 'add_after_patch'
+
+        if self._entity_mode == 'embedding' and not is_add_after_patch:
+            if is_multi_channel:
                 self._model = ChannelEntityWrapper(
                     self._model,
                     num_stations=config.get('num_embeddings', 50),
@@ -342,5 +555,23 @@ class EntityAwareMixin:
                     embedding_size=config.get('embedding_size', 10),
                     entity_id_col=self._entity_id_col,
                 )
-            # Ensure the wrapper is on the correct device
+            self._model = self._model.to(self.device)
+
+        elif self._entity_mode in _TRANSPARENT_MODES and is_multi_channel:
+            station_ids = config.get('station_ids')
+            if isinstance(station_ids, list):
+                station_ids_list = [str(s) for s in station_ids]
+            else:
+                station_ids_list = None
+            num_stations = config.get('num_embeddings', config.get('enc_in', 50))
+            self._model = ChannelTransparentWrapper(
+                self._model,
+                mode=self._entity_mode,
+                num_stations=num_stations,
+                sinusoidal_dim=config.get('sinusoidal_dim', 16),
+                random_dim=config.get('random_identifier_dim', 16),
+                random_seed=config.get('random_identifier_seed', 2026),
+                coordinates=config.get('coordinates'),
+                station_ids=station_ids_list,
+            )
             self._model = self._model.to(self.device)

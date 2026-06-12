@@ -71,9 +71,7 @@ class TestAutoformerForecast:
             features=forecast_config['c_out'],
         )
 
-    def test_different_moving_avg_windows(
-        self, forecast_config, sample_forecast_inputs
-    ):
+    def test_different_moving_avg_windows(self, forecast_config, sample_forecast_inputs):
         """Test different moving average window sizes for decomposition."""
         from liulian.models.torch.autoformer import AutoformerAdapter
 

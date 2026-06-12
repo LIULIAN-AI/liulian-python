@@ -1,0 +1,31 @@
+- generic [ref=e2]:
+  - paragraph [ref=e3]: Liquid Intelligence · Unified Logic · Interactive Adaptive Networks
+  - heading "LIULIAN" [level=1] [ref=e4]
+  - paragraph [ref=e5]: Open-source production stack for spatio-temporal AI. Demo index — three pages running locally, fonts loaded from CDN, charts inline.
+  - list [ref=e6]:
+    - listitem [ref=e7]:
+      - link "Landing Editorial-magazine hero · three pillars · CTA →" [ref=e8] [cursor=pointer]:
+        - /url: standalone-landing.html
+        - generic [ref=e9]: Landing
+        - generic [ref=e10]: Editorial-magazine hero · three pillars · CTA
+        - generic [ref=e11]: →
+    - listitem [ref=e12]:
+      - link "Forecast Canvas Map · Q05/Q95 fan · KPI · alert ribbon · BI agent →" [ref=e13] [cursor=pointer]:
+        - /url: standalone-forecast.html
+        - generic [ref=e14]: Forecast Canvas
+        - generic [ref=e15]: Map · Q05/Q95 fan · KPI · alert ribbon · BI agent
+        - generic [ref=e16]: →
+    - listitem [ref=e17]:
+      - link "Studio 4-tab IA · Data · Train · Inference · Insight →" [ref=e18] [cursor=pointer]:
+        - /url: standalone-studio.html
+        - generic [ref=e19]: Studio
+        - generic [ref=e20]: 4-tab IA · Data · Train · Inference · Insight
+        - generic [ref=e21]: →
+  - generic [ref=e22]:
+    - text: Backend live at
+    - code [ref=e23]: http://localhost:8000/api/docs
+    - text: ·
+    - code [ref=e24]: GET /healthz
+    - text: · 7 routers · 6/6 tests pass
+    - text: Static pages served via
+    - code [ref=e25]: python3 -m http.server 8888

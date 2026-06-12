@@ -15,7 +15,7 @@ Note: This adapter works directly with PyTorch tensors. No numpy conversion is p
 
 from __future__ import annotations
 
-from typing import Any, Dict, Union
+from typing import Any, Dict
 from types import SimpleNamespace
 
 import numpy as np
@@ -24,10 +24,7 @@ try:
     import torch
     import torch.nn as nn
 except ImportError:
-    raise ImportError(
-        'PyTorch models require torch to be installed. '
-        'Install with: pip install liulian[torch-models]'
-    )
+    raise ImportError('PyTorch models require torch to be installed. Install with: pip install liulian[torch-models]')
 
 from liulian.models.base import ExecutableModel
 
@@ -52,9 +49,7 @@ class TorchModelAdapter(ExecutableModel):
             config: Model configuration dictionary
         """
         super().__init__()
-        self.device: torch.device = torch.device(
-            'cuda' if torch.cuda.is_available() else 'cpu'
-        )
+        self.device: torch.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self._model: nn.Module = model.to(self.device)
         self._config: Dict[str, Any] = config
 
@@ -110,9 +105,7 @@ class TorchModelAdapter(ExecutableModel):
         """
         return self.forward(batch)
 
-    def _forward_torch_model(
-        self, torch_batch: Dict[str, torch.Tensor]
-    ) -> Dict[str, torch.Tensor]:
+    def _forward_torch_model(self, torch_batch: Dict[str, torch.Tensor]) -> Dict[str, torch.Tensor]:
         """Call PyTorch model's forward method
 
         This method handles different calling conventions for different models.
@@ -161,9 +154,7 @@ class TorchModelAdapter(ExecutableModel):
             # Ensure 'predictions' key exists
             if 'predictions' not in output and len(output) > 0:
                 # Use first tensor as predictions
-                first_tensor = next(
-                    (v for v in output.values() if isinstance(v, torch.Tensor)), None
-                )
+                first_tensor = next((v for v in output.values() if isinstance(v, torch.Tensor)), None)
                 if first_tensor is not None:
                     output['predictions'] = first_tensor
             return output

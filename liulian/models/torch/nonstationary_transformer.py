@@ -36,9 +36,12 @@ class Projector(nn.Module):
 
         padding = 1 if torch.__version__ >= '1.5.0' else 2
         self.series_conv = nn.Conv1d(
-            in_channels=seq_len, out_channels=1,
-            kernel_size=kernel_size, padding=padding,
-            padding_mode='circular', bias=False,
+            in_channels=seq_len,
+            out_channels=1,
+            kernel_size=kernel_size,
+            padding=padding,
+            padding_mode='circular',
+            bias=False,
         )
 
         layers = [nn.Linear(2 * enc_in, hidden_dims[0]), nn.ReLU()]
@@ -53,10 +56,10 @@ class Projector(nn.Module):
         # stats: B x 1 x E
         # y:     B x O
         batch_size = x.shape[0]
-        x = self.series_conv(x)          # B x 1 x E
+        x = self.series_conv(x)  # B x 1 x E
         x = torch.cat([x, stats], dim=1)  # B x 2 x E
-        x = x.view(batch_size, -1)        # B x 2E
-        y = self.backbone(x)              # B x O
+        x = x.view(batch_size, -1)  # B x 2E
+        y = self.backbone(x)  # B x O
         return y
 
 
@@ -75,7 +78,10 @@ class Model(nn.Module):
 
         # Embedding
         self.enc_embedding = DataEmbedding(
-            configs.enc_in, configs.d_model, configs.embed, configs.freq,
+            configs.enc_in,
+            configs.d_model,
+            configs.embed,
+            configs.freq,
             configs.dropout,
         )
 
@@ -85,11 +91,13 @@ class Model(nn.Module):
                 EncoderLayer(
                     AttentionLayer(
                         DSAttention(
-                            False, configs.factor,
+                            False,
+                            configs.factor,
                             attention_dropout=configs.dropout,
                             output_attention=False,
                         ),
-                        configs.d_model, configs.n_heads,
+                        configs.d_model,
+                        configs.n_heads,
                     ),
                     configs.d_model,
                     configs.d_ff,
@@ -104,7 +112,10 @@ class Model(nn.Module):
         # Decoder (forecast tasks only)
         if self.task_name in ('long_term_forecast', 'short_term_forecast'):
             self.dec_embedding = DataEmbedding(
-                configs.dec_in, configs.d_model, configs.embed, configs.freq,
+                configs.dec_in,
+                configs.d_model,
+                configs.embed,
+                configs.freq,
                 configs.dropout,
             )
             self.decoder = Decoder(
@@ -112,19 +123,23 @@ class Model(nn.Module):
                     DecoderLayer(
                         AttentionLayer(
                             DSAttention(
-                                True, configs.factor,
+                                True,
+                                configs.factor,
                                 attention_dropout=configs.dropout,
                                 output_attention=False,
                             ),
-                            configs.d_model, configs.n_heads,
+                            configs.d_model,
+                            configs.n_heads,
                         ),
                         AttentionLayer(
                             DSAttention(
-                                False, configs.factor,
+                                False,
+                                configs.factor,
                                 attention_dropout=configs.dropout,
                                 output_attention=False,
                             ),
-                            configs.d_model, configs.n_heads,
+                            configs.d_model,
+                            configs.n_heads,
                         ),
                         configs.d_model,
                         configs.d_ff,
@@ -144,18 +159,21 @@ class Model(nn.Module):
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
             self.projection = nn.Linear(
-                configs.d_model * configs.seq_len, configs.num_class,
+                configs.d_model * configs.seq_len,
+                configs.num_class,
             )
 
         # De-stationary factor learners
         self.tau_learner = Projector(
-            enc_in=configs.enc_in, seq_len=configs.seq_len,
+            enc_in=configs.enc_in,
+            seq_len=configs.seq_len,
             hidden_dims=configs.p_hidden_dims,
             hidden_layers=configs.p_hidden_layers,
             output_dim=1,
         )
         self.delta_learner = Projector(
-            enc_in=configs.enc_in, seq_len=configs.seq_len,
+            enc_in=configs.enc_in,
+            seq_len=configs.seq_len,
             hidden_dims=configs.p_hidden_dims,
             hidden_layers=configs.p_hidden_layers,
             output_dim=configs.seq_len,
@@ -167,9 +185,7 @@ class Model(nn.Module):
         # Normalization
         mean_enc = x_enc.mean(1, keepdim=True).detach()
         x_enc = x_enc - mean_enc
-        std_enc = torch.sqrt(
-            torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5
-        ).detach()
+        std_enc = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5).detach()
         x_enc = x_enc / std_enc
 
         # Learned de-stationary factors
@@ -177,18 +193,24 @@ class Model(nn.Module):
         tau = torch.clamp(tau, max=80.0).exp()
         delta = self.delta_learner(x_raw, mean_enc)
 
-        x_dec_new = torch.cat(
-            [x_enc[:, -self.label_len:, :],
-             torch.zeros_like(x_dec[:, -self.pred_len:, :])],
-            dim=1,
-        ).to(x_enc.device).clone()
+        x_dec_new = (
+            torch.cat(
+                [
+                    x_enc[:, -self.label_len :, :],
+                    torch.zeros_like(x_dec[:, -self.pred_len :, :]),
+                ],
+                dim=1,
+            )
+            .to(x_enc.device)
+            .clone()
+        )
 
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         enc_out, attns = self.encoder(enc_out, attn_mask=None, tau=tau, delta=delta)
 
         # align x_mark_dec to x_dec_new length (label_len+pred_len)
         if x_mark_dec is not None and x_mark_dec.shape[1] > x_dec_new.shape[1]:
-            x_mark_dec = x_mark_dec[:, :x_dec_new.shape[1], :]
+            x_mark_dec = x_mark_dec[:, : x_dec_new.shape[1], :]
         dec_out = self.dec_embedding(x_dec_new, x_mark_dec)
         dec_out = self.decoder(dec_out, enc_out, x_mask=None, cross_mask=None, tau=tau, delta=delta)
         dec_out = dec_out * std_enc + mean_enc
@@ -201,9 +223,7 @@ class Model(nn.Module):
         mean_enc = mean_enc.unsqueeze(1).detach()
         x_enc = x_enc - mean_enc
         x_enc = x_enc.masked_fill(mask == 0, 0)
-        std_enc = torch.sqrt(
-            torch.sum(x_enc * x_enc, dim=1) / torch.sum(mask == 1, dim=1) + 1e-5
-        )
+        std_enc = torch.sqrt(torch.sum(x_enc * x_enc, dim=1) / torch.sum(mask == 1, dim=1) + 1e-5)
         std_enc = std_enc.unsqueeze(1).detach()
         x_enc /= std_enc
 
@@ -223,9 +243,7 @@ class Model(nn.Module):
 
         mean_enc = x_enc.mean(1, keepdim=True).detach()
         x_enc = x_enc - mean_enc
-        std_enc = torch.sqrt(
-            torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5
-        ).detach()
+        std_enc = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5).detach()
         x_enc = x_enc / std_enc
 
         tau = self.tau_learner(x_raw, std_enc)
@@ -243,9 +261,7 @@ class Model(nn.Module):
         x_raw = x_enc.clone().detach()
 
         mean_enc = x_enc.mean(1, keepdim=True).detach()
-        std_enc = torch.sqrt(
-            torch.var(x_enc - mean_enc, dim=1, keepdim=True, unbiased=False) + 1e-5
-        ).detach()
+        std_enc = torch.sqrt(torch.var(x_enc - mean_enc, dim=1, keepdim=True, unbiased=False) + 1e-5).detach()
 
         tau = self.tau_learner(x_raw, std_enc)
         tau = torch.clamp(tau, max=80.0).exp()
@@ -264,7 +280,7 @@ class Model(nn.Module):
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
         if self.task_name in ('long_term_forecast', 'short_term_forecast'):
             dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
-            return dec_out[:, -self.pred_len:, :]
+            return dec_out[:, -self.pred_len :, :]
         if self.task_name == 'imputation':
             dec_out = self.imputation(x_enc, x_mark_enc, x_dec, x_mark_dec, mask)
             return dec_out

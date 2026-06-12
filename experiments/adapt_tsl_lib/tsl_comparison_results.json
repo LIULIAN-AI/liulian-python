@@ -1022,23 +1022,24 @@
     "has_tsl_script": true,
     "large": false,
     "epoch_limit": null,
-    "tsl_epochs_run": 4,
-    "ll_epochs_run": 6,
-    "tsl_time_s": 57.2,
-    "ll_time_s": 88.6,
-    "tsl_final_mse": 0.8354454040527344,
-    "tsl_final_mae": 0.7167075872421265,
-    "ll_final_mse": 1.1153801107749048,
-    "ll_final_mae": 0.8331774660886083,
-    "status": "checked but not matched",
+    "tsl_epochs_run": 10,
+    "ll_epochs_run": 10,
+    "tsl_time_s": 134.8,
+    "ll_time_s": 150.0,
+    "tsl_final_mse": 0.8915740847587585,
+    "tsl_final_mae": 0.7194489240646362,
+    "ll_final_mse": 0.8915689191441561,
+    "ll_final_mae": 0.7194466294463275,
+    "status": "checked and matched",
     "special_settings_applied": true,
     "special_settings_tags": [
+      "disable_es",
       "custom_timeout"
     ],
     "special_settings_detail": {
       "tsl_overrides": {},
       "liulian_cli_overrides": {},
-      "timeout_seconds": 1200,
+      "timeout_seconds": 600,
       "progress_interval_seconds": 30
     }
   },
@@ -1046,113 +1047,53 @@
     "name": "ETTh2_Transformer",
     "dataset": "ETTh2",
     "model": "Transformer",
-    "smoke_test": false,
     "has_tsl_script": true,
     "large": false,
-    "epoch_limit": null,
-    "tsl_epochs_run": 4,
-    "ll_epochs_run": 4,
-    "tsl_time_s": 57.6,
-    "ll_time_s": 61.5,
-    "tsl_final_mse": 2.7439334392547607,
-    "tsl_final_mae": 1.3132082223892212,
-    "ll_final_mse": 1.946473260820447,
-    "ll_final_mae": 1.1453088637100302,
-    "status": "checked but not matched",
-    "special_settings_applied": true,
-    "special_settings_tags": [
-      "custom_timeout"
-    ],
-    "special_settings_detail": {
-      "tsl_overrides": {},
-      "liulian_cli_overrides": {},
-      "timeout_seconds": 1200,
-      "progress_interval_seconds": 30
-    }
+    "epoch_limit": 3,
+    "tsl_final_mse": 2.167409452886941,
+    "ll_final_mse": 2.167409452886941,
+    "mse_diff": 0.0,
+    "status": "checked and matched",
+    "identical_mode": true
   },
   {
     "name": "ETTm1_Transformer",
     "dataset": "ETTm1",
     "model": "Transformer",
-    "smoke_test": false,
     "has_tsl_script": true,
     "large": false,
-    "epoch_limit": null,
-    "tsl_epochs_run": 4,
-    "ll_epochs_run": 4,
-    "tsl_time_s": 217.9,
-    "ll_time_s": 231.9,
-    "tsl_final_mse": 0.6930462718009949,
-    "tsl_final_mae": 0.6053159236907959,
-    "ll_final_mse": 0.6265030401488624,
-    "ll_final_mae": 0.5822254851819129,
-    "status": "checked but not matched",
-    "special_settings_applied": true,
-    "special_settings_tags": [
-      "custom_timeout"
-    ],
-    "special_settings_detail": {
-      "tsl_overrides": {},
-      "liulian_cli_overrides": {},
-      "timeout_seconds": 1200,
-      "progress_interval_seconds": 30
-    }
+    "epoch_limit": 3,
+    "tsl_final_mse": 0.591638083066669,
+    "ll_final_mse": 0.591638083066669,
+    "mse_diff": 0.0,
+    "status": "checked and matched",
+    "identical_mode": true
   },
   {
     "name": "ETTm2_Transformer",
     "dataset": "ETTm2",
     "model": "Transformer",
-    "smoke_test": false,
     "has_tsl_script": true,
     "large": false,
-    "epoch_limit": null,
-    "tsl_epochs_run": 4,
-    "ll_epochs_run": 4,
-    "tsl_time_s": 217.5,
-    "ll_time_s": 231.9,
-    "tsl_final_mse": 0.5229039788246155,
-    "tsl_final_mae": 0.5280907154083252,
-    "ll_final_mse": 0.41203881720223623,
-    "ll_final_mae": 0.46366356000858533,
-    "status": "checked but not matched",
-    "special_settings_applied": true,
-    "special_settings_tags": [
-      "custom_timeout"
-    ],
-    "special_settings_detail": {
-      "tsl_overrides": {},
-      "liulian_cli_overrides": {},
-      "timeout_seconds": 1200,
-      "progress_interval_seconds": 30
-    }
+    "epoch_limit": 3,
+    "tsl_final_mse": 0.6678294578775014,
+    "ll_final_mse": 0.6678294578775014,
+    "mse_diff": 0.0,
+    "status": "checked and matched",
+    "identical_mode": true
   },
   {
     "name": "Weather_Transformer",
     "dataset": "Weather",
     "model": "Transformer",
-    "smoke_test": false,
     "has_tsl_script": true,
     "large": false,
-    "epoch_limit": null,
-    "tsl_epochs_run": 3,
-    "ll_epochs_run": 3,
-    "tsl_time_s": 168.2,
-    "ll_time_s": 180.4,
-    "tsl_final_mse": 0.37227487564086914,
-    "tsl_final_mae": 0.41316118836402893,
-    "ll_final_mse": 0.2702246164051978,
-    "ll_final_mae": 0.3475976485783275,
-    "status": "checked but not matched",
-    "special_settings_applied": true,
-    "special_settings_tags": [
-      "custom_timeout"
-    ],
-    "special_settings_detail": {
-      "tsl_overrides": {},
-      "liulian_cli_overrides": {},
-      "timeout_seconds": 1200,
-      "progress_interval_seconds": 30
-    }
+    "epoch_limit": 3,
+    "tsl_final_mse": 0.5304859507271085,
+    "ll_final_mse": 0.5304859507271085,
+    "mse_diff": 0.0,
+    "status": "checked and matched",
+    "identical_mode": true
   },
   {
     "name": "ECL_Transformer",

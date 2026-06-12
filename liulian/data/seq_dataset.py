@@ -88,9 +88,7 @@ class SequenceDataset(Dataset):
         day_diff = self.df[self.time_col].diff()
 
         if (day_diff[1:] < 0).any():
-            raise ValueError(
-                f'DataFrame must be sorted by {self.time_col!r} in ascending order!'
-            )
+            raise ValueError(f'DataFrame must be sorted by {self.time_col!r} in ascending order!')
 
         breaks = day_diff != 1  # first row is always NaN → True
         seq_id = breaks.cumsum()

@@ -35,9 +35,7 @@ class PositionalEmbedding(nn.Module):
         pe.require_grad = False
 
         position = torch.arange(0, max_len).float().unsqueeze(1)
-        div_term = (
-            torch.arange(0, d_model, 2).float() * -(math.log(10000.0) / d_model)
-        ).exp()
+        div_term = (torch.arange(0, d_model, 2).float() * -(math.log(10000.0) / d_model)).exp()
 
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
@@ -82,9 +80,7 @@ class TokenEmbedding(nn.Module):
         )
         for m in self.modules():
             if isinstance(m, nn.Conv1d):
-                nn.init.kaiming_normal_(
-                    m.weight, mode='fan_in', nonlinearity='leaky_relu'
-                )
+                nn.init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='leaky_relu')
 
     def forward(self, x):
         """Forward pass
@@ -118,9 +114,7 @@ class FixedEmbedding(nn.Module):
         w.require_grad = False
 
         position = torch.arange(0, c_in).float().unsqueeze(1)
-        div_term = (
-            torch.arange(0, d_model, 2).float() * -(math.log(10000.0) / d_model)
-        ).exp()
+        div_term = (torch.arange(0, d_model, 2).float() * -(math.log(10000.0) / d_model)).exp()
 
         w[:, 0::2] = torch.sin(position * div_term)
         w[:, 1::2] = torch.cos(position * div_term)
@@ -181,9 +175,7 @@ class TemporalEmbedding(nn.Module):
             Temporal embeddings [batch_size, seq_len, d_model]
         """
         x = x.long()
-        minute_x = (
-            self.minute_embed(x[:, :, 4]) if hasattr(self, 'minute_embed') else 0.0
-        )
+        minute_x = self.minute_embed(x[:, :, 4]) if hasattr(self, 'minute_embed') else 0.0
         hour_x = self.hour_embed(x[:, :, 3])
         weekday_x = self.weekday_embed(x[:, :, 2])
         day_x = self.day_embed(x[:, :, 1])
@@ -284,13 +276,9 @@ class DataEmbedding(nn.Module):
         if embed_type == 'none':
             self.temporal_embedding = None
         elif embed_type == 'timeF':
-            self.temporal_embedding = TimeFeatureEmbedding(
-                d_model=d_model, embed_type=embed_type, freq=freq
-            )
+            self.temporal_embedding = TimeFeatureEmbedding(d_model=d_model, embed_type=embed_type, freq=freq)
         else:
-            self.temporal_embedding = TemporalEmbedding(
-                d_model=d_model, embed_type=embed_type, freq=freq
-            )
+            self.temporal_embedding = TemporalEmbedding(d_model=d_model, embed_type=embed_type, freq=freq)
         self.dropout = nn.Dropout(p=dropout)
 
     def forward(self, x, x_mark):
@@ -306,11 +294,7 @@ class DataEmbedding(nn.Module):
         if x_mark is None or self.temporal_embedding is None:
             x = self.value_embedding(x) + self.position_embedding(x)
         else:
-            x = (
-                self.value_embedding(x)
-                + self.temporal_embedding(x_mark)
-                + self.position_embedding(x)
-            )
+            x = self.value_embedding(x) + self.temporal_embedding(x_mark) + self.position_embedding(x)
         return self.dropout(x)
 
 
@@ -416,14 +400,7 @@ class PatchEmbedding(nn.Module):
     Divides the time series into patches and embeds each patch.
     """
 
-    def __init__(
-        self,
-        d_model: int,
-        patch_len: int,
-        stride: int,
-        padding: int,
-        dropout: float
-    ):
+    def __init__(self, d_model: int, patch_len: int, stride: int, padding: int, dropout: float):
         """Initialize patch embedding
 
         Args:
@@ -476,9 +453,7 @@ class TimeLLMPatchEmbedding(nn.Module):
     Divides the time series into patches and embeds each patch.
     """
 
-    def __init__(
-        self, d_model: int, patch_len: int, stride: int, padding: int, dropout: float
-    ):
+    def __init__(self, d_model: int, patch_len: int, stride: int, padding: int, dropout: float):
         """Initialize patch embedding
 
         Args:
@@ -517,12 +492,8 @@ class TimeLLMPatchEmbedding(nn.Module):
         # Do patching
         n_vars = x.shape[1]  # x: [B, N_f, T]
         x = self.padding_patch_layer(x)  # [B, N_f, T + pad_len (T')]
-        x = x.unfold(
-            dimension=-1, size=self.patch_len, step=self.stride
-        )  # [B, N_f, num_patches, patch_len]
-        x = torch.reshape(
-            x, (x.shape[0] * x.shape[1], x.shape[2], x.shape[3])
-        )  # [B * N_f, num_patches, patch_len]
+        x = x.unfold(dimension=-1, size=self.patch_len, step=self.stride)  # [B, N_f, num_patches, patch_len]
+        x = torch.reshape(x, (x.shape[0] * x.shape[1], x.shape[2], x.shape[3]))  # [B * N_f, num_patches, patch_len]
         # Input encoding
         x = self.value_embedding(x)  # x: [B*N_f, num_patches, d_model]
         return self.dropout(x), n_vars

@@ -10,7 +10,25 @@ Autoformer uses progressive decomposition architecture with AutoCorrelation.
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from liulian.models.torch.layers.decomposition import series_decomp, my_Layernorm
+from liulian.models.torch.layers.decomposition import series_decomp
+
+
+class my_Layernorm(nn.Module):
+    """Special-designed Layernorm for the seasonal part of Autoformer.
+
+    Adapted from thuml/Time-Series-Library/layers/Autoformer_EncDec.py:my_Layernorm.
+    Subtracts the time-axis mean of the layernorm output so the seasonal
+    branch stays zero-mean across the sequence dimension.
+    """
+
+    def __init__(self, channels):
+        super().__init__()
+        self.layernorm = nn.LayerNorm(channels)
+
+    def forward(self, x):
+        x_hat = self.layernorm(x)
+        bias = torch.mean(x_hat, dim=1).unsqueeze(1).repeat(1, x.shape[1], 1)
+        return x_hat - bias
 
 
 class EncoderLayer(nn.Module):
@@ -30,12 +48,8 @@ class EncoderLayer(nn.Module):
         super(EncoderLayer, self).__init__()
         d_ff = d_ff or 4 * d_model
         self.attention = attention
-        self.conv1 = nn.Conv1d(
-            in_channels=d_model, out_channels=d_ff, kernel_size=1, bias=False
-        )
-        self.conv2 = nn.Conv1d(
-            in_channels=d_ff, out_channels=d_model, kernel_size=1, bias=False
-        )
+        self.conv1 = nn.Conv1d(in_channels=d_model, out_channels=d_ff, kernel_size=1, bias=False)
+        self.conv2 = nn.Conv1d(in_channels=d_ff, out_channels=d_model, kernel_size=1, bias=False)
         self.decomp1 = series_decomp(moving_avg)
         self.decomp2 = series_decomp(moving_avg)
         self.dropout = nn.Dropout(dropout)
@@ -60,9 +74,7 @@ class Encoder(nn.Module):
     def __init__(self, attn_layers, conv_layers=None, norm_layer=None):
         super(Encoder, self).__init__()
         self.attn_layers = nn.ModuleList(attn_layers)
-        self.conv_layers = (
-            nn.ModuleList(conv_layers) if conv_layers is not None else None
-        )
+        self.conv_layers = nn.ModuleList(conv_layers) if conv_layers is not None else None
         self.norm = norm_layer
 
     def forward(self, x, attn_mask=None):
@@ -105,12 +117,8 @@ class DecoderLayer(nn.Module):
         d_ff = d_ff or 4 * d_model
         self.self_attention = self_attention
         self.cross_attention = cross_attention
-        self.conv1 = nn.Conv1d(
-            in_channels=d_model, out_channels=d_ff, kernel_size=1, bias=False
-        )
-        self.conv2 = nn.Conv1d(
-            in_channels=d_ff, out_channels=d_model, kernel_size=1, bias=False
-        )
+        self.conv1 = nn.Conv1d(in_channels=d_model, out_channels=d_ff, kernel_size=1, bias=False)
+        self.conv2 = nn.Conv1d(in_channels=d_ff, out_channels=d_model, kernel_size=1, bias=False)
         self.decomp1 = series_decomp(moving_avg)
         self.decomp2 = series_decomp(moving_avg)
         self.decomp3 = series_decomp(moving_avg)
@@ -129,9 +137,7 @@ class DecoderLayer(nn.Module):
     def forward(self, x, cross, x_mask=None, cross_mask=None):
         x = x + self.dropout(self.self_attention(x, x, x, attn_mask=x_mask)[0])
         x, trend1 = self.decomp1(x)
-        x = x + self.dropout(
-            self.cross_attention(x, cross, cross, attn_mask=cross_mask)[0]
-        )
+        x = x + self.dropout(self.cross_attention(x, cross, cross, attn_mask=cross_mask)[0])
         x, trend2 = self.decomp2(x)
         y = x
         y = self.dropout(self.activation(self.conv1(y.transpose(-1, 1))))
@@ -139,9 +145,7 @@ class DecoderLayer(nn.Module):
         x, trend3 = self.decomp3(x + y)
 
         residual_trend = trend1 + trend2 + trend3
-        residual_trend = self.projection(residual_trend.permute(0, 2, 1)).transpose(
-            1, 2
-        )
+        residual_trend = self.projection(residual_trend.permute(0, 2, 1)).transpose(1, 2)
         return x, residual_trend
 
 

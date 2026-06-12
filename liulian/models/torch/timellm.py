@@ -38,9 +38,7 @@ class FlattenHead(nn.Module):
 
 
 class ReprogrammingLayer(nn.Module):
-    def __init__(
-        self, d_model, n_heads, d_keys=None, d_llm=None, attention_dropout=0.1
-    ):
+    def __init__(self, d_model, n_heads, d_keys=None, d_llm=None, attention_dropout=0.1):
         super(ReprogrammingLayer, self).__init__()
 
         d_keys = d_keys or (d_model // n_heads)
@@ -56,9 +54,7 @@ class ReprogrammingLayer(nn.Module):
         # target_embedding is the time series patch embeddings,
         # source_embedding and value_embedding are the LLM vocabulary embeddings.
         B, L, _ = target_embedding.shape
-        S, _ = (
-            source_embedding.shape
-        )  # S: num_tokens for text protypes embeddings (from LLM vocabulary)
+        S, _ = source_embedding.shape  # S: num_tokens for text protypes embeddings (from LLM vocabulary)
         H = self.n_heads
 
         target_embedding = self.query_projection(target_embedding).view(B, L, H, -1)
@@ -146,9 +142,7 @@ class Model(nn.Module):
                     trust_remote_code=True,
                     local_files_only=True,
                 )
-            except (
-                EnvironmentError
-            ):  # downloads the tokenizer from HF if not already done
+            except EnvironmentError:  # downloads the tokenizer from HF if not already done
                 print('Local tokenizer files not found. Attempting to download them..')
                 self.tokenizer = LlamaTokenizer.from_pretrained(
                     'huggyllama/llama-7b',
@@ -183,9 +177,7 @@ class Model(nn.Module):
                     trust_remote_code=True,
                     local_files_only=True,
                 )
-            except (
-                EnvironmentError
-            ):  # downloads the tokenizer from HF if not already done
+            except EnvironmentError:  # downloads the tokenizer from HF if not already done
                 print('Local tokenizer files not found. Attempting to download them..')
                 self.tokenizer = GPT2Tokenizer.from_pretrained(
                     'openai-community/gpt2',
@@ -193,9 +185,7 @@ class Model(nn.Module):
                     local_files_only=False,
                 )
         elif configs.llm_model == 'BERT':
-            self.bert_config = BertConfig.from_pretrained(
-                'google-bert/bert-base-uncased'
-            )
+            self.bert_config = BertConfig.from_pretrained('google-bert/bert-base-uncased')
             self.bert_config.num_hidden_layers = configs.llm_layers
             self.bert_config.output_attentions = True
             self.bert_config.output_hidden_states = True
@@ -222,9 +212,7 @@ class Model(nn.Module):
                     trust_remote_code=True,
                     local_files_only=True,
                 )
-            except (
-                EnvironmentError
-            ):  # downloads the tokenizer from HF if not already done
+            except EnvironmentError:  # downloads the tokenizer from HF if not already done
                 print('Local tokenizer files not found. Attempting to download them..')
                 self.tokenizer = BertTokenizer.from_pretrained(
                     'google-bert/bert-base-uncased',
@@ -233,9 +221,7 @@ class Model(nn.Module):
                 )
 
         elif configs.llm_model == 'TINYLLAMA':
-            self.llm_config = AutoConfig.from_pretrained(
-                'TinyLlama/TinyLlama-1.1B-Chat-v1.0'
-            )
+            self.llm_config = AutoConfig.from_pretrained('TinyLlama/TinyLlama-1.1B-Chat-v1.0')
             self.llm_config.num_hidden_layers = configs.llm_layers
             self.llm_config.attn_implementation = 'eager'
             self.llm_config.output_attentions = True
@@ -274,9 +260,7 @@ class Model(nn.Module):
                 )
 
         elif configs.llm_model == 'QWEN':
-            self.llm_config = AutoModelForCausalLM.from_pretrained(
-                'Qwen/Qwen-7B-Chat'
-            ).config
+            self.llm_config = AutoModelForCausalLM.from_pretrained('Qwen/Qwen-7B-Chat').config
             self.llm_config.num_hidden_layers = configs.llm_layers
             self.llm_config.output_attentions = True
             self.llm_config.output_hidden_states = True
@@ -339,17 +323,12 @@ class Model(nn.Module):
         self.num_tokens = 1000
         self.mapping_layer = nn.Linear(self.vocab_size, self.num_tokens)
 
-        self.reprogramming_layer = ReprogrammingLayer(
-            configs.d_model, configs.n_heads, self.d_ff, self.d_llm
-        )
+        self.reprogramming_layer = ReprogrammingLayer(configs.d_model, configs.n_heads, self.d_ff, self.d_llm)
 
         self.patch_nums = int((configs.seq_len - self.patch_len) / self.stride + 2)
         self.head_nf = self.d_ff * self.patch_nums
 
-        if (
-            self.task_name == 'long_term_forecast'
-            or self.task_name == 'short_term_forecast'
-        ):
+        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
             self.output_projection = FlattenHead(
                 configs.enc_in,
                 self.head_nf,
@@ -362,13 +341,8 @@ class Model(nn.Module):
         self.normalize_layers = Normalize(configs.enc_in, affine=False)
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
-        if (
-            self.task_name == 'long_term_forecast'
-            or self.task_name == 'short_term_forecast'
-        ):
-            dec_out = self.forecast(
-                x_enc, x_mark_enc, x_dec, x_mark_dec
-            )  # [B, pred_len, N_f]
+        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
+            dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)  # [B, pred_len, N_f]
             return dec_out[:, -self.pred_len :, :]
         return None
 
@@ -410,29 +384,21 @@ class Model(nn.Module):
             raise RuntimeError(
                 'Tokenizer is not properly initialized or not callable. Please check LLM model and tokenizer setup.'
             )
-        prompt_output = self.tokenizer(
-            prompt, return_tensors='pt', padding=True, truncation=True, max_length=2048
-        )
+        prompt_output = self.tokenizer(prompt, return_tensors='pt', padding=True, truncation=True, max_length=2048)
         if not hasattr(prompt_output, 'input_ids'):
             raise RuntimeError(
                 f"Tokenizer output does not have 'input_ids'. Type: {type(prompt_output)}. Please check tokenizer type and initialization."
             )
         prompt = prompt_output.input_ids
-        prompt_embeddings = self.llm_model.get_input_embeddings()(
-            prompt.to(x_enc.device)
-        )  # (batch, prompt_token, dim)
+        prompt_embeddings = self.llm_model.get_input_embeddings()(prompt.to(x_enc.device))  # (batch, prompt_token, dim)
 
         # [num_tokens, d_vocab]:
-        source_embeddings = self.mapping_layer(
-            self.word_embeddings.permute(1, 0)
-        ).permute(1, 0)
+        source_embeddings = self.mapping_layer(self.word_embeddings.permute(1, 0)).permute(1, 0)
 
         x_enc = x_enc.permute(0, 2, 1).contiguous()
         # x_enc: [B, N_f, T]， enc_out: [B*N_f, num_patches, d_model]:
         # enc_out, n_vars = self.patch_embedding(x_enc.to(torch.bfloat16))  # todo: maybe needed autocast as in timellm?
-        enc_out, n_vars = self.patch_embedding(
-            x_enc
-        )  # keep as float32, do not cast to bfloat16
+        enc_out, n_vars = self.patch_embedding(x_enc)  # keep as float32, do not cast to bfloat16
         enc_out = self.reprogramming_layer(
             enc_out, source_embeddings, source_embeddings
         )  # enc_out: [B*N_f, num_patches, d_llm]
@@ -444,16 +410,10 @@ class Model(nn.Module):
         # dec_out = dec_out.float()
         dec_out = dec_out[:, :, : self.d_ff]  # [B*N_f, prompt_len + num_patches, d_ff]
 
-        dec_out = torch.reshape(
-            dec_out, (-1, n_vars, dec_out.shape[-2], dec_out.shape[-1])
-        )
-        dec_out = dec_out.permute(
-            0, 1, 3, 2
-        ).contiguous()  # [B, N_f, d_ff, prompt_len + num_patches]
+        dec_out = torch.reshape(dec_out, (-1, n_vars, dec_out.shape[-2], dec_out.shape[-1]))
+        dec_out = dec_out.permute(0, 1, 3, 2).contiguous()  # [B, N_f, d_ff, prompt_len + num_patches]
 
-        dec_out = self.output_projection(
-            dec_out[:, :, :, -self.patch_nums :]
-        )  # [B, N_f, pred_len]
+        dec_out = self.output_projection(dec_out[:, :, :, -self.patch_nums :])  # [B, N_f, pred_len]
         dec_out = dec_out.permute(0, 2, 1).contiguous()
 
         dec_out = self.normalize_layers(dec_out, 'denorm')
@@ -524,14 +484,10 @@ class TimeLLMAdapter(EntityAwareMixin, TorchModelAdapter):
         x_enc = inputs['x_enc']
         batch_size, seq_len, n_features = x_enc.shape
 
-        x_mark_enc = inputs.get(
-            'x_mark_enc', torch.zeros(batch_size, seq_len, 1, device=x_enc.device)
-        )
+        x_mark_enc = inputs.get('x_mark_enc', torch.zeros(batch_size, seq_len, 1, device=x_enc.device))
         x_dec = inputs.get(
             'x_dec',
-            torch.zeros(
-                batch_size, self._config['pred_len'], n_features, device=x_enc.device
-            ),
+            torch.zeros(batch_size, self._config['pred_len'], n_features, device=x_enc.device),
         )
         x_mark_dec = inputs.get(
             'x_mark_dec',

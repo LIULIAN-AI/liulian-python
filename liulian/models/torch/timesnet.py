@@ -79,19 +79,13 @@ class TimesBlock(nn.Module):
             # padding
             if (self.seq_len + self.pred_len) % period != 0:
                 length = (((self.seq_len + self.pred_len) // period) + 1) * period
-                padding = torch.zeros(
-                    [x.shape[0], (length - (self.seq_len + self.pred_len)), x.shape[2]]
-                ).to(x.device)
+                padding = torch.zeros([x.shape[0], (length - (self.seq_len + self.pred_len)), x.shape[2]]).to(x.device)
                 out = torch.cat([x, padding], dim=1)
             else:
                 length = self.seq_len + self.pred_len
                 out = x
             # reshape to 2D
-            out = (
-                out.reshape(B, length // period, period, N)
-                .permute(0, 3, 1, 2)
-                .contiguous()
-            )
+            out = out.reshape(B, length // period, period, N).permute(0, 3, 1, 2).contiguous()
             # 2D conv
             out = self.conv(out)
             # reshape back
@@ -120,9 +114,7 @@ class Model(nn.Module):
         self.seq_len = configs.seq_len
         self.label_len = configs.label_len
         self.pred_len = configs.pred_len
-        self.model = nn.ModuleList(
-            [TimesBlock(configs) for _ in range(configs.e_layers)]
-        )
+        self.model = nn.ModuleList([TimesBlock(configs) for _ in range(configs.e_layers)])
         self.enc_embedding = DataEmbedding(
             configs.enc_in,
             configs.d_model,
@@ -132,10 +124,7 @@ class Model(nn.Module):
         )
         self.layer = configs.e_layers
         self.layer_norm = nn.LayerNorm(configs.d_model)
-        if (
-            self.task_name == 'long_term_forecast'
-            or self.task_name == 'short_term_forecast'
-        ):
+        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
             self.predict_linear = nn.Linear(self.seq_len, self.pred_len + self.seq_len)
             self.projection = nn.Linear(configs.d_model, configs.c_out, bias=True)
         if self.task_name == 'imputation' or self.task_name == 'anomaly_detection':
@@ -143,9 +132,7 @@ class Model(nn.Module):
         if self.task_name == 'classification':
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
-            self.projection = nn.Linear(
-                configs.d_model * configs.seq_len, configs.num_class
-            )
+            self.projection = nn.Linear(configs.d_model * configs.seq_len, configs.num_class)
 
     def forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         means = x_enc.mean(1, keepdim=True).detach()
@@ -159,12 +146,8 @@ class Model(nn.Module):
             enc_out = self.layer_norm(self.model[i](enc_out))
         dec_out = self.projection(enc_out)
 
-        dec_out = dec_out.mul(
-            stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len + self.seq_len, 1)
-        )
-        dec_out = dec_out.add(
-            means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len + self.seq_len, 1)
-        )
+        dec_out = dec_out.mul(stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len + self.seq_len, 1))
+        dec_out = dec_out.add(means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len + self.seq_len, 1))
         return dec_out
 
     def imputation(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask):
@@ -172,9 +155,7 @@ class Model(nn.Module):
         means = means.unsqueeze(1).detach()
         x_enc = x_enc.sub(means)
         x_enc = x_enc.masked_fill(mask == 0, 0)
-        stdev = torch.sqrt(
-            torch.sum(x_enc * x_enc, dim=1) / torch.sum(mask == 1, dim=1) + 1e-5
-        )
+        stdev = torch.sqrt(torch.sum(x_enc * x_enc, dim=1) / torch.sum(mask == 1, dim=1) + 1e-5)
         stdev = stdev.unsqueeze(1).detach()
         x_enc = x_enc.div(stdev)
 
@@ -183,12 +164,8 @@ class Model(nn.Module):
             enc_out = self.layer_norm(self.model[i](enc_out))
         dec_out = self.projection(enc_out)
 
-        dec_out = dec_out.mul(
-            stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len + self.seq_len, 1)
-        )
-        dec_out = dec_out.add(
-            means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len + self.seq_len, 1)
-        )
+        dec_out = dec_out.mul(stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len + self.seq_len, 1))
+        dec_out = dec_out.add(means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len + self.seq_len, 1))
         return dec_out
 
     def anomaly_detection(self, x_enc):
@@ -202,12 +179,8 @@ class Model(nn.Module):
             enc_out = self.layer_norm(self.model[i](enc_out))
         dec_out = self.projection(enc_out)
 
-        dec_out = dec_out.mul(
-            stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len + self.seq_len, 1)
-        )
-        dec_out = dec_out.add(
-            means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len + self.seq_len, 1)
-        )
+        dec_out = dec_out.mul(stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len + self.seq_len, 1))
+        dec_out = dec_out.add(means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len + self.seq_len, 1))
         return dec_out
 
     def classification(self, x_enc, x_mark_enc):
@@ -228,10 +201,7 @@ class Model(nn.Module):
         return output
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
-        if (
-            self.task_name == 'long_term_forecast'
-            or self.task_name == 'short_term_forecast'
-        ):
+        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
             dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
             return dec_out[:, -self.pred_len :, :]
         if self.task_name == 'imputation':

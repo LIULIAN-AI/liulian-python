@@ -265,9 +265,7 @@ def time_features(dates: pd.DatetimeIndex, freq: str = 'h') -> np.ndarray:
 
         >>> # Use in model input preparation
         >>> import torch
-        >>> x_mark = torch.from_numpy(
-        ...     features.T
-        ... )  # Transpose to (n_timesteps, n_features)
+        >>> x_mark = torch.from_numpy(features.T)  # Transpose to (n_timesteps, n_features)
 
     Note:
         The returned array has features as rows and timesteps as columns.

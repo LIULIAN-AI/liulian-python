@@ -58,9 +58,7 @@ def CORR(pred: npt.NDArray[np.float64], true: npt.NDArray[np.float64]) -> float:
         >>> corr = CORR(pred, true)
     """
     u = ((true - true.mean(0)) * (pred - pred.mean(0))).sum(0)
-    d = np.sqrt(
-        ((true - true.mean(0)) ** 2).sum(0) * ((pred - pred.mean(0)) ** 2).sum(0)
-    )
+    d = np.sqrt(((true - true.mean(0)) ** 2).sum(0) * ((pred - pred.mean(0)) ** 2).sum(0))
     corr = u / d
     # Handle different array dimensions
     if corr.ndim == 0:
@@ -209,9 +207,7 @@ def MSPE(pred: npt.NDArray[np.float64], true: npt.NDArray[np.float64]) -> float:
     return float(np.mean(np.square((true - pred) / true)))
 
 
-def metric(
-    pred: npt.NDArray[np.float64], true: npt.NDArray[np.float64]
-) -> Tuple[float, float, float, float, float]:
+def metric(pred: npt.NDArray[np.float64], true: npt.NDArray[np.float64]) -> Tuple[float, float, float, float, float]:
     """
     Calculate all standard time series metrics at once.
 

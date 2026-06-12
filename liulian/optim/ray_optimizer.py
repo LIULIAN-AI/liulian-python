@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import itertools
 import logging
+import os
 from typing import Any, Callable, Dict, List, Optional
 
 from liulian.optim.base import BaseOptimizer, OptimizationResult
@@ -73,6 +74,29 @@ def make_trainable(
         # Merge base config with trial-specific hypers
         merged = {**base_config, **config}
 
+        # Per-trial deterministic seeding: base seed + trial index. Each
+        # trial becomes reproducible, and trials differ only through their
+        # sampled hyperparameters — not through uncontrolled worker RNG
+        # (model init, dropout masks, batch order). Before 2026-06-12 Ray
+        # workers never re-seeded, so trial scores carried init noise.
+        trial_index = 0
+        try:
+            from ray import tune as _tune
+
+            _ctx_getter = getattr(_tune, 'get_context', None)
+            _ctx = _ctx_getter() if callable(_ctx_getter) else None
+            if _ctx is not None:
+                # Ray trial ids look like '761d6_00046' — suffix is the index.
+                trial_index = int(str(_ctx.get_trial_id()).rsplit('_', 1)[-1])
+        except Exception:
+            pass
+        from liulian.pipeline import seed_everything
+
+        seed_everything(
+            int(merged.get('seed', 2026)) + trial_index,
+            deterministic=bool(merged.get('deterministic', False)),
+        )
+
         # Override model_args with trial hypers
         args = _clone_namespace(model_args)
         for k, v in config.items():
@@ -89,11 +113,31 @@ def make_trainable(
                 model = model_cls(**vars(args)).float()
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-        # Disable early stopping inside HPO trials — ASHA handles pruning
-        merged['disable_early_stopping'] = True
+        # Keep trainer-level early stopping behavior from the base config
+        # (Swiss-River style): patience-driven stop remains active unless the
+        # caller explicitly sets ``disable_early_stopping=True``.
+        merged.setdefault('disable_early_stopping', False)
+        # Use a trial-unique checkpoint directory so concurrent Ray trials do
+        # not overwrite each other's best checkpoints.
+        trial_checkpoint_dir = os.path.join('checkpoints', f'pid_{os.getpid()}')
+        try:
+            from ray import tune
+
+            get_context = getattr(tune, 'get_context', None)
+            if callable(get_context):
+                context = get_context()
+                if context is not None:
+                    trial_id = context.get_trial_id()
+                    if trial_id:
+                        trial_checkpoint_dir = os.path.join('checkpoints', f'trial_{trial_id}')
+        except Exception:
+            # Keep PID-scoped fallback if Ray context is unavailable.
+            pass
         trainer = ForecastTrainer(
-            config=merged, device=device
-        )  # todo: checkpoint_dir and exp_logger?
+            config=merged,
+            device=device,
+            checkpoint_dir=trial_checkpoint_dir,
+        )
 
         train_loader = loaders['train']
         val_loader = loaders['val']
@@ -158,14 +202,10 @@ def _make_ray_epoch_callback(
             if val_key in epoch_record:
                 report_dict[metric_name] = epoch_record[val_key]
             elif 'train_loss' in epoch_record:
-                raise ValueError(
-                    'train_loss reported as metric — ASHA pruning may be unreliable!'
-                )
+                raise ValueError('train_loss reported as metric — ASHA pruning may be unreliable!')
                 report_dict[metric_name] = epoch_record['train_loss']
             else:
-                raise ValueError(
-                    f'Metric "{metric_name}" not found in epoch_record — ASHA pruning may be unreliable!'
-                )
+                raise ValueError(f'Metric "{metric_name}" not found in epoch_record — ASHA pruning may be unreliable!')
                 # Fallback: use the first val_* numeric value
                 for k, v in epoch_record.items():
                     if k.startswith('val_') and isinstance(v, (int, float)):
@@ -242,9 +282,7 @@ def _get_metrics_from_ray_trial(
     try:
         best_anchor = trial.metric_analysis.get(anchor_metric, {}).get(mode)
     except (AttributeError, TypeError):
-        raise ValueError(
-            f'Metric analysis for "{anchor_metric}" not found — best_value may be inaccurate!'
-        )
+        raise ValueError(f'Metric analysis for "{anchor_metric}" not found — best_value may be inaccurate!')
         pass
 
     # ── Read progress.csv ───────────────────────────────────────────
@@ -257,9 +295,7 @@ def _get_metrics_from_ray_trial(
                 last_row = df.iloc[-1]
                 result['n_epochs'] = int(last_row.get('training_iteration', len(df)))
                 result['last_metrics'] = {
-                    k: v
-                    for k, v in last_row.to_dict().items()
-                    if isinstance(v, (int, float)) and not np.isnan(v)
+                    k: v for k, v in last_row.to_dict().items() if isinstance(v, (int, float)) and not np.isnan(v)
                 }
 
             # Best-epoch metrics: find the row closest to best_anchor
@@ -270,15 +306,11 @@ def _get_metrics_from_ray_trial(
                     result['best_value'] = best_anchor
                     result['best_epoch'] = int(best_row.get('training_iteration', 0))
                     result['best_metrics'] = {
-                        k: v
-                        for k, v in best_row.to_dict().items()
-                        if isinstance(v, (int, float)) and not np.isnan(v)
+                        k: v for k, v in best_row.to_dict().items() if isinstance(v, (int, float)) and not np.isnan(v)
                     }
                     return result
         except Exception as exc:
-            logger.debug(
-                'progress.csv parsing failed for trial %s: %s', trial.trial_id, exc
-            )
+            logger.debug('progress.csv parsing failed for trial %s: %s', trial.trial_id, exc)
 
     raise ValueError(
         f'Could not extract best epoch metrics from progress.csv for trial {trial.trial_id} — best_epoch will be None and best_metrics will fallback to last_metrics!'
@@ -287,9 +319,7 @@ def _get_metrics_from_ray_trial(
     # ── Fallback: use last_result / metric_analysis directly ────────
     result['best_value'] = best_anchor
     result['n_epochs'] = trial.last_result.get('training_iteration')
-    result['last_metrics'] = {
-        k: v for k, v in trial.last_result.items() if isinstance(v, (int, float))
-    }
+    result['last_metrics'] = {k: v for k, v in trial.last_result.items() if isinstance(v, (int, float))}
     # Without progress.csv we cannot determine best_epoch reliably
     result['best_epoch'] = None
     result['best_metrics'] = result['last_metrics']
@@ -385,9 +415,7 @@ class RayOptimizer(BaseOptimizer):
 
             self._ray_available = True
         except ImportError:
-            logger.info(
-                'ray[tune] not installed — RayOptimizer will use fallback grid sweep.'
-            )
+            logger.info('ray[tune] not installed — RayOptimizer will use fallback grid sweep.')
 
     # ------------------------------------------------------------------
     # Public helpers
@@ -521,9 +549,7 @@ class RayOptimizer(BaseOptimizer):
                     os.chdir(_cwd.replace(_base, _link))
                     sys.executable = sys.executable.replace(_base, _link)
                     if 'PYTHONPATH' in os.environ:
-                        os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'].replace(
-                            _base, _link
-                        )
+                        os.environ['PYTHONPATH'] = os.environ['PYTHONPATH'].replace(_base, _link)
 
                     _spaces_patch = (
                         _base,
@@ -579,9 +605,7 @@ class RayOptimizer(BaseOptimizer):
 
             with warnings.catch_warnings():
                 warnings.filterwarnings('ignore', category=FutureWarning, module=r'ray')
-                warnings.filterwarnings(
-                    'ignore', category=DeprecationWarning, module=r'ray'
-                )
+                warnings.filterwarnings('ignore', category=DeprecationWarning, module=r'ray')
                 ray.init(**init_kwargs)
             # Redirect Ray's internal loggers from stderr → stdout so
             # that IDEs like PyCharm don't render them in red.
@@ -667,9 +691,7 @@ class RayOptimizer(BaseOptimizer):
             'mode': mode,
             'verbose': 0,
             'storage_path': storage_path,
-            'resources_per_trial': self.config.get(
-                'resources_per_trial', {'cpu': 1, 'gpu': 0}
-            ),
+            'resources_per_trial': self.config.get('resources_per_trial', {'cpu': 1, 'gpu': 0}),
         }
         if scheduler is not None:
             run_kwargs['scheduler'] = scheduler
@@ -753,12 +775,8 @@ class RayOptimizer(BaseOptimizer):
                     anchor_metric=metric,
                     mode=mode,
                     if_trim_best_n=self.config.get('trim_best_n', True),
-                    keep_best_for_trimmed_trials=self.config.get(
-                        'trim_keep_best', True
-                    ),
-                    keep_last_for_trimmed_trials=self.config.get(
-                        'trim_keep_last', False
-                    ),
+                    keep_best_for_trimmed_trials=self.config.get('trim_keep_best', True),
+                    keep_last_for_trimmed_trials=self.config.get('trim_keep_last', False),
                 )
                 if n_removed > 0:
                     logger.info(
@@ -816,11 +834,7 @@ class RayOptimizer(BaseOptimizer):
             # Without a real training loop we use a deterministic hash-based
             # proxy metric.  In production code the caller should supply a
             # ``trainable`` and use the Ray path instead.
-            proxy = (
-                sum(abs(hash(str(v))) % 1000 for v in combo)
-                / max(len(combo), 1)
-                / 1000.0
-            )
+            proxy = sum(abs(hash(str(v))) % 1000 for v in combo) / max(len(combo), 1) / 1000.0
             trial_metrics = {metric: proxy}
             trials_summary.append(
                 {

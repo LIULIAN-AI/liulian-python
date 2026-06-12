@@ -45,7 +45,7 @@ include_historical_y: none
 include_historical_predicted_y: false
 
 # ── Entity identifiers ─────────────────────────────────────────────────
-identifier_mode: one_hot
+identifier_mode: embedding
 id_integration: concat_to_x
 embedding_size: 10
 num_embeddings: null

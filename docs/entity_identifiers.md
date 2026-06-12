@@ -107,6 +107,7 @@ Entity identifiers **do not** help when features are heterogeneous — they meas
 | One-hot | `'onehot'` | Binary one-hot vector concatenated to input features |
 | Numeric ID | `'numeric_id'` | Raw integer ID as an additional feature |
 | Sinusoidal | `'sinusoidal'` | Positional-encoding-style features from entity ID |
+| Random | `'random'` | Deterministic random vector baseline per entity |
 | Coordinates | `'coordinates'` | Geographic lat/lon (Swiss-river only) |
 | Descriptors | `'descriptors'` | Custom descriptor vector per entity |
 
@@ -134,7 +135,7 @@ adapter = DLinearAdapter(config)
 # The model automatically wraps in EntityWrapper for 'embedding' mode
 ```
 
-For transparent modes (`'onehot'`, `'numeric_id'`, `'sinusoidal'`, `'coordinates'`), the entity features are concatenated to `x_enc` by the data layer. Set `enc_in` to include the extra dimensions:
+For transparent modes (`'onehot'`, `'numeric_id'`, `'sinusoidal'`, `'random'`, `'coordinates'`), the entity features are concatenated to `x_enc` by the data layer. Set `enc_in` to include the extra dimensions:
 
 ```python
 config = {
@@ -146,7 +147,7 @@ config = {
 
 ### With Custom Models (LSTMAdapter, TransformerEncoderAdapter)
 
-These models have built-in entity support with all 7 modes:
+These models have built-in entity support with all listed modes:
 
 ```python
 from liulian.models.torch import LSTMAdapter
@@ -179,7 +180,43 @@ For encoder-decoder models, the decoder input `x_dec` is also augmented.
 
 ### Transparent Modes
 
-For `'onehot'`, `'numeric_id'`, `'sinusoidal'`, and `'coordinates'`, the data layer (`TimeSeriesDataset.make_entity_features()`) appends entity features directly to the input tensor. The model's `enc_in` parameter must account for the additional dimensions.
+For `'onehot'`, `'numeric_id'`, `'sinusoidal'`, `'random'`, and `'coordinates'`, the data layer (`TimeSeriesDataset.make_entity_features()`) appends entity features directly to the input tensor. The model's `enc_in` parameter must account for the additional dimensions.
+
+> **Current caveat (important):** In this repository's default matrix setup, transparent modes are currently applied only to `swiss-river-1990 + lstm` (per-entity split). For `traffic`, `electricity`, and most other multi-channel CSV/PEMS setups, transparent modes are not enabled in the matrix runner because those paths do not currently construct per-entity transparent features.
+
+### Why include sinusoidal and random baselines?
+
+- **Sinusoidal** is a non-learnable structured baseline: it injects a smooth, index-aware entity code without extra trainable parameters.
+- **Random** is a non-semantic control baseline: if random IDs perform close to learned embeddings, gains may come from extra capacity only; if embeddings clearly win, gains are likely entity-structure-aware.
+
+## Matrix Experiment Integration (`experiments/entity_identifier`)
+
+The matrix runner (`experiments/entity_identifier/run.py`) now supports:
+
+- Global modes: `none`, `embedding`
+- Additional competitor modes (applicable subset): `onehot`, `coordinates`, `sinusoidal`, `random`
+
+By default, the runner auto-filters inapplicable dataset-model-mode combinations.
+For random/sinusoidal transparent baselines, you can tune:
+
+- `random_identifier_dim` (default `16`)
+- `random_identifier_seed` (default `2026`)
+- `sinusoidal_dim` (default `16`)
+
+Examples:
+
+```bash
+# Local dry run with extra identifier competitors
+python experiments/entity_identifier/run.py \
+  --phase dry \
+  --modes none embedding onehot coordinates sinusoidal random
+
+# Slurm: recommended one job per experiment (better GPU parallelism + fault isolation)
+python experiments/entity_identifier/submit_slurm.py \
+  --dispatch-mode per-experiment \
+  --run-tag eid_competitors \
+  --modes none embedding onehot coordinates sinusoidal random
+```
 
 ## Benchmark Experiments
 

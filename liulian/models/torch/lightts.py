@@ -72,7 +72,7 @@ class Model(nn.Module):
             self.chunk_size = min(configs.seq_len, chunk_size)
 
         if self.seq_len % self.chunk_size != 0:
-            self.seq_len += (self.chunk_size - self.seq_len % self.chunk_size)
+            self.seq_len += self.chunk_size - self.seq_len % self.chunk_size
         self.num_chunks = self.seq_len // self.chunk_size
 
         self.d_model = configs.d_model
@@ -82,7 +82,8 @@ class Model(nn.Module):
             self.act = F.gelu
             self.dropout_layer = nn.Dropout(configs.dropout)
             self.projection = nn.Linear(
-                configs.enc_in * configs.seq_len, configs.num_class,
+                configs.enc_in * configs.seq_len,
+                configs.num_class,
             )
         self._build()
 
@@ -117,7 +118,8 @@ class Model(nn.Module):
 
         # Padding to match seq_len (after chunk alignment)
         x = torch.cat(
-            [x, torch.zeros((B, self.seq_len - T, N)).to(x.device)], dim=1,
+            [x, torch.zeros((B, self.seq_len - T, N)).to(x.device)],
+            dim=1,
         )
 
         highway = self.ar(x.permute(0, 2, 1))
@@ -163,7 +165,7 @@ class Model(nn.Module):
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
         if self.task_name in ('long_term_forecast', 'short_term_forecast'):
             dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
-            return dec_out[:, -self.pred_len:, :]
+            return dec_out[:, -self.pred_len :, :]
         if self.task_name == 'imputation':
             dec_out = self.imputation(x_enc, x_mark_enc, x_dec, x_mark_dec, mask)
             return dec_out

@@ -1,0 +1,20 @@
+phase: dev
+run_tag: null
+output_root: null
+datasets:
+  - swiss-river-1990
+models:
+  - lstm
+modes:
+  - none
+seeds: [2026]
+hpo_num_samples: 2 # default: 50
+hpo_max_concurrent: 4
+hpo_resources_gpu: 0.25
+train_epochs: 1  # default: 30
+max_train_samples: 100 # default: null (use all samples)
+timeout_seconds: 0
+max_jobs: null
+resume: false
+strict: false
+skip_compare: false

@@ -114,6 +114,9 @@ class SwissRiverDataset(SpatialTempoDataset):
         include_historical_predicted_y: bool = False,
         identifier_mode: str = 'none',
         id_integration: str = 'concat_to_x',
+        sinusoidal_dim: int = 16,  # CASE 1 (inner HPO) tunable for multi_channel via search_spaces.yaml; per_entity (here) is frozen per run -> CASE 2 outer sweep for "dim vs metrics" analysis (separate entry point, TBD)
+        random_identifier_dim: int = 16,  # same as sinusoidal_dim (see CASE 1 / CASE 2 note above)
+        random_identifier_seed: int = 2026,
         graph_mode: str = 'none',
         graphlet_num_hops: int = 1,
         max_samples: Optional[int] = None,
@@ -125,11 +128,12 @@ class SwissRiverDataset(SpatialTempoDataset):
         self.scaler_type = scaler_type.strip().lower()
         self.graphlet_num_hops = graphlet_num_hops
         self.max_samples = max_samples
+        self.sinusoidal_dim = int(sinusoidal_dim)
+        self.random_identifier_dim = int(random_identifier_dim)
+        self.random_identifier_seed = int(random_identifier_seed)
 
         project_root = Path(__file__).resolve().parents[2]
-        self.root_path = (
-            Path(root_path) if root_path else project_root / 'dataset' / 'swiss_river'
-        )
+        self.root_path = Path(root_path) if root_path else project_root / 'dataset' / 'swiss_river'
 
         self._file_map = {
             'swiss-river-1990': {
@@ -158,9 +162,7 @@ class SwissRiverDataset(SpatialTempoDataset):
         # --- Load raw DataFrames ----------------------------------------
         train_df = self._read_csv(self._file_map[data_name]['train'])
         test_df = self._read_csv(self._file_map[data_name]['test'])
-        train_df, val_df = TimeSeriesDataset.split_train_val(
-            train_df, train_ratio=train_split
-        )
+        train_df, val_df = TimeSeriesDataset.split_train_val(train_df, train_ratio=train_split)
 
         self.graph_name = self._file_map[data_name]['graph_name']
         # todo: check if we need to use the original read_graph() to get station ids instead:
@@ -179,8 +181,11 @@ class SwissRiverDataset(SpatialTempoDataset):
         for df in (train_df, val_df, test_df):
             entity_scaler.transform(df)
 
-        # --- Topology is optional (only needed for graph-based modes) ----
-        if graph_mode != 'none':
+        # --- Topology: needed for graph-based modes AND for the
+        # 'coordinates' identifier (station coords live in the graph file).
+        # Before 2026-06-11 it was only loaded for graph modes, so the
+        # coordinates identifier silently received an empty mapping.
+        if graph_mode != 'none' or identifier_mode == 'coordinates':
             topology = self._load_topology(self._file_map[data_name]['graph'])
         else:
             topology = None
@@ -321,9 +326,7 @@ class SwissRiverDataset(SpatialTempoDataset):
                 if 0 <= s < len(node_ids) and 0 <= d < len(node_ids):
                     edges.append((node_ids[s], node_ids[d]))
                 else:
-                    raise ValueError(
-                        f'Edge index out of bounds: {(s, d)} with {len(node_ids)} nodes.'
-                    )
+                    raise ValueError(f'Edge index out of bounds: {(s, d)} with {len(node_ids)} nodes.')
 
         coords: dict[str, tuple[float, float]] = {}
         if hasattr(x, 'shape') and x.shape[1] >= 2:
@@ -342,7 +345,7 @@ class SwissRiverDataset(SpatialTempoDataset):
         station: str,
         graphlet_neighbors: list[str] | None = None,
     ) -> pd.DataFrame:
-        """Build a single-station DataFrame with standard column names.
+        """Build a single-station DataFrame with standard column names.  # todo: resolve the duplication
 
         Parameters
         ----------
@@ -377,6 +380,15 @@ class SwissRiverDataset(SpatialTempoDataset):
         # Include predicted y for this station if available
         if f'{station}_wt_hat' in df.columns:
             out['water_temperature_hat'] = df[f'{station}_wt_hat']
+
+        # Drop rows where THIS station has missing measurements (stations
+        # join/leave the network at different times — the swiss-river-2010 /
+        # zurich CSVs carry NaNs; swiss-river-1990 is pre-cleaned so this is
+        # a no-op there). The resulting epoch_day jumps become segment breaks
+        # via _detect_breaks(), so no window ever spans a dropped region.
+        # Without this a single NaN sample drives the whole per_entity loss
+        # to NaN (observed on swiss-river-2010, 2026-06-11).
+        out = out.dropna().reset_index(drop=True)
 
         return out
 
@@ -426,20 +438,12 @@ class SwissRiverDataset(SpatialTempoDataset):
         ``torch.utils.data.ConcatDataset`` in the reference project).
         """
         df = self._split_frames[split_name]
-        graphlet_map = (
-            self._graphlet_neighbor_map()
-            if self.graph_mode == 'graphlet_features'
-            else {}
-        )
+        graphlet_map = self._graphlet_neighbor_map() if self.graph_mode == 'graphlet_features' else {}
 
         parts: list[TimeSeriesSplit] = []
         for station in self.station_ids:
-            station_df = self._make_station_frame(
-                df, station, graphlet_neighbors=graphlet_map.get(station)
-            )
-            predicted_cols = [
-                col for col in station_df.columns if col.endswith('_wt_hat')
-            ]
+            station_df = self._make_station_frame(df, station, graphlet_neighbors=graphlet_map.get(station))
+            predicted_cols = [col for col in station_df.columns if col.endswith('_wt_hat')]
             ds_station = TimeSeriesDataset(
                 splits={split_name: station_df},
                 time_col='epoch_day',
@@ -463,6 +467,9 @@ class SwissRiverDataset(SpatialTempoDataset):
                 id_integration=self.id_integration,
                 coordinates=(self.topology.coordinates if self.topology else {}),
                 station_name=station,
+                sinusoidal_dim=self.sinusoidal_dim,
+                random_identifier_dim=self.random_identifier_dim,
+                random_identifier_seed=self.random_identifier_seed,
             )
             parts.append(ds_station.get_split(split_name))
 
@@ -478,16 +485,8 @@ class SwissRiverDataset(SpatialTempoDataset):
         the [``Time-Series-Library``](https://github.com/thuml/Time-Series-Library/tree/main).
         """
         df = self._split_frames[split_name].copy().reset_index(drop=True)
-        feature_cols = [
-            f'{station}_at'
-            for station in self.station_ids
-            if f'{station}_at' in df.columns
-        ]
-        target_cols = [
-            f'{station}_wt'
-            for station in self.station_ids
-            if f'{station}_wt' in df.columns
-        ]
+        feature_cols = [f'{station}_at' for station in self.station_ids if f'{station}_at' in df.columns]
+        target_cols = [f'{station}_wt' for station in self.station_ids if f'{station}_wt' in df.columns]
 
         mc_ds = TimeSeriesDataset(
             splits={split_name: df[['epoch_day'] + feature_cols + target_cols]},
@@ -506,6 +505,17 @@ class SwissRiverDataset(SpatialTempoDataset):
             max_mask_consecutive=self.max_mask_consecutive,
             noise_type=self.noise_type,
             noise_kwargs=self.noise_kwargs,
+            # Entity identifier params — required so that downstream
+            # pipeline / adapter code (e.g. EntityAwareMixin,
+            # ChannelEntityWrapper, ChannelTransparentWrapper) can
+            # detect the configured mode and wrap the model accordingly.
+            station_ids=self.station_ids,
+            identifier_mode=self.identifier_mode,
+            id_integration=self.id_integration,
+            coordinates=(self.topology.coordinates if self.topology else {}),
+            sinusoidal_dim=self.sinusoidal_dim,
+            random_identifier_dim=self.random_identifier_dim,
+            random_identifier_seed=self.random_identifier_seed,
         )
         split = mc_ds.get_split(split_name)
         return split.with_max_samples(self.max_samples)

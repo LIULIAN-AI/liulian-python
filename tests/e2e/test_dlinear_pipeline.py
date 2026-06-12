@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import os
 
-import numpy as np
 import pytest
 
 
@@ -438,9 +437,7 @@ class TestChannelEntityWrapper:
 # ===========================================================================
 
 
-DATASET_ROOT = os.path.join(
-    os.path.dirname(__file__), '..', '..', 'dataset', 'swiss_river'
-)
+DATASET_ROOT = os.path.join(os.path.dirname(__file__), '..', '..', 'dataset', 'swiss_river')
 
 
 class TestTargetNames:

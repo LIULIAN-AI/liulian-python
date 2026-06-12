@@ -83,9 +83,7 @@ class mape_loss(nn.Module):
         >>> forecast = torch.randn(32, 24, 7)  # Predictions
         >>> target = torch.randn(32, 24, 7)  # Ground truth
         >>> mask = torch.ones(32, 24, 7)  # All valid
-        >>> loss = criterion(
-        ...     insample, freq=24, forecast=forecast, target=target, mask=mask
-        ... )
+        >>> loss = criterion(insample, freq=24, forecast=forecast, target=target, mask=mask)
 
     Note:
         - Undefined for target values close to zero
@@ -198,9 +196,7 @@ class mase_loss(nn.Module):
         >>> forecast = torch.randn(32, 24, 7)  # Predictions
         >>> target = torch.randn(32, 24, 7)  # Ground truth
         >>> mask = torch.ones(32, 24, 7)
-        >>> loss = criterion(
-        ...     insample, freq=24, forecast=forecast, target=target, mask=mask
-        ... )
+        >>> loss = criterion(insample, freq=24, forecast=forecast, target=target, mask=mask)
 
     Note:
         - Requires in-sample data to compute naive forecast error
@@ -239,9 +235,7 @@ class mase_loss(nn.Module):
             insample must have at least freq+1 timesteps to compute naive error.
         """
         # Compute naive forecast error: mean(|y_t - y_{t-freq}|)
-        masep = torch.mean(
-            torch.abs(insample[:, freq:] - insample[:, :-freq]), dim=1
-        )  # Shape: (batch, features)
+        masep = torch.mean(torch.abs(insample[:, freq:] - insample[:, :-freq]), dim=1)  # Shape: (batch, features)
 
         # Invert and apply mask
         masked_masep_inv = divide_no_nan(mask, masep[:, None, :])

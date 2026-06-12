@@ -18,9 +18,8 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional
 
-import numpy as np
 
 from liulian.data.base import BaseDataset
 from liulian.loggers.interface import LoggerInterface
@@ -218,9 +217,7 @@ class Experiment:
         if self.data_loaders is not None:
             self._run_torch(summary, train=train, eval=eval, infer=infer)
         else:
-            self._run_simple(
-                summary, train=train, eval=eval, infer=infer, batch_size=batch_size
-            )
+            self._run_simple(summary, train=train, eval=eval, infer=infer, batch_size=batch_size)
 
         # ---- Finalise ----
         self._sm.transition(LifecycleState.COMPLETED)
@@ -318,6 +315,7 @@ class Experiment:
             preds,
             trues,
             times,
+            entity_ids=predictions.get('entity_ids'),
             method=viz_method,
             pred_len=pred_len,
             output_dir=output_dir,
@@ -360,20 +358,14 @@ class Experiment:
             torch_model = getattr(self.model, '_model', None)
         if torch_model is None:
             raise RuntimeError(
-                'Cannot find a torch nn.Module.  Pass torch_model= '
-                'or use a TorchModelAdapter-based model.'
+                'Cannot find a torch nn.Module.  Pass torch_model= or use a TorchModelAdapter-based model.'
             )
 
         ckpt_dir = os.path.join(self._artifacts_dir, 'checkpoints')
 
         # ----- HPO branch -----
         search_space = self.config.get('search_space')
-        if (
-            train
-            and self.optimizer is not None
-            and search_space
-            and train_loader is not None
-        ):
+        if train and self.optimizer is not None and search_space and train_loader is not None:
             self._sm.transition(LifecycleState.TRAIN)
             logger.info('Starting HPO via %s', type(self.optimizer).__name__)
 
@@ -382,25 +374,35 @@ class Experiment:
             # models per trial.
             from liulian.models.torch.entity_mixin import (
                 ChannelEntityWrapper,
+                ChannelTransparentWrapper,
                 EntityWrapper,
             )
 
             is_entity_wrapped = isinstance(torch_model, EntityWrapper)
             is_channel_wrapped = isinstance(torch_model, ChannelEntityWrapper)
+            is_transparent_wrapped = isinstance(torch_model, ChannelTransparentWrapper)
 
             if is_channel_wrapped:
                 inner_model_cls = type(torch_model.inner)
                 model_args = getattr(torch_model.inner, '_args', None)
                 _cw_num_stations = torch_model.station_embedding.num_embeddings
                 _cw_emb_size = torch_model.station_embedding.embedding_dim
+            elif is_transparent_wrapped:
+                # Transparent multi_channel modes (onehot/sinusoidal/random/
+                # coordinates). The wrapper holds the (N, D) feature matrix; we
+                # capture N + the mode so the per-trial factory can rebuild it
+                # with a tuned sinusoidal_dim / random_identifier_dim.
+                inner_model_cls = type(torch_model.inner)
+                model_args = getattr(torch_model.inner, '_args', None)
+                _tw_num_stations = int(torch_model.channel_features.shape[0])
+                _tw_mode = str(self.config.get('identifier_mode', 'none'))
             elif is_entity_wrapped:
                 inner_model_cls = type(torch_model.inner)
                 model_args = getattr(torch_model.inner, '_args', None)
                 # Capture EntityWrapper parameters so we can re-wrap per trial todo: these arg names may change.
                 _ew_enc_in = self.config.get(
                     'enc_in',
-                    torch_model.enc_proj.in_features
-                    - torch_model.embedding.embedding_dim,
+                    torch_model.enc_proj.in_features - torch_model.embedding.embedding_dim,
                 )
                 _ew_num_embeddings = torch_model.embedding.num_embeddings
                 _ew_entity_id_col = torch_model.entity_id_col
@@ -413,9 +415,16 @@ class Experiment:
 
                 model_args = SimpleNamespace(**self.config)
 
+            if is_transparent_wrapped:
+                # Make the transparent-dim knobs visible on the namespace so a
+                # tuned value from the trial config propagates into the rebuild
+                # (make_trainable only sets config keys the namespace already has).
+                for _attr in ('sinusoidal_dim', 'random_identifier_dim'):
+                    if not hasattr(model_args, _attr):
+                        setattr(model_args, _attr, self.config.get(_attr, 16))
+
             # Build a model factory that rebuilds the full model (including
-            # EntityWrapper / ChannelEntityWrapper wrapping) from a
-            # namespace of args.
+            # entity / transparent wrapping) from a namespace of args.
             if is_channel_wrapped:
 
                 def _model_factory(args):
@@ -438,6 +447,33 @@ class Experiment:
                         num_embeddings=_ew_num_embeddings,
                         embedding_size=emb_size,
                         entity_id_col=_ew_entity_id_col,
+                    )
+
+            elif is_transparent_wrapped:
+
+                def _model_factory(args):
+                    inner = inner_model_cls(args).float()
+                    return ChannelTransparentWrapper(
+                        inner_model=inner,
+                        mode=_tw_mode,
+                        num_stations=_tw_num_stations,
+                        sinusoidal_dim=int(
+                            getattr(
+                                args,
+                                'sinusoidal_dim',
+                                self.config.get('sinusoidal_dim', 16),
+                            )
+                        ),
+                        random_dim=int(
+                            getattr(
+                                args,
+                                'random_identifier_dim',
+                                self.config.get('random_identifier_dim', 16),
+                            )
+                        ),
+                        random_seed=int(self.config.get('random_identifier_seed', 2026)),
+                        coordinates=self.config.get('coordinates'),
+                        station_ids=self.config.get('station_ids'),
                     )
             else:
                 _model_factory = None
@@ -469,6 +505,9 @@ class Experiment:
             )
             summary['metrics']['hpo'] = {
                 'best_config': hpo_result.best_config,
+                # Alias for the results.json contract (docs/results_json.md,
+                # field `hpo.best_hparams`); `best_config` stays for cli.py.
+                'best_hparams': hpo_result.best_config,
                 'best_value': hpo_result.best_value,
                 'n_trials': hpo_result.n_trials,
                 'best_checkpoint_path': hpo_result.best_checkpoint_path,
@@ -486,29 +525,19 @@ class Experiment:
                 import datetime
                 import yaml as _yaml
 
-                best_hparams_path = os.path.join(
-                    self._artifacts_dir, 'best_hparams.yaml'
-                )
+                best_hparams_path = os.path.join(self._artifacts_dir, 'best_hparams.yaml')
                 best_hparams_record = {
                     'best_config': hpo_result.best_config,
                     'best_metric_value': float(hpo_result.best_value),
-                    'metric_name': str(
-                        self.config.get('loss', 'mse')
-                    ),
+                    'metric_name': str(self.config.get('loss', 'mse')),
                     'n_trials': hpo_result.n_trials,
                     'dataset': str(self.config.get('data', '')),
                     'model': str(self.config.get('model', '')),
-                    'timestamp': datetime.datetime.now().isoformat(
-                        timespec='seconds'
-                    ),
+                    'timestamp': datetime.datetime.now().isoformat(timespec='seconds'),
                 }
                 with open(best_hparams_path, 'w') as fh:
-                    _yaml.safe_dump(
-                        best_hparams_record, fh, default_flow_style=False
-                    )
-                logger.info(
-                    'Best hyper-parameters saved to %s', best_hparams_path
-                )
+                    _yaml.safe_dump(best_hparams_record, fh, default_flow_style=False)
+                logger.info('Best hyper-parameters saved to %s', best_hparams_path)
             except Exception as exc:
                 logger.debug('Could not save best_hparams.yaml: %s', exc)
 
@@ -547,9 +576,7 @@ class Experiment:
                         import torch as _torch
 
                         state_path = os.path.join(ckpt_dir_path, sorted(pth_files)[0])
-                        torch_model.load_state_dict(
-                            _torch.load(state_path, weights_only=True)
-                        )
+                        torch_model.load_state_dict(_torch.load(state_path, weights_only=True))
                         torch_model.eval()
                         logger.ok('Loaded best checkpoint from %s', state_path)
                         _loaded_checkpoint = True
@@ -614,9 +641,7 @@ class Experiment:
 
         if train and train_loader is not None and val_loader is not None:
             self._sm.transition(LifecycleState.TRAIN)
-            train_result = trainer.fit(
-                torch_model, train_loader, val_loader, test_loader
-            )
+            train_result = trainer.fit(torch_model, train_loader, val_loader, test_loader)
             train_metrics = train_result.get('metrics', {})
             summary['metrics']['training'] = train_metrics.get('training', {})
             summary['metrics']['validation'] = train_metrics.get('validation', {})
@@ -645,11 +670,7 @@ class Experiment:
 
             ckpt_path = os.path.join(ckpt_dir, 'checkpoint')
             if os.path.exists(ckpt_path):
-                torch_model.load_state_dict(
-                    _torch.load(
-                        ckpt_path, map_location=trainer.device, weights_only=True
-                    )
-                )
+                torch_model.load_state_dict(_torch.load(ckpt_path, map_location=trainer.device, weights_only=True))
                 logger.ok('Loaded checkpoint: %s', ckpt_path)
 
             if test_loader is not None:
@@ -691,7 +712,9 @@ class Experiment:
             import torch as _torch
 
             test_split = self.dataset.get_split('test')
-            X_sample, y_sample = test_split.get_batch(batch_size=32)  # todo: this is computed on a given sample batch. Maybe remove it.
+            X_sample, y_sample = test_split.get_batch(
+                batch_size=32
+            )  # todo: this is computed on a given sample batch. Maybe remove it.
 
             cfg = self.config
             pred_len = cfg.get('pred_len', 1)

@@ -53,10 +53,7 @@ def trim_checkpoints(
     # Otherwise, recurse one level (multi-experiment layout).
     children = list(root_path.iterdir())
     has_state = any(
-        c.is_file()
-        and c.name.startswith('experiment_state-')
-        and c.name.endswith('.json')
-        for c in children
+        c.is_file() and c.name.startswith('experiment_state-') and c.name.endswith('.json') for c in children
     )
     if not has_state:
         # Try one level deeper (e.g. storage_path/run_name/experiment_state-*.json)
@@ -104,9 +101,7 @@ def trim_checkpoints(
     metric_vals = []
     for t in trials:
         ma = t.metric_analysis.get(anchor_metric, {})
-        metric_vals.append(
-            ma.get(mode, float('inf') if mode == 'min' else float('-inf'))
-        )
+        metric_vals.append(ma.get(mode, float('inf') if mode == 'min' else float('-inf')))
 
     idx_sorted = np.argsort(metric_vals)
     if mode == 'max':
@@ -126,9 +121,7 @@ def trim_checkpoints(
         keep_best = True if is_best else keep_best_for_trimmed_trials
         keep_last = True if is_best else keep_last_for_trimmed_trials
 
-        nr, freed, trimmed = _trim_one_trial(
-            trial, analysis, root_path, anchor_metric, mode, keep_best, keep_last
-        )
+        nr, freed, trimmed = _trim_one_trial(trial, analysis, root_path, anchor_metric, mode, keep_best, keep_last)
         total_removed += nr
         total_freed += freed
         files_trimmed.extend(trimmed)
@@ -167,9 +160,7 @@ def _trim_one_trial(
     dirs_to_keep: set = set()
     try:
         if keep_best_checkpoint:
-            best_ck = analysis.get_best_checkpoint(
-                trial, metric=anchor_metric, mode=mode
-            )
+            best_ck = analysis.get_best_checkpoint(trial, metric=anchor_metric, mode=mode)
             if best_ck is not None:
                 dirs_to_keep.add(Path(best_ck.path).name)
         if keep_last_checkpoint:

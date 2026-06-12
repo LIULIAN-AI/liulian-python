@@ -77,9 +77,7 @@ def _build_config(args: argparse.Namespace) -> Dict[str, Any]:
 
     # Collect all non-None CLI overrides (skip argparse internal keys)
     skip = {'config', 'command', 'func', 'verbose'}
-    cli_overrides = {
-        k: v for k, v in vars(args).items() if k not in skip and v is not None
-    }
+    cli_overrides = {k: v for k, v in vars(args).items() if k not in skip and v is not None}
     return load_config(yaml_path=yaml_path, cli_overrides=cli_overrides)
 
 
@@ -237,9 +235,7 @@ def _add_common_args(parser: argparse.ArgumentParser) -> None:
         if isinstance(default, bool):
             # Boolean: --flag / --no_flag
             parser.add_argument(flag, action='store_true', default=None)
-            parser.add_argument(
-                f'--no_{key}', action='store_false', dest=key, default=None
-            )
+            parser.add_argument(f'--no_{key}', action='store_false', dest=key, default=None)
         elif isinstance(default, int):
             parser.add_argument(flag, type=int, default=None)
         elif isinstance(default, float):

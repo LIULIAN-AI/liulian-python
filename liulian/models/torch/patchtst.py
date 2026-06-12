@@ -16,7 +16,6 @@ Supported entity settings for ``model: patchtst``:
 
 import torch
 from torch import nn
-import numpy as np
 from typing import Dict, Any
 from liulian.models.torch.layers.transformer_blocks import Encoder, EncoderLayer
 from liulian.models.torch.layers.attention import FullAttention, AttentionLayer
@@ -70,19 +69,12 @@ class Model(nn.Module):
         self.id_integration = getattr(configs, 'id_integration', 'concat_to_x')
         padding = stride
 
-        self._use_add_after_patch = (
-            self.identifier_mode == 'embedding'
-            and self.id_integration == 'add_after_patch'
-        )
+        self._use_add_after_patch = self.identifier_mode == 'embedding' and self.id_integration == 'add_after_patch'
         if self._use_add_after_patch and getattr(configs, 'split_mode', None) != 'multi_channel':
-            raise ValueError(
-                "PatchTST only supports id_integration='add_after_patch' in split_mode='multi_channel'."
-            )
+            raise ValueError("PatchTST only supports id_integration='add_after_patch' in split_mode='multi_channel'.")
 
         # patching and embedding
-        self.patch_embedding = PatchEmbedding(
-            configs.d_model, patch_len, stride, padding, configs.dropout
-        )
+        self.patch_embedding = PatchEmbedding(configs.d_model, patch_len, stride, padding, configs.dropout)
         if self._use_add_after_patch:
             num_stations = getattr(configs, 'enc_in', 1)
             self.entity_embedding = nn.Embedding(num_stations, configs.d_model)
@@ -108,17 +100,12 @@ class Model(nn.Module):
                 )
                 for l in range(configs.e_layers)
             ],
-            norm_layer=nn.Sequential(
-                Transpose(1, 2), nn.BatchNorm1d(configs.d_model), Transpose(1, 2)
-            ),
+            norm_layer=nn.Sequential(Transpose(1, 2), nn.BatchNorm1d(configs.d_model), Transpose(1, 2)),
         )
 
         # Prediction Head
         self.head_nf = configs.d_model * int((configs.seq_len - patch_len) / stride + 2)
-        if (
-            self.task_name == 'long_term_forecast'
-            or self.task_name == 'short_term_forecast'
-        ):
+        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
             self.head = FlattenHead(
                 configs.enc_in,
                 self.head_nf,
@@ -135,9 +122,7 @@ class Model(nn.Module):
         elif self.task_name == 'classification':
             self.flatten = nn.Flatten(start_dim=-2)
             self.dropout = nn.Dropout(configs.dropout)
-            self.projection = nn.Linear(
-                self.head_nf * configs.enc_in, configs.num_class
-            )
+            self.projection = nn.Linear(self.head_nf * configs.enc_in, configs.num_class)
 
     def _inject_entity_after_patch(
         self,
@@ -169,9 +154,7 @@ class Model(nn.Module):
         # z: [bs * nvars x patch_num x d_model]
         enc_out, attns = self.encoder(enc_out)
         # z: [bs x nvars x patch_num x d_model]
-        enc_out = torch.reshape(
-            enc_out, (-1, n_vars, enc_out.shape[-2], enc_out.shape[-1])
-        )
+        enc_out = torch.reshape(enc_out, (-1, n_vars, enc_out.shape[-2], enc_out.shape[-1]))
         # z: [bs x nvars x d_model x patch_num]
         enc_out = enc_out.permute(0, 1, 3, 2)
 
@@ -190,9 +173,7 @@ class Model(nn.Module):
         means = means.unsqueeze(1).detach()
         x_enc = x_enc - means
         x_enc = x_enc.masked_fill(mask == 0, 0)
-        stdev = torch.sqrt(
-            torch.sum(x_enc * x_enc, dim=1) / torch.sum(mask == 1, dim=1) + 1e-5
-        )
+        stdev = torch.sqrt(torch.sum(x_enc * x_enc, dim=1) / torch.sum(mask == 1, dim=1) + 1e-5)
         stdev = stdev.unsqueeze(1).detach()
         x_enc = x_enc / stdev
 
@@ -206,9 +187,7 @@ class Model(nn.Module):
         # z: [bs * nvars x patch_num x d_model]
         enc_out, attns = self.encoder(enc_out)
         # z: [bs x nvars x patch_num x d_model]
-        enc_out = torch.reshape(
-            enc_out, (-1, n_vars, enc_out.shape[-2], enc_out.shape[-1])
-        )
+        enc_out = torch.reshape(enc_out, (-1, n_vars, enc_out.shape[-2], enc_out.shape[-1]))
         # z: [bs x nvars x d_model x patch_num]
         enc_out = enc_out.permute(0, 1, 3, 2)
 
@@ -238,9 +217,7 @@ class Model(nn.Module):
         # z: [bs * nvars x patch_num x d_model]
         enc_out, attns = self.encoder(enc_out)
         # z: [bs x nvars x patch_num x d_model]
-        enc_out = torch.reshape(
-            enc_out, (-1, n_vars, enc_out.shape[-2], enc_out.shape[-1])
-        )
+        enc_out = torch.reshape(enc_out, (-1, n_vars, enc_out.shape[-2], enc_out.shape[-1]))
         # z: [bs x nvars x d_model x patch_num]
         enc_out = enc_out.permute(0, 1, 3, 2)
 
@@ -270,9 +247,7 @@ class Model(nn.Module):
         # z: [bs * nvars x patch_num x d_model]
         enc_out, attns = self.encoder(enc_out)
         # z: [bs x nvars x patch_num x d_model]
-        enc_out = torch.reshape(
-            enc_out, (-1, n_vars, enc_out.shape[-2], enc_out.shape[-1])
-        )
+        enc_out = torch.reshape(enc_out, (-1, n_vars, enc_out.shape[-2], enc_out.shape[-1]))
         # z: [bs x nvars x d_model x patch_num]
         enc_out = enc_out.permute(0, 1, 3, 2)
 
@@ -284,10 +259,7 @@ class Model(nn.Module):
         return output
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
-        if (
-            self.task_name == 'long_term_forecast'
-            or self.task_name == 'short_term_forecast'
-        ):
+        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
             dec_out = self.forecast(x_enc, x_mark_enc, x_dec, x_mark_dec)
             return dec_out[:, -self.pred_len :, :]  # [B, L, D]
         if self.task_name == 'imputation':
@@ -351,14 +323,10 @@ class PatchTSTAdapter(EntityAwareMixin, TorchModelAdapter):
         x_enc = inputs['x_enc']
         batch_size, seq_len, n_features = x_enc.shape
 
-        x_mark_enc = inputs.get(
-            'x_mark_enc', torch.zeros(batch_size, seq_len, 1, device=x_enc.device)
-        )
+        x_mark_enc = inputs.get('x_mark_enc', torch.zeros(batch_size, seq_len, 1, device=x_enc.device))
         x_dec = inputs.get(
             'x_dec',
-            torch.zeros(
-                batch_size, self.config['pred_len'], n_features, device=x_enc.device
-            ),
+            torch.zeros(batch_size, self.config['pred_len'], n_features, device=x_enc.device),
         )
         x_mark_dec = inputs.get(
             'x_mark_dec',

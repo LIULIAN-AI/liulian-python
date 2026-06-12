@@ -59,8 +59,7 @@ class TestLocalFileLogger:
         logger.log_artifact('/nonexistent/file.json')  # should not raise
         files_after = set(os.listdir(log_dir))
         assert files_after == files_before, (
-            f'Non-existent artifact created unexpected files: '
-            f'{files_after - files_before}'
+            f'Non-existent artifact created unexpected files: {files_after - files_before}'
         )
 
     def test_read_metrics_empty(self, log_dir: str) -> None:

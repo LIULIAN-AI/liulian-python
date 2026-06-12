@@ -11,7 +11,6 @@ Informer introduces ProbSparse attention to achieve O(L log L) complexity.
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import numpy as np
 from typing import Dict, Any
 from liulian.models.torch.layers.transformer_blocks import (
     Decoder,
@@ -122,15 +121,13 @@ class Model(nn.Module):
         if self.task_name == 'classification':
             self.act = F.gelu
             self.dropout = nn.Dropout(configs.dropout)
-            self.projection = nn.Linear(
-                configs.d_model * configs.seq_len, configs.num_class
-            )
+            self.projection = nn.Linear(configs.d_model * configs.seq_len, configs.num_class)
 
     def long_forecast(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         # Align x_mark_dec length to x_dec (liulian passes full batch_y_mark which may
         # span seq_len+label_len+pred_len, but decoder only needs label_len+pred_len)
         if x_mark_dec is not None and x_mark_dec.shape[1] > x_dec.shape[1]:
-            x_mark_dec = x_mark_dec[:, :x_dec.shape[1], :]
+            x_mark_dec = x_mark_dec[:, : x_dec.shape[1], :]
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         dec_out = self.dec_embedding(x_dec, x_mark_dec)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
@@ -143,14 +140,12 @@ class Model(nn.Module):
         # Normalization
         mean_enc = x_enc.mean(1, keepdim=True).detach()  # B x 1 x E
         x_enc = x_enc - mean_enc
-        std_enc = torch.sqrt(
-            torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5
-        ).detach()  # B x 1 x E
+        std_enc = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5).detach()  # B x 1 x E
         x_enc = x_enc / std_enc
 
         # Align x_mark_dec length to x_dec (same reason as long_forecast)
         if x_mark_dec is not None and x_mark_dec.shape[1] > x_dec.shape[1]:
-            x_mark_dec = x_mark_dec[:, :x_dec.shape[1], :]
+            x_mark_dec = x_mark_dec[:, : x_dec.shape[1], :]
         enc_out = self.enc_embedding(x_enc, x_mark_enc)
         dec_out = self.dec_embedding(x_dec, x_mark_dec)
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
@@ -182,9 +177,7 @@ class Model(nn.Module):
         enc_out, attns = self.encoder(enc_out, attn_mask=None)
 
         # Output
-        output = self.act(
-            enc_out
-        )  # the output transformer encoder/decoder embeddings don't include non-linearity
+        output = self.act(enc_out)  # the output transformer encoder/decoder embeddings don't include non-linearity
         output = self.dropout(output)
         # x_mark_enc may be 3D time features [B,L,C] or 2D padding mask [B,L]
         if x_mark_enc.ndim == 3:
@@ -192,9 +185,7 @@ class Model(nn.Module):
         else:
             padding_mask = x_mark_enc
         output = output * padding_mask.unsqueeze(-1)  # zero-out padding embeddings
-        output = output.reshape(
-            output.shape[0], -1
-        )  # (batch_size, seq_length * d_model)
+        output = output.reshape(output.shape[0], -1)  # (batch_size, seq_length * d_model)
         output = self.projection(output)  # (batch_size, num_classes)
         return output
 
@@ -281,9 +272,7 @@ class InformerAdapter(EntityAwareMixin, TorchModelAdapter):
         label_len = self.config.get('label_len', min(48, seq_len // 2))
         pred_len = self.config['pred_len']
 
-        x_mark_enc = inputs.get(
-            'x_mark_enc', torch.zeros(batch_size, seq_len, 4, device=x_enc.device)
-        )
+        x_mark_enc = inputs.get('x_mark_enc', torch.zeros(batch_size, seq_len, 4, device=x_enc.device))
 
         # Decoder input: last label_len of encoder + pred_len zeros
         if 'x_dec' not in inputs:

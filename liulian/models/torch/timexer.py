@@ -117,9 +117,7 @@ class TimeXerEncoderLayer(nn.Module):
 
     def forward(self, x, cross, x_mask=None, cross_mask=None, tau=None, delta=None):
         B, L, D = cross.shape
-        x = x + self.dropout(
-            self.self_attention(x, x, x, attn_mask=x_mask, tau=tau, delta=None)[0]
-        )
+        x = x + self.dropout(self.self_attention(x, x, x, attn_mask=x_mask, tau=tau, delta=None)[0])
         x = self.norm1(x)
 
         x_glb_ori = x[:, -1, :].unsqueeze(1)
@@ -227,43 +225,31 @@ class Model(nn.Module):
         if self.use_norm:
             means = x_enc.mean(1, keepdim=True).detach()
             x_enc = x_enc - means
-            stdev = torch.sqrt(
-                torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5
-            )
+            stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
             x_enc /= stdev
 
         _, _, N = x_enc.shape
 
-        en_embed, n_vars = self.en_embedding(
-            x_enc[:, :, -1].unsqueeze(-1).permute(0, 2, 1)
-        )
+        en_embed, n_vars = self.en_embedding(x_enc[:, :, -1].unsqueeze(-1).permute(0, 2, 1))
         ex_embed = self.ex_embedding(x_enc[:, :, :-1], x_mark_enc)
 
         enc_out = self.encoder(en_embed, ex_embed)
-        enc_out = torch.reshape(
-            enc_out, (-1, n_vars, enc_out.shape[-2], enc_out.shape[-1])
-        )
+        enc_out = torch.reshape(enc_out, (-1, n_vars, enc_out.shape[-2], enc_out.shape[-1]))
         enc_out = enc_out.permute(0, 1, 3, 2)
 
         dec_out = self.head(enc_out)
         dec_out = dec_out.permute(0, 2, 1)
 
         if self.use_norm:
-            dec_out = dec_out * (
-                stdev[:, 0, -1:].unsqueeze(1).repeat(1, self.pred_len, 1)
-            )
-            dec_out = dec_out + (
-                means[:, 0, -1:].unsqueeze(1).repeat(1, self.pred_len, 1)
-            )
+            dec_out = dec_out * (stdev[:, 0, -1:].unsqueeze(1).repeat(1, self.pred_len, 1))
+            dec_out = dec_out + (means[:, 0, -1:].unsqueeze(1).repeat(1, self.pred_len, 1))
         return dec_out
 
     def forecast_multi(self, x_enc, x_mark_enc, x_dec, x_mark_dec):
         if self.use_norm:
             means = x_enc.mean(1, keepdim=True).detach()
             x_enc = x_enc - means
-            stdev = torch.sqrt(
-                torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5
-            )
+            stdev = torch.sqrt(torch.var(x_enc, dim=1, keepdim=True, unbiased=False) + 1e-5)
             x_enc /= stdev
 
         _, _, N = x_enc.shape
@@ -272,28 +258,19 @@ class Model(nn.Module):
         ex_embed = self.ex_embedding(x_enc, x_mark_enc)
 
         enc_out = self.encoder(en_embed, ex_embed)
-        enc_out = torch.reshape(
-            enc_out, (-1, n_vars, enc_out.shape[-2], enc_out.shape[-1])
-        )
+        enc_out = torch.reshape(enc_out, (-1, n_vars, enc_out.shape[-2], enc_out.shape[-1]))
         enc_out = enc_out.permute(0, 1, 3, 2)
 
         dec_out = self.head(enc_out)
         dec_out = dec_out.permute(0, 2, 1)
 
         if self.use_norm:
-            dec_out = dec_out * (
-                stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1)
-            )
-            dec_out = dec_out + (
-                means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1)
-            )
+            dec_out = dec_out * (stdev[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
+            dec_out = dec_out + (means[:, 0, :].unsqueeze(1).repeat(1, self.pred_len, 1))
         return dec_out
 
     def forward(self, x_enc, x_mark_enc, x_dec, x_mark_dec, mask=None):
-        if (
-            self.task_name == 'long_term_forecast'
-            or self.task_name == 'short_term_forecast'
-        ):
+        if self.task_name == 'long_term_forecast' or self.task_name == 'short_term_forecast':
             if self.features == 'M':
                 dec_out = self.forecast_multi(x_enc, x_mark_enc, x_dec, x_mark_dec)
                 return dec_out[:, -self.pred_len :, :]

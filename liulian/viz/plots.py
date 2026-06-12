@@ -12,7 +12,7 @@ Provides:
 from __future__ import annotations
 
 import os
-from typing import Dict, List, Optional, Sequence
+from typing import Dict, List, Sequence
 
 import numpy as np
 
@@ -97,9 +97,7 @@ def plot_predictions(
     if target_names is None:
         target_names = [f'Target {i}' for i in range(C)]
 
-    fig, axes = plt.subplots(
-        C, 1, figsize=(figsize[0], figsize[1] * C), squeeze=False, sharex=True
-    )
+    fig, axes = plt.subplots(C, 1, figsize=(figsize[0], figsize[1] * C), squeeze=False, sharex=True)
 
     for c in range(C):
         ax = axes[c, 0]
@@ -159,15 +157,11 @@ def plot_prediction_summary(
         pred_std = pred_std[:, None]
         true_mean = true_mean[:, None]
 
-    fig, axes = plt.subplots(
-        C, 1, figsize=(figsize[0], figsize[1] * C), squeeze=False, sharex=True
-    )
+    fig, axes = plt.subplots(C, 1, figsize=(figsize[0], figsize[1] * C), squeeze=False, sharex=True)
     for c in range(C):
         ax = axes[c, 0]
         ax.plot(time, true_mean[:, c], label='GT Mean', linewidth=1.2, color='#1f77b4')
-        ax.plot(
-            time, pred_mean[:, c], label='Pred Mean', linewidth=1.2, color='#ff7f0e'
-        )
+        ax.plot(time, pred_mean[:, c], label='Pred Mean', linewidth=1.2, color='#ff7f0e')
         ax.fill_between(
             time,
             pred_mean[:, c] - pred_std[:, c],
@@ -235,6 +229,14 @@ def plot_prediction_range(
     preds = _to_numpy(preds)
     trues = _to_numpy(trues)
     times = _to_numpy(times)
+    if times.ndim == 3:
+        # Time marks may come as (N, win_len, T_feat). Use the first channel
+        # as the canonical timeline for aggregation/range plotting.
+        times = times[..., 0]
+    if times.ndim == 1:
+        times = times[None, :]
+    if times.ndim != 2:
+        raise ValueError(f'Expected times with 2 dims after normalization, got shape={times.shape}.')
 
     N = preds.shape[0]
     if pred_len is None:
@@ -331,12 +333,17 @@ def save_prediction_plots(
     trues: np.ndarray,
     times: np.ndarray,
     *,
+    entity_ids: Sequence[object] | np.ndarray | None = None,
     method: str = 'mean',
     pred_len: int | None = None,
     output_dir: str = 'artifacts',
+    formats: Sequence[str] | None = None,
+    plot_stem: str = 'pred_vs_gt',
+    range_stem: str = 'pred_range',
     title_prefix: str = '',
     target_names: Sequence[str] | None = None,
     max_channels: int = 20,
+    raise_exceed_channels: bool = True,
 ) -> Dict[str, str]:
     """High-level helper: aggregate → plot → save.
 
@@ -348,12 +355,21 @@ def save_prediction_plots(
         Ground-truth aligned with *preds*.
     times : (N, win_len)
         Time marks for each window.
+    entity_ids : sequence or array-like, optional
+        Entity ID per sample/window (length ``N``). When provided, prediction
+        aggregation resolves overlaps per entity before global aggregation.
     method : str
         Aggregation method (see :mod:`~liulian.viz.prediction_aggregator`).
     pred_len : int or None
         Prediction horizon (inferred from *preds* if None).
     output_dir : str
         Directory where figure PNGs are saved.
+    formats : sequence of str or None
+        Output formats (e.g. ``('png', 'svg', 'pdf')``). Defaults to ``('png',)``.
+    plot_stem : str
+        File stem for the prediction-vs-ground-truth figure.
+    range_stem : str
+        File stem for the prediction-range figure.
     title_prefix : str
         Prepended to plot titles.
     target_names : list of str or None
@@ -363,6 +379,8 @@ def save_prediction_plots(
         more channels (e.g. 862, as in Traffic), only the first
         ``max_channels`` are plotted to avoid excessive memory use and
         matplotlib rendering failures.
+    raise_exceed_channels : bool
+        Whether raise an error if the number of channels exceeds ``max_channels``.
 
     Returns
     -------
@@ -378,6 +396,13 @@ def save_prediction_plots(
     # ── Guard: limit channels to avoid OOM / OOB on high-dim data ───
     C = preds.shape[-1] if preds.ndim >= 3 else 1
     if C > max_channels:
+        if raise_exceed_channels:
+            raise RuntimeError(
+                'Prediction has %d channels, which exceeds the max_channels limit of %d. '
+                'Set raise_exceed_channels=False to truncate and continue.',
+                C,
+                max_channels,
+            )
         _log.warning(
             'Prediction has %d channels — truncating to %d for viz.',
             C,
@@ -392,6 +417,7 @@ def save_prediction_plots(
         preds,
         trues,
         times,
+        entity_ids=entity_ids,
         method=method,
         pred_len=pred_len,
     )
@@ -399,29 +425,39 @@ def save_prediction_plots(
     os.makedirs(output_dir, exist_ok=True)
     paths: Dict[str, str] = {}
 
-    # Full time-series plot
-    ts_path = os.path.join(output_dir, 'pred_vs_gt.png')
-    plot_predictions(
-        result['time'],
-        result['true'],
-        result['pred'],
-        title=f'{title_prefix}Predictions vs Ground Truth ({method})',
-        target_names=target_names,
-        save_path=ts_path,
-    )
-    paths['pred_vs_gt'] = ts_path
+    normalized_formats = [fmt.strip().lower().lstrip('.') for fmt in (formats or ('png',))]
+    normalized_formats = [fmt for fmt in normalized_formats if fmt]
+    if not normalized_formats:
+        raise ValueError('At least one plot format is required.')
 
-    # Prediction range plot (min/max/mean envelope)
-    range_path = os.path.join(output_dir, 'pred_range.png')
-    plot_prediction_range(
-        preds,
-        trues,
-        times,
-        pred_len=pred_len,
-        title=f'{title_prefix}Prediction Range (Min/Max/Mean)',
-        target_names=target_names,
-        save_path=range_path,
-    )
-    paths['pred_range'] = range_path
+    for index, fmt in enumerate(normalized_formats):
+        # Full time-series plot
+        ts_path = os.path.join(output_dir, f'{plot_stem}.{fmt}')
+        plot_predictions(
+            result['time'],
+            result['true'],
+            result['pred'],
+            title=f'{title_prefix}Predictions vs Ground Truth ({method})',
+            target_names=target_names,
+            save_path=ts_path,
+        )
+        paths[f'pred_vs_gt_{fmt}'] = ts_path
+        if index == 0:
+            paths['pred_vs_gt'] = ts_path
+
+        # Prediction range plot (min/max/mean envelope)
+        range_path = os.path.join(output_dir, f'{range_stem}.{fmt}')
+        plot_prediction_range(
+            preds,
+            trues,
+            times,
+            pred_len=pred_len,
+            title=f'{title_prefix}Prediction Range (Min/Max/Mean)',
+            target_names=target_names,
+            save_path=range_path,
+        )
+        paths[f'pred_range_{fmt}'] = range_path
+        if index == 0:
+            paths['pred_range'] = range_path
 
     return paths
