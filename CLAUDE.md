@@ -51,9 +51,10 @@ Layer → directory map: `tasks/`, `data/`, `models/` (ABC), `adapters/` (wrappe
 
 ## Conventions worth knowing up-front
 
-- **Task ledger:** `docs/tasks.md` records completed / in-progress / future
-  work. Update it in the same commit whenever a work item finishes or a new
-  one is decided (agent session task IDs `#N` are mirrored there).
+- **Task ledger:** lives in the `liulian-docs` hub repo at
+  `docs/tasks/liulian-python/<YYYY-MM>.md` (monthly files, topic-tagged
+  entries; `docs/tasks.md` here is just a pointer stub). Update the ledger
+  whenever a work item finishes or a new one is decided.
 - **Optional deps:** core is numpy + pyyaml only. Torch, ray, wandb, mkdocs are all extras. When importing an optional dep in library code, catch `ImportError` and raise with install hint (`pip install -e '.[logging]'`).
 - **Datasets go through manifests.** `manifests/*.yaml` defines fields/topology/integrity hash; loaders in `liulian/data/` read from these, not raw paths.
 - **Experiments live in `experiments/<dataset>/`** with their own config YAML + runner. They're separate from `tests/`.
