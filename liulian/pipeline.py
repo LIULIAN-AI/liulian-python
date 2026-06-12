@@ -195,6 +195,7 @@ def build_dataset(config: Dict[str, Any]) -> Any:
             include_historical_predicted_y=config['include_historical_predicted_y'],
             identifier_mode=config['identifier_mode'],
             id_integration=config['id_integration'],
+            id_injection=config.get('id_injection', 'data'),
             sinusoidal_dim=config.get('sinusoidal_dim', 16),
             random_identifier_dim=config.get('random_identifier_dim', 16),
             random_identifier_seed=config.get('random_identifier_seed', 2026),
@@ -321,6 +322,50 @@ def print_dataset_summary(dataset: Any) -> None:
             raise ValueError(f'Dataset missing expected split: "{name}".') from None
 
 
+_MODEL_INJECTABLE_TRANSPARENT_MODES = frozenset({'onehot', 'coordinates', 'sinusoidal', 'random', 'numeric_id'})
+
+
+def _uses_model_transparent_injection(config: Dict[str, Any]) -> bool:
+    """True when transparent identifiers are injected by the MODEL wrapper.
+
+    ``id_injection='model'`` + a transparent mode + non-multi_channel split:
+    the dataset emits only base features and ``EntityTransparentWrapper``
+    concatenates the fixed per-station block per batch (rebuilt per HPO
+    trial). multi_channel keeps its own ChannelTransparentWrapper path.
+    """
+    mode = str(config.get('identifier_mode', 'none')).strip().lower()
+    if str(config.get('id_injection', 'data')).strip().lower() != 'model':
+        return False
+    if config.get('split_mode') == 'multi_channel':
+        return False
+    if mode == 'descriptors':
+        raise ValueError(
+            "id_injection='model' does not support identifier_mode="
+            "'descriptors' yet (no descriptor source is plumbed) — use "
+            "id_injection='data'."
+        )
+    return mode in _MODEL_INJECTABLE_TRANSPARENT_MODES
+
+
+def _transparent_feature_dim(config: Dict[str, Any], dataset: Any) -> int:
+    """Width D of the transparent identifier block for the active mode."""
+    mode = str(config.get('identifier_mode', 'none')).strip().lower()
+    if mode == 'onehot':
+        n = len(getattr(dataset, 'station_ids', []) or [])
+        if n == 0:
+            raise ValueError('onehot identifier needs dataset.station_ids.')
+        return n
+    if mode == 'coordinates':
+        return 2
+    if mode == 'numeric_id':
+        return 1
+    if mode == 'sinusoidal':
+        return int(config.get('sinusoidal_dim', 16))
+    if mode == 'random':
+        return int(config.get('random_identifier_dim', 16))
+    raise ValueError(f'No transparent feature dim for mode {mode!r}.')
+
+
 def auto_detect_enc_in(dataset: Any) -> int:
     """Derive ``enc_in`` from the training split's feature dimension."""
     split = dataset.get_split('train')
@@ -376,9 +421,19 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
     model_name = config['model']
 
     # Auto-detect enc_in from the training split's feature dimension.
+    _mi_transparent_dim = 0
     if config.get('enc_in') is None and dataset is not None:
         config['enc_in'] = auto_detect_enc_in(dataset)
+        # Model-layer transparent injection: the dataset emits ONLY base
+        # features, but the inner model consumes the wrapper's concatenated
+        # input — widen enc_in by the identifier dim (keeps enc_in semantics
+        # identical to the data-layer bake-in path).
+        if _uses_model_transparent_injection(config):
+            _mi_transparent_dim = _transparent_feature_dim(config, dataset)
+            config['enc_in'] = int(config['enc_in']) + _mi_transparent_dim
         logger.info('Auto-detected enc_in=%d from training data', config['enc_in'])
+    elif _uses_model_transparent_injection(config):
+        _mi_transparent_dim = _transparent_feature_dim(config, dataset)
 
     # ── Auto-detect c_out / dec_in based on features mode ───────────────
     #
@@ -488,6 +543,33 @@ def build_model(config: Dict[str, Any], dataset: Any = None) -> Any:
                 num_emb,
                 emb_size,
             )
+
+    # Model-layer transparent injection (id_injection='model'): wrap with the
+    # per-sample fixed-feature injector. The wrapper holds NO learnable
+    # parameters; the inner model was built with enc_in = base + feature_dim.
+    if _mi_transparent_dim:
+        from liulian.models.torch.entity_mixin import EntityTransparentWrapper
+
+        _station_ids = [str(s) for s in getattr(dataset, 'station_ids', [])]
+        if not _station_ids:
+            raise ValueError("id_injection='model' requires dataset.station_ids for the transparent feature table.")
+        _topo = getattr(dataset, 'topology', None)
+        _coords = getattr(_topo, 'coordinates', None) if _topo is not None else None
+        model = EntityTransparentWrapper(
+            inner_model=model,
+            mode=config['identifier_mode'],
+            station_ids=_station_ids,
+            coordinates=_coords,
+            sinusoidal_dim=int(config.get('sinusoidal_dim', 16)),
+            random_dim=int(config.get('random_identifier_dim', 16)),
+            random_seed=int(config.get('random_identifier_seed', 2026)),
+        )
+        logger.info(
+            'EntityTransparentWrapper: mode=%s, stations=%d, feature_dim=%d',
+            config['identifier_mode'],
+            len(_station_ids),
+            model.feature_dim,
+        )
 
     n_params = sum(p.numel() for p in model.parameters())
     logger.info('Model: %s  (%.1fK params)', model_name, n_params / 1e3)

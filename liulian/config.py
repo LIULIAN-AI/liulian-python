@@ -76,6 +76,11 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     # ── Entity identifiers ──────────────────────────────────────────
     'identifier_mode': 'embedding',
     'id_integration': 'concat_to_x',
+    # 'model' (canonical since 2026-06-12): transparent identifiers injected
+    # by EntityTransparentWrapper, rebuilt per HPO trial — unified with the
+    # embedding / multi_channel wrappers; inputs are bitwise-identical to the
+    # legacy 'data' bake-in (see test_transparent_injection_equivalence.py).
+    'id_injection': 'model',
     'embedding_size': 10,
     'num_embeddings': None,
     'sinusoidal_dim': 16,

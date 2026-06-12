@@ -148,7 +148,7 @@ def make_entity_features(
             dtype=torch.float32,
         )
         norm = torch.linalg.norm(vec)
-        if torch.isfinite(norm) and float(norm) > 0:
+        if torch.isfinite(norm) and float(norm) > 0:  # todo: what happens if norm is not finite or not 0?
             vec = vec / norm
     elif mode == 'descriptors':
         if descriptors and station_name in descriptors:
@@ -800,6 +800,14 @@ class TimeSeriesDataset(BaseDataset):
         station_ids: list[str] | None = None,
         identifier_mode: str = 'none',
         id_integration: str = 'concat_to_x',
+        # 'data'  -> transparent identifier features are baked into the
+        #            windows here (legacy / fallback path).
+        # 'model' -> the dataset emits ONLY base features; injection happens
+        #            in EntityTransparentWrapper (models/torch/entity_mixin),
+        #            which rebuilds per HPO trial — unified with the
+        #            embedding / multi_channel wrapper mechanism.
+        # Entity ids are emitted either way (the collate adds entity_idx).
+        id_injection: str = 'data',
         coordinates: dict[str, tuple[float, float]] | None = None,
         station_name: str | None = None,
         sinusoidal_dim: int = 16,
@@ -842,6 +850,7 @@ class TimeSeriesDataset(BaseDataset):
         self.station_ids = station_ids or []
         self.identifier_mode = identifier_mode
         self.id_integration = id_integration
+        self.id_injection = str(id_injection).strip().lower()
         self.coordinates = coordinates or {}
         self.station_name = station_name
         self.sinusoidal_dim = int(sinusoidal_dim)
@@ -1142,7 +1151,7 @@ class TimeSeriesDataset(BaseDataset):
             'descriptors',
             'numeric_id',
         }
-        if self.identifier_mode in _transparent_modes and self.station_name is None:
+        if self.identifier_mode in _transparent_modes and self.station_name is None and self.id_injection == 'data':
             logger.warning(  # todo: test this
                 'identifier_mode=%r requires station_name to generate '
                 'entity features in the data layer, but station_name is '
@@ -1152,7 +1161,7 @@ class TimeSeriesDataset(BaseDataset):
                 'the dataset sets station_name for each station.',
                 self.identifier_mode,
             )
-        if self.identifier_mode != 'none' and self.station_name is not None:
+        if self.identifier_mode != 'none' and self.station_name is not None and self.id_injection == 'data':
             ent = make_entity_features(
                 self.station_name,
                 self.station_ids,

@@ -369,6 +369,122 @@ def _build_channel_features(
     raise ValueError(f'Unsupported transparent mode for channel wrapper: {mode!r}')
 
 
+class EntityTransparentWrapper(nn.Module):
+    """Per-sample transparent (non-learned) feature injection — per_entity mode.
+
+    Model-layer equivalent of the data-layer bake-in
+    (``liulian.data.ts.timeseriesdataset.make_entity_features``): looks up a
+    FIXED ``(num_stations, D)`` feature table by per-sample entity index,
+    tiles it over time and CONCATENATES it to ``x_enc`` — no projection, no
+    learnable parameters. The inner model must therefore be built with
+    ``enc_in = base_features + D``.
+
+    The table rows are built by calling the data-layer
+    ``make_entity_features`` per station, so the injected values are
+    BITWISE-IDENTICAL to what the data-layer bake-in would have produced
+    (see tests/models/torch/test_transparent_injection_equivalence.py).
+    This is what keeps wrapper-injected runs comparable with the
+    data-injected baselines.
+
+    Unlike :class:`EntityWrapper` (embedding mode) there is no projection
+    back to the original width — transparency means the raw fixed vector IS
+    the input. ``x_dec`` is passed through untouched (decoder injection is
+    not needed for the current per_entity matrix; LSTM ignores ``x_dec``).
+
+    Parameters
+    ----------
+    inner_model : nn.Module
+        TSL-style model built with ``enc_in = base + feature_dim``.
+    mode : str
+        Transparent identifier mode (``onehot`` / ``coordinates`` /
+        ``sinusoidal`` / ``random`` / ``numeric_id``).
+    station_ids : list[str]
+        Ordered station ids; row ``i`` of the table belongs to
+        ``station_ids[i]`` (must match the dataset's entity indexing).
+    coordinates : dict | None
+        Station-name to ``(x, y)`` mapping (required for ``coordinates``).
+    sinusoidal_dim / random_dim / random_seed
+        Forwarded to ``make_entity_features``.
+    """
+
+    def __init__(
+        self,
+        inner_model: nn.Module,
+        mode: str,
+        station_ids: list[str],
+        *,
+        coordinates: dict[str, tuple[float, float]] | None = None,
+        sinusoidal_dim: int = 16,
+        random_dim: int = 16,
+        random_seed: int = 2026,
+    ) -> None:
+        super().__init__()
+        # Data-layer feature builder reused on purpose: constructive
+        # equivalence with the bake-in path (NOT make_channel_features,
+        # whose sinusoidal formula differs — see ledger 2026-06-12).
+        from liulian.data.ts.timeseriesdataset import make_entity_features
+
+        self.inner = inner_model
+        self.mode = str(mode)
+        self.station_ids = [str(s) for s in station_ids]
+        self._coordinates = coordinates
+        self.sinusoidal_dim = int(sinusoidal_dim)
+        self.random_dim = int(random_dim)
+        self.random_seed = int(random_seed)
+
+        rows = []
+        for name in self.station_ids:
+            block = make_entity_features(
+                name,
+                self.station_ids,
+                self.mode,
+                seq_len=1,
+                coordinates=coordinates,
+                sinusoidal_dim=self.sinusoidal_dim,
+                random_dim=self.random_dim,
+                random_seed=self.random_seed,
+            )
+            if block is None:
+                raise ValueError(
+                    f'mode {mode!r} produces no transparent features — EntityTransparentWrapper is not applicable.'
+                )
+            rows.append(block[0])
+        self.register_buffer('feature_table', torch.stack(rows))  # (N, D)
+
+    @property
+    def feature_dim(self) -> int:
+        """Width ``D`` of the injected feature block."""
+        return int(self.feature_table.shape[-1])
+
+    def forward(
+        self,
+        x_enc: torch.Tensor,
+        x_mark_enc: torch.Tensor | None = None,
+        x_dec: torch.Tensor | None = None,
+        x_mark_dec: torch.Tensor | None = None,
+        mask: torch.Tensor | None = None,
+        entity_ids: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        """Concat the per-sample fixed feature block to ``x_enc``.
+
+        ``entity_ids``: integer station indices of shape ``(B,)`` — supplied
+        by the trainer from the loader's per-sample entity index.
+        """
+        if entity_ids is None:
+            raise ValueError(
+                'EntityTransparentWrapper requires entity_ids (per-sample '
+                'station indices); check the trainer wiring '
+                '(pass_entity_ids).'
+            )
+        rows = self.feature_table[entity_ids.long()]  # (B, D)
+        ent = rows.unsqueeze(1).expand(-1, x_enc.size(1), -1)  # (B, T, D)
+        # Same layout as the data-layer bake-in: identifier block LAST.
+        x_enc = torch.cat([x_enc, ent.to(x_enc.dtype)], dim=-1)
+        if mask is not None:
+            return self.inner(x_enc, x_mark_enc, x_dec, x_mark_dec, mask)
+        return self.inner(x_enc, x_mark_enc, x_dec, x_mark_dec)
+
+
 class ChannelTransparentWrapper(nn.Module):
     """Per-channel transparent (non-learned) feature injection for multi_channel mode.
 

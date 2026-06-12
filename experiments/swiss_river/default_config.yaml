@@ -46,6 +46,7 @@ include_historical_predicted_y: false
 # ── Entity identifiers ─────────────────────────────────────────────────
 identifier_mode: embedding        # none | embedding | embedding_idx | onehot | numeric_id | coordinates | sinusoidal | descriptors
 id_integration: concat_to_x      # concat_to_x | add_to_x | add_after_patch (PatchTST+embedding)
+id_injection: model              # model (wrapper, per-trial rebuild — canonical) | data (legacy bake-in)
 embedding_size: 10
 num_embeddings: null              # Auto-detected from dataset if null
 

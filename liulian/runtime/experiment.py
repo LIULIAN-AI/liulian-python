@@ -375,14 +375,29 @@ class Experiment:
             from liulian.models.torch.entity_mixin import (
                 ChannelEntityWrapper,
                 ChannelTransparentWrapper,
+                EntityTransparentWrapper,
                 EntityWrapper,
             )
 
             is_entity_wrapped = isinstance(torch_model, EntityWrapper)
             is_channel_wrapped = isinstance(torch_model, ChannelEntityWrapper)
             is_transparent_wrapped = isinstance(torch_model, ChannelTransparentWrapper)
+            is_pe_transparent = isinstance(torch_model, EntityTransparentWrapper)
 
-            if is_channel_wrapped:
+            if is_pe_transparent:
+                # Per_entity transparent modes with id_injection='model'. The
+                # wrapper holds the (N, D) fixed feature table; capture its
+                # rebuild ingredients so a trial-tuned sinusoidal_dim /
+                # random_identifier_dim takes effect (the inner model is
+                # rebuilt with enc_in = base + tuned_dim).
+                inner_model_cls = type(torch_model.inner)
+                model_args = getattr(torch_model.inner, '_args', None)
+                _pt_mode = str(torch_model.mode)
+                _pt_station_ids = list(torch_model.station_ids)
+                _pt_coords = torch_model._coordinates
+                _pt_seed = int(torch_model.random_seed)
+                _pt_fixed_dim = int(torch_model.feature_dim)
+            elif is_channel_wrapped:
                 inner_model_cls = type(torch_model.inner)
                 model_args = getattr(torch_model.inner, '_args', None)
                 _cw_num_stations = torch_model.station_embedding.num_embeddings
@@ -415,7 +430,7 @@ class Experiment:
 
                 model_args = SimpleNamespace(**self.config)
 
-            if is_transparent_wrapped:
+            if is_transparent_wrapped or is_pe_transparent:
                 # Make the transparent-dim knobs visible on the namespace so a
                 # tuned value from the trial config propagates into the rebuild
                 # (make_trainable only sets config keys the namespace already has).
@@ -423,9 +438,37 @@ class Experiment:
                     if not hasattr(model_args, _attr):
                         setattr(model_args, _attr, self.config.get(_attr, 16))
 
+            if is_pe_transparent:
+                # Base (identifier-free) input width: the captured namespace
+                # carries the WIDENED enc_in the inner model was built with.
+                _pt_base_enc_in = int(getattr(model_args, 'enc_in', self.config.get('enc_in', 1))) - _pt_fixed_dim
+
             # Build a model factory that rebuilds the full model (including
             # entity / transparent wrapping) from a namespace of args.
-            if is_channel_wrapped:
+            if is_pe_transparent:
+
+                def _model_factory(args):
+                    # Tuned dims change the input width: rebuild the inner
+                    # model at enc_in = base + dim, then re-wrap.
+                    if _pt_mode == 'sinusoidal':
+                        dim = int(getattr(args, 'sinusoidal_dim', _pt_fixed_dim))
+                    elif _pt_mode == 'random':
+                        dim = int(getattr(args, 'random_identifier_dim', _pt_fixed_dim))
+                    else:  # onehot / coordinates / numeric_id: width is fixed
+                        dim = _pt_fixed_dim
+                    args.enc_in = _pt_base_enc_in + dim
+                    inner = inner_model_cls(args).float()
+                    return EntityTransparentWrapper(
+                        inner_model=inner,
+                        mode=_pt_mode,
+                        station_ids=_pt_station_ids,
+                        coordinates=_pt_coords,
+                        sinusoidal_dim=int(getattr(args, 'sinusoidal_dim', 16)),
+                        random_dim=int(getattr(args, 'random_identifier_dim', 16)),
+                        random_seed=_pt_seed,
+                    )
+
+            elif is_channel_wrapped:
 
                 def _model_factory(args):
                     inner = inner_model_cls(args).float()
@@ -486,6 +529,12 @@ class Experiment:
 
                 return build_loaders(build_dataset(cfg), cfg)
 
+            # Per-trial loader rebuilds are only needed when transparent
+            # identifiers are injected at the DATA layer; with
+            # id_injection='model' the loaders are identifier-agnostic and
+            # the wrapper rebuild (above) handles tuned dims.
+            _inj_is_data = str(self.config.get('id_injection', 'data')).strip().lower() == 'data'
+
             trainable = None
             try:
                 from liulian.optim.ray_optimizer import make_trainable
@@ -502,7 +551,7 @@ class Experiment:
                     base_config=self.config,
                     model_factory=_model_factory,
                     save_checkpoints=_save_ckpts,
-                    loaders_factory=_loaders_factory,
+                    loaders_factory=_loaders_factory if _inj_is_data else None,
                 )
             except Exception as exc:
                 logger.warning('Could not build HPO trainable: %s', exc)
@@ -561,7 +610,7 @@ class Experiment:
 
             _best_dims = {k: hpo_result.best_config[k] for k in DATA_LAYER_DIM_KEYS if k in hpo_result.best_config}
             _rebuilt_enc_in: int | None = None
-            if _best_dims:
+            if _best_dims and _inj_is_data:
                 from liulian.pipeline import build_dataset, build_loaders
 
                 loaders = build_loaders(build_dataset(best_cfg), best_cfg)

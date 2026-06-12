@@ -104,7 +104,15 @@ class ForecastTrainer:
         self.nan_mask_loss = bool(self.config.get('nan_mask_loss', False))
         self.teacher_forcing = str(self.config.get('teacher_forcing', 'label')).strip().lower()
         self.eval_denorm = bool(self.config.get('eval_denorm', False))
-        self.use_entity_embedding = str(self.config.get('identifier_mode', 'none')).strip().lower() == 'embedding'
+        _idmode = str(self.config.get('identifier_mode', 'none')).strip().lower()
+        self.use_entity_embedding = _idmode == 'embedding'
+        # Models that need per-sample entity indices in forward():
+        # embedding (EntityWrapper) AND model-layer transparent injection
+        # (EntityTransparentWrapper, id_injection='model').
+        self.pass_entity_ids = self.use_entity_embedding or (
+            str(self.config.get('id_injection', 'data')).strip().lower() == 'model'
+            and _idmode in {'onehot', 'coordinates', 'sinusoidal', 'random', 'numeric_id'}
+        )
 
         # Data augmentation during training
         aug_cfg = self.config.get('augmentation', None)
@@ -429,7 +437,7 @@ class ForecastTrainer:
 
                 # Pass entity_ids to model if in embedding mode
                 fwd_kwargs: Dict[str, Any] = {}
-                if self.use_entity_embedding and batch_entity_idx is not None:
+                if self.pass_entity_ids and batch_entity_idx is not None:
                     fwd_kwargs['entity_ids'] = batch_entity_idx
                 outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs)
                 if isinstance(outputs, tuple):
@@ -559,7 +567,7 @@ class ForecastTrainer:
                 dec_inp = self._build_decoder_input(batch_y, label_len, pred_len)
 
                 fwd_kwargs: Dict[str, Any] = {}
-                if self.use_entity_embedding and batch_entity_idx is not None:
+                if self.pass_entity_ids and batch_entity_idx is not None:
                     fwd_kwargs['entity_ids'] = batch_entity_idx
                 outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs)
                 if isinstance(outputs, tuple):
@@ -694,7 +702,7 @@ class ForecastTrainer:
             dec_inp = self._build_decoder_input(batch_y, label_len, pred_len)
 
             fwd_kwargs: Dict[str, Any] = {}
-            if self.use_entity_embedding and batch_entity_idx is not None:
+            if self.pass_entity_ids and batch_entity_idx is not None:
                 fwd_kwargs['entity_ids'] = batch_entity_idx
             outputs = model(batch_x, batch_x_mark, dec_inp, batch_y_mark, **fwd_kwargs)
             if isinstance(outputs, tuple):

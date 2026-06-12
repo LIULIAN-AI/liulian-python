@@ -114,6 +114,11 @@ class SwissRiverDataset(SpatialTempoDataset):
         include_historical_predicted_y: bool = False,
         identifier_mode: str = 'none',
         id_integration: str = 'concat_to_x',
+        # 'model' (canonical) -> transparent identifiers injected by
+        # EntityTransparentWrapper (rebuilt per HPO trial); 'data' -> legacy
+        # bake-in at window-build time. Both produce bitwise-identical
+        # model inputs (see test_transparent_injection_equivalence.py).
+        id_injection: str = 'data',
         # sinusoidal_dim / random_identifier_dim: inner-HPO tunable in BOTH
         # split modes (since 2026-06-12). per_entity trials rebuild this
         # dataset + its loaders with the sampled dim (loaders_factory in
@@ -137,6 +142,7 @@ class SwissRiverDataset(SpatialTempoDataset):
         self.sinusoidal_dim = int(sinusoidal_dim)
         self.random_identifier_dim = int(random_identifier_dim)
         self.random_identifier_seed = int(random_identifier_seed)
+        self.id_injection = str(id_injection).strip().lower()
 
         project_root = Path(__file__).resolve().parents[2]
         self.root_path = Path(root_path) if root_path else project_root / 'dataset' / 'swiss_river'
@@ -225,6 +231,15 @@ class SwissRiverDataset(SpatialTempoDataset):
             station_ids=self.station_ids,
             identifier_mode=identifier_mode,
             id_integration=id_integration,
+            # These MUST be forwarded: TimeSeriesDataset.__init__ assigns
+            # self.id_injection / sinusoidal_dim / random_identifier_dim /
+            # random_identifier_seed and would silently overwrite our earlier
+            # assignments with the parent defaults (same trap as the entity
+            # scaler below; bit us 2026-06-12 — custom dims were reset to 16).
+            id_injection=id_injection,
+            sinusoidal_dim=sinusoidal_dim,
+            random_identifier_dim=random_identifier_dim,
+            random_identifier_seed=random_identifier_seed,
             topology=topology,
             graph_mode=graph_mode,
             graph_metadata={'graph_name': self.graph_name},
@@ -471,6 +486,7 @@ class SwissRiverDataset(SpatialTempoDataset):
                 station_ids=self.station_ids,
                 identifier_mode=self.identifier_mode,
                 id_integration=self.id_integration,
+                id_injection=self.id_injection,
                 coordinates=(self.topology.coordinates if self.topology else {}),
                 station_name=station,
                 sinusoidal_dim=self.sinusoidal_dim,
