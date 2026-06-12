@@ -411,7 +411,7 @@ class ForecastTrainer:
                 batch_y = batch[1]
                 batch_x_mark = batch[2]
                 batch_y_mark = batch[3]
-                batch_entity_ids = batch[4] if len(batch) > 4 else None
+                batch_entity_ids = batch[4] if len(batch) > 4 else None  # todo: comment what is batch[5] (and batch[4] in this case)
                 batch_entity_idx = batch[5] if len(batch) > 5 else None
 
                 batch_x = batch_x.float().to(self.device)  # todo: always to float as timellm?

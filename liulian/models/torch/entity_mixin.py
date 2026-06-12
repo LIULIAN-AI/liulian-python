@@ -122,10 +122,10 @@ class EntityWrapper(nn.Module):
         # Resolve entity indices
         e_ids: torch.Tensor | None = None
         if entity_ids is not None:
-            # Direct entity_ids tensor: (B,) → expand to (B, T_enc)
+            # Direct entity_ids tensor: (B,) → expand to (B, T_enc)  todo: test this
             e_ids = entity_ids.unsqueeze(1).expand(-1, x_enc.size(1))  # (B, T_enc)
         elif x_mark_enc is not None and x_mark_enc.ndim >= 2:
-            # Legacy: read from mark tensor
+            # Legacy: read from mark tensor  todo: test this
             col = self.entity_id_col
             if x_mark_enc.ndim == 3:
                 e_ids = x_mark_enc[:, : x_enc.size(1), col].long()
@@ -136,8 +136,8 @@ class EntityWrapper(nn.Module):
             emb = self.embedding(e_ids)  # (B, T_enc, embedding_size)
             x_enc = self.enc_proj(torch.cat([x_enc, emb], dim=-1))
 
-            # Also augment x_dec for encoder-decoder models
-            if x_dec is not None:
+            # Also augment x_dec for encoder-decoder models  # todo: this is not needed for non-enc-dec models
+            if x_dec is not None: # todo: test this part
                 T_dec = x_dec.size(1)
                 e_id_scalar = e_ids[:, 0:1]  # (B, 1)
                 dec_emb = self.embedding(e_id_scalar.expand(-1, T_dec))  # (B, T_dec, embedding_size)
