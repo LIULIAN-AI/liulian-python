@@ -2,6 +2,21 @@
 
 _Advisor update · 2026-05-15 · single-slide summary (+ speaker notes)_
 
+> ⚠️ **Correction (2026-06-13) — `coordinates` rows are RETRACTED.**
+> This snapshot's `coordinates` results (the `🔴 +4.1 %` LSTM cell in §2,
+> its heatmap column, and §5.1) are **invalid**: a bug meant the coordinate
+> identifier was fed an
+> all-**zero vector** (the dataset topology that holds station `(x, y)` was
+> never loaded under the matrix default `graph_mode='none'`, so
+> `make_entity_features` silently zero-filled — measured `abs-max = 0.0` on
+> 2026-06-11). The "raw lat/lon as unscaled features" explanation below is
+> therefore also wrong — no coordinate ever reached the model. After the fix
+> (real, min-max-normalized coordinates, commit `421f1e7`), `coordinates`
+> **helps** the LSTM by ≈ −33 % vs `none` (1.155 vs 1.723 on 1990), not
+> +4 %. The non-coordinate rows stand. Full corrected results:
+> [`2026-06-13-swiss3dt-results.md`](2026-06-13-swiss3dt-results.md).
+> Original text below is preserved unedited as the as-presented record.
+
 > **One-line takeaway:** On Swiss-River-1990, attaching a near-zero-cost entity
 > identifier to a plain LSTM cuts per-station RMSE by **up to 32 %** and lets a
 > 55 K-parameter LSTM **outperform a 410 K-parameter PatchTST transformer** —
@@ -35,7 +50,7 @@ that row.**
 
 | dataset | model (split) | `none` baseline | embedding | onehot | sinusoidal | random | coordinates |
 |---|---|---|---|---|---|---|---|
-| **swiss-river** | LSTM (per_entity) | 1.725 °C | −21.4 % | 🟢 **−32.1 %** | −30.9 % | −31.0 % | 🔴 +4.1 % |
+| **swiss-river** | LSTM (per_entity) | 1.725 °C | −21.4 % | 🟢 **−32.1 %** | −30.9 % | −31.0 % | 🔴 +4.1 % ⚠️[R] |
 | **swiss-river** | PatchTST (multi-ch) | 1.382 °C | 🟢 **−4.7 %** | −1.0 % | −1.2 % | −0.6 % | −0.1 % |
 | **swiss-river** | DLinear (multi-ch) | 1.287 °C | **−0.7 %** | −0.7 % | −0.4 % | −0.4 % | −0.5 % |
 | **traffic** | LSTM (multi-ch) | 0.0280 † | 🟢 **−4.5 %** | −1.7 % | _deferred_ | _deferred_ | N/A |
@@ -50,7 +65,15 @@ occupancy fraction for traffic; ‡ standardised power for electricity. Absolute
 RMSE units differ by dataset — the **Δ%** column is the cross-comparable
 signal._ `coordinates` is only meaningful for swiss-river (has lat/lon).
 
+> ⚠️[R] **RETRACTED (2026-06-13):** the `coordinates +4.1 %` cell is a
+> zero-vector artifact (see the correction banner at the top). Corrected:
+> `coordinates` ≈ −33 % vs `none` on swiss-river-1990.
+
 ![results heatmap](figures/entity-id-2026-05-15/results-heatmap-all.png)
+
+> ⚠️[R] The **`coordinates` column** of this heatmap is invalid (zero-vector
+> bug, see top banner). Read it with that column greyed out; the corrected
+> coordinate bars are in `2026-06-13-swiss3dt-results.md`.
 
 **Cross-dataset signal (read the heatmap):**
 
@@ -66,6 +89,9 @@ signal._ `coordinates` is only meaningful for swiss-river (has lat/lon).
    identity signal.
 4. **`coordinates` regresses LSTM** (+4.1 %) — raw lat/lon as unscaled features
    acts as noise. Needs normalisation / a learned geo-encoder.
+   > ⚠️[R] **RETRACTED (2026-06-13):** wrong — the input was an all-zero
+   > vector (bug), not "unscaled lat/lon". Fixed → `coordinates` **helps**
+   > (≈ −33 %). See top banner + `2026-06-13-swiss3dt-results.md`.
 5. **`traffic × PatchTST × onehot` essentially neutral (+0.2 %).** Now that the
    cell finished, the pattern holds: PatchTST gains only via `embedding`
    (native `add_after_patch`); transparent identifiers on PatchTST barely move
@@ -144,6 +170,10 @@ largely redundant (PatchTST/DLinear ≤5 % RMSE).
 1. **`coordinates` hurts LSTM (+4 % RMSE).** Raw lat/lon fed as two unscaled
    features — large-magnitude, low-information columns that act as noise. Needs
    normalisation / a learned geo-encoder before it can help. *(actionable fix)*
+   > ⚠️[R] **RETRACTED (2026-06-13):** the diagnosis was wrong — coordinates
+   > were never loaded (zero vector), not "unscaled". The actionable fix
+   > (load topology + min-max normalize, `421f1e7`) is done; `coordinates`
+   > now helps the LSTM (≈ −33 %).
 2. **PatchTST & DLinear barely move (≤5 % RMSE).** In `multi_channel` split
    every station is already its own channel, so channel identity is *implicit*
    in the layout — an explicit identifier is largely redundant (best case is
@@ -165,7 +195,10 @@ largely redundant (PatchTST/DLinear ≤5 % RMSE).
 - **Controlled comparison:** re-run PatchTST/DLinear in `per_entity` to remove
   the split-mode confound.
 - **Multi-seed** (≥3) for the headline cells → significance bands.
-- **Fix `coordinates`:** normalise + try a small geo-MLP encoder.
+- ~~**Fix `coordinates`:** normalise + try a small geo-MLP encoder.~~
+  ✅ **Done (2026-06-13):** the regression was a zero-vector bug, not
+  scaling; fixed by loading topology + min-max normalization (`421f1e7`).
+  `coordinates` now helps (≈ −33 %).
 - Ablation: parameter-matched baseline (does the `EntityWrapper`'s extra linear
   layer explain part of the embedding gain?).
 

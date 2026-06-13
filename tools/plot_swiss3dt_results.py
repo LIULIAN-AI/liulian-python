@@ -30,7 +30,11 @@ MODES = ['none', 'embedding', 'onehot', 'random', 'sinusoidal', 'coordinates']
 NEW_TAG = {'swiss-river-1990': 'swiss3dt-1990-20260612',
            'swiss-river-2010': 'swiss3dt-2010-20260612',
            'swiss-river-zurich': 'swiss3dt-zurich-20260612'}
-OLD_TAG = 'swissriver-fullmatrix-20260511'  # only swiss-river-1990 exists here
+# The 2026-05-15 advisor slide's numbers come from this run (its onehot
+# 1.1717 matches the slide's 1.171), NOT the earlier under-trained
+# fullmatrix-0511 (none 3.88). Use it so the coordinate comparison is on the
+# same footing as the slide.
+OLD_TAG = 'swissriver-lstm-REAL-20260512-084128'  # swiss-river-1990 only
 
 
 def rmse(tag: str, ds: str, mode: str) -> float | None:
@@ -88,7 +92,7 @@ new_none = new['swiss-river-1990']['none']
 fig2, (axL, axR) = plt.subplots(1, 2, figsize=(8, 4.2))
 for ax, (title, none_v, coord_v, sub) in zip(
     (axL, axR),
-    [('OLD (2026-05-11)\nzero-vector bug', old_none, old_coord, 'coord ≈ none (+%.1f%%)'),
+    [('OLD (2026-05-12)\nzero-vector bug', old_none, old_coord, 'coord worse than none (+%.1f%%)'),
      ('NEW (2026-06-13)\nreal + normalized', new_none, new_coord, 'coord beats none (%.1f%%)')],
 ):
     delta = (coord_v - none_v) / none_v * 100.0
@@ -96,11 +100,12 @@ for ax, (title, none_v, coord_v, sub) in zip(
                   color=['#9aa0a6', '#d93025'], edgecolor='white')
     ax.set_title(title, fontsize=10)
     ax.set_ylabel('Test RMSE (°C)')
-    ax.set_ylim(0, max(old_none, old_coord) * 1.15)
-    ax.text(0.5, 0.92, sub % delta, transform=ax.transAxes, ha='center', fontsize=9,
+    ax.set_ylim(0, max(none_v, coord_v) * 1.30)  # headroom for the annotation
+    ax.text(0.5, 0.95, sub % delta, transform=ax.transAxes, ha='center', fontsize=9,
             color=('#d93025' if delta > 0 else '#188038'))
     for b, v in zip(bars, [none_v, coord_v]):
-        ax.text(b.get_x() + b.get_width() / 2, v + 0.03, f'{v:.3f}', ha='center', fontsize=8)
+        ax.text(b.get_x() + b.get_width() / 2, v + max(none_v, coord_v) * 0.02,
+                f'{v:.3f}', ha='center', fontsize=8)
     for sp in ('top', 'right'):
         ax.spines[sp].set_visible(False)
 fig2.suptitle('Coordinates identifier — swiss-river-1990 × LSTM', fontsize=11)

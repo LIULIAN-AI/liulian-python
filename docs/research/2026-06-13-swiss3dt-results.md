@@ -58,14 +58,12 @@ padding channels).
 ![Coordinates old vs new](figures/swiss3dt-2026-06-13/swiss3dt-coordinates-fix.png)
 
 The 2026-05 matrix reported `coordinates` as **regressing** the LSTM. On
-swiss-river-1990 × LSTM the old run gave coord 3.914 vs none 3.882 (+0.8 %
-— i.e. no benefit, slight harm). The new run gives coord 1.155 vs none
-1.723 (−33 % — a clear benefit).
-
-The old absolute numbers are higher across the board (old none 3.882 vs new
-1.723) because of unrelated training-setup changes (batch_size 8 → 32, new
-HPO search space). The **relative** coordinate effect is what flipped, and
-the cause is a fixed bug:
+swiss-river-1990 × LSTM the old run (`swissriver-lstm-REAL-20260512`, the
+batch the advisor slide used — its onehot 1.1717 matches the slide's 1.171)
+gave coord 1.630 vs none 1.561 (**+4.4 %** — worse than no identifier). The
+new run gives coord 1.155 vs none 1.723 (**−33 %** — a clear benefit). The
+two `none` baselines are at a similar level (1.561 vs 1.723), so the flip is
+in the coordinate effect itself, and the cause is a fixed bug:
 
 - **Old = zero-vector bug.** The identifier-matrix default is
   `graph_mode='none'`, and the old code only loaded the dataset topology
