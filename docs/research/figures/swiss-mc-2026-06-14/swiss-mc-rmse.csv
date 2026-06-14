@@ -1,0 +1,7 @@
+model,dataset,none,embedding,onehot,random,sinusoidal,coordinates
+dlinear,swiss-river-1990,1.2814,1.2860,1.2860,1.2827,1.2817,1.2790
+dlinear,swiss-river-2010,1.3545,1.3560,1.3558,1.3606,1.3576,1.3572
+dlinear,swiss-river-zurich,1.3905,1.4008,1.3964,1.3927,1.3933,1.3851
+patchtst,swiss-river-1990,1.3737,1.3035,2.1889,2.0590,2.1075,1.8148
+patchtst,swiss-river-2010,1.4884,1.3865,2.5051,2.3452,2.3402,2.0356
+patchtst,swiss-river-zurich,1.4803,1.3884,2.7380,2.6311,2.6900,2.3773
