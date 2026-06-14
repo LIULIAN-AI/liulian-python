@@ -38,14 +38,14 @@ def test_iter_jobs_default_matrix_size() -> None:
     jobs = iter_jobs()
     # 15 pairs (5 datasets x 3 models) x (none + embedding) = 30 baseline jobs
     # + 3 universally-supported transparent modes (onehot, sinusoidal, random) x 15 pairs = 45
-    # + coordinates for the 3 Swiss LSTM pairs (per_entity path only) = 3
-    # Total = 30 + 45 + 3 = 78
-    assert len(jobs) == 78
+    # + coordinates for all 9 Swiss pairs (3 datasets x {lstm, dlinear, patchtst}) = 9
+    # Total = 30 + 45 + 9 = 84
+    assert len(jobs) == 84
     coord_jobs = [job for job in jobs if job.mode == 'coordinates']
-    # Coordinates only available for Swiss River + LSTM (per_entity) pairs
-    assert len(coord_jobs) == 3
+    # Coordinates available for every Swiss River pair (wired in mc since 2026-06-14)
+    assert len(coord_jobs) == 9
     assert all(job.dataset.startswith('swiss-river') for job in coord_jobs)
-    assert all(job.model == 'lstm' for job in coord_jobs)
+    assert {job.model for job in coord_jobs} == {'lstm', 'dlinear', 'patchtst'}
     # All pairs get onehot, sinusoidal, random
     onehot_datasets = {job.dataset for job in jobs if job.mode == 'onehot'}
     assert onehot_datasets == {

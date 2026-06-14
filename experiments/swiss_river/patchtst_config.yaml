@@ -74,6 +74,7 @@ batch_size: 32
 learning_rate: 0.0001
 loss: mse
 metrics: rmse,mae,nse
+nan_mask_loss: true               # multi_channel: target NaNs (2010/zurich) excluded from loss; per_entity drops them in the data layer
 eval_denorm: true
 show_progress: true
 patience: 10

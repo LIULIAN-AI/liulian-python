@@ -817,6 +817,17 @@ class ForecastTrainer:
         true: torch.Tensor,
         metric_names: List[str],
     ) -> Dict[str, float]:
+        # Exclude NaN targets unconditionally — a no-op for clean data (mask
+        # all-True), but required for multi_channel swiss-river-2010/zurich
+        # whose target CSVs carry NaNs (stations join/leave the network).
+        # Without this every metric is NaN even when nan_mask_loss trains fine.
+        mask = ~torch.isnan(true)
+        if not bool(mask.all()):
+            pred = pred[mask]
+            true = true[mask]
+            if true.numel() == 0:
+                nan = float('nan')
+                return {name: nan for name in metric_names}
         mse = torch.mean((pred - true) ** 2)
         mae = torch.mean(torch.abs(pred - true))
         rmse = torch.sqrt(mse + 1e-12)

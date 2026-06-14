@@ -43,6 +43,25 @@ model_spaces:
     e_layers:      {dist: randint, low: 1, high: 4}
     dropout:       {dist: choice, values: [0.0, 0.1, 0.2, 0.3]}
 
+  # DLinear on swiss-river (multi_channel). batch_size FIXED at 32 (user
+  # decision 2026-06-14: match the swiss lstm so the cross-model comparison
+  # is clean) -> NOT in the space, taken from the config. DLinear is a pure
+  # linear decomposition model: moving_avg (decomp kernel) is its only
+  # architecture knob (no dropout / d_model / attention).
+  dlinear_swiss:
+    learning_rate: {dist: loguniform, low: 0.0001, high: 0.005}
+    moving_avg:    {dist: choice, values: [13, 25, 51]}
+
+  # PatchTST on swiss-river (multi_channel). batch_size FIXED at 32 (same
+  # reason); patch_len/stride FIXED at 16/8 (TSL standard, not tuned).
+  patchtst_swiss:
+    learning_rate: {dist: loguniform, low: 0.0001, high: 0.001}
+    d_model:       {dist: choice, values: [128, 256, 512]}
+    d_ff:          {dist: choice, values: [256, 512, 2048]}
+    n_heads:       {dist: choice, values: [2, 4, 8, 16]}
+    e_layers:      {dist: choice, values: [1, 2, 3]}
+    dropout:       {dist: choice, values: [0.1, 0.2]}
+
   # DLinear — must EXACTLY mirror dlinear_space() to preserve anchored baselines.
   # batch_size stays TUNED here: the 2026-05 traffic/electricity baselines were
   # produced with it, and TSL_REQUIRED_HPARAMS (matrix.py) enforces coverage.
@@ -90,6 +109,8 @@ identifier_spaces:
 # --------------------------------------------------------------------------- #
 resolution:
   - {data: swiss-river, model: lstm,     space: lstm_swiss}
+  - {data: swiss-river, model: dlinear,  space: dlinear_swiss}
+  - {data: swiss-river, model: patchtst, space: patchtst_swiss}
   - {model: lstm,                         space: lstm_general}
   - {model: dlinear,                      space: dlinear}
   - {model: patchtst,                     space: patchtst}

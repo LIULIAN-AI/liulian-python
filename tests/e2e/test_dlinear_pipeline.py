@@ -253,8 +253,9 @@ class TestModelAwareSearchSpace:
     """Default HPO search space adapts to model type."""
 
     def test_dlinear_search_space(self):
-        """DLinear search space should have learning_rate, batch_size, moving_avg
-        but NOT embedding_size or d_model."""
+        """Swiss DLinear search space: learning_rate + moving_avg, with
+        batch_size FIXED at 32 (user decision 2026-06-14, not tuned) and no
+        LSTM/PatchTST-specific params."""
         from liulian.pipeline import build_optimizer
 
         cfg = {
@@ -286,9 +287,10 @@ class TestModelAwareSearchSpace:
 
         space = cfg['search_space']
         assert 'learning_rate' in space
-        assert 'batch_size' in space
         assert 'moving_avg' in space
-        # Should NOT have LSTM-specific params
+        # batch_size FIXED at 32 for swiss (dlinear_swiss space) -> not tuned
+        assert 'batch_size' not in space
+        # Should NOT have LSTM/PatchTST-specific params
         assert 'embedding_size' not in space
         assert 'd_model' not in space
 

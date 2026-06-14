@@ -30,22 +30,23 @@ MODES: tuple[str, ...] = (
 )
 DEFAULT_SEEDS: tuple[int, ...] = (2026,)
 
-_ALWAYS_SUPPORTED_MODES = frozenset(
-    {'none', 'embedding', 'onehot', 'sinusoidal', 'random'}
-)
+_ALWAYS_SUPPORTED_MODES = frozenset({'none', 'embedding', 'onehot', 'sinusoidal', 'random'})
 # Modes needing extra information (e.g. geographic coordinates) are
 # restricted to pairs where that data is available.
 _EXTRA_MODES_BY_PAIR: dict[tuple[str, str], frozenset[str]] = {
-    # Coordinates live in the Swiss graph files. Offered ONLY for the
-    # per_entity path (LSTM) for now: the multi_channel wrapper needs
-    # config['coordinates'] injected, which the pipeline does not do yet.
-    # Before 2026-06-11 the multi_channel cells silently ran ZERO vectors
-    # (make_channel_features fallback) — those results are invalid, so the
-    # patchtst/dlinear coordinate cells are withdrawn until the injection
-    # fix lands.
+    # Coordinates live in the Swiss graph files. Available for ALL swiss
+    # model pairs since 2026-06-14: the multi_channel ChannelTransparentWrapper
+    # coordinate injection is now wired in pipeline.build_model (the earlier
+    # zero-vector cells are retracted). lstm uses the per_entity path.
     ('swiss-river-1990', 'lstm'): frozenset({'coordinates'}),
     ('swiss-river-2010', 'lstm'): frozenset({'coordinates'}),
     ('swiss-river-zurich', 'lstm'): frozenset({'coordinates'}),
+    ('swiss-river-1990', 'dlinear'): frozenset({'coordinates'}),
+    ('swiss-river-2010', 'dlinear'): frozenset({'coordinates'}),
+    ('swiss-river-zurich', 'dlinear'): frozenset({'coordinates'}),
+    ('swiss-river-1990', 'patchtst'): frozenset({'coordinates'}),
+    ('swiss-river-2010', 'patchtst'): frozenset({'coordinates'}),
+    ('swiss-river-zurich', 'patchtst'): frozenset({'coordinates'}),
 }
 
 
@@ -53,28 +54,14 @@ BASE_CONFIG_BY_PAIR: dict[tuple[str, str], Path] = {
     # All Swiss variants share the same base configs — the `data` key is
     # overridden per job by build_cli_overrides().
     ('swiss-river-1990', 'lstm'): Path('experiments/swiss_river/default_config.yaml'),
-    ('swiss-river-1990', 'patchtst'): Path(
-        'experiments/swiss_river/patchtst_config.yaml'
-    ),
-    ('swiss-river-1990', 'dlinear'): Path(
-        'experiments/swiss_river/dlinear_config.yaml'
-    ),
+    ('swiss-river-1990', 'patchtst'): Path('experiments/swiss_river/patchtst_config.yaml'),
+    ('swiss-river-1990', 'dlinear'): Path('experiments/swiss_river/dlinear_config.yaml'),
     ('swiss-river-2010', 'lstm'): Path('experiments/swiss_river/default_config.yaml'),
-    ('swiss-river-2010', 'patchtst'): Path(
-        'experiments/swiss_river/patchtst_config.yaml'
-    ),
-    ('swiss-river-2010', 'dlinear'): Path(
-        'experiments/swiss_river/dlinear_config.yaml'
-    ),
-    ('swiss-river-zurich', 'lstm'): Path(
-        'experiments/swiss_river/default_config.yaml'
-    ),
-    ('swiss-river-zurich', 'patchtst'): Path(
-        'experiments/swiss_river/patchtst_config.yaml'
-    ),
-    ('swiss-river-zurich', 'dlinear'): Path(
-        'experiments/swiss_river/dlinear_config.yaml'
-    ),
+    ('swiss-river-2010', 'patchtst'): Path('experiments/swiss_river/patchtst_config.yaml'),
+    ('swiss-river-2010', 'dlinear'): Path('experiments/swiss_river/dlinear_config.yaml'),
+    ('swiss-river-zurich', 'lstm'): Path('experiments/swiss_river/default_config.yaml'),
+    ('swiss-river-zurich', 'patchtst'): Path('experiments/swiss_river/patchtst_config.yaml'),
+    ('swiss-river-zurich', 'dlinear'): Path('experiments/swiss_river/dlinear_config.yaml'),
     ('traffic', 'lstm'): Path('experiments/traffic/lstm_config.yaml'),
     ('traffic', 'patchtst'): Path('experiments/traffic/patchtst_config.yaml'),
     ('traffic', 'dlinear'): Path('experiments/traffic/dlinear_config.yaml'),
@@ -98,18 +85,10 @@ TSL_ALIGNMENT_STATUS: dict[tuple[str, str], str] = {
 
 
 TSL_REQUIRED_HPARAMS: dict[tuple[str, str], frozenset[str]] = {
-    ('traffic', 'patchtst'): frozenset(
-        {'batch_size', 'learning_rate', 'd_model', 'd_ff', 'n_heads', 'e_layers'}
-    ),
-    ('electricity', 'patchtst'): frozenset(
-        {'batch_size', 'learning_rate', 'd_model', 'd_ff', 'n_heads', 'e_layers'}
-    ),
-    ('traffic', 'dlinear'): frozenset(
-        {'batch_size', 'learning_rate', 'moving_avg'}
-    ),
-    ('electricity', 'dlinear'): frozenset(
-        {'batch_size', 'learning_rate', 'moving_avg'}
-    ),
+    ('traffic', 'patchtst'): frozenset({'batch_size', 'learning_rate', 'd_model', 'd_ff', 'n_heads', 'e_layers'}),
+    ('electricity', 'patchtst'): frozenset({'batch_size', 'learning_rate', 'd_model', 'd_ff', 'n_heads', 'e_layers'}),
+    ('traffic', 'dlinear'): frozenset({'batch_size', 'learning_rate', 'moving_avg'}),
+    ('electricity', 'dlinear'): frozenset({'batch_size', 'learning_rate', 'moving_avg'}),
 }
 
 
@@ -187,9 +166,7 @@ class MatrixJob:
 
     @property
     def tsl_alignment(self) -> str:
-        return TSL_ALIGNMENT_STATUS.get(
-            (self.dataset, self.model), 'no canonical TSL comparison'
-        )
+        return TSL_ALIGNMENT_STATUS.get((self.dataset, self.model), 'no canonical TSL comparison')
 
 
 def supported_modes_for_pair(dataset: str, model: str) -> frozenset[str]:
@@ -261,10 +238,7 @@ def iter_jobs(
                         )
                     )
     if not jobs:
-        raise ValueError(
-            'No applicable matrix jobs were generated for the given '
-            'datasets/models/modes filters.'
-        )
+        raise ValueError('No applicable matrix jobs were generated for the given datasets/models/modes filters.')
     return jobs
 
 
@@ -337,9 +311,7 @@ def build_cli_overrides(
 
     if job.model == 'patchtst':
         # Required by the approved design: embedding uses add_after_patch.
-        overrides['id_integration'] = (
-            'add_after_patch' if job.mode == 'embedding' else 'concat_to_x'
-        )
+        overrides['id_integration'] = 'add_after_patch' if job.mode == 'embedding' else 'concat_to_x'
     elif job.mode in {'onehot', 'coordinates', 'sinusoidal', 'random'}:
         overrides['id_integration'] = 'concat_to_x'
     elif job.mode == 'embedding':
@@ -361,14 +333,10 @@ def build_cli_overrides(
     if hpo:
         default_max_concurrent, default_gpu_per_trial = recommend_hpo_parallelism(job)
         overrides['hpo_max_concurrent'] = (
-            int(hpo_max_concurrent)
-            if hpo_max_concurrent is not None
-            else default_max_concurrent
+            int(hpo_max_concurrent) if hpo_max_concurrent is not None else default_max_concurrent
         )
         overrides['hpo_resources_gpu'] = (
-            float(hpo_resources_gpu)
-            if hpo_resources_gpu is not None
-            else default_gpu_per_trial
+            float(hpo_resources_gpu) if hpo_resources_gpu is not None else default_gpu_per_trial
         )
     return overrides
 
@@ -438,7 +406,5 @@ def validate_tsl_hparam_coverage(config: dict[str, Any], job: MatrixJob) -> list
     keys = set(search_space.keys())
     missing = sorted(required.difference(keys))
     if missing:
-        raise ValueError(
-            f'Missing TSL-relevant hparams for {job.dataset}/{job.model}: {missing}'
-        )
+        raise ValueError(f'Missing TSL-relevant hparams for {job.dataset}/{job.model}: {missing}')
     return sorted(required)
