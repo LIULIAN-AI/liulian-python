@@ -410,7 +410,13 @@ class Experiment:
                 inner_model_cls = type(torch_model.inner)
                 model_args = getattr(torch_model.inner, '_args', None)
                 _tw_num_stations = int(torch_model.channel_features.shape[0])
-                _tw_mode = str(self.config.get('identifier_mode', 'none'))
+                _tw_mode = str(torch_model.mode)
+                # From the model instance, NOT config (coordinates/station_ids
+                # are never in config) — otherwise the rebuild falls back to
+                # integer ids and coordinates raises.
+                _tw_station_ids = torch_model.station_ids
+                _tw_coords = torch_model._coordinates
+                _tw_seed = int(torch_model.random_seed)
             elif is_entity_wrapped:
                 inner_model_cls = type(torch_model.inner)
                 model_args = getattr(torch_model.inner, '_args', None)
@@ -514,9 +520,9 @@ class Experiment:
                                 self.config.get('random_identifier_dim', 16),
                             )
                         ),
-                        random_seed=int(self.config.get('random_identifier_seed', 2026)),
-                        coordinates=self.config.get('coordinates'),
-                        station_ids=self.config.get('station_ids'),
+                        random_seed=_tw_seed,
+                        coordinates=_tw_coords,
+                        station_ids=_tw_station_ids,
                     )
             else:
                 _model_factory = None

@@ -538,6 +538,17 @@ class ChannelTransparentWrapper(nn.Module):
     ) -> None:
         super().__init__()
         self.inner = inner_model
+        # Stored so an HPO trial can rebuild this wrapper faithfully from the
+        # model instance (NOT from config — coordinates/station_ids are never
+        # written to config). Mirrors EntityTransparentWrapper; without this
+        # the rebuild fell back to integer station ids and the coordinates
+        # mode raised "missing coordinate for ['0','1',...]" (fixed 2026-06-14).
+        self.mode = str(mode)
+        self.station_ids = [str(s) for s in station_ids] if station_ids else None
+        self._coordinates = coordinates
+        self.sinusoidal_dim = int(sinusoidal_dim)
+        self.random_dim = int(random_dim)
+        self.random_seed = int(random_seed)
         features = _build_channel_features(
             mode,
             num_stations,
