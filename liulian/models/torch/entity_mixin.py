@@ -564,12 +564,20 @@ class ChannelTransparentWrapper(nn.Module):
         self.dec_proj = nn.Linear(1 + feat_dim, 1)
 
     def _augment(self, x: torch.Tensor, proj: nn.Linear) -> torch.Tensor:
-        B, T, N = x.shape
-        feats = self.channel_features  # (N, D)
-        feats = feats.unsqueeze(0).unsqueeze(0).expand(B, T, -1, -1)  # (B,T,N,D)
-        x_4d = x.unsqueeze(-1)  # (B, T, N, 1)
-        augmented = torch.cat([x_4d, feats], dim=-1)  # (B, T, N, 1+D)
-        return proj(augmented).squeeze(-1)  # (B, T, N)
+        # proj(cat([x, feats])) is LINEAR, so it equals
+        #   w_val * x + (feats @ w_feat + bias)   [per channel],
+        # which avoids ever materializing the (B, T, N, 1+D) tensor. That
+        # materialization is O(B·T·N²) for onehot (D=N) and OOMs on big mc
+        # datasets (traffic N=862 → ~9 GiB). This form is O(B·T·N + N·D) and
+        # is numerically identical (verified in tests).
+        w = proj.weight  # (1, 1+D)
+        w_val = w[0, 0]
+        w_feat = w[0, 1:]  # (D,)
+        feats = self.channel_features.to(x.dtype)  # (N, D)
+        chan_offset = feats @ w_feat.to(x.dtype)  # (N,)
+        if proj.bias is not None:
+            chan_offset = chan_offset + proj.bias  # (N,)
+        return w_val * x + chan_offset  # (B, T, N), chan_offset broadcasts over N
 
     def forward(
         self,

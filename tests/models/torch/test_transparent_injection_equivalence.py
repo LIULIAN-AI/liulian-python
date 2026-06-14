@@ -134,3 +134,60 @@ def test_swiss_dataset_both_injection_paths_identical(mode: str) -> None:
         w(base_x.unsqueeze(0), entity_ids=torch.tensor([sid_to_idx[str(eid)]]))
         assert w.inner.last_x is not None
         assert torch.equal(w.inner.last_x[0], baked_x)
+
+
+# --------------------------------------------------------------------------- #
+# ChannelTransparentWrapper (multi_channel) — algebraic _augment correctness   #
+# --------------------------------------------------------------------------- #
+from liulian.models.torch.entity_mixin import ChannelTransparentWrapper  # noqa: E402
+
+
+class _IdentInner(nn.Module):
+    """Returns x_enc unchanged so tests can read the augmented tensor."""
+
+    def forward(self, x_enc, x_mark_enc=None, x_dec=None, x_mark_dec=None, mask=None):
+        return x_enc
+
+
+def _materializing_augment(x, proj, feats):
+    """The pre-2026-06-14 O(B·T·N²) reference implementation."""
+    B, T, N = x.shape
+    f = feats.unsqueeze(0).unsqueeze(0).expand(B, T, -1, -1)
+    aug = torch.cat([x.unsqueeze(-1), f], dim=-1)
+    return proj(aug).squeeze(-1)
+
+
+@pytest.mark.parametrize('mode', ['onehot', 'sinusoidal', 'random', 'coordinates'])
+def test_channel_augment_matches_materializing_reference(mode: str) -> None:
+    """The algebraic _augment must equal the old materializing form."""
+    torch.manual_seed(0)
+    w = ChannelTransparentWrapper(
+        _IdentInner(),
+        mode,
+        num_stations=len(IDS),
+        coordinates=COORDS if mode == 'coordinates' else None,
+        sinusoidal_dim=8,
+        random_dim=8,
+        random_seed=7,
+        station_ids=IDS,
+    )
+    x = torch.randn(3, 6, len(IDS))
+    got = w._augment(x, w.enc_proj)
+    ref = _materializing_augment(x, w.enc_proj, w.channel_features)
+    assert torch.allclose(got, ref, atol=1e-5)
+
+
+def test_channel_onehot_does_not_materialize_n_squared() -> None:
+    """onehot on a big channel count must not allocate an (N,N)-per-element
+    tensor — the algebraic path keeps peak work O(B·T·N)."""
+    N = 800  # ~ traffic scale; the old path would build (B,T,N,1+N)
+    w = ChannelTransparentWrapper(
+        _IdentInner(),
+        'onehot',
+        num_stations=N,
+        station_ids=[str(i) for i in range(N)],
+    )
+    x = torch.randn(8, 16, N)
+    out = w(x)  # would OOM-scale under the materializing path
+    assert out.shape == (8, 16, N)
+    assert torch.isfinite(out).all()
